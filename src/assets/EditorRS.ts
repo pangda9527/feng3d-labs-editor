@@ -42,6 +42,8 @@ namespace editor
                 ["resource/template/default.scene.json", "default.scene.json"],
                 ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
                 ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["resource/template/libs/feng2d.js", "libs/feng2d.js"],
+                ["resource/template/libs/feng2d.d.ts", "libs/feng2d.d.ts"],
                 ["resource/template/libs/cannon.js", "libs/cannon.js"],
                 ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
                 ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
@@ -75,8 +77,12 @@ namespace editor
             var urls = [
                 ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
                 ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["../physics/out/physics.js", "libs/physics.js"],
-                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
+                ["../feng2d/out/feng2d.js", "libs/feng2d.js"],
+                ["../feng2d/out/feng2d.d.ts", "libs/feng2d.d.ts"],
+                ["../cannon/cannon/out/cannon.js", "libs/cannon.js"],
+                ["../cannon/cannon/out/cannon.d.ts", "libs/cannon.d.ts"],
+                ["../cannon/cannon-plugin/out/cannon-plugin.js", "libs/cannon-plugin.js"],
+                ["../cannon/cannon-plugin/out/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
             ];
             var index = 0;
             var loadUrls = () =>

@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,7 +22,7 @@ var ts;
 (function (ts) {
     if (!ts.getClassExtendsHeritageElement) {
         ts.getClassExtendsHeritageElement = function (node) {
-            const heritageClause = ts.getHeritageClause(node.heritageClauses, ts.SyntaxKind.ExtendsKeyword);
+            var heritageClause = ts.getHeritageClause(node.heritageClauses, ts.SyntaxKind.ExtendsKeyword);
             return heritageClause && heritageClause.types.length > 0 ? heritageClause.types[0] : undefined;
         };
     }
@@ -35,7 +48,7 @@ var feng3d;
 var egret;
 (function (egret) {
     egret.MouseEvent = egret.TouchEvent;
-    (() => {
+    (function () {
         //映射事件名称
         egret.MouseEvent.MOUSE_DOWN = "mousedown";
         egret.MouseEvent.MIDDLE_MOUSE_DOWN = "middlemousedown";
@@ -52,7 +65,7 @@ var egret;
         //
     })();
     var overDisplayObject;
-    egret.mouseEventEnvironment = () => {
+    egret.mouseEventEnvironment = function () {
         var webTouchHandler;
         var canvas;
         var touch;
@@ -66,7 +79,7 @@ var egret;
         canvas = webTouchHandler.canvas;
         touch = webTouchHandler.touch;
         webTouchHandler.canvas.addEventListener("mousemove", onMouseMove);
-        feng3d.windowEventProxy.on("mousedown", (e) => {
+        feng3d.windowEventProxy.on("mousedown", function (e) {
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
@@ -83,7 +96,7 @@ var egret;
                 egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.RIGHT_MOUSE_DOWN, true, true, x, y);
             }
         });
-        feng3d.windowEventProxy.on("mouseup", (e) => {
+        feng3d.windowEventProxy.on("mouseup", function (e) {
             //右键按下
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
@@ -109,7 +122,7 @@ var egret;
             }
             mousedownObject = null;
         });
-        feng3d.windowEventProxy.on("dblclick", (e) => {
+        feng3d.windowEventProxy.on("dblclick", function (e) {
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
@@ -117,7 +130,7 @@ var egret;
             egret.TouchEvent.dispatchTouchEvent(target, egret.MouseEvent.DOUBLE_CLICK, true, true, x, y);
         });
         // 调试，查看鼠标下的对象
-        feng3d.windowEventProxy.on("keyup", (e) => {
+        feng3d.windowEventProxy.on("keyup", function (e) {
             if (e.key == "p") {
                 var location = webTouchHandler.getLocation(e);
                 var target = touch["findTarget"](location.x, location.y);
@@ -254,7 +267,7 @@ var egret;
  *--------------------------------------------------------------------------------------------*/
 var json;
 (function (json) {
-    let ParseOptions;
+    var ParseOptions;
     (function (ParseOptions) {
         ParseOptions.DEFAULT = {
             allowTrailingComma: true
@@ -264,13 +277,14 @@ var json;
      * Creates a JSON scanner on the given text.
      * If ignoreTrivia is set, whitespaces or comments are ignored.
      */
-    function createScanner(text, ignoreTrivia = false) {
-        let pos = 0, len = text.length, value = '', tokenOffset = 0, token = 16 /* Unknown */, scanError = 0 /* None */;
+    function createScanner(text, ignoreTrivia) {
+        if (ignoreTrivia === void 0) { ignoreTrivia = false; }
+        var pos = 0, len = text.length, value = '', tokenOffset = 0, token = 16 /* Unknown */, scanError = 0 /* None */;
         function scanHexDigits(count) {
-            let digits = 0;
-            let value = 0;
+            var digits = 0;
+            var value = 0;
             while (digits < count) {
-                const ch = text.charCodeAt(pos);
+                var ch = text.charCodeAt(pos);
                 if (ch >= 48 /* _0 */ && ch <= 57 /* _9 */) {
                     value = value * 16 + ch - 48 /* _0 */;
                 }
@@ -299,7 +313,7 @@ var json;
             scanError = 0 /* None */;
         }
         function scanNumber() {
-            const start = pos;
+            var start = pos;
             if (text.charCodeAt(pos) === 48 /* _0 */) {
                 pos++;
             }
@@ -322,7 +336,7 @@ var json;
                     return text.substring(start, pos);
                 }
             }
-            let end = pos;
+            var end = pos;
             if (pos < text.length && (text.charCodeAt(pos) === 69 /* E */ || text.charCodeAt(pos) === 101 /* e */)) {
                 pos++;
                 if (pos < text.length && text.charCodeAt(pos) === 43 /* plus */ || text.charCodeAt(pos) === 45 /* minus */) {
@@ -342,14 +356,14 @@ var json;
             return text.substring(start, end);
         }
         function scanString() {
-            let result = '', start = pos;
+            var result = '', start = pos;
             while (true) {
                 if (pos >= len) {
                     result += text.substring(start, pos);
                     scanError = 2 /* UnexpectedEndOfString */;
                     break;
                 }
-                let ch = text.charCodeAt(pos);
+                var ch = text.charCodeAt(pos);
                 if (ch === 34 /* doubleQuote */) {
                     result += text.substring(start, pos);
                     pos++;
@@ -389,9 +403,9 @@ var json;
                             result += '\t';
                             break;
                         case 117 /* u */:
-                            const ch = scanHexDigits(4);
-                            if (ch >= 0) {
-                                result += String.fromCharCode(ch);
+                            var ch_1 = scanHexDigits(4);
+                            if (ch_1 >= 0) {
+                                result += String.fromCharCode(ch_1);
                             }
                             else {
                                 scanError = 4 /* InvalidUnicode */;
@@ -427,7 +441,7 @@ var json;
                 tokenOffset = len;
                 return token = 17 /* EOF */;
             }
-            let code = text.charCodeAt(pos);
+            var code = text.charCodeAt(pos);
             // trivia: whitespace
             if (isWhiteSpace(code)) {
                 do {
@@ -474,7 +488,7 @@ var json;
                     return token = 10 /* StringLiteral */;
                 // comments
                 case 47 /* slash */:
-                    const start = pos - 1;
+                    var start = pos - 1;
                     // Single-line comment
                     if (text.charCodeAt(pos + 1) === 47 /* slash */) {
                         pos += 2;
@@ -490,10 +504,10 @@ var json;
                     // Multi-line comment
                     if (text.charCodeAt(pos + 1) === 42 /* asterisk */) {
                         pos += 2;
-                        const safeLength = len - 1; // For lookahead.
-                        let commentClosed = false;
+                        var safeLength = len - 1; // For lookahead.
+                        var commentClosed = false;
                         while (pos < safeLength) {
-                            const ch = text.charCodeAt(pos);
+                            var ch = text.charCodeAt(pos);
                             if (ch === 42 /* asterisk */ && text.charCodeAt(pos + 1) === 47 /* slash */) {
                                 pos += 2;
                                 commentClosed = true;
@@ -575,7 +589,7 @@ var json;
             return true;
         }
         function scanNextNonTrivia() {
-            let result;
+            var result;
             do {
                 result = scanNext();
             } while (result >= 12 /* LineCommentTrivia */ && result <= 15 /* Trivia */);
@@ -583,13 +597,13 @@ var json;
         }
         return {
             setPosition: setPosition,
-            getPosition: () => pos,
+            getPosition: function () { return pos; },
             scan: ignoreTrivia ? scanNextNonTrivia : scanNext,
-            getToken: () => token,
-            getTokenValue: () => value,
-            getTokenOffset: () => tokenOffset,
-            getTokenLength: () => pos - tokenOffset,
-            getTokenError: () => scanError
+            getToken: function () { return token; },
+            getTokenValue: function () { return value; },
+            getTokenOffset: function () { return tokenOffset; },
+            getTokenLength: function () { return pos - tokenOffset; },
+            getTokenError: function () { return scanError; }
         };
     }
     json.createScanner = createScanner;
@@ -608,17 +622,17 @@ var json;
      * For a given offset, evaluate the location in the JSON document. Each segment in the location path is either a property name or an array index.
      */
     function getLocation(text, position) {
-        const segments = []; // strings or numbers
-        const earlyReturnException = new Object();
-        let previousNode = undefined;
-        const previousNodeInst = {
+        var segments = []; // strings or numbers
+        var earlyReturnException = new Object();
+        var previousNode = undefined;
+        var previousNodeInst = {
             value: {},
             offset: 0,
             length: 0,
             type: 'object',
             parent: undefined
         };
-        let isAtPropertyKey = false;
+        var isAtPropertyKey = false;
         function setPreviousNode(value, offset, length, type) {
             previousNodeInst.value = value;
             previousNodeInst.offset = offset;
@@ -629,7 +643,7 @@ var json;
         }
         try {
             visit(text, {
-                onObjectBegin: (offset, length) => {
+                onObjectBegin: function (offset, length) {
                     if (position <= offset) {
                         throw earlyReturnException;
                     }
@@ -637,7 +651,7 @@ var json;
                     isAtPropertyKey = position > offset;
                     segments.push(''); // push a placeholder (will be replaced)
                 },
-                onObjectProperty: (name, offset, length) => {
+                onObjectProperty: function (name, offset, length) {
                     if (position < offset) {
                         throw earlyReturnException;
                     }
@@ -647,28 +661,28 @@ var json;
                         throw earlyReturnException;
                     }
                 },
-                onObjectEnd: (offset, length) => {
+                onObjectEnd: function (offset, length) {
                     if (position <= offset) {
                         throw earlyReturnException;
                     }
                     previousNode = undefined;
                     segments.pop();
                 },
-                onArrayBegin: (offset, length) => {
+                onArrayBegin: function (offset, length) {
                     if (position <= offset) {
                         throw earlyReturnException;
                     }
                     previousNode = undefined;
                     segments.push(0);
                 },
-                onArrayEnd: (offset, length) => {
+                onArrayEnd: function (offset, length) {
                     if (position <= offset) {
                         throw earlyReturnException;
                     }
                     previousNode = undefined;
                     segments.pop();
                 },
-                onLiteralValue: (value, offset, length) => {
+                onLiteralValue: function (value, offset, length) {
                     if (position < offset) {
                         throw earlyReturnException;
                     }
@@ -677,7 +691,7 @@ var json;
                         throw earlyReturnException;
                     }
                 },
-                onSeparator: (sep, offset, length) => {
+                onSeparator: function (sep, offset, length) {
                     if (position <= offset) {
                         throw earlyReturnException;
                     }
@@ -687,7 +701,7 @@ var json;
                         previousNode = undefined;
                     }
                     else if (sep === ',') {
-                        const last = segments[segments.length - 1];
+                        var last = segments[segments.length - 1];
                         if (typeof last === 'number') {
                             segments[segments.length - 1] = last + 1;
                         }
@@ -707,11 +721,11 @@ var json;
         }
         return {
             path: segments,
-            previousNode,
-            isAtPropertyKey,
-            matches: (pattern) => {
-                let k = 0;
-                for (let i = 0; k < pattern.length && i < segments.length; i++) {
+            previousNode: previousNode,
+            isAtPropertyKey: isAtPropertyKey,
+            matches: function (pattern) {
+                var k = 0;
+                for (var i = 0; k < pattern.length && i < segments.length; i++) {
                     if (pattern[k] === segments[i] || pattern[k] === '*') {
                         k++;
                     }
@@ -728,10 +742,12 @@ var json;
      * Parses the given text and returns the object the JSON content represents. On invalid input, the parser tries to be as fault tolerant as possible, but still return a result.
      * Therefore always check the errors list to find out if the input was valid.
      */
-    function parse(text, errors = [], options = ParseOptions.DEFAULT) {
-        let currentProperty = null;
-        let currentParent = [];
-        const previousParents = [];
+    function parse(text, errors, options) {
+        if (errors === void 0) { errors = []; }
+        if (options === void 0) { options = ParseOptions.DEFAULT; }
+        var currentProperty = null;
+        var currentParent = [];
+        var previousParents = [];
         function onValue(value) {
             if (Array.isArray(currentParent)) {
                 currentParent.push(value);
@@ -740,33 +756,33 @@ var json;
                 currentParent[currentProperty] = value;
             }
         }
-        const visitor = {
-            onObjectBegin: () => {
-                const object = {};
+        var visitor = {
+            onObjectBegin: function () {
+                var object = {};
                 onValue(object);
                 previousParents.push(currentParent);
                 currentParent = object;
                 currentProperty = null;
             },
-            onObjectProperty: (name) => {
+            onObjectProperty: function (name) {
                 currentProperty = name;
             },
-            onObjectEnd: () => {
+            onObjectEnd: function () {
                 currentParent = previousParents.pop();
             },
-            onArrayBegin: () => {
-                const array = [];
+            onArrayBegin: function () {
+                var array = [];
                 onValue(array);
                 previousParents.push(currentParent);
                 currentParent = array;
                 currentProperty = null;
             },
-            onArrayEnd: () => {
+            onArrayEnd: function () {
                 currentParent = previousParents.pop();
             },
             onLiteralValue: onValue,
-            onError: (error, offset, length) => {
-                errors.push({ error, offset, length });
+            onError: function (error, offset, length) {
+                errors.push({ error: error, offset: offset, length: length });
             }
         };
         visit(text, visitor, options);
@@ -776,8 +792,10 @@ var json;
     /**
      * Parses the given text and returns a tree representation the JSON content. On invalid input, the parser tries to be as fault tolerant as possible, but still return a result.
      */
-    function parseTree(text, errors = [], options = ParseOptions.DEFAULT) {
-        let currentParent = { type: 'array', offset: -1, length: -1, children: [], parent: undefined }; // artificial root
+    function parseTree(text, errors, options) {
+        if (errors === void 0) { errors = []; }
+        if (options === void 0) { options = ParseOptions.DEFAULT; }
+        var currentParent = { type: 'array', offset: -1, length: -1, children: [], parent: undefined }; // artificial root
         function ensurePropertyComplete(endOffset) {
             if (currentParent.type === 'property') {
                 currentParent.length = endOffset - currentParent.offset;
@@ -788,32 +806,32 @@ var json;
             currentParent.children.push(valueNode);
             return valueNode;
         }
-        const visitor = {
-            onObjectBegin: (offset) => {
-                currentParent = onValue({ type: 'object', offset, length: -1, parent: currentParent, children: [] });
+        var visitor = {
+            onObjectBegin: function (offset) {
+                currentParent = onValue({ type: 'object', offset: offset, length: -1, parent: currentParent, children: [] });
             },
-            onObjectProperty: (name, offset, length) => {
-                currentParent = onValue({ type: 'property', offset, length: -1, parent: currentParent, children: [] });
-                currentParent.children.push({ type: 'string', value: name, offset, length, parent: currentParent });
+            onObjectProperty: function (name, offset, length) {
+                currentParent = onValue({ type: 'property', offset: offset, length: -1, parent: currentParent, children: [] });
+                currentParent.children.push({ type: 'string', value: name, offset: offset, length: length, parent: currentParent });
             },
-            onObjectEnd: (offset, length) => {
+            onObjectEnd: function (offset, length) {
                 currentParent.length = offset + length - currentParent.offset;
                 currentParent = currentParent.parent;
                 ensurePropertyComplete(offset + length);
             },
-            onArrayBegin: (offset, length) => {
-                currentParent = onValue({ type: 'array', offset, length: -1, parent: currentParent, children: [] });
+            onArrayBegin: function (offset, length) {
+                currentParent = onValue({ type: 'array', offset: offset, length: -1, parent: currentParent, children: [] });
             },
-            onArrayEnd: (offset, length) => {
+            onArrayEnd: function (offset, length) {
                 currentParent.length = offset + length - currentParent.offset;
                 currentParent = currentParent.parent;
                 ensurePropertyComplete(offset + length);
             },
-            onLiteralValue: (value, offset, length) => {
-                onValue({ type: getLiteralNodeType(value), offset, length, parent: currentParent, value });
+            onLiteralValue: function (value, offset, length) {
+                onValue({ type: getLiteralNodeType(value), offset: offset, length: length, parent: currentParent, value: value });
                 ensurePropertyComplete(offset + length);
             },
-            onSeparator: (sep, offset, length) => {
+            onSeparator: function (sep, offset, length) {
                 if (currentParent.type === 'property') {
                     if (sep === ':') {
                         currentParent.colonOffset = offset;
@@ -823,12 +841,12 @@ var json;
                     }
                 }
             },
-            onError: (error, offset, length) => {
-                errors.push({ error, offset, length });
+            onError: function (error, offset, length) {
+                errors.push({ error: error, offset: offset, length: length });
             }
         };
         visit(text, visitor, options);
-        const result = currentParent.children[0];
+        var result = currentParent.children[0];
         if (result) {
             delete result.parent;
         }
@@ -842,14 +860,16 @@ var json;
         if (!root) {
             return undefined;
         }
-        let node = root;
-        for (let segment of path) {
+        var node = root;
+        for (var _i = 0, path_1 = path; _i < path_1.length; _i++) {
+            var segment = path_1[_i];
             if (typeof segment === 'string') {
                 if (node.type !== 'object' || !Array.isArray(node.children)) {
                     return undefined;
                 }
-                let found = false;
-                for (const propertyNode of node.children) {
+                var found = false;
+                for (var _a = 0, _b = node.children; _a < _b.length; _a++) {
+                    var propertyNode = _b[_a];
                     if (Array.isArray(propertyNode.children) && propertyNode.children[0].value === segment) {
                         node = propertyNode.children[1];
                         found = true;
@@ -861,7 +881,7 @@ var json;
                 }
             }
             else {
-                const index = segment;
+                var index = segment;
                 if (node.type !== 'array' || index < 0 || !Array.isArray(node.children) || index >= node.children.length) {
                     return undefined;
                 }
@@ -878,13 +898,13 @@ var json;
         if (!node.parent || !node.parent.children) {
             return [];
         }
-        const path = getNodePath(node.parent);
+        var path = getNodePath(node.parent);
         if (node.parent.type === 'property') {
-            const key = node.parent.children[0].value;
+            var key = node.parent.children[0].value;
             path.push(key);
         }
         else if (node.parent.type === 'array') {
-            const index = node.parent.children.indexOf(node);
+            var index = node.parent.children.indexOf(node);
             if (index !== -1) {
                 path.push(index);
             }
@@ -900,9 +920,10 @@ var json;
             case 'array':
                 return node.children.map(getNodeValue);
             case 'object':
-                const obj = Object.create(null);
-                for (let prop of node.children) {
-                    const valueNode = prop.children[1];
+                var obj = Object.create(null);
+                for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+                    var prop = _a[_i];
+                    var valueNode = prop.children[1];
                     if (valueNode) {
                         obj[prop.children[0].value] = getNodeValue(valueNode);
                     }
@@ -918,19 +939,21 @@ var json;
         }
     }
     json.getNodeValue = getNodeValue;
-    function contains(node, offset, includeRightBound = false) {
+    function contains(node, offset, includeRightBound) {
+        if (includeRightBound === void 0) { includeRightBound = false; }
         return (offset >= node.offset && offset < (node.offset + node.length)) || includeRightBound && (offset === (node.offset + node.length));
     }
     json.contains = contains;
     /**
      * Finds the most inner node at the given offset. If includeRightBound is set, also finds nodes that end at the given offset.
      */
-    function findNodeAtOffset(node, offset, includeRightBound = false) {
+    function findNodeAtOffset(node, offset, includeRightBound) {
+        if (includeRightBound === void 0) { includeRightBound = false; }
         if (contains(node, offset, includeRightBound)) {
-            const children = node.children;
+            var children = node.children;
             if (Array.isArray(children)) {
-                for (let i = 0; i < children.length && children[i].offset <= offset; i++) {
-                    const item = findNodeAtOffset(children[i], offset, includeRightBound);
+                for (var i = 0; i < children.length && children[i].offset <= offset; i++) {
+                    var item = findNodeAtOffset(children[i], offset, includeRightBound);
                     if (item) {
                         return item;
                     }
@@ -944,20 +967,21 @@ var json;
     /**
      * Parses the given text and invokes the visitor functions for each object, array and literal reached.
      */
-    function visit(text, visitor, options = ParseOptions.DEFAULT) {
-        const _scanner = createScanner(text, false);
+    function visit(text, visitor, options) {
+        if (options === void 0) { options = ParseOptions.DEFAULT; }
+        var _scanner = createScanner(text, false);
         function toNoArgVisit(visitFunction) {
-            return visitFunction ? () => visitFunction(_scanner.getTokenOffset(), _scanner.getTokenLength()) : () => true;
+            return visitFunction ? function () { return visitFunction(_scanner.getTokenOffset(), _scanner.getTokenLength()); } : function () { return true; };
         }
         function toOneArgVisit(visitFunction) {
-            return visitFunction ? (arg) => visitFunction(arg, _scanner.getTokenOffset(), _scanner.getTokenLength()) : () => true;
+            return visitFunction ? function (arg) { return visitFunction(arg, _scanner.getTokenOffset(), _scanner.getTokenLength()); } : function () { return true; };
         }
-        const onObjectBegin = toNoArgVisit(visitor.onObjectBegin), onObjectProperty = toOneArgVisit(visitor.onObjectProperty), onObjectEnd = toNoArgVisit(visitor.onObjectEnd), onArrayBegin = toNoArgVisit(visitor.onArrayBegin), onArrayEnd = toNoArgVisit(visitor.onArrayEnd), onLiteralValue = toOneArgVisit(visitor.onLiteralValue), onSeparator = toOneArgVisit(visitor.onSeparator), onComment = toNoArgVisit(visitor.onComment), onError = toOneArgVisit(visitor.onError);
-        const disallowComments = options && options.disallowComments;
-        const allowTrailingComma = options && options.allowTrailingComma;
+        var onObjectBegin = toNoArgVisit(visitor.onObjectBegin), onObjectProperty = toOneArgVisit(visitor.onObjectProperty), onObjectEnd = toNoArgVisit(visitor.onObjectEnd), onArrayBegin = toNoArgVisit(visitor.onArrayBegin), onArrayEnd = toNoArgVisit(visitor.onArrayEnd), onLiteralValue = toOneArgVisit(visitor.onLiteralValue), onSeparator = toOneArgVisit(visitor.onSeparator), onComment = toNoArgVisit(visitor.onComment), onError = toOneArgVisit(visitor.onError);
+        var disallowComments = options && options.disallowComments;
+        var allowTrailingComma = options && options.allowTrailingComma;
         function scanNext() {
             while (true) {
-                const token = _scanner.scan();
+                var token = _scanner.scan();
                 switch (_scanner.getTokenError()) {
                     case 4 /* InvalidUnicode */:
                         handleError(14 /* InvalidUnicode */);
@@ -1001,10 +1025,12 @@ var json;
                 }
             }
         }
-        function handleError(error, skipUntilAfter = [], skipUntil = []) {
+        function handleError(error, skipUntilAfter, skipUntil) {
+            if (skipUntilAfter === void 0) { skipUntilAfter = []; }
+            if (skipUntil === void 0) { skipUntil = []; }
             onError(error);
             if (skipUntilAfter.length + skipUntil.length > 0) {
-                let token = _scanner.getToken();
+                var token = _scanner.getToken();
                 while (token !== 17 /* EOF */) {
                     if (skipUntilAfter.indexOf(token) !== -1) {
                         scanNext();
@@ -1018,7 +1044,7 @@ var json;
             }
         }
         function parseString(isValue) {
-            const value = _scanner.getTokenValue();
+            var value = _scanner.getTokenValue();
             if (isValue) {
                 onLiteralValue(value);
             }
@@ -1031,7 +1057,7 @@ var json;
         function parseLiteral() {
             switch (_scanner.getToken()) {
                 case 11 /* NumericLiteral */:
-                    let value = 0;
+                    var value = 0;
                     try {
                         value = JSON.parse(_scanner.getTokenValue());
                         if (typeof value !== 'number') {
@@ -1080,7 +1106,7 @@ var json;
         function parseObject() {
             onObjectBegin();
             scanNext(); // consume open brace
-            let needsComma = false;
+            var needsComma = false;
             while (_scanner.getToken() !== 2 /* CloseBraceToken */ && _scanner.getToken() !== 17 /* EOF */) {
                 if (_scanner.getToken() === 5 /* CommaToken */) {
                     if (!needsComma) {
@@ -1112,7 +1138,7 @@ var json;
         function parseArray() {
             onArrayBegin();
             scanNext(); // consume open bracket
-            let needsComma = false;
+            var needsComma = false;
             while (_scanner.getToken() !== 4 /* CloseBracketToken */ && _scanner.getToken() !== 17 /* EOF */) {
                 if (_scanner.getToken() === 5 /* CommaToken */) {
                     if (!needsComma) {
@@ -1173,7 +1199,7 @@ var json;
      * of comments with a replaceCharacter
      */
     function stripComments(text, replaceCh) {
-        let _scanner = createScanner(text), parts = [], kind, offset = 0, pos;
+        var _scanner = createScanner(text), parts = [], kind, offset = 0, pos;
         do {
             pos = _scanner.getPosition();
             kind = _scanner.scan();
@@ -1233,9 +1259,9 @@ var editor;
      * @param param 参数
      */
     function getHttpUrl(template, param) {
-        for (const key in param) {
+        for (var key in param) {
             if (param.hasOwnProperty(key)) {
-                template = template.replace(`{${key}}`, param[key]);
+                template = template.replace("{" + key + "}", param[key]);
             }
         }
         return template;
@@ -1243,19 +1269,21 @@ var editor;
     /**
      * gitee 认证授权
      */
-    class GiteeOauth {
+    var GiteeOauth = /** @class */ (function () {
+        function GiteeOauth() {
+        }
         /**
          * 认证授权
          *
          * @param callback 完成回调
          */
-        oauth(callback) {
-            var app = apps.filter(v => document.URL.indexOf(v.redirect_uri) == 0)[0];
+        GiteeOauth.prototype.oauth = function (callback) {
+            var app = apps.filter(function (v) { return document.URL.indexOf(v.redirect_uri) == 0; })[0];
             if (app) {
                 if (document.URL.indexOf("code=") != -1) {
                     app.code = document.URL.substring(document.URL.indexOf("code=") + "code=".length);
                     currentAPP = app;
-                    alert(`已认证授权`);
+                    alert("\u5DF2\u8BA4\u8BC1\u6388\u6743");
                     this.getAccessToken();
                     // this.getUser();
                     return;
@@ -1266,17 +1294,17 @@ var editor;
                 }
             }
             else {
-                alert(`gitee认证只支持 ${apps.map(v => v.redirect_uri).toString()}`);
+                alert("gitee\u8BA4\u8BC1\u53EA\u652F\u6301 " + apps.map(function (v) { return v.redirect_uri; }).toString());
             }
-        }
-        getAccessToken() {
+        };
+        GiteeOauth.prototype.getAccessToken = function () {
             var urls = getHttpUrl(giteeAPIHttps.token, currentAPP).split("?");
             var url = urls[0];
             var body = urls[1];
             var xhr = new XMLHttpRequest();
             //Send the proper header information along with the request
             // xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = (ev) => {
+            xhr.onreadystatechange = function (ev) {
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                     // Request finished. Do processing here.
                 }
@@ -1284,10 +1312,10 @@ var editor;
             xhr.open('POST', url, true);
             xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
             xhr.send(body);
-        }
-        getUser() {
+        };
+        GiteeOauth.prototype.getUser = function () {
             var request = new XMLHttpRequest();
-            request.onreadystatechange = (ev) => {
+            request.onreadystatechange = function (ev) {
                 var result = ev.type;
                 if (request.readyState == 4) { // 4 = "loaded"
                     request.onreadystatechange = null;
@@ -1306,10 +1334,11 @@ var editor;
                     // callbackFn(path, result, ev.defaultPrevented, request.responseText);
                 }
             };
-            request.open('Get', `https://gitee.com/api/v5/user?access_token=${currentAPP.access_token}`, true);
+            request.open('Get', "https://gitee.com/api/v5/user?access_token=" + currentAPP.access_token, true);
             request.send();
-        }
-    }
+        };
+        return GiteeOauth;
+    }());
     editor.GiteeOauth = GiteeOauth;
     editor.giteeOauth = new GiteeOauth();
 })(editor || (editor = {}));
@@ -1335,7 +1364,7 @@ var editor;
      * -- 其他端支持绝对路径
      * Created by kds on 2017/1/21 0021.
      */
-    class FileObject {
+    var FileObject = /** @class */ (function () {
         /**
          * 构造函数
          *  -- 当存在path且isGetFileInfo==true的时候会自动探索基本信息
@@ -1349,131 +1378,177 @@ var editor;
          * @param onError 当错误时返回 onError([object FileObject])
          * @param isGetFileInfo 初始就获取下该文件的基本信息
          */
-        constructor(path, onComplete, thisPtr, onError, isGetFileInfo) {
+        function FileObject(path, onComplete, thisPtr, onError, isGetFileInfo) {
             this.updateStats(path, null, onComplete, onError);
         }
         /**
          * 判断文件名是否合法
          * @param fileName 文件名
          */
-        static isLegalName(fileName) {
+        FileObject.isLegalName = function (fileName) {
             return true;
-        }
-        /**
-         * 文件/文件夹是否存在 基本探索过后才可知道是否存在
-         */
-        get exists() {
-            return this._exists;
-        }
-        /**
-         * 文件尺寸
-         */
-        get size() {
-            return this._size;
-        }
-        /**
-         * 是否是文件夹
-         */
-        get isDirectory() {
-            return this._isDirectory;
-        }
-        /**
-         * 创建日期
-         */
-        get createDate() {
-            return this._createDate;
-        }
-        /**
-         * 上次修改日期
-         */
-        get lastModifyDate() {
-            return this._lastModifyDate;
-        }
-        /**
-         * 路径
-         * -- WEB端是相对路径
-         * -- 其他端支持绝对路径 file:///xxx/yyy
-         */
-        get path() {
-            return this._path;
-        }
-        /**
-         * 文件或文件夹名 xxx.ks
-         */
-        get fileName() {
-            var fileName = this.path.split("/").pop();
-            return fileName;
-        }
-        /**
-         * 不包含格式的文件名称 如 xxx.ks就是xxx
-         */
-        get fileNameWithoutExt() {
-            var fileName = this.fileName;
-            var fileNameWithoutExt = (fileName.indexOf(".") == -1) ? fileName : fileName.substring(0, fileName.lastIndexOf("."));
-            return fileNameWithoutExt;
-        }
-        /**
-         * 当前文件/文件夹所在的相对路径（即父文件夹path）如  serverRun/abc/xxx.ks 的location就是serverRun/abc
-         */
-        get location() {
-            var paths = this.path.split("/");
-            paths.pop();
-            var location = paths.join("/");
-            return location;
-        }
-        /**
-         * 绝对路径
-         * -- WEB端的是 http://xxxx
-         * -- 其他端的是 file:///xxxx
-         */
-        get fullPath() {
-            return this._path;
-        }
-        /**
-         * 格式
-         */
-        get extension() {
-            var fileName = this.fileName;
-            if (fileName.indexOf(".") == -1)
-                return "";
-            var extension = fileName.split(".").pop();
-            return extension;
-        }
+        };
+        Object.defineProperty(FileObject.prototype, "exists", {
+            /**
+             * 文件/文件夹是否存在 基本探索过后才可知道是否存在
+             */
+            get: function () {
+                return this._exists;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "size", {
+            /**
+             * 文件尺寸
+             */
+            get: function () {
+                return this._size;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "isDirectory", {
+            /**
+             * 是否是文件夹
+             */
+            get: function () {
+                return this._isDirectory;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "createDate", {
+            /**
+             * 创建日期
+             */
+            get: function () {
+                return this._createDate;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "lastModifyDate", {
+            /**
+             * 上次修改日期
+             */
+            get: function () {
+                return this._lastModifyDate;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "path", {
+            /**
+             * 路径
+             * -- WEB端是相对路径
+             * -- 其他端支持绝对路径 file:///xxx/yyy
+             */
+            get: function () {
+                return this._path;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "fileName", {
+            /**
+             * 文件或文件夹名 xxx.ks
+             */
+            get: function () {
+                var fileName = this.path.split("/").pop();
+                return fileName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "fileNameWithoutExt", {
+            /**
+             * 不包含格式的文件名称 如 xxx.ks就是xxx
+             */
+            get: function () {
+                var fileName = this.fileName;
+                var fileNameWithoutExt = (fileName.indexOf(".") == -1) ? fileName : fileName.substring(0, fileName.lastIndexOf("."));
+                return fileNameWithoutExt;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "location", {
+            /**
+             * 当前文件/文件夹所在的相对路径（即父文件夹path）如  serverRun/abc/xxx.ks 的location就是serverRun/abc
+             */
+            get: function () {
+                var paths = this.path.split("/");
+                paths.pop();
+                var location = paths.join("/");
+                return location;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "fullPath", {
+            /**
+             * 绝对路径
+             * -- WEB端的是 http://xxxx
+             * -- 其他端的是 file:///xxxx
+             */
+            get: function () {
+                return this._path;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(FileObject.prototype, "extension", {
+            /**
+             * 格式
+             */
+            get: function () {
+                var fileName = this.fileName;
+                if (fileName.indexOf(".") == -1)
+                    return "";
+                var extension = fileName.split(".").pop();
+                return extension;
+            },
+            enumerable: false,
+            configurable: true
+        });
         /**
          * 获取该文件下的目录
          * @param onComplete 当完成时回调 onComplete([object FileObject],null/[FileObject数组])
          * @param onError 失败时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        getDirectoryListing(onComplete, onError, thisPtr) {
-            editor.editorRS.fs.readdir(this._path, (err, files) => {
+        FileObject.prototype.getDirectoryListing = function (onComplete, onError, thisPtr) {
+            var _this = this;
+            editor.editorRS.fs.readdir(this._path, function (err, files) {
                 if (err) {
                     console.warn(err);
-                    onError(this);
+                    onError(_this);
                 }
                 else {
-                    onComplete(this, files);
+                    onComplete(_this, files);
                 }
             });
-        }
+        };
         /**
          * 创建文件夹
          * @param onComplete 完成时回调 onComplete([object FileObject])
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        createDirectory(onComplete, onError, thisPtr) {
-            editor.editorRS.fs.mkdir(this._path, (err) => {
+        FileObject.prototype.createDirectory = function (onComplete, onError, thisPtr) {
+            var _this = this;
+            editor.editorRS.fs.mkdir(this._path, function (err) {
                 if (err) {
-                    console.warn(this);
-                    onError(this);
+                    console.warn(_this);
+                    onError(_this);
                     return;
                 }
-                this.updateStats(this._path, () => {
-                    onComplete(this);
+                _this.updateStats(_this._path, function () {
+                    onComplete(_this);
                 });
             });
-        }
+        };
         /**
          * 创建文件
          * @param content 初次创建时的内容 一般可为""
@@ -1481,9 +1556,9 @@ var editor;
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        createFile(content, onComplete, onError, thisPtr) {
+        FileObject.prototype.createFile = function (content, onComplete, onError, thisPtr) {
             this.saveFile(content, onComplete, onError, thisPtr);
-        }
+        };
         /**
          * 储存文件（文本格式）
          * @param content 文件内容文本
@@ -1491,23 +1566,24 @@ var editor;
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        saveFile(content, onComplete, onError, thisPtr) {
+        FileObject.prototype.saveFile = function (content, onComplete, onError, thisPtr) {
+            var _this = this;
             if (typeof content == "string") {
                 var uint8Array = feng3d.dataTransform.stringToArrayBuffer(content);
                 this.saveFile(uint8Array, onComplete, onError, thisPtr);
                 return;
             }
-            editor.editorRS.fs.writeArrayBuffer(this._path, content, (err) => {
+            editor.editorRS.fs.writeArrayBuffer(this._path, content, function (err) {
                 if (err) {
-                    onError(this);
+                    onError(_this);
                 }
                 else {
-                    this.updateStats(this._path, () => {
-                        onComplete(this);
+                    _this.updateStats(_this._path, function () {
+                        onComplete(_this);
                     });
                 }
             });
-        }
+        };
         /**
          * 重命名
          * @param newName 重命名
@@ -1515,20 +1591,21 @@ var editor;
          * @param onError 错误时回调 onError([object FileObject])
          * @param thisPtr 执行域
          */
-        rename(newName, onComplete, onError, thisPtr) {
+        FileObject.prototype.rename = function (newName, onComplete, onError, thisPtr) {
+            var _this = this;
             var oldPath = this._path;
             var newPath = this.location ? (this.location + "/" + newName) : newName;
-            editor.editorRS.fs.rename(oldPath, newPath, (err) => {
+            editor.editorRS.fs.rename(oldPath, newPath, function (err) {
                 if (err) {
                     console.warn(err);
-                    onError(this);
+                    onError(_this);
                     return;
                 }
-                this.updateStats(newPath, () => {
-                    onComplete(this);
+                _this.updateStats(newPath, function () {
+                    onComplete(_this);
                 });
             });
-        }
+        };
         /**
          * 移动文件夹
          * @param newPath 新的路径
@@ -1536,66 +1613,70 @@ var editor;
          * @param onError 失败时回调  onError([object FileObject])
          * @param thisPtr 执行域
          */
-        move(newPath, onComplete, onError, thisPtr) {
-            editor.editorRS.fs.move(this._path, newPath, (err) => {
+        FileObject.prototype.move = function (newPath, onComplete, onError, thisPtr) {
+            var _this = this;
+            editor.editorRS.fs.move(this._path, newPath, function (err) {
                 if (err) {
                     console.warn(err);
-                    onError(this);
+                    onError(_this);
                     return;
                 }
-                this.updateStats(newPath, () => {
-                    onComplete(this);
+                _this.updateStats(newPath, function () {
+                    onComplete(_this);
                 });
             });
-        }
+        };
         /**
          * 删除文件（夹）
          * @param onComplete onComplete([object FileObject])
          * @param onError onError([object FileObject])
          * @param thisPtr 执行域
          */
-        delete(onComplete, onError, thisPtr) {
-            editor.editorRS.fs.delete(this._path, (err) => {
+        FileObject.prototype.delete = function (onComplete, onError, thisPtr) {
+            var _this = this;
+            editor.editorRS.fs.delete(this._path, function (err) {
                 if (err) {
                     console.warn(err);
-                    onError(this);
+                    onError(_this);
                     return;
                 }
-                this._exists = false;
-                onComplete(this);
+                _this._exists = false;
+                onComplete(_this);
             });
-        }
+        };
         /**
          * 打开文件
          * @param onFin 完成时回调 onFin(txt:string)
          * @param onError 错误时回调 onError([fileObject])
          */
-        open(onFin, onError) {
+        FileObject.prototype.open = function (onFin, onError) {
             throw "未实现";
-        }
+        };
         /**
          * 更新状态
          * @param callback 回调函数
          */
-        updateStats(path, callback, onComplete, onError) {
-            editor.editorRS.fs.exists(path, (exists) => {
+        FileObject.prototype.updateStats = function (path, callback, onComplete, onError) {
+            var _this = this;
+            editor.editorRS.fs.exists(path, function (exists) {
                 if (!exists) {
-                    this._exists = false;
-                    onError && onError(this);
+                    _this._exists = false;
+                    onError && onError(_this);
                 }
                 else {
-                    this._exists = true;
-                    this._size = 0;
-                    this._path = path;
-                    this._isDirectory = path.charAt(path.length - 1) == "/";
-                    this._createDate = new Date();
-                    this._lastModifyDate = new Date();
-                    onError && onComplete(this);
+                    _this._exists = true;
+                    _this._size = 0;
+                    _this._path = path;
+                    _this._isDirectory = path.charAt(path.length - 1) == "/";
+                    _this._createDate = new Date();
+                    _this._lastModifyDate = new Date();
+                    onError && onComplete(_this);
                 }
                 callback && callback();
             });
-        }
-    }
+        };
+        return FileObject;
+    }());
     editor.FileObject = FileObject;
 })(editor || (editor = {}));
 var editor;
@@ -1603,8 +1684,8 @@ var editor;
     /**
      * 本地文件系统
      */
-    class NativeFS {
-        constructor(fs) {
+    var NativeFS = /** @class */ (function () {
+        function NativeFS(fs) {
             /**
              * 文件系统类型
              */
@@ -1616,217 +1697,223 @@ var editor;
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readArrayBuffer(path, callback) {
+        NativeFS.prototype.readArrayBuffer = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.readFile(realPath, callback);
-        }
+        };
         /**
          * 读取文件为字符串
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readString(path, callback) {
-            this.readArrayBuffer(path, (err, data) => {
+        NativeFS.prototype.readString = function (path, callback) {
+            this.readArrayBuffer(path, function (err, data) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
-                feng3d.dataTransform.arrayBufferToString(data, (content) => {
+                feng3d.dataTransform.arrayBufferToString(data, function (content) {
                     callback(null, content);
                 });
             });
-        }
+        };
         /**
          * 读取文件为Object
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path, callback) {
-            this.readArrayBuffer(path, (err, buffer) => {
+        NativeFS.prototype.readObject = function (path, callback) {
+            this.readArrayBuffer(path, function (err, buffer) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
-                feng3d.dataTransform.arrayBufferToObject(buffer, (content) => {
+                feng3d.dataTransform.arrayBufferToObject(buffer, function (content) {
                     callback(null, content);
                 });
             });
-        }
+        };
         /**
          * 加载图片
          * @param path 图片路径
          * @param callback 加载完成回调
          */
-        readImage(path, callback) {
-            this.exists(path, exists => {
+        NativeFS.prototype.readImage = function (path, callback) {
+            var _this = this;
+            this.exists(path, function (exists) {
                 if (exists) {
                     var img = new Image();
                     img.onload = function () {
                         callback(null, img);
                     };
-                    img.onerror = (evt) => {
-                        callback(new Error(`加载图片${path}失败`), null);
+                    img.onerror = function (evt) {
+                        callback(new Error("\u52A0\u8F7D\u56FE\u7247" + path + "\u5931\u8D25"), null);
                     };
-                    img.src = this.getAbsolutePath(path);
+                    img.src = _this.getAbsolutePath(path);
                 }
                 else {
-                    callback(new Error(`图片资源 ${path} 不存在`), null);
+                    callback(new Error("\u56FE\u7247\u8D44\u6E90 " + path + " \u4E0D\u5B58\u5728"), null);
                 }
             });
-        }
+        };
         /**
          * 获取文件绝对路径
          * @param path （相对）路径
          */
-        getAbsolutePath(path) {
+        NativeFS.prototype.getAbsolutePath = function (path) {
             if (!this.projectname) {
-                console.error(`请先使用 initproject 初始化项目`);
+                console.error("\u8BF7\u5148\u4F7F\u7528 initproject \u521D\u59CB\u5316\u9879\u76EE");
             }
             return this.projectname + "/" + path;
-        }
+        };
         /**
          * 文件是否存在
          * @param path 文件路径
          * @param callback 回调函数
          */
-        exists(path, callback) {
+        NativeFS.prototype.exists = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.exists(realPath, callback);
-        }
+        };
         /**
          * 是否为文件夹
          *
          * @param path 文件路径
          * @param callback 完成回调
          */
-        isDirectory(path, callback) {
+        NativeFS.prototype.isDirectory = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.isDirectory(realPath, callback);
-        }
+        };
         /**
          * 读取文件夹中文件列表
          *
          * @param path 路径
          * @param callback 回调函数
          */
-        readdir(path, callback) {
+        NativeFS.prototype.readdir = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.readdir(realPath, callback);
-        }
+        };
         /**
          * 新建文件夹
          * @param path 文件夹路径
          * @param callback 回调函数
          */
-        mkdir(path, callback) {
+        NativeFS.prototype.mkdir = function (path, callback) {
             var realPath = this.getAbsolutePath(path);
             this.fs.mkdir(realPath, callback);
-        }
+        };
         /**
          * 删除文件
          * @param path 文件路径
          * @param callback 回调函数
          */
-        deleteFile(path, callback) {
-            callback = callback || (() => { });
+        NativeFS.prototype.deleteFile = function (path, callback) {
+            var _this = this;
+            callback = callback || (function () { });
             var realPath = this.getAbsolutePath(path);
-            this.isDirectory(path, result => {
+            this.isDirectory(path, function (result) {
                 if (result) {
-                    this.fs.rmdir(realPath, callback);
+                    _this.fs.rmdir(realPath, callback);
                 }
                 else {
-                    this.fs.deleteFile(realPath, callback);
+                    _this.fs.deleteFile(realPath, callback);
                 }
             });
             feng3d.globalDispatcher.dispatch("fs.delete", path);
-        }
+        };
         /**
          * 写ArrayBuffer(新建)文件
          * @param path 文件路径
          * @param arraybuffer 文件数据
          * @param callback 回调函数
          */
-        writeArrayBuffer(path, arraybuffer, callback) {
+        NativeFS.prototype.writeArrayBuffer = function (path, arraybuffer, callback) {
             var realPath = this.getAbsolutePath(path);
-            this.fs.writeFile(realPath, arraybuffer, err => { callback && callback(err); });
+            this.fs.writeFile(realPath, arraybuffer, function (err) { callback && callback(err); });
             feng3d.globalDispatcher.dispatch("fs.write", path);
-        }
+        };
         /**
          * 写字符串到(新建)文件
          * @param path 文件路径
          * @param str 文件数据
          * @param callback 回调函数
          */
-        writeString(path, str, callback) {
+        NativeFS.prototype.writeString = function (path, str, callback) {
             var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
             this.writeArrayBuffer(path, buffer, callback);
             feng3d.globalDispatcher.dispatch("fs.write", path);
-        }
+        };
         /**
          * 写Object到(新建)文件
          * @param path 文件路径
          * @param object 文件数据
          * @param callback 回调函数
          */
-        writeObject(path, object, callback) {
+        NativeFS.prototype.writeObject = function (path, object, callback) {
             var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
             this.writeString(path, str, callback);
             feng3d.globalDispatcher.dispatch("fs.write", path);
-        }
+        };
         /**
          * 写图片
          * @param path 图片路径
          * @param image 图片
          * @param callback 回调函数
          */
-        writeImage(path, image, callback) {
-            feng3d.dataTransform.imageToArrayBuffer(image, (buffer) => {
-                this.writeArrayBuffer(path, buffer, callback);
+        NativeFS.prototype.writeImage = function (path, image, callback) {
+            var _this = this;
+            feng3d.dataTransform.imageToArrayBuffer(image, function (buffer) {
+                _this.writeArrayBuffer(path, buffer, callback);
             });
             feng3d.globalDispatcher.dispatch("fs.write", path);
-        }
+        };
         /**
          * 复制文件
          * @param src    源路径
          * @param dest    目标路径
          * @param callback 回调函数
          */
-        copyFile(src, dest, callback) {
-            this.readArrayBuffer(src, (err, buffer) => {
+        NativeFS.prototype.copyFile = function (src, dest, callback) {
+            var _this = this;
+            this.readArrayBuffer(src, function (err, buffer) {
                 if (err) {
                     callback && callback(err);
                     return;
                 }
-                this.writeArrayBuffer(dest, buffer, callback);
+                _this.writeArrayBuffer(dest, buffer, callback);
             });
-        }
+        };
         /**
          * 是否存在指定项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        hasProject(projectname, callback) {
+        NativeFS.prototype.hasProject = function (projectname, callback) {
             this.fs.exists(projectname, callback);
-        }
+        };
         /**
          * 初始化项目
          * @param projectname 项目名称
          * @param callback 回调函数
          */
-        initproject(projectname, callback) {
-            this.fs.exists(editor.editorcache.projectname, exists => {
+        NativeFS.prototype.initproject = function (projectname, callback) {
+            var _this = this;
+            this.fs.exists(editor.editorcache.projectname, function (exists) {
                 if (exists) {
-                    this.projectname = editor.editorcache.projectname;
+                    _this.projectname = editor.editorcache.projectname;
                     callback();
                     return;
                 }
-                editor.nativeAPI.selectDirectoryDialog((event, path) => {
-                    editor.editorcache.projectname = this.projectname = path;
+                editor.nativeAPI.selectDirectoryDialog(function (event, path) {
+                    editor.editorcache.projectname = _this.projectname = path;
                     callback();
                 });
             });
-        }
-    }
+        };
+        return NativeFS;
+    }());
     editor.NativeFS = NativeFS;
 })(editor || (editor = {}));
 var editor;
@@ -1834,15 +1921,20 @@ var editor;
     /**
      * 编辑器资源系统
      */
-    class EditorRS extends feng3d.ReadWriteRS {
+    var EditorRS = /** @class */ (function (_super) {
+        __extends(EditorRS, _super);
+        function EditorRS() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
         /**
          * 初始化项目
          *
          * @param callback 完成回调
          */
-        initproject(callback) {
-            this.fs.hasProject(editor.editorcache.projectname, (has) => {
-                this.fs.initproject(editor.editorcache.projectname, (err) => {
+        EditorRS.prototype.initproject = function (callback) {
+            var _this = this;
+            this.fs.hasProject(editor.editorcache.projectname, function (has) {
+                _this.fs.initproject(editor.editorcache.projectname, function (err) {
                     if (err) {
                         callback(err);
                         return;
@@ -1851,14 +1943,15 @@ var editor;
                         callback();
                         return;
                     }
-                    this.createproject(callback);
+                    _this.createproject(callback);
                 });
             });
-        }
+        };
         /**
          * 创建项目
          */
-        createproject(callback) {
+        EditorRS.prototype.createproject = function (callback) {
+            var _this = this;
             var urls = [
                 ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
                 ["resource/template/app.js", "app.js"],
@@ -1868,95 +1961,103 @@ var editor;
                 ["resource/template/default.scene.json", "default.scene.json"],
                 ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
                 ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+                ["resource/template/libs/feng2d.js", "libs/feng2d.js"],
+                ["resource/template/libs/feng2d.d.ts", "libs/feng2d.d.ts"],
                 ["resource/template/libs/cannon.js", "libs/cannon.js"],
                 ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
                 ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
                 ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
             ];
             var index = 0;
-            var loadUrls = () => {
+            var loadUrls = function () {
                 if (index >= urls.length) {
                     callback();
                     return;
                 }
-                feng3d.loader.loadText(urls[index][0], (content) => {
-                    this.fs.writeString(urls[index][1], content, (err) => {
+                feng3d.loader.loadText(urls[index][0], function (content) {
+                    _this.fs.writeString(urls[index][1], content, function (err) {
                         if (err)
                             throw err;
                         index++;
                         loadUrls();
                     });
-                }, null, (e) => {
+                }, null, function (e) {
                     throw e;
                     index++;
                     loadUrls();
                 });
             };
             loadUrls();
-        }
-        upgradeProject(callback) {
+        };
+        EditorRS.prototype.upgradeProject = function (callback) {
+            var _this = this;
             var urls = [
                 ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
                 ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["../physics/out/physics.js", "libs/physics.js"],
-                ["../physics/out/physics.d.ts", "libs/physics.d.ts"],
+                ["../feng2d/out/feng2d.js", "libs/feng2d.js"],
+                ["../feng2d/out/feng2d.d.ts", "libs/feng2d.d.ts"],
+                ["../cannon/cannon/out/cannon.js", "libs/cannon.js"],
+                ["../cannon/cannon/out/cannon.d.ts", "libs/cannon.d.ts"],
+                ["../cannon/cannon-plugin/out/cannon-plugin.js", "libs/cannon-plugin.js"],
+                ["../cannon/cannon-plugin/out/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
             ];
             var index = 0;
-            var loadUrls = () => {
+            var loadUrls = function () {
                 if (index >= urls.length) {
                     callback();
                     return;
                 }
-                feng3d.loader.loadText(urls[index][0], (content) => {
-                    this.fs.writeString(urls[index][1], content, (err) => {
+                feng3d.loader.loadText(urls[index][0], function (content) {
+                    _this.fs.writeString(urls[index][1], content, function (err) {
                         if (err)
                             console.warn(err);
                         index++;
                         loadUrls();
                     });
-                }, null, (e) => {
+                }, null, function (e) {
                     console.warn(e);
                     index++;
                     loadUrls();
                 });
             };
             loadUrls();
-        }
+        };
         /**
          * 选择文件
          *
          * @param callback 完成回调
          */
-        selectFile(callback) {
+        EditorRS.prototype.selectFile = function (callback) {
             selectFileCallback = callback;
             isSelectFile = true;
-        }
+        };
         /**
          * 清理项目
          *
          * @param callback
          */
-        clearProject(callback) {
+        EditorRS.prototype.clearProject = function (callback) {
             this._idMap = {};
             this._pathMap = {};
             this.fs.delete("", callback);
-        }
+        };
         /**
          * 导出项目为zip压缩包
          *
          * @param filename 导出后压缩包名称
          * @param callback 完成回调
          */
-        exportProjectToJSZip(filename, callback) {
-            this.fs.getAllPathsInFolder("", (err, filepaths) => {
+        EditorRS.prototype.exportProjectToJSZip = function (filename, callback) {
+            var _this = this;
+            this.fs.getAllPathsInFolder("", function (err, filepaths) {
                 if (err) {
                     console.error(err);
                     callback && callback();
                     return;
                 }
-                this.exportFilesToJSZip(filename, filepaths, callback);
+                _this.exportFilesToJSZip(filename, filepaths, callback);
             });
-        }
+        };
         /**
          * 导出指定文件夹为zip压缩包
          *
@@ -1964,16 +2065,17 @@ var editor;
          * @param folderpath 需要导出的文件夹路径
          * @param callback 完成回调
          */
-        exportFolderToJSZip(filename, folderpath, callback) {
-            this.fs.getAllPathsInFolder(folderpath, (err, filepaths) => {
+        EditorRS.prototype.exportFolderToJSZip = function (filename, folderpath, callback) {
+            var _this = this;
+            this.fs.getAllPathsInFolder(folderpath, function (err, filepaths) {
                 if (err) {
                     console.error(err);
                     callback && callback();
                     return;
                 }
-                this.exportFilesToJSZip(filename, filepaths, callback);
+                _this.exportFilesToJSZip(filename, filepaths, callback);
             });
-        }
+        };
         /**
          * 导出文件列表为zip压缩包
          *
@@ -1981,57 +2083,60 @@ var editor;
          * @param filepaths 需要导出的文件列表
          * @param callback 完成回调
          */
-        exportFilesToJSZip(filename, filepaths, callback) {
+        EditorRS.prototype.exportFilesToJSZip = function (filename, filepaths, callback) {
+            var _this = this;
             var zip = new JSZip();
-            var fns = filepaths.map(p => (callback) => {
-                this.fs.isDirectory(p, (result) => {
+            var fns = filepaths.map(function (p) { return function (callback) {
+                _this.fs.isDirectory(p, function (result) {
                     if (result) {
                         zip.folder(p);
                         callback();
                     }
                     else {
-                        this.fs.readArrayBuffer(p, (err, data) => {
+                        _this.fs.readArrayBuffer(p, function (err, data) {
                             //处理文件夹
                             data && zip.file(p, data);
                             callback();
                         });
                     }
                 });
-            });
-            feng3d.task.parallel(fns)(() => {
+            }; });
+            feng3d.task.parallel(fns)(function () {
                 zip.generateAsync({ type: "blob" }).then(function (content) {
                     saveAs(content, filename);
                     callback && callback();
                 });
             });
-        }
+        };
         /**
          * 导入项目
          */
-        importProject(file, callback) {
+        EditorRS.prototype.importProject = function (file, callback) {
+            var _this = this;
             var zip = new JSZip();
-            zip.loadAsync(file).then((value) => {
+            zip.loadAsync(file).then(function (value) {
                 var filepaths = Object.keys(value.files);
                 filepaths.sort();
-                var fns = filepaths.map(p => (callback) => {
+                var fns = filepaths.map(function (p) { return function (callback) {
                     if (value.files[p].dir) {
-                        this.fs.mkdir(p, (err) => {
+                        _this.fs.mkdir(p, function (err) {
                             callback();
                         });
                     }
                     else {
-                        zip.file(p).async("arraybuffer").then((data) => {
-                            this.fs.writeFile(p, data, (err) => {
+                        zip.file(p).async("arraybuffer").then(function (data) {
+                            _this.fs.writeFile(p, data, function (err) {
                                 callback();
                             });
-                        }, (reason) => {
+                        }, function (reason) {
                         });
                     }
-                });
+                }; });
                 feng3d.task.series(fns)(callback);
             });
-        }
-    }
+        };
+        return EditorRS;
+    }(feng3d.ReadWriteRS));
     editor.EditorRS = EditorRS;
     if (editor.supportNative) {
         feng3d.basefs = new editor.NativeFS(editor.nativeFS);
@@ -2053,7 +2158,7 @@ var editor;
         fileInput.value = null;
     });
     // document.body.appendChild(fileInput);
-    window.addEventListener("click", () => {
+    window.addEventListener("click", function () {
         if (isSelectFile)
             fileInput.click();
         isSelectFile = false;
@@ -2062,8 +2167,8 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class EditorCache {
-        constructor() {
+    var EditorCache = /** @class */ (function () {
+        function EditorCache() {
             /**
              * 最近的项目列表
              */
@@ -2081,19 +2186,20 @@ var editor;
         /**
          * 设置最近打开的项目
          */
-        setLastProject(projectname) {
+        EditorCache.prototype.setLastProject = function (projectname) {
             var index = this.lastProjects.indexOf(projectname);
             if (index != -1)
                 this.lastProjects.splice(index, 1);
             this.lastProjects.unshift(projectname);
-        }
-        save() {
+        };
+        EditorCache.prototype.save = function () {
             localStorage.setItem("feng3d-editor", JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
-        }
-    }
+        };
+        return EditorCache;
+    }());
     editor.EditorCache = EditorCache;
     editor.editorcache = new EditorCache();
-    window.addEventListener("beforeunload", () => {
+    window.addEventListener("beforeunload", function () {
         if (codeeditoWin)
             codeeditoWin.close();
         if (editor.runwin)
@@ -2103,37 +2209,40 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Drag {
-        register(displayObject, setdargSource, accepttypes, onDragDrop) {
+    var Drag = /** @class */ (function () {
+        function Drag() {
+        }
+        Drag.prototype.register = function (displayObject, setdargSource, accepttypes, onDragDrop) {
             this.unregister(displayObject);
             registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
             if (setdargSource)
                 displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
-        }
-        unregister(displayObject) {
+        };
+        Drag.prototype.unregister = function (displayObject) {
             for (var i = registers.length - 1; i >= 0; i--) {
                 if (registers[i].displayObject == displayObject) {
                     registers.splice(i, 1);
                 }
             }
             displayObject.removeEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null);
-        }
+        };
         /** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
-        refreshAcceptables() {
+        Drag.prototype.refreshAcceptables = function () {
             //获取可接受数据的对象列表
-            acceptableitems = registers.reduce((value, item) => {
+            acceptableitems = registers.reduce(function (value, item) {
                 if (item != dragitem && acceptData(item, dragSource)) {
                     value.push(item);
                 }
                 return value;
             }, []);
-        }
-    }
+        };
+        return Drag;
+    }());
     editor.Drag = Drag;
     ;
     editor.drag = new Drag();
-    class DragData {
-        constructor() {
+    var DragData = /** @class */ (function () {
+        function DragData() {
             this.datas = [];
         }
         /**
@@ -2142,29 +2251,30 @@ var editor;
          * @param datatype
          * @param value
          */
-        addDragData(datatype, value) {
+        DragData.prototype.addDragData = function (datatype, value) {
             var item = { datatype: datatype, value: value };
             this.datas.push(item);
-        }
+        };
         /**
          * 获取拖拽数据列表
          *
          * @param datatype
          */
-        getDragData(datatype) {
-            var data = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+        DragData.prototype.getDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
             return data;
-        }
+        };
         /**
          * 是否拥有指定类型数据
          *
          * @param datatype
          */
-        hasDragData(datatype) {
-            var data = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+        DragData.prototype.hasDragData = function (datatype) {
+            var data = this.datas.filter(function (v) { return v.datatype == datatype; }).map(function (v) { return v.value; });
             return data.length > 0;
-        }
-    }
+        };
+        return DragData;
+    }());
     editor.DragData = DragData;
     var stage;
     var registers = [];
@@ -2198,7 +2308,7 @@ var editor;
      * @param dragSource
      */
     function acceptData(item, dragSource) {
-        var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || dragSource.hasDragData(accepttype); }, false);
+        var hasdata = item.accepttypes.reduce(function (prevalue, accepttype) { return prevalue || dragSource.hasDragData(accepttype); }, false);
         return hasdata;
     }
     /**
@@ -2258,7 +2368,7 @@ var editor;
             dragSource = new DragData();
             dragitem.setdargSource(dragSource);
             //获取可接受数据的对象列表
-            acceptableitems = registers.reduce((value, item) => {
+            acceptableitems = registers.reduce(function (value, item) {
                 if (acceptData(item, dragSource) && item.displayObject.stage) {
                     item["hierarchyValue"] = getHierarchyValue(item.displayObject);
                     value.push(item);
@@ -2266,10 +2376,10 @@ var editor;
                 return value;
             }, []);
             // 根据层级排序
-            acceptableitems.sort((a, b) => {
+            acceptableitems.sort(function (a, b) {
                 var ah = a["hierarchyValue"];
                 var bh = b["hierarchyValue"];
-                for (let i = 0, num = Math.min(ah.length, bh.length); i < num; i++) {
+                for (var i = 0, num = Math.min(ah.length, bh.length); i < num; i++) {
                     if (ah[i] != bh[i])
                         return ah[i] - bh[i];
                 }
@@ -2284,8 +2394,8 @@ var editor;
             accepter = null;
         }
         //
-        for (let i = 0; i < acceptableitems.length; i++) {
-            const element = acceptableitems[i];
+        for (var i = 0; i < acceptableitems.length; i++) {
+            var element = acceptableitems[i];
             var rect = element.displayObject.getGlobalBounds();
             if (rect.contains(event.stageX, event.stageY)) {
                 accepter = element.displayObject;
@@ -2313,23 +2423,24 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Cursor {
-        constructor() {
+    var Cursor = /** @class */ (function () {
+        function Cursor() {
             this.o = new Map();
         }
-        add(id, value) {
+        Cursor.prototype.add = function (id, value) {
             this.o.set(id, value);
             this.update();
-        }
-        clear(id) {
+        };
+        Cursor.prototype.clear = function (id) {
             this.o.delete(id);
             this.update();
-        }
-        update() {
+        };
+        Cursor.prototype.update = function () {
             var v = Map.getValues(this.o).reverse()[0];
             document.body.style.cursor = v || "auto";
-        }
-    }
+        };
+        return Cursor;
+    }());
     /**
      * 鼠标光标管理
      */
@@ -2337,8 +2448,8 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Editorshortcut {
-        constructor() {
+    var Editorshortcut = /** @class */ (function () {
+        function Editorshortcut() {
             // 初始化快捷键
             feng3d.shortcut.addShortCuts(shortcutConfig);
             //监听命令
@@ -2355,21 +2466,21 @@ var editor;
             feng3d.shortcut.on("paste", this.onPaste, this);
             feng3d.shortcut.on("undo", this.onUndo, this);
         }
-        onGameobjectMoveTool() {
+        Editorshortcut.prototype.onGameobjectMoveTool = function () {
             editor.editorData.toolType = editor.MRSToolType.MOVE;
-        }
-        onGameobjectRotationTool() {
+        };
+        Editorshortcut.prototype.onGameobjectRotationTool = function () {
             editor.editorData.toolType = editor.MRSToolType.ROTATION;
-        }
-        onGameobjectScaleTool() {
+        };
+        Editorshortcut.prototype.onGameobjectScaleTool = function () {
             editor.editorData.toolType = editor.MRSToolType.SCALE;
-        }
-        onDeleteSeletedGameObject() {
+        };
+        Editorshortcut.prototype.onDeleteSeletedGameObject = function () {
             var selectedObject = editor.editorData.selectedObjects;
             if (!selectedObject)
                 return;
             //删除文件引用计数
-            selectedObject.forEach(element => {
+            selectedObject.forEach(function (element) {
                 if (element instanceof feng3d.GameObject) {
                     element.remove();
                 }
@@ -2378,53 +2489,55 @@ var editor;
                 }
             });
             editor.editorData.clearSelectedObjects();
-        }
-        onOpenDevTools() {
+        };
+        Editorshortcut.prototype.onOpenDevTools = function () {
             if (editor.nativeAPI)
                 editor.nativeAPI.openDevTools();
-        }
-        onRefreshWindow() {
+        };
+        Editorshortcut.prototype.onRefreshWindow = function () {
             window.location.reload();
-        }
-        onCopy() {
-            var objects = editor.editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+        };
+        Editorshortcut.prototype.onCopy = function () {
+            var objects = editor.editorData.selectedObjects.filter(function (v) { return v instanceof feng3d.GameObject; });
             editor.editorData.copyObjects = objects;
-        }
-        onPaste() {
+        };
+        Editorshortcut.prototype.onPaste = function () {
             var undoSelectedObjects = editor.editorData.selectedObjects;
             //
-            var objects = editor.editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+            var objects = editor.editorData.copyObjects.filter(function (v) { return v instanceof feng3d.GameObject; });
             if (objects.length == 0)
                 return;
             var parent = objects[0].parent;
-            var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
-            newGameObjects.forEach(v => {
+            var newGameObjects = objects.map(function (v) { return feng3d.serialization.clone(v); });
+            newGameObjects.forEach(function (v) {
                 parent.addChild(v);
             });
             editor.editorData.selectMultiObject(newGameObjects, false);
             // undo
-            editor.editorData.undoList.push(() => {
-                newGameObjects.forEach(v => {
+            editor.editorData.undoList.push(function () {
+                newGameObjects.forEach(function (v) {
                     v.remove();
                 });
                 editor.editorData.selectMultiObject(undoSelectedObjects, false);
             });
-        }
-        onUndo() {
+        };
+        Editorshortcut.prototype.onUndo = function () {
             var item = editor.editorData.undoList.pop();
             if (item)
                 item();
-        }
-    }
+        };
+        return Editorshortcut;
+    }());
     editor.Editorshortcut = Editorshortcut;
-    class SceneControlConfig {
-        constructor() {
+    var SceneControlConfig = /** @class */ (function () {
+        function SceneControlConfig() {
             this.mouseWheelMoveStep = 0.004;
             //dynamic
             this.lookDistance = 3;
             this.sceneCameraForwardBackwardStep = 0.01;
         }
-    }
+        return SceneControlConfig;
+    }());
     editor.SceneControlConfig = SceneControlConfig;
     editor.sceneControlConfig = new SceneControlConfig();
 })(editor || (editor = {}));
@@ -2435,37 +2548,38 @@ var editor;
      *
      * 用于管理功能模块
      */
-    class Modules {
-        constructor() {
+    var Modules = /** @class */ (function () {
+        function Modules() {
             this.moduleViewMap = {};
         }
-        getModuleView(moduleName) {
+        Modules.prototype.getModuleView = function (moduleName) {
             this.moduleViewMap[moduleName] = this.moduleViewMap[moduleName] || [];
             var moduleview = this.moduleViewMap[moduleName].pop();
             if (!moduleview) {
                 var cls = Modules.moduleViewCls[moduleName];
                 if (!cls) {
-                    console.error(`无法获取模块 ${moduleName} 界面类定义`);
+                    console.error("\u65E0\u6CD5\u83B7\u53D6\u6A21\u5757 " + moduleName + " \u754C\u9762\u7C7B\u5B9A\u4E49");
                     return;
                 }
                 moduleview = new cls();
             }
             return moduleview;
-        }
+        };
         /**
          * 回收模块界面
          *
          * @param moduleView 模块界面
          */
-        recycleModuleView(moduleView) {
+        Modules.prototype.recycleModuleView = function (moduleView) {
             this.moduleViewMap[moduleView.moduleName] = this.moduleViewMap[moduleView.moduleName] || [];
             this.moduleViewMap[moduleView.moduleName].push(moduleView);
-        }
-    }
-    /**
-     * 模块界面类定义
-     */
-    Modules.moduleViewCls = {};
+        };
+        /**
+         * 模块界面类定义
+         */
+        Modules.moduleViewCls = {};
+        return Modules;
+    }());
     editor.Modules = Modules;
     editor.modules = new Modules();
 })(editor || (editor = {}));
@@ -2474,32 +2588,34 @@ var editor;
     /**
      * 快捷键设置界面
      */
-    class ShortCutSetting extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "ShortCutSetting";
-            this.moduleName = ShortCutSetting.moduleName;
+    var ShortCutSetting = /** @class */ (function (_super) {
+        __extends(ShortCutSetting, _super);
+        function ShortCutSetting() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ShortCutSetting";
+            _this.moduleName = ShortCutSetting.moduleName;
+            return _this;
         }
-        onComplete() {
+        ShortCutSetting.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        ShortCutSetting.prototype.onAddedToStage = function () {
             this.searchTxt.addEventListener(egret.Event.CHANGE, this.updateView, this);
             this.updateView();
-        }
-        onRemovedFromStage() {
+        };
+        ShortCutSetting.prototype.onRemovedFromStage = function () {
             this.searchTxt.removeEventListener(egret.Event.CHANGE, this.updateView, this);
-        }
-        updateView() {
+        };
+        ShortCutSetting.prototype.updateView = function () {
             var text = this.searchTxt.text;
             var reg = new RegExp(text, "i");
-            var data = shortcutConfig.filter(v => {
-                for (const key in v) {
+            var data = shortcutConfig.filter(function (v) {
+                for (var key in v) {
                     if (key.charAt(0) != "_") {
                         if (typeof v[key] == "string" && v[key].search(reg) != -1)
                             return true;
@@ -2508,9 +2624,10 @@ var editor;
                 return false;
             });
             this.list.dataProvider = new eui.ArrayCollection(data);
-        }
-    }
-    ShortCutSetting.moduleName = "ShortCutSetting";
+        };
+        ShortCutSetting.moduleName = "ShortCutSetting";
+        return ShortCutSetting;
+    }(eui.Component));
     editor.ShortCutSetting = ShortCutSetting;
     editor.Modules.moduleViewCls[ShortCutSetting.moduleName] = ShortCutSetting;
 })(editor || (editor = {}));
@@ -2519,29 +2636,36 @@ var editor;
     /**
      * 场景视图
      */
-    class SceneView extends eui.Component {
-        constructor() {
-            super();
-            this.selectedObjectsHistory = [];
-            this.skinName = "SceneView";
+    var SceneView = /** @class */ (function (_super) {
+        __extends(SceneView, _super);
+        function SceneView() {
+            var _this = _super.call(this) || this;
+            _this.selectedObjectsHistory = [];
+            _this.skinName = "SceneView";
             //
             feng3d.Stats.init(document.getElementById("stats"));
             //
-            this.moduleName = SceneView.moduleName;
+            _this.moduleName = SceneView.moduleName;
             //
-            this._areaSelectRect = new editor.AreaSelectRect();
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveFromStage, this);
+            _this._areaSelectRect = new editor.AreaSelectRect();
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
+            return _this;
         }
-        /**
-         * 鼠标是否在界面中
-         */
-        get mouseInView() {
-            if (!this.stage)
-                return false;
-            return this.getGlobalBounds().contains(this.stage.stageX, this.stage.stageY);
-        }
-        onAddedToStage() {
+        Object.defineProperty(SceneView.prototype, "mouseInView", {
+            /**
+             * 鼠标是否在界面中
+             */
+            get: function () {
+                if (!this.stage)
+                    return false;
+                return this.getGlobalBounds().contains(this.stage.stageX, this.stage.stageY);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        SceneView.prototype.onAddedToStage = function () {
+            var _this = this;
             //
             if (!this._canvas) {
                 //
@@ -2572,7 +2696,7 @@ var editor;
                 mrsTool.editorCamera = editorCamera;
                 this.view.editorComponent = editorScene.gameObject.addComponent("EditorComponent");
                 //
-                feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) => {
+                feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), function (content) {
                     var trident = feng3d.serialization.deserialize(JSON.parse(content));
                     editorScene.gameObject.addChild(trident);
                 });
@@ -2603,20 +2727,20 @@ var editor;
             feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
-            editor.drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) => {
-                dragdata.getDragData("file_gameobject").forEach(v => {
+            editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
+                dragdata.getDragData("file_gameobject").forEach(function (v) {
                     editor.hierarchy.addGameoObjectFromAsset(v, editor.hierarchy.rootnode.gameobject);
                 });
-                dragdata.getDragData("file_script").forEach(v => {
-                    var gameobject = this.view.mouse3DManager.selectedGameObject;
+                dragdata.getDragData("file_script").forEach(function (v) {
+                    var gameobject = _this.view.mouse3DManager.selectedGameObject;
                     if (!gameobject || !gameobject.scene)
                         gameobject = editor.hierarchy.rootnode.gameobject;
                     gameobject.addScript(v.scriptName);
                 });
             });
             this.once(egret.Event.ENTER_FRAME, this.onResize, this);
-        }
-        onRemoveFromStage() {
+        };
+        SceneView.prototype.onRemoveFromStage = function () {
             this.removeEventListener(egret.Event.RESIZE, this.onResize, this);
             this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
             this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
@@ -2646,13 +2770,13 @@ var editor;
                 this._canvas.style.display = "none";
                 this._canvas = null;
             }
-        }
-        _onAreaSelectStart() {
+        };
+        SceneView.prototype._onAreaSelectStart = function () {
             if (!this.mouseInView)
                 return;
             this._areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        }
-        _onAreaSelect() {
+        };
+        SceneView.prototype._onAreaSelect = function () {
             if (!this._areaSelectStartPosition)
                 return;
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2663,22 +2787,22 @@ var editor;
             this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
             //
             var gs = this.view.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
-            var gs0 = gs.filter(g => {
+            var gs0 = gs.filter(function (g) {
                 return !!editor.hierarchy.getNode(g);
             });
             editor.editorData.selectMultiObject(gs0);
-        }
-        _onAreaSelectEnd() {
+        };
+        SceneView.prototype._onAreaSelectEnd = function () {
             this._areaSelectStartPosition = null;
             this._areaSelectRect.hide();
-        }
-        onMouseOver() {
+        };
+        SceneView.prototype.onMouseOver = function () {
             feng3d.shortcut.activityState("mouseInView3D");
-        }
-        onMouseOut() {
+        };
+        SceneView.prototype.onMouseOut = function () {
             feng3d.shortcut.deactivityState("mouseInView3D");
-        }
-        onResize() {
+        };
+        SceneView.prototype.onResize = function () {
             if (!this._canvas)
                 return;
             this._canvas.style.display = "";
@@ -2692,21 +2816,21 @@ var editor;
             style.cursor = "hand";
             feng3d.Stats.instance.dom.style.left = bound.x + "px";
             feng3d.Stats.instance.dom.style.top = bound.y + "px";
-        }
-        onSelectGameObject() {
+        };
+        SceneView.prototype.onSelectGameObject = function () {
             if (!this.mouseInView)
                 return;
-            var gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+            var gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, this.view.editorScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length > 0)
                 return;
             //
-            gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, editor.editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+            gameObjects = feng3d.raycaster.pickAll(this.view.mouseRay3D, editor.editorData.gameScene.mouseCheckObjects).sort(function (a, b) { return a.rayEntryDistance - b.rayEntryDistance; }).map(function (v) { return v.gameObject; });
             if (gameObjects.length == 0) {
                 editor.editorData.clearSelectedObjects();
                 return;
             }
             //
-            gameObjects = gameObjects.reduce((pv, gameObject) => {
+            gameObjects = gameObjects.reduce(function (pv, gameObject) {
                 var node = editor.hierarchy.getNode(gameObject);
                 while (!node && gameObject.parent) {
                     gameObject = gameObject.parent;
@@ -2720,7 +2844,7 @@ var editor;
             //
             if (gameObjects.length > 0) {
                 var selectedObjectsHistory = this.selectedObjectsHistory;
-                var gameObject = gameObjects.reduce((pv, cv) => {
+                var gameObject = gameObjects.reduce(function (pv, cv) {
                     if (pv)
                         return pv;
                     if (selectedObjectsHistory.indexOf(cv) == -1)
@@ -2737,8 +2861,8 @@ var editor;
             else {
                 editor.editorData.clearSelectedObjects();
             }
-        }
-        onMouseRotateSceneStart() {
+        };
+        SceneView.prototype.onMouseRotateSceneStart = function () {
             if (!this.mouseInView)
                 return;
             this.rotateSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2754,8 +2878,8 @@ var editor;
                 this.rotateSceneCenter.scaleNumber(editor.sceneControlConfig.lookDistance);
                 this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix.getPosition());
             }
-        }
-        onMouseRotateScene() {
+        };
+        SceneView.prototype.onMouseRotateScene = function () {
             if (!this.rotateSceneMousePoint)
                 return;
             var globalMatrix = this.rotateSceneCameraGlobalMatrix.clone();
@@ -2767,16 +2891,16 @@ var editor;
             var rotateAxisX = globalMatrix.right;
             globalMatrix.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
             this.editorCamera.transform.localToWorldMatrix = globalMatrix;
-        }
-        onMouseRotateSceneEnd() {
+        };
+        SceneView.prototype.onMouseRotateSceneEnd = function () {
             this.rotateSceneMousePoint = null;
-        }
-        onSceneCameraForwardBackMouseMoveStart() {
+        };
+        SceneView.prototype.onSceneCameraForwardBackMouseMoveStart = function () {
             if (!this.mouseInView)
                 return;
             this.preMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        }
-        onSceneCameraForwardBackMouseMove() {
+        };
+        SceneView.prototype.onSceneCameraForwardBackMouseMove = function () {
             if (!this.preMousePoint)
                 return;
             var currentMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2788,17 +2912,17 @@ var editor;
             var newCameraPosition = this.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
             this.editorCamera.transform.position = newCameraPosition;
             this.preMousePoint = currentMousePoint;
-        }
-        onSceneCameraForwardBackMouseMoveEnd() {
+        };
+        SceneView.prototype.onSceneCameraForwardBackMouseMoveEnd = function () {
             this.preMousePoint = null;
-        }
-        onDragSceneStart() {
+        };
+        SceneView.prototype.onDragSceneStart = function () {
             if (!this.mouseInView)
                 return;
             this.dragSceneMousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             this.dragSceneCameraGlobalMatrix = this.editorCamera.transform.localToWorldMatrix.clone();
-        }
-        onDragScene() {
+        };
+        SceneView.prototype.onDragScene = function () {
             if (!this.dragSceneMousePoint)
                 return;
             var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
@@ -2811,28 +2935,28 @@ var editor;
             var globalMatrix = this.dragSceneCameraGlobalMatrix.clone();
             globalMatrix.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
             this.editorCamera.transform.localToWorldMatrix = globalMatrix;
-        }
-        onDragSceneEnd() {
+        };
+        SceneView.prototype.onDragSceneEnd = function () {
             this.dragSceneMousePoint = null;
             this.dragSceneCameraGlobalMatrix = null;
-        }
-        onFpsViewStart() {
+        };
+        SceneView.prototype.onFpsViewStart = function () {
             if (!this.mouseInView)
                 return;
             var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.onMousedown();
             feng3d.ticker.onframe(this.updateFpsView, this);
-        }
-        onFpsViewStop() {
+        };
+        SceneView.prototype.onFpsViewStop = function () {
             var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.onMouseup();
             feng3d.ticker.offframe(this.updateFpsView, this);
-        }
-        updateFpsView() {
+        };
+        SceneView.prototype.updateFpsView = function () {
             var fpsController = this.editorCamera.getComponent("FPSController");
             fpsController.update();
-        }
-        onLookToSelectedGameObject() {
+        };
+        SceneView.prototype.onLookToSelectedGameObject = function () {
             if (!this.mouseInView)
                 return;
             var transformBox = editor.editorData.transformBox;
@@ -2856,46 +2980,54 @@ var editor;
                 }
                 egret.Tween.get(this.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
             }
-        }
-        onMouseWheelMoveSceneCamera() {
+        };
+        SceneView.prototype.onMouseWheelMoveSceneCamera = function () {
             if (!this.mouseInView)
                 return;
             var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
             this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
             editor.sceneControlConfig.lookDistance -= distance;
-        }
-    }
-    SceneView.moduleName = "Scene";
+        };
+        SceneView.moduleName = "Scene";
+        return SceneView;
+    }(eui.Component));
     editor.SceneView = SceneView;
     editor.Modules.moduleViewCls[SceneView.moduleName] = SceneView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class CameraPreview extends eui.Component {
-        constructor() {
-            super();
-            this.skinName = "CameraPreview";
+    var CameraPreview = /** @class */ (function (_super) {
+        __extends(CameraPreview, _super);
+        function CameraPreview() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "CameraPreview";
+            return _this;
         }
-        get camera() {
-            return this._camera;
-        }
-        set camera(value) {
-            if (this._camera) {
-                feng3d.ticker.offframe(this.onframe, this);
-            }
-            this._camera = value;
-            this.previewView.camera = this._camera;
-            this.visible = !!this._camera;
-            this.canvas.style.display = this._camera ? "inline" : "none";
-            if (this._camera) {
-                feng3d.ticker.onframe(this.onframe, this);
-            }
-        }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        Object.defineProperty(CameraPreview.prototype, "camera", {
+            get: function () {
+                return this._camera;
+            },
+            set: function (value) {
+                if (this._camera) {
+                    feng3d.ticker.offframe(this.onframe, this);
+                }
+                this._camera = value;
+                this.previewView.camera = this._camera;
+                this.visible = !!this._camera;
+                this.canvas.style.display = this._camera ? "inline" : "none";
+                if (this._camera) {
+                    feng3d.ticker.onframe(this.onframe, this);
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        CameraPreview.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.initView();
-        }
-        initView() {
+        };
+        CameraPreview.prototype.initView = function () {
+            var _this = this;
             if (this.saveParent)
                 return;
             //
@@ -2906,15 +3038,15 @@ var editor;
             this.previewView.stop();
             //
             this.saveParent = this.parent;
-            feng3d.ticker.nextframe(() => {
-                this.parent.removeChild(this);
+            feng3d.ticker.nextframe(function () {
+                _this.parent.removeChild(_this);
             });
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
             this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
             this.onResize();
-        }
-        onResize() {
+        };
+        CameraPreview.prototype.onResize = function () {
             if (!this.stage)
                 return;
             this.height = this.width * 3 / 5;
@@ -2926,11 +3058,11 @@ var editor;
             style.width = bound.width + "px";
             style.height = bound.height + "px";
             style.cursor = "hand";
-        }
-        onDataChange() {
+        };
+        CameraPreview.prototype.onDataChange = function () {
             var selectedGameObjects = editor.editorData.selectedGameObjects;
             if (selectedGameObjects.length > 0) {
-                for (let i = 0; i < selectedGameObjects.length; i++) {
+                for (var i = 0; i < selectedGameObjects.length; i++) {
                     var camera = selectedGameObjects[i].getComponent("Camera");
                     if (camera) {
                         this.camera = camera;
@@ -2941,14 +3073,15 @@ var editor;
             }
             this.camera = null;
             this.parent && this.parent.removeChild(this);
-        }
-        onframe() {
+        };
+        CameraPreview.prototype.onframe = function () {
             if (this.previewView.scene != editor.editorData.gameScene) {
                 this.previewView.scene = editor.editorData.gameScene;
             }
             this.previewView.render();
-        }
-    }
+        };
+        return CameraPreview;
+    }(eui.Component));
     editor.CameraPreview = CameraPreview;
 })(editor || (editor = {}));
 var editor;
@@ -2956,86 +3089,95 @@ var editor;
     /**
      * 粒子特效控制器
      */
-    class ParticleEffectController extends eui.Component {
-        constructor() {
-            super();
-            this.particleSystems = [];
-            this.skinName = "ParticleEffectController";
+    var ParticleEffectController = /** @class */ (function (_super) {
+        __extends(ParticleEffectController, _super);
+        function ParticleEffectController() {
+            var _this = _super.call(this) || this;
+            _this.particleSystems = [];
+            _this.skinName = "ParticleEffectController";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        ParticleEffectController.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.initView();
             this.updateView();
             this.addEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
             this.pauseBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.stopBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        ParticleEffectController.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.Event.ENTER_FRAME, this.onEnterFrame, this);
             this.pauseBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.stopBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        }
-        onClick(e) {
+        };
+        ParticleEffectController.prototype.onClick = function (e) {
             switch (e.currentTarget) {
                 case this.stopBtn:
-                    this.particleSystems.forEach(v => v.stop());
+                    this.particleSystems.forEach(function (v) { return v.stop(); });
                     break;
                 case this.pauseBtn:
                     if (this.isParticlePlaying)
-                        this.particleSystems.forEach(v => v.pause());
+                        this.particleSystems.forEach(function (v) { return v.pause(); });
                     else
-                        this.particleSystems.forEach(v => v.continue());
+                        this.particleSystems.forEach(function (v) { return v.continue(); });
                     break;
             }
             this.updateView();
-        }
-        onEnterFrame() {
+        };
+        ParticleEffectController.prototype.onEnterFrame = function () {
             var v = this.particleSystems;
             if (v) {
                 var playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
                 var playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
-                var particles = this.particleSystems.reduce((pv, cv) => { pv += cv.particleCount; return pv; }, 0);
+                var particles = this.particleSystems.reduce(function (pv, cv) { pv += cv.particleCount; return pv; }, 0);
                 //
                 this.speedInput.text = playbackSpeed.toString();
                 this.timeInput.text = playbackTime.toFixed(3);
                 this.particlesInput.text = particles.toString();
             }
-        }
-        initView() {
+        };
+        ParticleEffectController.prototype.initView = function () {
+            var _this = this;
             if (this.saveParent)
                 return;
             this.saveParent = this.parent;
-            feng3d.ticker.nextframe(() => {
-                this.parent.removeChild(this);
+            feng3d.ticker.nextframe(function () {
+                _this.parent.removeChild(_this);
             });
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
-        }
-        updateView() {
+        };
+        ParticleEffectController.prototype.updateView = function () {
             if (!this.particleSystems)
                 return;
             this.pauseBtn.label = this.isParticlePlaying ? "Pause" : "Continue";
-        }
-        get isParticlePlaying() {
-            return this.particleSystems.reduce((pv, cv) => { return pv || cv.isPlaying; }, false);
-        }
-        onDataChange() {
-            var particleSystems = editor.editorData.selectedGameObjects.reduce((pv, cv) => { var ps = cv.getComponent("ParticleSystem"); ps && (pv.push(ps)); return pv; }, []);
-            this.particleSystems.forEach(v => {
+        };
+        Object.defineProperty(ParticleEffectController.prototype, "isParticlePlaying", {
+            get: function () {
+                return this.particleSystems.reduce(function (pv, cv) { return pv || cv.isPlaying; }, false);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        ParticleEffectController.prototype.onDataChange = function () {
+            var _this = this;
+            var particleSystems = editor.editorData.selectedGameObjects.reduce(function (pv, cv) { var ps = cv.getComponent("ParticleSystem"); ps && (pv.push(ps)); return pv; }, []);
+            this.particleSystems.forEach(function (v) {
                 v.pause();
-                v.off("particleCompleted", this.updateView, this);
+                v.off("particleCompleted", _this.updateView, _this);
             });
             this.particleSystems = particleSystems;
-            this.particleSystems.forEach(v => {
+            this.particleSystems.forEach(function (v) {
                 v.continue();
-                v.on("particleCompleted", this.updateView, this);
+                v.on("particleCompleted", _this.updateView, _this);
             });
             if (this.particleSystems.length > 0)
                 this.saveParent.addChild(this);
             else
                 this.parent && this.parent.removeChild(this);
-        }
-    }
+        };
+        return ParticleEffectController;
+    }(eui.Component));
     editor.ParticleEffectController = ParticleEffectController;
 })(editor || (editor = {}));
 var defaultTextFiled;
@@ -3052,30 +3194,40 @@ var editor;
     /**
      * 重命名组件
      */
-    class RenameTextInput extends eui.Component {
-        constructor() {
-            super();
-            this.skinName = "RenameTextInputSkin";
+    var RenameTextInput = /** @class */ (function (_super) {
+        __extends(RenameTextInput, _super);
+        function RenameTextInput() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "RenameTextInputSkin";
+            return _this;
         }
-        /**
-         * 显示文本
-         */
-        get text() {
-            return this.nameLabel.text;
-        }
-        set text(v) {
-            this.nameLabel.text = v;
-        }
-        get textAlign() {
-            return this.nameLabel.textAlign;
-        }
-        set textAlign(v) {
-            this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
-        }
+        Object.defineProperty(RenameTextInput.prototype, "text", {
+            /**
+             * 显示文本
+             */
+            get: function () {
+                return this.nameLabel.text;
+            },
+            set: function (v) {
+                this.nameLabel.text = v;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(RenameTextInput.prototype, "textAlign", {
+            get: function () {
+                return this.nameLabel.textAlign;
+            },
+            set: function (v) {
+                this.nameeditTxt.textDisplay.textAlign = this.nameLabel.textAlign = v;
+            },
+            enumerable: false,
+            configurable: true
+        });
         /**
          * 启动编辑
          */
-        edit(callback) {
+        RenameTextInput.prototype.edit = function (callback) {
             this.callback = callback;
             this.textAlign = this.textAlign;
             this.nameeditTxt.text = this.nameLabel.text;
@@ -3085,11 +3237,11 @@ var editor;
             //
             this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
             feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
-        }
+        };
         /**
          * 取消编辑
          */
-        cancelEdit() {
+        RenameTextInput.prototype.cancelEdit = function () {
             this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
             feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
             //
@@ -3101,15 +3253,16 @@ var editor;
             this.callback && this.callback();
             this.callback = null;
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        onnameeditChanged() {
+        };
+        RenameTextInput.prototype.onnameeditChanged = function () {
             if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape") {
                 //拾取焦点
                 var inputUtils = this.nameeditTxt.textDisplay["inputUtils"];
                 inputUtils["onStageDownHandler"](new egret.Event(""));
             }
-        }
-    }
+        };
+        return RenameTextInput;
+    }(eui.Component));
     editor.RenameTextInput = RenameTextInput;
 })(editor || (editor = {}));
 var editor;
@@ -3118,12 +3271,15 @@ var editor;
      * 分割组，提供鼠标拖拽改变组内对象分割尺寸
      * 注：不支持 SplitGroup 中两个对象都是Group，不支持两个对象都使用百分比宽高
      */
-    class SplitGroup extends eui.Group {
-        constructor() {
-            super();
-            new editor.SplitUIComponent().init(this);
+    var SplitGroup = /** @class */ (function (_super) {
+        __extends(SplitGroup, _super);
+        function SplitGroup() {
+            var _this = _super.call(this) || this;
+            new editor.SplitUIComponent().init(_this);
+            return _this;
         }
-    }
+        return SplitGroup;
+    }(eui.Group));
     editor.SplitGroup = SplitGroup;
 })(editor || (editor = {}));
 var editor;
@@ -3131,33 +3287,36 @@ var editor;
     /**
      * 可拆分UI组件
      */
-    class SplitUIComponent {
-        init(splitGroup) {
+    var SplitUIComponent = /** @class */ (function () {
+        function SplitUIComponent() {
+        }
+        SplitUIComponent.prototype.init = function (splitGroup) {
             this.splitGroup = splitGroup;
             this.splitGroup.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.splitGroup.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.splitGroup.stage) {
                 this.onAddedToStage();
             }
-        }
+        };
         /**
          * 销毁
          */
-        dispose() {
+        SplitUIComponent.prototype.dispose = function () {
             if (this.splitGroup.stage) {
                 this.onRemovedFromStage();
             }
             this.splitGroup = null;
-        }
-        onAddedToStage() {
+        };
+        SplitUIComponent.prototype.onAddedToStage = function () {
             splitManager.addSplitGroup(this.splitGroup);
-        }
-        onRemovedFromStage() {
+        };
+        SplitUIComponent.prototype.onRemovedFromStage = function () {
             splitManager.removeSplitGroup(this.splitGroup);
-        }
-    }
+        };
+        return SplitUIComponent;
+    }());
     editor.SplitUIComponent = SplitUIComponent;
-    let SplitGroupState;
+    var SplitGroupState;
     (function (SplitGroupState) {
         /**
          * 默认状态，鼠标呈现正常形态
@@ -3175,8 +3334,8 @@ var editor;
     /**
      * 可拆分UI组件管理器
      */
-    class SplitManager {
-        constructor() {
+    var SplitManager = /** @class */ (function () {
+        function SplitManager() {
             this.isdebug = false;
             /**
              * 状态
@@ -3185,21 +3344,21 @@ var editor;
             //
             this.splitGroups = [];
         }
-        addSplitGroup(splitGroup) {
+        SplitManager.prototype.addSplitGroup = function (splitGroup) {
             this.splitGroups.push(splitGroup);
             if (this.splitGroups.length > 0) {
                 editor.editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onPick, this);
             }
-        }
-        removeSplitGroup(splitGroup) {
+        };
+        SplitManager.prototype.removeSplitGroup = function (splitGroup) {
             var index = this.splitGroups.indexOf(splitGroup);
             if (index != -1)
                 this.splitGroups.splice(index, 1);
             if (this.splitGroups.length == 0) {
                 editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onPick, this);
             }
-        }
-        onPick(e) {
+        };
+        SplitManager.prototype.onPick = function (e) {
             if (this.state == SplitGroupState.draging)
                 return;
             if (feng3d.shortcut.getState(feng3d.shortCutStates.draging))
@@ -3207,24 +3366,24 @@ var editor;
             if (feng3d.shortcut.getState("inModal"))
                 return;
             //
-            let checkItems = this.getAllCheckItems();
+            var checkItems = this.getAllCheckItems();
             if (this.isdebug) {
-                let s = this["a"] = this["a"] || new egret.Sprite();
-                editor.editorui.tooltipLayer.addChild(s);
-                s.graphics.clear();
-                s.graphics.beginFill(0xff0000);
-                checkItems.forEach(v => {
-                    s.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
+                var s_1 = this["a"] = this["a"] || new egret.Sprite();
+                editor.editorui.tooltipLayer.addChild(s_1);
+                s_1.graphics.clear();
+                s_1.graphics.beginFill(0xff0000);
+                checkItems.forEach(function (v) {
+                    s_1.graphics.drawRect(v.rect.x, v.rect.y, v.rect.width, v.rect.height);
                 });
-                s.graphics.endFill();
+                s_1.graphics.endFill();
             }
             else {
-                let s = this["a"];
+                var s = this["a"];
                 if (s && s.parent)
                     s.parent.removeChild(s);
             }
             checkItems.reverse();
-            let result = checkItems.filter(v => { return v.rect.contains(e.stageX, e.stageY); });
+            var result = checkItems.filter(function (v) { return v.rect.contains(e.stageX, e.stageY); });
             var checkItem = result[0];
             if (checkItem) {
                 this.state = SplitGroupState.onSplit;
@@ -3245,10 +3404,10 @@ var editor;
                 editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
             this.checkItem = checkItem;
-        }
-        getAllCheckItems() {
-            var checkItems = this.splitGroups.reduce((pv, cv) => {
-                cv.$children.reduce((pv0, cv0, ci) => {
+        };
+        SplitManager.prototype.getAllCheckItems = function () {
+            var checkItems = this.splitGroups.reduce(function (pv, cv) {
+                cv.$children.reduce(function (pv0, cv0, ci) {
                     if (ci == 0)
                         return pv0;
                     var item = { splitGroup: cv, index: ci - 1, rect: null };
@@ -3265,8 +3424,8 @@ var editor;
                 return pv;
             }, []);
             return checkItems;
-        }
-        onMouseDown(e) {
+        };
+        SplitManager.prototype.onMouseDown = function (e) {
             this.state = SplitGroupState.draging;
             // 拖拽分割
             feng3d.windowEventProxy.on("mousemove", this.onDragMouseMove, this);
@@ -3287,11 +3446,11 @@ var editor;
             var minY = preElementRect.top + (preElement.minHeight ? preElement.minHeight : 10);
             var maxY = nextElementRect.bottom - (nextElement.minHeight ? nextElement.minHeight : 10);
             this.dragRect = new feng3d.Rectangle(minX, minY, maxX - minX, maxY - minY);
-        }
+        };
         /**
          * 拖拽分割
          */
-        onDragMouseMove() {
+        SplitManager.prototype.onDragMouseMove = function () {
             var preElement = this.preElement;
             var nextElement = this.nextElement;
             var stageX = feng3d.windowEventProxy.clientX;
@@ -3311,19 +3470,20 @@ var editor;
                 preElement.percentHeight = preElementHeight / checkItem.splitGroup.height * 100;
                 nextElement.percentHeight = nextElementHeight / checkItem.splitGroup.height * 100;
             }
-        }
+        };
         /**
          * 停止拖拽
          */
-        onDragMouseUp() {
+        SplitManager.prototype.onDragMouseUp = function () {
             this.state = SplitGroupState.default;
             this.dragingMousePoint = null;
             this.checkItem = null;
             feng3d.windowEventProxy.off("mousemove", this.onDragMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onDragMouseUp, this);
             feng3d.globalDispatcher.dispatch("viewLayout.changed");
-        }
-    }
+        };
+        return SplitManager;
+    }());
     var splitManager = new SplitManager();
 })(editor || (editor = {}));
 var editor;
@@ -3331,55 +3491,59 @@ var editor;
     /**
      * Tab 界面
      */
-    class TabView extends eui.Group {
-        constructor() {
-            super();
+    var TabView = /** @class */ (function (_super) {
+        __extends(TabView, _super);
+        function TabView() {
+            var _this = _super.call(this) || this;
             /**
              * 按钮池
              */
-            this._tabViewButtonPool = [];
+            _this._tabViewButtonPool = [];
             /**
              * 模块按钮列表
              */
-            this._tabButtons = [];
+            _this._tabButtons = [];
             /**
              * 模块界面列表
              */
-            this._moduleViews = [];
+            _this._moduleViews = [];
             /**
              * 显示模块
              */
-            this._showModuleIndex = -1;
+            _this._showModuleIndex = -1;
+            return _this;
         }
         /**
          * 获取模块名称列表
          */
-        getModuleNames() {
-            var moduleNames = this._moduleViews.map(v => v.moduleName);
+        TabView.prototype.getModuleNames = function () {
+            var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             return moduleNames;
-        }
-        setModuleNames(moduleNames) {
+        };
+        TabView.prototype.setModuleNames = function (moduleNames) {
+            var _this = this;
             // 移除所有模块界面
-            this._moduleViews.concat().forEach(v => {
+            this._moduleViews.concat().forEach(function (v) {
                 v.parent && v.parent.removeChild(v);
             });
             //
             this._moduleViews = [];
-            moduleNames.forEach(v => {
-                this.addModuleByName(v);
+            moduleNames.forEach(function (v) {
+                _this.addModuleByName(v);
             });
             this._showModuleIndex = 0;
-        }
-        childrenCreated() {
-            super.childrenCreated();
+        };
+        TabView.prototype.childrenCreated = function () {
+            var _this = this;
+            _super.prototype.childrenCreated.call(this);
             //
-            this.$children.forEach(v => {
-                this._moduleViews.push(v);
+            this.$children.forEach(function (v) {
+                _this._moduleViews.push(v);
             });
-            this._moduleViews.forEach((v, index) => {
+            this._moduleViews.forEach(function (v, index) {
                 v.parent && v.parent.removeChild(v);
-                if (this._showModuleIndex == null && v.visible)
-                    this._showModuleIndex = index;
+                if (_this._showModuleIndex == null && v.visible)
+                    _this._showModuleIndex = index;
                 v.visible = true;
             });
             //
@@ -3389,16 +3553,16 @@ var editor;
             //
             // this._tabViewInstance.once(eui.UIEvent.COMPLETE, this.onComplete, this);
             this.onComplete();
-        }
-        onComplete() {
+        };
+        TabView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this._onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             //
             this.tabGroup = this._tabViewInstance.tabGroup;
             this.contentGroup = this._tabViewInstance.contentGroup;
             // 获取按钮列表
-            for (let i = this.tabGroup.numChildren - 1; i >= 0; i--) {
-                let child = this.tabGroup.getChildAt(i);
+            for (var i = this.tabGroup.numChildren - 1; i >= 0; i--) {
+                var child = this.tabGroup.getChildAt(i);
                 if (child instanceof TabViewButton) {
                     this._tabViewButtonPool.push(child);
                     this.tabGroup.removeChildAt(i);
@@ -3408,49 +3572,51 @@ var editor;
             if (this.stage) {
                 this._onAddedToStage();
             }
-        }
-        _onAddedToStage() {
-            editor.drag.register(this.tabGroup, null, ["moduleView"], (dragSource) => {
-                dragSource.getDragData("moduleView").forEach(v => {
-                    if (v.tabView == this) {
-                        let result = this._moduleViews.filter(v => v.moduleName == v.moduleName)[0];
+        };
+        TabView.prototype._onAddedToStage = function () {
+            var _this = this;
+            editor.drag.register(this.tabGroup, null, ["moduleView"], function (dragSource) {
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this) {
+                        var result = _this._moduleViews.filter(function (v) { return v.moduleName == v.moduleName; })[0];
                         if (result) {
-                            let index = this._moduleViews.indexOf(result);
-                            this._moduleViews.splice(index, 1);
-                            this._moduleViews.push(result);
-                            this._invalidateView();
+                            var index = _this._moduleViews.indexOf(result);
+                            _this._moduleViews.splice(index, 1);
+                            _this._moduleViews.push(result);
+                            _this._invalidateView();
                         }
                     }
                     else {
-                        let moduleView = v.tabView.removeModule(v.moduleName);
-                        this.addModule(moduleView);
+                        var moduleView = v.tabView.removeModule(v.moduleName);
+                        _this.addModule(moduleView);
                     }
                     feng3d.globalDispatcher.dispatch("viewLayout.changed");
                 });
             });
-            editor.drag.register(this.contentGroup, null, ["moduleView"], (dragSource) => {
-                dragSource.getDragData("moduleView").forEach(v => {
-                    if (v.tabView == this && this._moduleViews.length == 1)
+            editor.drag.register(this.contentGroup, null, ["moduleView"], function (dragSource) {
+                dragSource.getDragData("moduleView").forEach(function (v) {
+                    if (v.tabView == _this && _this._moduleViews.length == 1)
                         return;
-                    let moduleView = v.tabView.removeModule(v.moduleName);
-                    var rect = this.getGlobalBounds();
+                    var moduleView = v.tabView.removeModule(v.moduleName);
+                    var rect = _this.getGlobalBounds();
                     var center = rect.center;
                     var mouse = new feng3d.Vector2(editor.editorui.stage.stageX, editor.editorui.stage.stageY);
                     var sub = mouse.sub(center);
                     sub.x = sub.x / rect.width;
                     sub.y = sub.y / rect.height;
                     if (sub.x * sub.x > sub.y * sub.y) {
-                        this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
+                        _this.addModuleToLeft(moduleView, sub.x < 0 ? 4 : 6);
                     }
                     else {
-                        this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
+                        _this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
                     }
                     feng3d.globalDispatcher.dispatch("viewLayout.changed");
                 });
             });
             this._invalidateView();
-        }
-        addModuleToLeft(moduleView, dir = 4) {
+        };
+        TabView.prototype.addModuleToLeft = function (moduleView, dir) {
+            if (dir === void 0) { dir = 4; }
             //
             var tabView = new TabView();
             tabView.addModule(moduleView);
@@ -3490,8 +3656,8 @@ var editor;
             }
             //
             parent.addChildAt(splitGroup, index);
-        }
-        addModuleByName(moduleName) {
+        };
+        TabView.prototype.addModuleByName = function (moduleName) {
             var moduleView = editor.modules.getModuleView(moduleName);
             if (moduleView) {
                 moduleView.top = moduleView.bottom = moduleView.left = moduleView.right = 0;
@@ -3500,24 +3666,24 @@ var editor;
                 this._invalidateView();
             }
             else {
-                console.warn(`没有找到对应模块界面 ${moduleName}`);
+                console.warn("\u6CA1\u6709\u627E\u5230\u5BF9\u5E94\u6A21\u5757\u754C\u9762 " + moduleName);
             }
-        }
-        addModule(moduleView) {
+        };
+        TabView.prototype.addModule = function (moduleView) {
             this._moduleViews.push(moduleView);
             this._showModuleIndex = this._moduleViews.length - 1;
             this._invalidateView();
-        }
-        removeModule(moduleName) {
-            let moduleView = this._moduleViews.filter(v => v.moduleName == moduleName)[0];
+        };
+        TabView.prototype.removeModule = function (moduleName) {
+            var moduleView = this._moduleViews.filter(function (v) { return v.moduleName == moduleName; })[0];
             var index = this._moduleViews.indexOf(moduleView);
             console.assert(index != -1);
             this._moduleViews.splice(index, 1);
             this.adjust(this);
             this._invalidateView();
             return moduleView;
-        }
-        adjust(view) {
+        };
+        TabView.prototype.adjust = function (view) {
             var parent = view.parent;
             if (view instanceof TabView) {
                 // 当模块全被移除时移除 TabView
@@ -3529,12 +3695,12 @@ var editor;
             else if (view instanceof editor.SplitGroup) {
                 if (view.numChildren > 1) {
                     if (view.layout instanceof eui.HorizontalLayout) {
-                        var total = view.$children.reduce((pv, cv) => { return pv + cv.width; }, 0);
-                        view.$children.forEach((v) => { v.percentWidth = v.width / total * 100; });
+                        var total = view.$children.reduce(function (pv, cv) { return pv + cv.width; }, 0);
+                        view.$children.forEach(function (v) { v.percentWidth = v.width / total * 100; });
                     }
                     else if (view.layout instanceof eui.VerticalLayout) {
-                        var total = view.$children.reduce((pv, cv) => { return pv + cv.height; }, 0);
-                        view.$children.forEach((v) => { v.percentHeight = v.height / total * 100; });
+                        var total = view.$children.reduce(function (pv, cv) { return pv + cv.height; }, 0);
+                        view.$children.forEach(function (v) { v.percentHeight = v.height / total * 100; });
                     }
                 }
                 else if (view.numChildren == 1) {
@@ -3555,8 +3721,8 @@ var editor;
             var windowView = editor.WindowView.getWindow(parent);
             if (windowView && windowView.contenGroup.numChildren == 0)
                 windowView.remove();
-        }
-        copyLayoutInfo(src, dest) {
+        };
+        TabView.prototype.copyLayoutInfo = function (src, dest) {
             dest.x = src.x;
             dest.y = src.y;
             dest.width = src.width;
@@ -3567,27 +3733,28 @@ var editor;
             dest.right = src.right;
             dest.percentWidth = src.percentWidth;
             dest.percentHeight = src.percentHeight;
-        }
-        onRemovedFromStage() {
+        };
+        TabView.prototype.onRemovedFromStage = function () {
             editor.drag.unregister(this.tabGroup);
             editor.drag.unregister(this.contentGroup);
-        }
+        };
         /**
          * 界面显示失效
          */
-        _invalidateView() {
+        TabView.prototype._invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this._updateView, this);
-        }
+        };
         /**
          * 更新界面
          */
-        _updateView() {
-            var moduleNames = this._moduleViews.map(v => v.moduleName);
+        TabView.prototype._updateView = function () {
+            var _this = this;
+            var moduleNames = this._moduleViews.map(function (v) { return v.moduleName; });
             // 设置默认显示模块名称
             this._showModuleIndex = Math.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
-            this._tabButtons.forEach(v => {
-                v.removeEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
-                v.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
+            this._tabButtons.forEach(function (v) {
+                v.removeEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
+                v.removeEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
                 //
                 editor.drag.unregister(v);
             });
@@ -3626,104 +3793,119 @@ var editor;
                 }
             }
             this._tabButtons.length = viewNum;
-            this._tabButtons.forEach(v => {
-                v.addEventListener(egret.MouseEvent.CLICK, this._onTabButtonClick, this);
+            this._tabButtons.forEach(function (v) {
+                v.addEventListener(egret.MouseEvent.CLICK, _this._onTabButtonClick, _this);
                 //
-                editor.drag.register(v, (dragSource) => {
-                    dragSource.addDragData("moduleView", { tabView: this, moduleName: v.moduleName });
+                editor.drag.register(v, function (dragSource) {
+                    dragSource.addDragData("moduleView", { tabView: _this, moduleName: v.moduleName });
                 }, []);
-                v.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
+                v.addEventListener(egret.MouseEvent.RIGHT_CLICK, _this.onTabButtonRightClick, _this);
             });
-        }
+        };
         /**
          * 点击按钮事件
          *
          * @param e
          */
-        _onTabButtonClick(e) {
+        TabView.prototype._onTabButtonClick = function (e) {
             var index = this._tabButtons.indexOf(e.currentTarget);
             if (index != this._showModuleIndex) {
                 this._showModuleIndex = index;
                 this._invalidateView();
             }
-        }
-        onTabButtonRightClick(e) {
+        };
+        TabView.prototype.onTabButtonRightClick = function (e) {
+            var _this = this;
             var tabButton = e.currentTarget;
             editor.menu.popup([
                 {
-                    label: "Close Tab", click: () => {
-                        var moduleView = this.removeModule(tabButton.moduleName);
+                    label: "Close Tab",
+                    click: function () {
+                        var moduleView = _this.removeModule(tabButton.moduleName);
                         editor.modules.recycleModuleView(moduleView);
                     }
                 },
                 { type: "separator" },
                 {
                     label: "Add Tab",
-                    submenu: [editor.SceneView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.ProjectView.moduleName,].map(v => {
+                    submenu: [editor.SceneView.moduleName, editor.InspectorView.moduleName, editor.HierarchyView.moduleName, editor.ProjectView.moduleName,].map(function (v) {
                         var item = {
                             label: v,
-                            click: () => { this.addModuleByName(v); },
+                            click: function () { _this.addModuleByName(v); },
                         };
                         return item;
                     }),
                 },
             ]);
-        }
-    }
+        };
+        return TabView;
+    }(eui.Group));
     editor.TabView = TabView;
     /**
      * TabView 按钮
      */
-    class TabViewButton extends eui.Button {
-        constructor() {
-            super();
-            this.skinName = "TabViewButtonSkin";
+    var TabViewButton = /** @class */ (function (_super) {
+        __extends(TabViewButton, _super);
+        function TabViewButton() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TabViewButtonSkin";
+            return _this;
         }
-        /**
-         * 模块名称
-         */
-        get moduleName() {
-            return this._moduleName;
-        }
-        set moduleName(value) {
-            this._moduleName = value;
+        Object.defineProperty(TabViewButton.prototype, "moduleName", {
+            /**
+             * 模块名称
+             */
+            get: function () {
+                return this._moduleName;
+            },
+            set: function (value) {
+                this._moduleName = value;
+                this._invalidateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        TabViewButton.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
             this._invalidateView();
-        }
-        childrenCreated() {
-            super.childrenCreated();
-            this._invalidateView();
-        }
-        _invalidateView() {
+        };
+        TabViewButton.prototype._invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this._updateView, this);
-        }
-        _updateView() {
+        };
+        TabViewButton.prototype._updateView = function () {
             this.label = this._moduleName;
-            this.iconDisplay.source = `${this._moduleName}Icon_png`;
+            this.iconDisplay.source = this._moduleName + "Icon_png";
+        };
+        return TabViewButton;
+    }(eui.Button));
+    var TabViewUI = /** @class */ (function (_super) {
+        __extends(TabViewUI, _super);
+        function TabViewUI() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TabViewSkin";
+            return _this;
         }
-    }
-    class TabViewUI extends eui.Component {
-        constructor() {
-            super();
-            this.skinName = "TabViewSkin";
-        }
-    }
+        return TabViewUI;
+    }(eui.Component));
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class WindowView extends eui.Panel {
-        constructor() {
-            super();
-            this.boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new feng3d.Rectangle(), draging: false };
-            this.skinName = "WindowView";
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveFromStage, this);
+    var WindowView = /** @class */ (function (_super) {
+        __extends(WindowView, _super);
+        function WindowView() {
+            var _this = _super.call(this) || this;
+            _this.boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new feng3d.Rectangle(), draging: false };
+            _this.skinName = "WindowView";
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            _this.addEventListener(egret.Event.REMOVED_FROM_STAGE, _this.onRemoveFromStage, _this);
+            return _this;
         }
         /**
          * 获取所属窗口
          *
          * @param view 窗口中的 contenGroup
          */
-        static getWindow(contenGroup) {
+        WindowView.getWindow = function (contenGroup) {
             var p = contenGroup.parent;
             while (p && !(p instanceof WindowView)) {
                 p = p.parent;
@@ -3733,14 +3915,14 @@ var editor;
                 return windowView;
             }
             return null;
-        }
-        onAddedToStage() {
+        };
+        WindowView.prototype.onAddedToStage = function () {
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        }
-        onRemoveFromStage() {
+        };
+        WindowView.prototype.onRemoveFromStage = function () {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-        }
-        onMouseMove() {
+        };
+        WindowView.prototype.onMouseMove = function () {
             if (this.boundDragInfo.draging)
                 return;
             var rect = this.getGlobalBounds();
@@ -3768,8 +3950,8 @@ var editor;
                 editor.cursor.clear(this);
                 this.stage.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             }
-        }
-        onMouseDown(e) {
+        };
+        WindowView.prototype.onMouseDown = function (e) {
             this.boundDragInfo.draging = true;
             this.boundDragInfo.startX = e.stageX;
             this.boundDragInfo.startY = e.stageY;
@@ -3777,8 +3959,8 @@ var editor;
             this.boundDragInfo.rect = new feng3d.Rectangle(this.x, this.y, this.width, this.height);
             feng3d.windowEventProxy.on("mousemove", this.onBoundDrag, this);
             feng3d.windowEventProxy.on("mouseup", this.onBoundDragEnd, this);
-        }
-        onBoundDrag() {
+        };
+        WindowView.prototype.onBoundDrag = function () {
             var offsetX = this.boundDragInfo.stage.stageX - this.boundDragInfo.startX;
             var offsetY = this.boundDragInfo.stage.stageY - this.boundDragInfo.startY;
             if (this.boundDragInfo.type == 4) {
@@ -3797,13 +3979,14 @@ var editor;
                     this.height = this.boundDragInfo.rect.height + offsetY;
                 }
             }
-        }
-        onBoundDragEnd() {
+        };
+        WindowView.prototype.onBoundDragEnd = function () {
             this.boundDragInfo.draging = false;
             feng3d.windowEventProxy.off("mousemove", this.onBoundDrag, this);
             feng3d.windowEventProxy.off("mouseup", this.onBoundDragEnd, this);
-        }
-    }
+        };
+        return WindowView;
+    }(eui.Panel));
     editor.WindowView = WindowView;
 })(editor || (editor = {}));
 var editor;
@@ -3811,8 +3994,10 @@ var editor;
     /**
      * 在界面后面添加一层透明界面，当点击到透明界面时关闭界面。
      */
-    class Maskview {
-        mask(displayObject) {
+    var Maskview = /** @class */ (function () {
+        function Maskview() {
+        }
+        Maskview.prototype.mask = function (displayObject) {
             var maskReck = new eui.Rect();
             maskReck.alpha = 0;
             if (displayObject.stage) {
@@ -3841,12 +4026,13 @@ var editor;
                 if (maskReck.parent) {
                     maskReck.parent.removeChild(maskReck);
                 }
-                feng3d.ticker.nextframe(() => {
+                feng3d.ticker.nextframe(function () {
                     feng3d.shortcut.deactivityState("inModal");
                 });
             }
-        }
-    }
+        };
+        return Maskview;
+    }());
     editor.Maskview = Maskview;
     ;
     editor.maskview = new Maskview();
@@ -3856,7 +4042,9 @@ var editor;
     /**
      * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
      */
-    class Popupview {
+    var Popupview = /** @class */ (function () {
+        function Popupview() {
+        }
         /**
          * 弹出一个 objectview
          *
@@ -3864,26 +4052,28 @@ var editor;
          * @param closecallback
          * @param param
          */
-        popupObject(object, param = {}) {
+        Popupview.prototype.popupObject = function (object, param) {
+            if (param === void 0) { param = {}; }
             var view = feng3d.objectview.getObjectView(object);
             var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
             view.addChildAt(background, 0);
             //
             if (param.closecallback) {
                 var closecallback = param.closecallback;
-                param.closecallback = () => {
+                param.closecallback = function () {
                     closecallback && closecallback(object);
                 };
             }
             this.popupView(view, param);
-        }
+        };
         /**
          * 弹出一个界面
          *
          * @param view
          * @param param
          */
-        popupView(view, param = {}) {
+        Popupview.prototype.popupView = function (view, param) {
+            if (param === void 0) { param = {}; }
             editor.editorui.popupLayer.addChild(view);
             if (param.width !== undefined)
                 view.width = param.width;
@@ -3906,7 +4096,7 @@ var editor;
             }
             if (param.mode != false)
                 editor.maskview.mask(view);
-        }
+        };
         /**
          * 弹出一个包含objectview的窗口
          *
@@ -3914,20 +4104,21 @@ var editor;
          * @param closecallback
          * @param param
          */
-        popupObjectWindow(object, param = {}) {
+        Popupview.prototype.popupObjectWindow = function (object, param) {
+            if (param === void 0) { param = {}; }
             var view = feng3d.objectview.getObjectView(object);
             var window = new editor.WindowView();
             window.contenGroup.addChild(view);
-            window.title = `${object.constructor["name"]}`;
+            window.title = "" + object.constructor["name"];
             //
             if (param.closecallback) {
                 var closecallback = param.closecallback;
-                param.closecallback = () => {
+                param.closecallback = function () {
                     closecallback && closecallback(object);
                 };
             }
             this.popupView(window, param);
-        }
+        };
         /**
          * 弹出一个包含给出界面的窗口
          *
@@ -3935,13 +4126,15 @@ var editor;
          * @param closecallback
          * @param param
          */
-        popupViewWindow(view, param = {}) {
+        Popupview.prototype.popupViewWindow = function (view, param) {
+            if (param === void 0) { param = {}; }
             var window = new editor.WindowView();
             window.contenGroup.addChild(view);
             //
             this.popupView(window, param);
-        }
-    }
+        };
+        return Popupview;
+    }());
     editor.Popupview = Popupview;
     ;
     editor.popupview = new Popupview();
@@ -3951,55 +4144,61 @@ var editor;
     /**
      * 下拉列表
      */
-    class ComboBox extends eui.Component {
-        constructor() {
-            super();
+    var ComboBox = /** @class */ (function (_super) {
+        __extends(ComboBox, _super);
+        function ComboBox() {
+            var _this = _super.call(this) || this;
             /**
              * 数据
              */
-            this.dataProvider = [];
-            this.skinName = "ComboBoxSkin";
+            _this.dataProvider = [];
+            _this.skinName = "ComboBoxSkin";
+            return _this;
         }
-        /**
-         * 选中数据
-         */
-        get data() {
-            return this._data;
-        }
-        set data(v) {
-            this._data = v;
-            if (this.label) {
-                if (this._data)
-                    this.label.text = this._data.label;
-                else
-                    this.label.text = "";
-            }
-        }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        Object.defineProperty(ComboBox.prototype, "data", {
+            /**
+             * 选中数据
+             */
+            get: function () {
+                return this._data;
+            },
+            set: function (v) {
+                this._data = v;
+                if (this.label) {
+                    if (this._data)
+                        this.label.text = this._data.label;
+                    else
+                        this.label.text = "";
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        ComboBox.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.init();
             this.updateview();
             this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        ComboBox.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
-        }
-        init() {
+        };
+        ComboBox.prototype.init = function () {
             this.list = new eui.List();
             this.list.itemRenderer = eui.ItemRenderer;
-        }
-        updateview() {
+        };
+        ComboBox.prototype.updateview = function () {
             if (this.data == null && this.dataProvider != null)
                 this.data = this.dataProvider[0];
             if (this.data)
                 this.label.text = this.data.label;
             else
                 this.label.text = "";
-        }
-        onClick() {
+        };
+        ComboBox.prototype.onClick = function () {
             if (!this.dataProvider)
                 return;
             this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
@@ -4009,51 +4208,54 @@ var editor;
             this.list.selectedIndex = this.dataProvider.indexOf(this.data);
             editor.editorui.popupLayer.addChild(this.list);
             editor.maskview.mask(this.list);
-        }
-        onlistChange() {
+        };
+        ComboBox.prototype.onlistChange = function () {
             this.data = this.list.selectedItem;
             this.updateview();
             if (this.list.parent)
                 this.list.parent.removeChild(this.list);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-    }
+        };
+        return ComboBox;
+    }(eui.Component));
     editor.ComboBox = ComboBox;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Accordion extends eui.Component {
-        constructor() {
-            super();
+    var Accordion = /** @class */ (function (_super) {
+        __extends(Accordion, _super);
+        function Accordion() {
+            var _this = _super.call(this) || this;
             /**
              * 标签名称
              */
-            this.titleName = "";
-            this.components = [];
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "Accordion";
+            _this.titleName = "";
+            _this.components = [];
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "Accordion";
+            return _this;
         }
-        addContent(component) {
+        Accordion.prototype.addContent = function (component) {
             if (!this.contentGroup)
                 this.components.push(component);
             else
                 this.contentGroup.addChild(component);
-        }
-        removeContent(component) {
+        };
+        Accordion.prototype.removeContent = function (component) {
             var index = this.components ? this.components.indexOf(component) : -1;
             if (index != -1)
                 this.components.splice(index, 1);
             else
                 component.parent && component.parent.removeChild(component);
-        }
-        onComplete() {
+        };
+        Accordion.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        Accordion.prototype.onAddedToStage = function () {
             this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.titleLabel.text = this.titleName;
             if (this.components) {
@@ -4063,53 +4265,61 @@ var editor;
                 this.components = null;
                 delete this.components;
             }
-        }
-        onRemovedFromStage() {
+        };
+        Accordion.prototype.onRemovedFromStage = function () {
             this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-        }
-        onTitleButtonClick() {
+        };
+        Accordion.prototype.onTitleButtonClick = function () {
             this.currentState = this.currentState == "hide" ? "show" : "hide";
-        }
-    }
+        };
+        return Accordion;
+    }(eui.Component));
     editor.Accordion = Accordion;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class ColorPicker extends eui.Component {
-        constructor() {
-            super();
-            this._value = new feng3d.Color3();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "ColorPicker";
+    var ColorPicker = /** @class */ (function (_super) {
+        __extends(ColorPicker, _super);
+        function ColorPicker() {
+            var _this = _super.call(this) || this;
+            _this._value = new feng3d.Color3();
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ColorPicker";
+            return _this;
         }
-        get value() {
-            return this._value;
-        }
-        set value(v) {
-            this._value = v;
-            if (this.picker) {
-                if (this._value instanceof feng3d.Color3) {
-                    this.picker.fillColor = this._value.toInt();
+        Object.defineProperty(ColorPicker.prototype, "value", {
+            get: function () {
+                return this._value;
+            },
+            set: function (v) {
+                this._value = v;
+                if (this.picker) {
+                    if (this._value instanceof feng3d.Color3) {
+                        this.picker.fillColor = this._value.toInt();
+                    }
+                    else {
+                        this.picker.fillColor = this._value.toColor3().toInt();
+                    }
                 }
-                else {
-                    this.picker.fillColor = this._value.toColor3().toInt();
-                }
-            }
-        }
-        onComplete() {
+            },
+            enumerable: false,
+            configurable: true
+        });
+        ColorPicker.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        ColorPicker.prototype.onAddedToStage = function () {
             this.picker.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        }
-        onRemovedFromStage() {
+        };
+        ColorPicker.prototype.onRemovedFromStage = function () {
             this.picker.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-        }
-        onClick() {
+        };
+        ColorPicker.prototype.onClick = function () {
+            var _this = this;
             if (!editor.colorPickerView)
                 editor.colorPickerView = new editor.ColorPickerView();
             editor.colorPickerView.color = this.value;
@@ -4120,127 +4330,137 @@ var editor;
             //
             editor.popupview.popupView(editor.colorPickerView, {
                 x: pos.x, y: pos.y,
-                closecallback: () => {
-                    editor.colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                closecallback: function () {
+                    editor.colorPickerView.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
                 }
             });
-        }
-        onPickerViewChanged() {
+        };
+        ColorPicker.prototype.onPickerViewChanged = function () {
             this.value = editor.colorPickerView.color;
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-    }
+        };
+        return ColorPicker;
+    }(eui.Component));
     editor.ColorPicker = ColorPicker;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class TreeItemRenderer extends eui.ItemRenderer {
-        constructor() {
-            super();
+    var TreeItemRenderer = /** @class */ (function (_super) {
+        __extends(TreeItemRenderer, _super);
+        function TreeItemRenderer() {
+            var _this = _super.call(this) || this;
             /**
              * 子结点相对父结点的缩进值，以像素为单位。默认17。
              */
-            this.indentation = 17;
-            this.watchers = [];
-            this.skinName = "TreeItemRendererSkin";
+            _this.indentation = 17;
+            _this.watchers = [];
+            _this.skinName = "TreeItemRendererSkin";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        TreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             //
             this.disclosureButton.addEventListener(egret.MouseEvent.CLICK, this.onDisclosureButtonClick, this);
             this.watchers.push(eui.Watcher.watch(this, ["data", "depth"], this.updateView, this), eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this), eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this), eui.Watcher.watch(this, ["indentation"], this.updateView, this));
             this.updateView();
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        TreeItemRenderer.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             while (this.watchers.length > 0) {
                 this.watchers.pop().unwatch();
             }
             //
             this.disclosureButton.removeEventListener(egret.MouseEvent.CLICK, this.onDisclosureButtonClick, this);
-        }
-        onDisclosureButtonClick() {
+        };
+        TreeItemRenderer.prototype.onDisclosureButtonClick = function () {
             if (this.data)
                 this.data.isOpen = !this.data.isOpen;
-        }
-        updateView() {
+        };
+        TreeItemRenderer.prototype.updateView = function () {
             this.disclosureButton.visible = this.data ? (this.data.children && this.data.children.length > 0) : false;
             this.contentGroup.left = (this.data ? this.data.depth : 0) * this.indentation;
             this.disclosureButton.selected = this.data ? this.data.isOpen : false;
-        }
-    }
+        };
+        return TreeItemRenderer;
+    }(eui.ItemRenderer));
     editor.TreeItemRenderer = TreeItemRenderer;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class TreeNode extends feng3d.EventDispatcher {
-        constructor(obj) {
-            super();
+    var TreeNode = /** @class */ (function (_super) {
+        __extends(TreeNode, _super);
+        function TreeNode(obj) {
+            var _this = _super.call(this) || this;
             /**
              * 标签
              */
-            this.label = "";
+            _this.label = "";
             /**
              * 是否打开
              */
-            this.isOpen = false;
+            _this.isOpen = false;
             /**
              * 是否选中
              */
-            this.selected = false;
+            _this.selected = false;
             /**
              * 父结点
              */
-            this.parent = null;
+            _this.parent = null;
             if (obj) {
-                Object.assign(this, obj);
+                Object.assign(_this, obj);
             }
+            return _this;
         }
-        /**
-         * 目录深度
-         */
-        get depth() {
-            var d = 0;
-            var p = this.parent;
-            while (p) {
-                d++;
-                p = p.parent;
-            }
-            return d;
-        }
+        Object.defineProperty(TreeNode.prototype, "depth", {
+            /**
+             * 目录深度
+             */
+            get: function () {
+                var d = 0;
+                var p = this.parent;
+                while (p) {
+                    d++;
+                    p = p.parent;
+                }
+                return d;
+            },
+            enumerable: false,
+            configurable: true
+        });
         /**
          * 销毁
          */
-        destroy() {
+        TreeNode.prototype.destroy = function () {
             if (this.children) {
-                this.children.concat().forEach(element => {
+                this.children.concat().forEach(function (element) {
                     element.destroy();
                 });
             }
             this.remove();
             this.parent = null;
             this.children = null;
-        }
+        };
         /**
          * 判断是否包含结点
          */
-        contain(node) {
+        TreeNode.prototype.contain = function (node) {
             while (node) {
                 if (node == this)
                     return true;
                 node = node.parent;
             }
             return false;
-        }
-        addChild(node) {
+        };
+        TreeNode.prototype.addChild = function (node) {
             node.remove();
             console.assert(!node.contain(this), "无法添加到自身结点中!");
             if (this.children.indexOf(node) == -1)
                 this.children.push(node);
             node.parent = this;
             this.dispatch("added", node, true);
-        }
-        remove() {
+        };
+        TreeNode.prototype.remove = function () {
             if (this.parent) {
                 var index = this.parent.children.indexOf(this);
                 if (index != -1)
@@ -4248,60 +4468,63 @@ var editor;
                 this.dispatch("removed", this, true);
                 this.parent = null;
             }
-        }
-        getShowNodes() {
+        };
+        TreeNode.prototype.getShowNodes = function () {
             var nodes = [this];
             if (this.isOpen) {
-                this.children.forEach(element => {
+                this.children.forEach(function (element) {
                     nodes = nodes.concat(element.getShowNodes());
                 });
             }
             return nodes;
-        }
-        openParents() {
+        };
+        TreeNode.prototype.openParents = function () {
             var p = this.parent;
             while (p) {
                 p.isOpen = true;
                 p = p.parent;
             }
-        }
-        openChanged() {
+        };
+        TreeNode.prototype.openChanged = function () {
             this.dispatch("openChanged", null, true);
-        }
-        selectedChanged() {
+        };
+        TreeNode.prototype.selectedChanged = function () {
             this.openParents();
-        }
-    }
-    __decorate([
-        feng3d.watch("openChanged")
-    ], TreeNode.prototype, "isOpen", void 0);
-    __decorate([
-        feng3d.watch("selectedChanged")
-    ], TreeNode.prototype, "selected", void 0);
+        };
+        __decorate([
+            feng3d.watch("openChanged")
+        ], TreeNode.prototype, "isOpen", void 0);
+        __decorate([
+            feng3d.watch("selectedChanged")
+        ], TreeNode.prototype, "selected", void 0);
+        return TreeNode;
+    }(feng3d.EventDispatcher));
     editor.TreeNode = TreeNode;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class ComponentView extends eui.Component {
+    var ComponentView = /** @class */ (function (_super) {
+        __extends(ComponentView, _super);
         /**
          * 对象界面数据
          */
-        constructor(component) {
-            super();
-            this.component = component;
-            component.on("refreshView", this.onRefreshView, this);
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "ComponentSkin";
+        function ComponentView(component) {
+            var _this = _super.call(this) || this;
+            _this.component = component;
+            component.on("refreshView", _this.onRefreshView, _this);
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ComponentSkin";
+            return _this;
         }
         /**
          * 更新界面
          */
-        updateView() {
+        ComponentView.prototype.updateView = function () {
             this.updateEnableCB();
             if (this.componentView)
                 this.componentView.updateView();
-        }
-        onComplete() {
+        };
+        ComponentView.prototype.onComplete = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
             this.accordion.titleName = componentName;
             this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
@@ -4350,12 +4573,12 @@ var editor;
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage)
                 this.onAddToStage();
-        }
-        onDeleteButton(event) {
+        };
+        ComponentView.prototype.onDeleteButton = function (event) {
             if (this.component.gameObject)
                 this.component.gameObject.removeComponent(this.component);
-        }
-        onAddToStage() {
+        };
+        ComponentView.prototype.onAddToStage = function () {
             this.initScriptView();
             this.updateView();
             this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
@@ -4364,21 +4587,21 @@ var editor;
             this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
             this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
             feng3d.globalDispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
-        }
-        onRemovedFromStage() {
+        };
+        ComponentView.prototype.onRemovedFromStage = function () {
             this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
             if (this.component instanceof feng3d.Behaviour)
                 feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
             this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
             this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
             feng3d.globalDispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
-        }
-        onRefreshView() {
+        };
+        ComponentView.prototype.onRefreshView = function () {
             this.accordion.removeContent(this.componentView);
             this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
             this.accordion.addContent(this.componentView);
-        }
-        updateEnableCB() {
+        };
+        ComponentView.prototype.updateEnableCB = function () {
             if (this.component instanceof feng3d.Behaviour) {
                 this.enabledCB.selected = this.component.enabled;
                 this.enabledCB.visible = true;
@@ -4386,13 +4609,13 @@ var editor;
             else {
                 this.enabledCB.visible = false;
             }
-        }
-        onEnableCBChange() {
+        };
+        ComponentView.prototype.onEnableCBChange = function () {
             if (this.component instanceof feng3d.Behaviour) {
                 this.component.enabled = this.enabledCB.selected;
             }
-        }
-        initScriptView() {
+        };
+        ComponentView.prototype.initScriptView = function () {
             // 初始化Script属性界面
             if (this.component instanceof feng3d.ScriptComponent) {
                 feng3d.watcher.watch(this.component, "scriptName", this.onScriptChanged, this);
@@ -4402,8 +4625,8 @@ var editor;
                     this.accordion.addContent(this.scriptView);
                 }
             }
-        }
-        removeScriptView() {
+        };
+        ComponentView.prototype.removeScriptView = function () {
             // 移除Script属性界面
             if (this.component instanceof feng3d.ScriptComponent) {
                 feng3d.watcher.unwatch(this.component, "scriptName", this.onScriptChanged, this);
@@ -4412,53 +4635,58 @@ var editor;
                 if (this.scriptView.parent)
                     this.scriptView.parent.removeChild(this.scriptView);
             }
-        }
-        onOperationBtnClick() {
+        };
+        ComponentView.prototype.onOperationBtnClick = function () {
+            var _this = this;
             var menus = [];
             if (!(this.component instanceof feng3d.Transform)) {
                 menus.push({
                     label: "移除组件",
-                    click: () => {
-                        if (this.component.gameObject)
-                            this.component.gameObject.removeComponent(this.component);
+                    click: function () {
+                        if (_this.component.gameObject)
+                            _this.component.gameObject.removeComponent(_this.component);
                     }
                 });
             }
             editor.menu.popup(menus);
-        }
-        onHelpBtnClick() {
-            window.open(`http://feng3d.gitee.io/#/script`);
-        }
-        onScriptChanged() {
-            setTimeout(() => {
-                this.removeScriptView();
-                this.initScriptView();
+        };
+        ComponentView.prototype.onHelpBtnClick = function () {
+            window.open("http://feng3d.gitee.io/#/script");
+        };
+        ComponentView.prototype.onScriptChanged = function () {
+            var _this = this;
+            setTimeout(function () {
+                _this.removeScriptView();
+                _this.initScriptView();
             }, 10);
-        }
-    }
+        };
+        return ComponentView;
+    }(eui.Component));
     editor.ComponentView = ComponentView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class ParticleComponentView extends eui.Component {
+    var ParticleComponentView = /** @class */ (function (_super) {
+        __extends(ParticleComponentView, _super);
         /**
          * 对象界面数据
          */
-        constructor(component) {
-            super();
-            this.component = component;
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "ParticleComponentView";
+        function ParticleComponentView(component) {
+            var _this = _super.call(this) || this;
+            _this.component = component;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ParticleComponentView";
+            return _this;
         }
         /**
          * 更新界面
          */
-        updateView() {
+        ParticleComponentView.prototype.updateView = function () {
             this.updateEnableCB();
             if (this.componentView)
                 this.componentView.updateView();
-        }
-        onComplete() {
+        };
+        ParticleComponentView.prototype.onComplete = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
             this.accordion.titleName = componentName;
             this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
@@ -4468,28 +4696,31 @@ var editor;
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage)
                 this.onAddToStage();
-        }
-        onAddToStage() {
+        };
+        ParticleComponentView.prototype.onAddToStage = function () {
             this.updateView();
             this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
             feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
-        }
-        onRemovedFromStage() {
+        };
+        ParticleComponentView.prototype.onRemovedFromStage = function () {
             this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
             feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
-        }
-        updateEnableCB() {
+        };
+        ParticleComponentView.prototype.updateEnableCB = function () {
             this.enabledCB.selected = this.component.enabled;
-        }
-        onEnableCBChange() {
+        };
+        ParticleComponentView.prototype.onEnableCBChange = function () {
             this.component.enabled = this.enabledCB.selected;
-        }
-    }
+        };
+        return ParticleComponentView;
+    }(eui.Component));
     editor.ParticleComponentView = ParticleComponentView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Menu {
+    var Menu = /** @class */ (function () {
+        function Menu() {
+        }
         /**
          * 弹出菜单
          *
@@ -4521,23 +4752,24 @@ var editor;
 ```
          *
          */
-        popup(menuItems) {
+        Menu.prototype.popup = function (menuItems) {
             var menuItem = this.handleShow({ submenu: menuItems });
             if (menuItem.submenu.length == 0)
                 return;
             var menuUI = MenuUI.create(menuItem.submenu, null);
             editor.maskview.mask(menuUI);
             return menuUI;
-        }
+        };
         /**
          * 处理菜单中 show==false的菜单项
          *
          * @param menuItem 菜单数据
          */
-        handleShow(menuItem) {
+        Menu.prototype.handleShow = function (menuItem) {
+            var _this = this;
             if (menuItem.submenu) {
-                var submenu = menuItem.submenu.filter(v => v.show != false);
-                for (let i = submenu.length - 1; i >= 0; i--) {
+                var submenu = menuItem.submenu.filter(function (v) { return v.show != false; });
+                for (var i = submenu.length - 1; i >= 0; i--) {
                     if (submenu[i].type == 'separator') {
                         if (i == 0 || i == submenu.length - 1) {
                             submenu.splice(i, 1);
@@ -4548,10 +4780,10 @@ var editor;
                     }
                 }
                 menuItem.submenu = submenu;
-                menuItem.submenu.forEach(v => this.handleShow(v));
+                menuItem.submenu.forEach(function (v) { return _this.handleShow(v); });
             }
             return menuItem;
-        }
+        };
         /**
          * 弹出枚举选择菜单
          *
@@ -4559,47 +4791,59 @@ var editor;
          * @param currentValue 当前枚举值
          * @param selectCallBack 选择回调
          */
-        popupEnum(enumDefinition, currentValue, selectCallBack) {
+        Menu.prototype.popupEnum = function (enumDefinition, currentValue, selectCallBack) {
             var menu = [];
-            for (const key in enumDefinition) {
+            for (var key in enumDefinition) {
                 if (enumDefinition.hasOwnProperty(key)) {
                     if (isNaN(Number(key))) {
                         menu.push({
                             label: (currentValue == enumDefinition[key] ? "√ " : "   ") + key,
-                            click: ((v) => {
-                                return () => selectCallBack(v);
+                            click: (function (v) {
+                                return function () { return selectCallBack(v); };
                             })(enumDefinition[key])
                         });
                     }
                 }
             }
             this.popup(menu);
-        }
-    }
+        };
+        return Menu;
+    }());
     editor.Menu = Menu;
     ;
     editor.menu = new Menu();
-    class MenuUI extends eui.List {
-        constructor() {
-            super();
-            this.itemRenderer = MenuItemRenderer;
-            this.onComplete();
+    var MenuUI = /** @class */ (function (_super) {
+        __extends(MenuUI, _super);
+        function MenuUI() {
+            var _this = _super.call(this) || this;
+            _this.itemRenderer = MenuItemRenderer;
+            _this.onComplete();
+            return _this;
         }
-        get subMenuUI() {
-            return this._subMenuUI;
-        }
-        set subMenuUI(v) {
-            if (this._subMenuUI)
-                this._subMenuUI.remove();
-            this._subMenuUI = v;
-            if (this._subMenuUI)
-                this._subMenuUI.parentMenuUI = this;
-        }
-        get topMenu() {
-            var m = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
-            return m;
-        }
-        static create(menuItems, menuItemRendererRect = null) {
+        Object.defineProperty(MenuUI.prototype, "subMenuUI", {
+            get: function () {
+                return this._subMenuUI;
+            },
+            set: function (v) {
+                if (this._subMenuUI)
+                    this._subMenuUI.remove();
+                this._subMenuUI = v;
+                if (this._subMenuUI)
+                    this._subMenuUI.parentMenuUI = this;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(MenuUI.prototype, "topMenu", {
+            get: function () {
+                var m = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
+                return m;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        MenuUI.create = function (menuItems, menuItemRendererRect) {
+            if (menuItemRendererRect === void 0) { menuItemRendererRect = null; }
             var menuUI = new MenuUI();
             var dataProvider = new eui.ArrayCollection();
             dataProvider.replaceAll(menuItems);
@@ -4621,58 +4865,61 @@ var editor;
             if (menuUI.y + menuUI.height > editor.editorui.popupLayer.stage.stageHeight)
                 menuUI.y = editor.editorui.popupLayer.stage.stageHeight - menuUI.height;
             return menuUI;
-        }
-        onComplete() {
+        };
+        MenuUI.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        MenuUI.prototype.onAddedToStage = function () {
             this.updateView();
-        }
-        onRemovedFromStage() {
+        };
+        MenuUI.prototype.onRemovedFromStage = function () {
             this.subMenuUI = null;
             this.parentMenuUI = null;
-        }
-        updateView() {
-        }
-        remove() {
+        };
+        MenuUI.prototype.updateView = function () {
+        };
+        MenuUI.prototype.remove = function () {
             this.parent && this.parent.removeChild(this);
+        };
+        return MenuUI;
+    }(eui.List));
+    var MenuItemRenderer = /** @class */ (function (_super) {
+        __extends(MenuItemRenderer, _super);
+        function MenuItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "MenuItemRender";
+            return _this;
         }
-    }
-    class MenuItemRenderer extends eui.ItemRenderer {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "MenuItemRender";
-        }
-        dataChanged() {
-            super.dataChanged();
+        MenuItemRenderer.prototype.dataChanged = function () {
+            _super.prototype.dataChanged.call(this);
             this.updateView();
-        }
-        onComplete() {
+        };
+        MenuItemRenderer.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        MenuItemRenderer.prototype.onAddedToStage = function () {
             this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
             this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
             this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
             this.menuUI = this.parent;
             this.updateView();
-        }
-        onRemovedFromStage() {
+        };
+        MenuItemRenderer.prototype.onRemovedFromStage = function () {
             this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
             this.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
             this.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
             this.menuUI = null;
-        }
-        updateView() {
+        };
+        MenuItemRenderer.prototype.updateView = function () {
             if (!this.data)
                 return;
             this.touchEnabled = true;
@@ -4688,16 +4935,16 @@ var editor;
             }
             this.subSign.textColor = this.label.textColor = this.data.enable != false ? 0x000000 : 0x6E6E6E;
             this.selectedRect.visible = false;
-        }
-        onItemMouseDown(event) {
+        };
+        MenuItemRenderer.prototype.onItemMouseDown = function (event) {
             if (this.data.enable == false)
                 return;
             if (this.data.click) {
                 this.data.click();
                 this.menuUI.topMenu.remove();
             }
-        }
-        onItemMouseOver() {
+        };
+        MenuItemRenderer.prototype.onItemMouseOver = function () {
             if (this.data.submenu) {
                 if (this.data.enable != false) {
                     var rect = this.getTransformedBounds(this.stage);
@@ -4709,21 +4956,22 @@ var editor;
                 this.menuUI.subMenuUI = null;
             }
             this.selectedRect.visible = this.data.enable != false;
-        }
-        onItemMouseOut() {
+        };
+        MenuItemRenderer.prototype.onItemMouseOut = function () {
             if (!this.menuUI.subMenuUI)
                 this.selectedRect.visible = false;
-        }
-        onsubMenuUIRemovedFromeStage(e) {
+        };
+        MenuItemRenderer.prototype.onsubMenuUIRemovedFromeStage = function (e) {
             var current = e.currentTarget;
             current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
             this.selectedRect.visible = false;
-        }
-    }
+        };
+        return MenuItemRenderer;
+    }(eui.ItemRenderer));
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let MessageType;
+    var MessageType;
     (function (MessageType) {
         MessageType[MessageType["Normal"] = 0] = "Normal";
         MessageType[MessageType["Error"] = 1] = "Error";
@@ -4733,8 +4981,8 @@ var editor;
      *
      * 用于显示提示信息，例如屏幕中间的上浮信息
      */
-    class Message {
-        constructor() {
+    var Message = /** @class */ (function () {
+        function Message() {
             this._messages = [];
             this._showMessageIndex = 0;
             this._messageLabelPool = [];
@@ -4745,15 +4993,15 @@ var editor;
             feng3d.globalDispatcher.on("message", this._onMessage, this);
             feng3d.globalDispatcher.on("message.error", this._onErrorMessage, this);
         }
-        _onMessage(event) {
+        Message.prototype._onMessage = function (event) {
             this._messages.push([MessageType.Normal, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);
-        }
-        _onErrorMessage(event) {
+        };
+        Message.prototype._onErrorMessage = function (event) {
             this._messages.push([MessageType.Error, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);
-        }
-        _getMessageItem(message) {
+        };
+        Message.prototype._getMessageItem = function (message) {
             var label = this._messageLabelPool.pop();
             if (!label) {
                 label = new eui.Label();
@@ -4770,55 +5018,57 @@ var editor;
                     break;
             }
             return label;
-        }
-        _showMessage() {
+        };
+        Message.prototype._showMessage = function () {
+            var _this = this;
             if (this._showMessageIndex >= this._messages.length) {
                 this._showMessageIndex = 0;
                 this._messages = [];
                 return;
             }
-            let message = this._messages[this._showMessageIndex++];
-            let showItem = this._getMessageItem(message);
+            var message = this._messages[this._showMessageIndex++];
+            var showItem = this._getMessageItem(message);
             //
             showItem.x = (editor.editorui.stage.stageWidth - showItem.width) / 2;
             showItem.y = (editor.editorui.stage.stageHeight - showItem.height) / 4;
             editor.editorui.messageLayer.addChild(showItem);
             //
-            egret.Tween.get(showItem).to({ y: (editor.editorui.stage.stageHeight - showItem.height) / 8, alpha: 0 }, 1000, egret.Ease.sineIn).call(() => {
+            egret.Tween.get(showItem).to({ y: (editor.editorui.stage.stageHeight - showItem.height) / 8, alpha: 0 }, 1000, egret.Ease.sineIn).call(function () {
                 editor.editorui.messageLayer.removeChild(showItem);
-                this._messageLabelPool.push(showItem);
+                _this._messageLabelPool.push(showItem);
             });
-        }
-    }
+        };
+        return Message;
+    }());
     editor.Message = Message;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class ToolTip {
-        constructor() {
+    var ToolTip = /** @class */ (function () {
+        function ToolTip() {
             /**
              * 默认 提示界面
              */
-            this.defaultTipview = () => editor.TipString;
+            this.defaultTipview = function () { return editor.TipString; };
             /**
              * tip界面映射表，{key:数据类定义,value:界面类定义}，例如 {key:String,value:TipString}
              */
             this.tipviewmap = new Map();
             this.tipmap = new Map();
         }
-        register(displayObject, tip) {
+        ToolTip.prototype.register = function (displayObject, tip) {
             if (!displayObject)
                 return;
             this.tipmap.set(displayObject, tip);
             displayObject.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-        }
-        unregister(displayObject) {
+        };
+        ToolTip.prototype.unregister = function (displayObject) {
             if (!displayObject)
                 return;
             this.tipmap.delete(displayObject);
             displayObject.removeEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
-        }
-        onMouseOver(event) {
+        };
+        ToolTip.prototype.onMouseOver = function (event) {
             this.removeTipview();
             var displayObject = event.currentTarget;
             var tip = this.tipmap.get(displayObject);
@@ -4832,19 +5082,20 @@ var editor;
             this.tipView.y = feng3d.windowEventProxy.clientY - this.tipView.height;
             //
             displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
-        }
-        onMouseOut(event) {
+        };
+        ToolTip.prototype.onMouseOut = function (event) {
             var displayObject = event.currentTarget;
             displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
             this.removeTipview();
-        }
-        removeTipview() {
+        };
+        ToolTip.prototype.removeTipview = function () {
             if (this.tipView) {
                 this.tipView.parent.removeChild(this.tipView);
                 this.tipView = null;
             }
-        }
-    }
+        };
+        return ToolTip;
+    }());
     editor.ToolTip = ToolTip;
     editor.toolTip = new ToolTip();
 })(editor || (editor = {}));
@@ -4853,15 +5104,17 @@ var editor;
     var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
     /**
      */
-    class ColorPickerView extends eui.Component {
-        constructor() {
-            super();
+    var ColorPickerView = /** @class */ (function (_super) {
+        __extends(ColorPickerView, _super);
+        function ColorPickerView() {
+            var _this = _super.call(this) || this;
             //
-            this.color = new feng3d.Color4(0.2, 0.5, 0);
-            this.skinName = "ColorPickerView";
+            _this.color = new feng3d.Color4(0.2, 0.5, 0);
+            _this.skinName = "ColorPickerView";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        ColorPickerView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             var w = this.group1.width - 4;
             var h = this.group1.height - 4;
             this.image1.source = new feng3d.ImageUtil(w, h).drawMinMaxGradient(new feng3d.Gradient().fromColors(colors), false).toDataURL();
@@ -4885,8 +5138,8 @@ var editor;
             //
             this.group0.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.group1.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-        }
-        $onRemoveFromStage() {
+        };
+        ColorPickerView.prototype.$onRemoveFromStage = function () {
             //
             this.txtR.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.txtR.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
@@ -4907,15 +5160,15 @@ var editor;
             this.group0.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             this.group1.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             //
-            super.$onRemoveFromStage();
-        }
-        onMouseDown(e) {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        ColorPickerView.prototype.onMouseDown = function (e) {
             this._mouseDownGroup = e.currentTarget;
             this.onMouseMove();
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
-        }
-        onMouseMove() {
+        };
+        ColorPickerView.prototype.onMouseMove = function () {
             var image = this.image0;
             if (this._mouseDownGroup == this.group0)
                 image = this.image0;
@@ -4942,20 +5195,20 @@ var editor;
             else {
                 this.color = new feng3d.Color4(color.r, color.g, color.b, this.color.a);
             }
-        }
-        onMouseUp() {
+        };
+        ColorPickerView.prototype.onMouseUp = function () {
             this._mouseDownGroup = null;
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-        }
-        ontxtfocusin(e) {
+        };
+        ColorPickerView.prototype.ontxtfocusin = function (e) {
             this._textfocusintxt = e.currentTarget;
-        }
-        ontxtfocusout(e) {
+        };
+        ColorPickerView.prototype.ontxtfocusout = function (e) {
             this._textfocusintxt = null;
             this.updateView();
-        }
-        onTextChange(e) {
+        };
+        ColorPickerView.prototype.onTextChange = function (e) {
             if (this._textfocusintxt == e.currentTarget) {
                 var color = this.color.clone();
                 switch (this._textfocusintxt) {
@@ -4977,14 +5230,14 @@ var editor;
                 }
                 this.color = color;
             }
-        }
-        onColorChanged(property, oldValue, newValue) {
+        };
+        ColorPickerView.prototype.onColorChanged = function (property, oldValue, newValue) {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             if (oldValue && newValue && !oldValue.equals(newValue)) {
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
-        }
-        updateView() {
+        };
+        ColorPickerView.prototype.updateView = function () {
             if (this._textfocusintxt != this.txtR)
                 this.txtR.text = Math.round(this.color.r * 255).toString();
             if (this._textfocusintxt != this.txtG)
@@ -5021,11 +5274,12 @@ var editor;
                     this._groupAParent.addChildAt(this.groupA, 3);
                 }
             }
-        }
-    }
-    __decorate([
-        feng3d.watch("onColorChanged")
-    ], ColorPickerView.prototype, "color", void 0);
+        };
+        __decorate([
+            feng3d.watch("onColorChanged")
+        ], ColorPickerView.prototype, "color", void 0);
+        return ColorPickerView;
+    }(eui.Component));
     editor.ColorPickerView = ColorPickerView;
     /**
      * 获取颜色的基色以及颜色拾取矩形所在位置
@@ -5061,11 +5315,11 @@ var editor;
     function getMixColorRatio(color, colors, ratios) {
         if (!ratios) {
             ratios = [];
-            for (let i = 0; i < colors.length; i++) {
-                ratios[i] = i / (colors.length - 1);
+            for (var i_1 = 0; i_1 < colors.length; i_1++) {
+                ratios[i_1] = i_1 / (colors.length - 1);
             }
         }
-        var colors1 = colors.map(v => new feng3d.Color3().fromUnit(v));
+        var colors1 = colors.map(function (v) { return new feng3d.Color3().fromUnit(v); });
         var c = new feng3d.Color3().fromUnit(color);
         var r = c.r;
         var g = c.g;
@@ -5117,11 +5371,11 @@ var editor;
     function getMixColorAtRatio(ratio, colors, ratios) {
         if (!ratios) {
             ratios = [];
-            for (let i = 0; i < colors.length; i++) {
-                ratios[i] = i / (colors.length - 1);
+            for (var i_2 = 0; i_2 < colors.length; i_2++) {
+                ratios[i_2] = i_2 / (colors.length - 1);
             }
         }
-        var colors1 = colors.map(v => new feng3d.Color3().fromUnit(v));
+        var colors1 = colors.map(function (v) { return new feng3d.Color3().fromUnit(v); });
         for (var i = 0; i < colors1.length - 1; i++) {
             if (ratios[i] <= ratio && ratio <= ratios[i + 1]) {
                 var mix = Math.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
@@ -5137,18 +5391,20 @@ var editor;
     /**
      * 区域选择框
      */
-    class AreaSelectRect extends eui.Rect {
-        constructor() {
-            super(...arguments);
-            this.fillAlpha = 0.5;
-            this.fillColor = 0x8888ff;
+    var AreaSelectRect = /** @class */ (function (_super) {
+        __extends(AreaSelectRect, _super);
+        function AreaSelectRect() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.fillAlpha = 0.5;
+            _this.fillColor = 0x8888ff;
+            return _this;
         }
         /**
          * 显示
          * @param start 起始位置
          * @param end 结束位置
          */
-        show(start, end) {
+        AreaSelectRect.prototype.show = function (start, end) {
             var minX = Math.min(start.x, end.x);
             var maxX = Math.max(start.x, end.x);
             var minY = Math.min(start.y, end.y);
@@ -5158,14 +5414,15 @@ var editor;
             this.width = maxX - minX;
             this.height = maxY - minY;
             editor.editorui.popupLayer.addChild(this);
-        }
+        };
         /**
          * 隐藏
          */
-        hide() {
+        AreaSelectRect.prototype.hide = function () {
             this.parent && this.parent.removeChild(this);
-        }
-    }
+        };
+        return AreaSelectRect;
+    }(eui.Rect));
     editor.AreaSelectRect = AreaSelectRect;
 })(editor || (editor = {}));
 var editor;
@@ -5173,26 +5430,28 @@ var editor;
     /**
      * 最大最小曲线界面
      */
-    class MinMaxCurveView extends eui.Component {
-        constructor() {
-            super();
-            this.minMaxCurve = new feng3d.MinMaxCurve();
-            this.skinName = "MinMaxCurveView";
+    var MinMaxCurveView = /** @class */ (function (_super) {
+        __extends(MinMaxCurveView, _super);
+        function MinMaxCurveView() {
+            var _this = _super.call(this) || this;
+            _this.minMaxCurve = new feng3d.MinMaxCurve();
+            _this.skinName = "MinMaxCurveView";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        MinMaxCurveView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.modeBtn.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.updateView();
-        }
-        $onRemoveFromStage() {
+        };
+        MinMaxCurveView.prototype.$onRemoveFromStage = function () {
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.curveGroup.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxCurveView.prototype.updateView = function () {
             this.constantGroup.visible = false;
             this.curveGroup.visible = false;
             this.randomBetweenTwoConstantsGroup.visible = false;
@@ -5225,19 +5484,20 @@ var editor;
                 }
                 this.curveImage.source = imageUtil.toDataURL();
             }
-        }
-        onReSize() {
+        };
+        MinMaxCurveView.prototype.onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        _onMinMaxCurveChanged() {
+        };
+        MinMaxCurveView.prototype._onMinMaxCurveChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        onClick(e) {
+        };
+        MinMaxCurveView.prototype.onClick = function (e) {
+            var _this = this;
             switch (e.currentTarget) {
                 case this.modeBtn:
-                    editor.menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, (v) => {
-                        this.minMaxCurve.mode = v;
-                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    editor.menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, function (v) {
+                        _this.minMaxCurve.mode = v;
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     });
                     break;
                 case this.curveGroup:
@@ -5248,81 +5508,89 @@ var editor;
                     editor.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                     //
                     editor.popupview.popupView(editor.minMaxCurveEditor, {
-                        x: pos.x, y: pos.y, closecallback: () => {
-                            editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        x: pos.x, y: pos.y,
+                        closecallback: function () {
+                            editor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
                         }
                     });
                     break;
             }
-        }
-        onPickerViewChanged() {
+        };
+        MinMaxCurveView.prototype.onPickerViewChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onRightClick() {
+        };
+        MinMaxCurveView.prototype._onRightClick = function () {
+            var _this = this;
             if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
                 return;
             var menus = [{
-                    label: "Copy", click: () => {
-                        copyCurve = feng3d.serialization.clone(this.minMaxCurve);
+                    label: "Copy",
+                    click: function () {
+                        copyCurve = feng3d.serialization.clone(_this.minMaxCurve);
                     }
                 }];
             if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1) {
                 menus.push({
-                    label: "Paste", click: () => {
+                    label: "Paste",
+                    click: function () {
                         if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve) {
-                            this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
+                            _this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
                         }
                         else if (copyCurve.mode == feng3d.MinMaxCurveMode.TwoCurves) {
-                            this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
-                            this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
+                            _this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
+                            _this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
                         }
-                        this.minMaxCurve.curveMultiplier = copyCurve.curveMultiplier;
-                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-                        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                        _this.minMaxCurve.curveMultiplier = copyCurve.curveMultiplier;
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
+                        _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
                 });
             }
             editor.menu.popup(menus);
-        }
-    }
-    __decorate([
-        feng3d.watch("_onMinMaxCurveChanged")
-    ], MinMaxCurveView.prototype, "minMaxCurve", void 0);
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxCurveChanged")
+        ], MinMaxCurveView.prototype, "minMaxCurve", void 0);
+        return MinMaxCurveView;
+    }(eui.Component));
     editor.MinMaxCurveView = MinMaxCurveView;
     var copyCurve;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MinMaxCurveEditor extends eui.Component {
-        constructor() {
-            super();
-            this.minMaxCurve = new feng3d.MinMaxCurve();
-            this.editing = false;
-            this.mousedownxy = { x: -1, y: -1 };
-            this.curveColor = new feng3d.Color4(1, 0, 0);
-            this.backColor = feng3d.Color4.fromUnit24(0x565656);
-            this.fillTwoCurvesColor = new feng3d.Color4(1, 1, 1, 0.2);
-            this.range = [1, -1];
-            this.imageUtil = new feng3d.ImageUtil();
+    var MinMaxCurveEditor = /** @class */ (function (_super) {
+        __extends(MinMaxCurveEditor, _super);
+        function MinMaxCurveEditor() {
+            var _this = _super.call(this) || this;
+            _this.minMaxCurve = new feng3d.MinMaxCurve();
+            _this.editing = false;
+            _this.mousedownxy = { x: -1, y: -1 };
+            _this.curveColor = new feng3d.Color4(1, 0, 0);
+            _this.backColor = feng3d.Color4.fromUnit24(0x565656);
+            _this.fillTwoCurvesColor = new feng3d.Color4(1, 1, 1, 0.2);
+            _this.range = [1, -1];
+            _this.imageUtil = new feng3d.ImageUtil();
             /**
              * 点绘制尺寸
              */
-            this.pointSize = 5;
+            _this.pointSize = 5;
             /**
              * 控制柄长度
              */
-            this.controllerLength = 50;
-            this.skinName = "MinMaxCurveEditor";
+            _this.controllerLength = 50;
+            _this.skinName = "MinMaxCurveEditor";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        MinMaxCurveEditor.prototype.$onAddToStage = function (stage, nestLevel) {
+            var _this = this;
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.yLabels = [this.y_0, this.y_1, this.y_2, this.y_3];
             this.xLabels = [this.x_0, this.x_1, this.x_2, this.x_3, this.x_4, this.x_5, this.x_6, this.x_7, this.x_8, this.x_9, this.x_10];
             this.sampleImages = [this.sample_0, this.sample_1, this.sample_2, this.sample_3, this.sample_4, this.sample_5, this.sample_6, this.sample_7];
             this.viewGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             editor.editorui.stage.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
-            this.sampleImages.forEach(v => v.addEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
+            this.sampleImages.forEach(function (v) { return v.addEventListener(egret.MouseEvent.CLICK, _this.onSampleClick, _this); });
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
@@ -5334,9 +5602,10 @@ var editor;
             this.updateXYLabels();
             this.updateSampleImages();
             this.updateView();
-        }
-        $onRemoveFromStage() {
-            this.sampleImages.forEach(v => v.removeEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
+        };
+        MinMaxCurveEditor.prototype.$onRemoveFromStage = function () {
+            var _this = this;
+            this.sampleImages.forEach(function (v) { return v.removeEventListener(egret.MouseEvent.CLICK, _this.onSampleClick, _this); });
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
             this.viewGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             editor.editorui.stage.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
@@ -5344,9 +5613,9 @@ var editor;
             this.preWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
             this.postWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
             feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxCurveEditor.prototype.updateView = function () {
             if (!this.stage)
                 return;
             // 曲线绘制区域
@@ -5371,8 +5640,8 @@ var editor;
             this.updateWrapModeBtnPosition();
             // 设置绘制结果
             this.curveImage.source = this.imageUtil.toDataURL();
-        }
-        updateXYLabels() {
+        };
+        MinMaxCurveEditor.prototype.updateXYLabels = function () {
             this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
             this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
             this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * Math.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
@@ -5381,12 +5650,12 @@ var editor;
             // {
             //     this.xLabels[i].text = (this.minMaxCurve.curveMultiplier * i / 10).toString();
             // }
-        }
-        updateSampleImages() {
+        };
+        MinMaxCurveEditor.prototype.updateSampleImages = function () {
             var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
             var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
-            for (let i = 0; i < this.sampleImages.length; i++) {
-                const element = this.sampleImages[i];
+            for (var i = 0; i < this.sampleImages.length; i++) {
+                var element = this.sampleImages[i];
                 if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve && curves[i]) {
                     var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
                     if (!this.minMaxCurve.between0And1)
@@ -5410,10 +5679,10 @@ var editor;
                     element.parent && element.parent.removeChild(element);
                 }
             }
-        }
-        onSampleClick(e) {
-            for (let i = 0; i < this.sampleImages.length; i++) {
-                const element = this.sampleImages[i];
+        };
+        MinMaxCurveEditor.prototype.onSampleClick = function (e) {
+            for (var i = 0; i < this.sampleImages.length; i++) {
+                var element = this.sampleImages[i];
                 if (element == e.currentTarget) {
                     var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
                     var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
@@ -5430,57 +5699,58 @@ var editor;
                     break;
                 }
             }
-        }
+        };
         /**
          * 绘制曲线关键点
          * @param animationCurve
          */
-        drawCurveKeys(animationCurve) {
+        MinMaxCurveEditor.prototype.drawCurveKeys = function (animationCurve) {
+            var _this = this;
             var c = new feng3d.Color4(1, 0, 0);
-            animationCurve.keys.forEach(key => {
-                var pos = this.curveToUIPos(key.time, key.value);
-                this.imageUtil.drawPoint(pos.x, pos.y, c, this.pointSize);
+            animationCurve.keys.forEach(function (key) {
+                var pos = _this.curveToUIPos(key.time, key.value);
+                _this.imageUtil.drawPoint(pos.x, pos.y, c, _this.pointSize);
             });
-        }
+        };
         /**
          * 曲线上的坐标转换为UI上的坐标
          * @param time
          * @param value
          */
-        curveToUIPos(time, value) {
+        MinMaxCurveEditor.prototype.curveToUIPos = function (time, value) {
             var x = Math.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
             var y = Math.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
             return new feng3d.Vector2(x, y);
-        }
+        };
         /**
          * UI上坐标转换为曲线上坐标
          * @param x
          * @param y
          */
-        uiToCurvePos(x, y) {
+        MinMaxCurveEditor.prototype.uiToCurvePos = function (x, y) {
             var time = Math.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
             var value = Math.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
             return { time: time, value: value };
-        }
-        getKeyUIPos(key) {
+        };
+        MinMaxCurveEditor.prototype.getKeyUIPos = function (key) {
             return this.curveToUIPos(key.time, key.value);
-        }
-        getKeyLeftControlUIPos(key) {
+        };
+        MinMaxCurveEditor.prototype.getKeyLeftControlUIPos = function (key) {
             var current = this.curveToUIPos(key.time, key.value);
             var currenttan = key.inTangent * this.curveRect.height / this.curveRect.width;
             var lcp = new feng3d.Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
             return lcp;
-        }
-        getKeyRightControlUIPos(key) {
+        };
+        MinMaxCurveEditor.prototype.getKeyRightControlUIPos = function (key) {
             var current = this.curveToUIPos(key.time, key.value);
             var currenttan = key.outTangent * this.curveRect.height / this.curveRect.width;
             var rcp = new feng3d.Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
             return rcp;
-        }
+        };
         /**
          * 绘制选中的关键点
          */
-        drawSelectedKey() {
+        MinMaxCurveEditor.prototype.drawSelectedKey = function () {
             if (this.selectedKey == null || this.selectTimeline == null)
                 return;
             var key = this.selectedKey;
@@ -5505,11 +5775,11 @@ var editor;
                     this.imageUtil.drawLine(current, rcp, new feng3d.Color4());
                 }
             }
-        }
+        };
         /**
          * 更新曲线重复模式按钮位置
          */
-        updateWrapModeBtnPosition() {
+        MinMaxCurveEditor.prototype.updateWrapModeBtnPosition = function () {
             var selectTimeline = this.selectTimeline;
             this.preWrapModeBtn.visible = false;
             this.postWrapModeBtn.visible = false;
@@ -5531,8 +5801,11 @@ var editor;
                 this.keyPosLab.y = editKeyPos.y - this.keyPosLab.height - 5;
                 this.keyPosLab.text = this.editKey.time.toFixed(3) + "," + this.editKey.value.toFixed(3);
             }
-        }
-        drawGrid(segmentW = 10, segmentH = 2) {
+        };
+        MinMaxCurveEditor.prototype.drawGrid = function (segmentW, segmentH) {
+            var _this = this;
+            if (segmentW === void 0) { segmentW = 10; }
+            if (segmentH === void 0) { segmentH = 2; }
             //
             var lines = [];
             var c0 = feng3d.Color4.fromUnit24(0x494949);
@@ -5543,23 +5816,23 @@ var editor;
             for (var i = 0; i <= segmentH; i++) {
                 lines.push({ start: new feng3d.Vector2(0, i / segmentH), end: new feng3d.Vector2(1, i / segmentH), color: i % 2 == 0 ? c0 : c1 });
             }
-            lines.forEach(v => {
-                v.start.x = this.curveRect.x + this.curveRect.width * v.start.x;
-                v.start.y = this.curveRect.y + this.curveRect.height * v.start.y;
-                v.end.x = this.curveRect.x + this.curveRect.width * v.end.x;
-                v.end.y = this.curveRect.y + this.curveRect.height * v.end.y;
+            lines.forEach(function (v) {
+                v.start.x = _this.curveRect.x + _this.curveRect.width * v.start.x;
+                v.start.y = _this.curveRect.y + _this.curveRect.height * v.start.y;
+                v.end.x = _this.curveRect.x + _this.curveRect.width * v.end.x;
+                v.end.y = _this.curveRect.y + _this.curveRect.height * v.end.y;
                 //
-                this.imageUtil.drawLine(v.start, v.end, v.color);
+                _this.imageUtil.drawLine(v.start, v.end, v.color);
             });
-        }
-        _onMinMaxCurveChanged() {
+        };
+        MinMaxCurveEditor.prototype._onMinMaxCurveChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.range = this.minMaxCurve.between0And1 ? [1, 0] : [1, -1];
-        }
-        _onReSize() {
+        };
+        MinMaxCurveEditor.prototype._onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        onMouseDown(ev) {
+        };
+        MinMaxCurveEditor.prototype.onMouseDown = function (ev) {
             var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
             var x = lp.x;
             var y = lp.y;
@@ -5590,8 +5863,8 @@ var editor;
             }
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        onMouseMove(ev) {
+        };
+        MinMaxCurveEditor.prototype.onMouseMove = function (ev) {
             this.editing = true;
             var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
             var x = lp.x;
@@ -5621,15 +5894,15 @@ var editor;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
-        }
-        onMouseUp(ev) {
+        };
+        MinMaxCurveEditor.prototype.onMouseUp = function (ev) {
             this.editing = false;
             this.editorControlkey = null;
             this.keyPosLab.visible = false;
             editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
             editor.editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
-        }
-        findControlKey(key, x, y, radius) {
+        };
+        MinMaxCurveEditor.prototype.findControlKey = function (key, x, y, radius) {
             var lcp = this.getKeyLeftControlUIPos(key);
             if (Math.abs(lcp.x - x) < radius && Math.abs(lcp.y - y) < radius) {
                 return key;
@@ -5639,8 +5912,8 @@ var editor;
                 return key;
             }
             return null;
-        }
-        ondblclick(ev) {
+        };
+        MinMaxCurveEditor.prototype.ondblclick = function (ev) {
             this.editing = false;
             this.editKey = null;
             this.editorControlkey = null;
@@ -5683,31 +5956,34 @@ var editor;
                     return;
                 }
             }
-        }
-        onPreWrapModeBtn(e) {
+        };
+        MinMaxCurveEditor.prototype.onPreWrapModeBtn = function (e) {
+            var _this = this;
             e.stopPropagation();
             var selectTimeline = this.selectTimeline;
             if (!selectTimeline)
                 return;
-            editor.menu.popupEnum(feng3d.WrapMode, selectTimeline.preWrapMode, (v) => {
+            editor.menu.popupEnum(feng3d.WrapMode, selectTimeline.preWrapMode, function (v) {
                 selectTimeline.preWrapMode = v;
-                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
             });
-        }
-        onPostWrapMode(e) {
+        };
+        MinMaxCurveEditor.prototype.onPostWrapMode = function (e) {
+            var _this = this;
             e.stopPropagation();
             var selectTimeline = this.selectTimeline;
             if (!selectTimeline)
                 return;
-            editor.menu.popupEnum(feng3d.WrapMode, selectTimeline.postWrapMode, (v) => {
+            editor.menu.popupEnum(feng3d.WrapMode, selectTimeline.postWrapMode, function (v) {
                 selectTimeline.postWrapMode = v;
-                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
             });
-        }
-    }
-    __decorate([
-        feng3d.watch("_onMinMaxCurveChanged")
-    ], MinMaxCurveEditor.prototype, "minMaxCurve", void 0);
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxCurveChanged")
+        ], MinMaxCurveEditor.prototype, "minMaxCurve", void 0);
+        return MinMaxCurveEditor;
+    }(eui.Component));
     editor.MinMaxCurveEditor = MinMaxCurveEditor;
     var particleCurves = [
         { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
@@ -5799,41 +6075,44 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MinMaxCurveVector3View extends eui.Component {
-        constructor() {
-            super();
-            this.minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
-            this.skinName = "MinMaxCurveVector3View";
+    var MinMaxCurveVector3View = /** @class */ (function (_super) {
+        __extends(MinMaxCurveVector3View, _super);
+        function MinMaxCurveVector3View() {
+            var _this = _super.call(this) || this;
+            _this.minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
+            _this.skinName = "MinMaxCurveVector3View";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        MinMaxCurveVector3View.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.xMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
             this.yMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
             this.zMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
-        }
-        $onRemoveFromStage() {
+        };
+        MinMaxCurveVector3View.prototype.$onRemoveFromStage = function () {
             this.xMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
             this.yMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
             this.zMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxCurveVector3View.prototype.updateView = function () {
             if (!this.stage)
                 return;
             this.xMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.xCurve;
             this.yMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.yCurve;
             this.zMinMaxCurveView.minMaxCurve = this.minMaxCurveVector3.zCurve;
-        }
-        _onMinMaxCurveVector3Changed() {
+        };
+        MinMaxCurveVector3View.prototype._onMinMaxCurveVector3Changed = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        _onchanged() {
+        };
+        MinMaxCurveVector3View.prototype._onchanged = function () {
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-    }
-    __decorate([
-        feng3d.watch("_onMinMaxCurveVector3Changed")
-    ], MinMaxCurveVector3View.prototype, "minMaxCurveVector3", void 0);
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxCurveVector3Changed")
+        ], MinMaxCurveVector3View.prototype, "minMaxCurveVector3", void 0);
+        return MinMaxCurveVector3View;
+    }(eui.Component));
     editor.MinMaxCurveVector3View = MinMaxCurveVector3View;
 })(editor || (editor = {}));
 var editor;
@@ -5841,15 +6120,17 @@ var editor;
     /**
      * 最大最小颜色渐变界面
      */
-    class MinMaxGradientView extends eui.Component {
-        constructor() {
-            super();
+    var MinMaxGradientView = /** @class */ (function (_super) {
+        __extends(MinMaxGradientView, _super);
+        function MinMaxGradientView() {
+            var _this = _super.call(this) || this;
             //
-            this.minMaxGradient = new feng3d.MinMaxGradient();
-            this.skinName = "MinMaxGradientView";
+            _this.minMaxGradient = new feng3d.MinMaxGradient();
+            _this.skinName = "MinMaxGradientView";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        MinMaxGradientView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.secondGroupParent = this.secondGroupParent || this.secondGroup.parent;
             this.colorGroup0.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup0.addEventListener(egret.Event.RESIZE, this.onReSize, this);
@@ -5859,8 +6140,8 @@ var editor;
             this.colorGroup0.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.colorGroup1.addEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.updateView();
-        }
-        $onRemoveFromStage() {
+        };
+        MinMaxGradientView.prototype.$onRemoveFromStage = function () {
             this.colorGroup0.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup0.removeEventListener(egret.Event.RESIZE, this.onReSize, this);
             this.colorGroup1.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
@@ -5868,9 +6149,9 @@ var editor;
             this.modeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
             this.colorGroup0.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
             this.colorGroup1.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        MinMaxGradientView.prototype.updateView = function () {
             //
             if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0) {
                 if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color) {
@@ -5909,15 +6190,16 @@ var editor;
                         this.secondGroup.parent.removeChild(this.secondGroup);
                 }
             }
-        }
-        onReSize() {
+        };
+        MinMaxGradientView.prototype.onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        _onMinMaxGradientChanged() {
+        };
+        MinMaxGradientView.prototype._onMinMaxGradientChanged = function () {
             if (this.stage)
                 this.updateView();
-        }
-        onClick(e) {
+        };
+        MinMaxGradientView.prototype.onClick = function (e) {
+            var _this = this;
             var view = null;
             switch (e.currentTarget) {
                 case this.colorGroup0:
@@ -5959,9 +6241,9 @@ var editor;
                     }
                     break;
                 case this.modeBtn:
-                    editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, (v) => {
-                        this.minMaxGradient.mode = v;
-                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    editor.menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, function (v) {
+                        _this.minMaxGradient.mode = v;
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     });
                     break;
             }
@@ -5971,14 +6253,15 @@ var editor;
                 view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                 //
                 editor.popupview.popupView(view, {
-                    x: pos.x, y: pos.y, closecallback: () => {
-                        view.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
-                        this.activeColorGroup = null;
+                    x: pos.x, y: pos.y,
+                    closecallback: function () {
+                        view.removeEventListener(egret.Event.CHANGE, _this.onPickerViewChanged, _this);
+                        _this.activeColorGroup = null;
                     },
                 });
             }
-        }
-        onPickerViewChanged() {
+        };
+        MinMaxGradientView.prototype.onPickerViewChanged = function () {
             if (this.activeColorGroup == this.colorGroup0) {
                 switch (this.minMaxGradient.mode) {
                     case feng3d.MinMaxGradientMode.Color:
@@ -6010,100 +6293,107 @@ var editor;
             }
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onRightClick(e) {
+        };
+        MinMaxGradientView.prototype._onRightClick = function (e) {
+            var _this = this;
             var mode = this.minMaxGradient.mode;
             var target = e.currentTarget;
             var menus = [{
-                    label: "Copy", click: () => {
-                        if (target == this.colorGroup0) {
+                    label: "Copy",
+                    click: function () {
+                        if (target == _this.colorGroup0) {
                             if (mode == feng3d.MinMaxGradientMode.Color)
-                                copyColor = this.minMaxGradient.color.clone();
+                                copyColor = _this.minMaxGradient.color.clone();
                             else if (mode == feng3d.MinMaxGradientMode.TwoColors)
-                                copyColor = this.minMaxGradient.colorMin.clone();
+                                copyColor = _this.minMaxGradient.colorMin.clone();
                             else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                                copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradientMin);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMin);
                             else
-                                copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradient);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradient);
                         }
-                        else if (target == this.colorGroup1) {
+                        else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.TwoColors)
-                                copyColor = this.minMaxGradient.colorMax.clone();
+                                copyColor = _this.minMaxGradient.colorMax.clone();
                             else
-                                copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradientMax);
+                                copyGradient = feng3d.serialization.clone(_this.minMaxGradient.gradientMax);
                         }
                     }
                 }];
             if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.TwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
                 || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors))) {
                 menus.push({
-                    label: "Paste", click: () => {
-                        if (target == this.colorGroup0) {
+                    label: "Paste",
+                    click: function () {
+                        if (target == _this.colorGroup0) {
                             if (mode == feng3d.MinMaxGradientMode.Color)
-                                this.minMaxGradient.color.copy(copyColor);
+                                _this.minMaxGradient.color.copy(copyColor);
                             else if (mode == feng3d.MinMaxGradientMode.TwoColors)
-                                this.minMaxGradient.colorMin.copy(copyColor);
+                                _this.minMaxGradient.colorMin.copy(copyColor);
                             else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                                this.minMaxGradient.gradientMin = feng3d.serialization.clone(copyGradient);
+                                _this.minMaxGradient.gradientMin = feng3d.serialization.clone(copyGradient);
                             else
-                                this.minMaxGradient.gradient = feng3d.serialization.clone(copyGradient);
+                                _this.minMaxGradient.gradient = feng3d.serialization.clone(copyGradient);
                         }
-                        else if (target == this.colorGroup1) {
+                        else if (target == _this.colorGroup1) {
                             if (mode == feng3d.MinMaxGradientMode.TwoColors)
-                                this.minMaxGradient.colorMax.copy(copyColor);
+                                _this.minMaxGradient.colorMax.copy(copyColor);
                             else
-                                this.minMaxGradient.gradientMax = feng3d.serialization.clone(copyGradient);
+                                _this.minMaxGradient.gradientMax = feng3d.serialization.clone(copyGradient);
                         }
-                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-                        this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
+                        _this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
                     }
                 });
             }
             editor.menu.popup(menus);
-        }
-    }
-    __decorate([
-        feng3d.watch("_onMinMaxGradientChanged")
-    ], MinMaxGradientView.prototype, "minMaxGradient", void 0);
+        };
+        __decorate([
+            feng3d.watch("_onMinMaxGradientChanged")
+        ], MinMaxGradientView.prototype, "minMaxGradient", void 0);
+        return MinMaxGradientView;
+    }(eui.Component));
     editor.MinMaxGradientView = MinMaxGradientView;
     var copyGradient;
     var copyColor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class GradientEditor extends eui.Component {
-        constructor() {
-            super();
-            this.gradient = new feng3d.Gradient();
-            this.skinName = "GradientEditor";
+    var GradientEditor = /** @class */ (function (_super) {
+        __extends(GradientEditor, _super);
+        function GradientEditor() {
+            var _this = _super.call(this) || this;
+            _this.gradient = new feng3d.Gradient();
+            _this.skinName = "GradientEditor";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        GradientEditor.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
             this.alphaLineGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorLineGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorPicker.addEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.addEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
-        }
-        $onRemoveFromStage() {
+        };
+        GradientEditor.prototype.$onRemoveFromStage = function () {
             this.alphaLineGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorLineGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this._onMouseDown, this);
             this.colorPicker.removeEventListener(egret.Event.CHANGE, this._onColorPickerChange, this);
             this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
             this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        GradientEditor.prototype.updateView = function () {
+            var _this = this;
             if (!this.stage)
                 return;
             var list = [];
-            for (const key in feng3d.GradientMode) {
+            for (var key in feng3d.GradientMode) {
                 if (isNaN(Number(key)))
                     list.push({ label: key, value: feng3d.GradientMode[key] });
             }
             this.modeCB.dataProvider = list;
-            this.modeCB.data = list.filter(v => v.value == this.gradient.mode)[0];
+            this.modeCB.data = list.filter(function (v) { return v.value == _this.gradient.mode; })[0];
             //
             if (this.colorImage.width > 0 && this.colorImage.height > 0) {
                 this.colorImage.source = new feng3d.ImageUtil(this.colorImage.width, this.colorImage.height).drawMinMaxGradient(this.gradient).toDataURL();
@@ -6118,13 +6408,13 @@ var editor;
             this._colorSprite.graphics.clear();
             //
             var alphaKeys = this.gradient.alphaKeys;
-            for (let i = 0, n = alphaKeys.length; i < n; i++) {
-                const element = alphaKeys[i];
+            for (var i = 0, n = alphaKeys.length; i < n; i++) {
+                var element = alphaKeys[i];
                 this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == alphaKeys[i]);
             }
             var colorKeys = this.gradient.colorKeys;
-            for (let i = 0, n = colorKeys.length; i < n; i++) {
-                const element = colorKeys[i];
+            for (var i = 0, n = colorKeys.length; i < n; i++) {
+                var element = colorKeys[i];
                 this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == colorKeys[i]);
             }
             //
@@ -6163,8 +6453,8 @@ var editor;
                 });
                 this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
             }
-        }
-        _drawAlphaGraphics(graphics, time, alpha, width, height, selected) {
+        };
+        GradientEditor.prototype._drawAlphaGraphics = function (graphics, time, alpha, width, height, selected) {
             graphics.beginFill(0xffffff, alpha);
             graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
             graphics.moveTo(time * width, height);
@@ -6174,8 +6464,8 @@ var editor;
             graphics.lineTo(time * width + 5, height - 10);
             graphics.lineTo(time * width, height);
             graphics.endFill();
-        }
-        _drawColorGraphics(graphics, time, color, width, height, selected) {
+        };
+        GradientEditor.prototype._drawColorGraphics = function (graphics, time, color, width, height, selected) {
             graphics.beginFill(color.toInt(), 1);
             graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
             graphics.moveTo(time * width, 0);
@@ -6185,35 +6475,35 @@ var editor;
             graphics.lineTo(time * width + 5, 10);
             graphics.lineTo(time * width, 0);
             graphics.endFill();
-        }
-        _onAlphaChanged() {
+        };
+        GradientEditor.prototype._onAlphaChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onLocationChanged() {
+        };
+        GradientEditor.prototype._onLocationChanged = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onReSize() {
+        };
+        GradientEditor.prototype._onReSize = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        _onModeCBChange() {
+        };
+        GradientEditor.prototype._onModeCBChange = function () {
             this.gradient.mode = this.modeCB.data.value;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onColorPickerChange() {
+        };
+        GradientEditor.prototype._onColorPickerChange = function () {
             if (this._selectedValue && this._selectedValue.color) {
                 this._selectedValue.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
             }
-        }
-        _onGradientChanged() {
+        };
+        GradientEditor.prototype._onGradientChanged = function () {
             this._selectedValue = this.gradient.colorKeys[0];
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-        _onMouseDown(e) {
+        };
+        GradientEditor.prototype._onMouseDown = function (e) {
             this._onMouseDownLineGroup = e.currentTarget;
             var sp = e.currentTarget.localToGlobal(0, 0);
             var localPosX = feng3d.windowEventProxy.clientX - sp.x;
@@ -6225,8 +6515,8 @@ var editor;
                     this._selectedValue = null;
                     var onClickIndex = -1;
                     var alphaKeys = this.gradient.alphaKeys;
-                    for (let i = 0, n = alphaKeys.length; i < n; i++) {
-                        const element = alphaKeys[i];
+                    for (var i = 0, n = alphaKeys.length; i < n; i++) {
+                        var element = alphaKeys[i];
                         if (Math.abs(element.time * this.alphaLineGroup.width - localPosX) < 8) {
                             onClickIndex = i;
                             break;
@@ -6238,14 +6528,14 @@ var editor;
                     else if (alphaKeys.length < 8) {
                         this._selectedValue = newAlphaKey;
                         alphaKeys.push(newAlphaKey);
-                        alphaKeys.sort((a, b) => a.time - b.time);
+                        alphaKeys.sort(function (a, b) { return a.time - b.time; });
                     }
                     break;
                 case this.colorLineGroup:
                     var onClickIndex = -1;
                     var colorKeys = this.gradient.colorKeys;
-                    for (let i = 0, n = colorKeys.length; i < n; i++) {
-                        const element = colorKeys[i];
+                    for (var i = 0, n = colorKeys.length; i < n; i++) {
+                        var element = colorKeys[i];
                         if (Math.abs(element.time * this.alphaLineGroup.width - localPosX) < 8) {
                             onClickIndex = i;
                             break;
@@ -6257,7 +6547,7 @@ var editor;
                     else if (colorKeys.length < 8) {
                         this._selectedValue = newColorKey;
                         colorKeys.push(newColorKey);
-                        colorKeys.sort((a, b) => a.time - b.time);
+                        colorKeys.sort(function (a, b) { return a.time - b.time; });
                     }
                     break;
             }
@@ -6268,8 +6558,8 @@ var editor;
                 feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
                 this._removedTemp = false;
             }
-        }
-        _onAlphaColorMouseMove() {
+        };
+        GradientEditor.prototype._onAlphaColorMouseMove = function () {
             if (!this._selectedValue)
                 return;
             var sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
@@ -6282,14 +6572,14 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.colorKeys.push(this._selectedValue);
-                        this.gradient.colorKeys.sort((a, b) => a.time - b.time);
+                        this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
                         ;
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index == -1)
                             this.gradient.alphaKeys.push(this._selectedValue);
-                        this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
+                        this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
                         ;
                     }
                     this._removedTemp = false;
@@ -6301,14 +6591,14 @@ var editor;
                         var index = this.gradient.colorKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.colorKeys.splice(index, 1);
-                        this.gradient.colorKeys.sort((a, b) => a.time - b.time);
+                        this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
                         ;
                     }
                     else {
                         var index = this.gradient.alphaKeys.indexOf(this._selectedValue);
                         if (index != -1)
                             this.gradient.alphaKeys.splice(index, 1);
-                        this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
+                        this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
                         ;
                     }
                     this._removedTemp = true;
@@ -6318,19 +6608,19 @@ var editor;
                 var sp = this.colorLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.colorLineGroup.width;
-                this.gradient.colorKeys.sort((a, b) => a.time - b.time);
+                this.gradient.colorKeys.sort(function (a, b) { return a.time - b.time; });
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             else {
                 var sp = this.alphaLineGroup.localToGlobal(0, 0);
                 var localPosX = feng3d.windowEventProxy.clientX - sp.x;
                 this._selectedValue.time = localPosX / this.alphaLineGroup.width;
-                this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
+                this.gradient.alphaKeys.sort(function (a, b) { return a.time - b.time; });
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             }
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        }
-        _onAlphaColorMouseUp() {
+        };
+        GradientEditor.prototype._onAlphaColorMouseUp = function () {
             if (this._removedTemp) {
                 this._selectedValue = null;
             }
@@ -6338,11 +6628,12 @@ var editor;
             feng3d.windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-    }
-    __decorate([
-        feng3d.watch("_onGradientChanged")
-    ], GradientEditor.prototype, "gradient", void 0);
+        };
+        __decorate([
+            feng3d.watch("_onGradientChanged")
+        ], GradientEditor.prototype, "gradient", void 0);
+        return GradientEditor;
+    }(eui.Component));
     editor.GradientEditor = GradientEditor;
 })(editor || (editor = {}));
 var editor;
@@ -6350,43 +6641,51 @@ var editor;
     /**
      * String 提示框
      */
-    class TipString extends eui.Component {
-        constructor() {
-            super();
-            this.value = "";
-            this.skinName = "TipString";
-            this.touchChildren = this.touchEnabled = false;
+    var TipString = /** @class */ (function (_super) {
+        __extends(TipString, _super);
+        function TipString() {
+            var _this = _super.call(this) || this;
+            _this.value = "";
+            _this.skinName = "TipString";
+            _this.touchChildren = _this.touchEnabled = false;
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        TipString.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.txtLab.text = String(this.value);
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
-        }
-        valuechanged() {
+        };
+        TipString.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        TipString.prototype.valuechanged = function () {
             if (this.txtLab) {
                 this.txtLab.text = String(this.value);
             }
-        }
-    }
-    __decorate([
-        feng3d.watch("valuechanged")
-    ], TipString.prototype, "value", void 0);
+        };
+        __decorate([
+            feng3d.watch("valuechanged")
+        ], TipString.prototype, "value", void 0);
+        return TipString;
+    }(eui.Component));
     editor.TipString = TipString;
 })(editor || (editor = {}));
 var eui;
 (function (eui) {
-    eui.Component.prototype["addBinder"] = function (...binders) {
+    eui.Component.prototype["addBinder"] = function () {
+        var _this = this;
+        var binders = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            binders[_i] = arguments[_i];
+        }
         this._binders = this._binders || [];
-        binders.forEach(v => {
-            this._binders.push(v);
+        binders.forEach(function (v) {
+            _this._binders.push(v);
         });
     };
     var old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
     eui.Component.prototype["$onRemoveFromStage"] = function () {
         if (this._binders) {
-            this._binders.forEach(v => v.dispose());
+            this._binders.forEach(function (v) { return v.dispose(); });
             this._binders.length = 0;
         }
         old$onRemoveFromStage.call(this);
@@ -6394,42 +6693,44 @@ var eui;
 })(eui || (eui = {}));
 var editor;
 (function (editor) {
-    class TextInputBinder extends feng3d.EventDispatcher {
-        constructor() {
-            super(...arguments);
+    var TextInputBinder = /** @class */ (function (_super) {
+        __extends(TextInputBinder, _super);
+        function TextInputBinder() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 是否可编辑
              */
-            this.editable = true;
+            _this.editable = true;
+            return _this;
         }
         /**
          * 绑定属性值转换为文本
          */
-        toText(v) {
+        TextInputBinder.prototype.toText = function (v) {
             return v;
-        }
+        };
         /**
          * 文本转换为绑定属性值
          */
-        toValue(v) {
+        TextInputBinder.prototype.toValue = function (v) {
             return v;
-        }
-        init(v) {
+        };
+        TextInputBinder.prototype.init = function (v) {
             Object.assign(this, v);
             //
             this.initView();
             this.invalidateView();
             //
             return this;
-        }
-        dispose() {
+        };
+        TextInputBinder.prototype.dispose = function () {
             feng3d.watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
             //
             this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-        initView() {
+        };
+        TextInputBinder.prototype.initView = function () {
             //
             if (this.editable) {
                 this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -6438,8 +6739,8 @@ var editor;
             }
             feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
             this.textInput.enabled = this.editable;
-        }
-        onValueChanged() {
+        };
+        TextInputBinder.prototype.onValueChanged = function () {
             var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
             objectViewEvent.space = this.space;
             objectViewEvent.attributeName = this.attribute;
@@ -6447,57 +6748,60 @@ var editor;
             this.textInput.dispatchEvent(objectViewEvent);
             this.dispatch("valueChanged");
             this.invalidateView();
-        }
-        updateView() {
+        };
+        TextInputBinder.prototype.updateView = function () {
             if (!this._textfocusintxt) {
                 this.textInput.text = this.toText(this.space[this.attribute]);
             }
-        }
-        onTextChange() {
+        };
+        TextInputBinder.prototype.onTextChange = function () {
             this.space[this.attribute] = this.toValue(this.textInput.text);
-        }
-        ontxtfocusin() {
+        };
+        TextInputBinder.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
-        }
-        ontxtfocusout() {
+        };
+        TextInputBinder.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
             this.invalidateView();
-        }
-        invalidateView() {
+        };
+        TextInputBinder.prototype.invalidateView = function () {
             feng3d.ticker.nextframe(this.updateView, this);
-        }
-    }
+        };
+        return TextInputBinder;
+    }(feng3d.EventDispatcher));
     editor.TextInputBinder = TextInputBinder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class NumberTextInputBinder extends editor.TextInputBinder {
-        constructor() {
-            super(...arguments);
+    var NumberTextInputBinder = /** @class */ (function (_super) {
+        __extends(NumberTextInputBinder, _super);
+        function NumberTextInputBinder() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 步长，精度
              */
-            this.step = 0.001;
+            _this.step = 0.001;
             /**
              * 按下上下方向键时增加的步长数量
              */
-            this.stepDownup = 10;
+            _this.stepDownup = 10;
             /**
              * 移动一个像素时增加的步长数量
              */
-            this.stepScale = 1;
+            _this.stepScale = 1;
             /**
              * 最小值
              */
-            this.minValue = NaN;
+            _this.minValue = NaN;
             /**
              * 最小值
              */
-            this.maxValue = NaN;
-            this.mouseDownPosition = new feng3d.Vector2();
-            this.mouseDownValue = 0;
+            _this.maxValue = NaN;
+            _this.mouseDownPosition = new feng3d.Vector2();
+            _this.mouseDownValue = 0;
+            return _this;
         }
-        toText(v) {
+        NumberTextInputBinder.prototype.toText = function (v) {
             // 消除数字显示为类似 0.0000000001 的问题
             var fractionDigits = 1;
             while (fractionDigits * this.step < 1) {
@@ -6505,8 +6809,8 @@ var editor;
             }
             var text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
             return text;
-        }
-        toValue(v) {
+        };
+        NumberTextInputBinder.prototype.toValue = function (v) {
             var n = Number(v) || 0;
             var fractionDigits = 1;
             while (fractionDigits * this.step < 1) {
@@ -6514,22 +6818,22 @@ var editor;
             }
             n = Math.round(fractionDigits * (Math.round(n / this.step) * this.step)) / fractionDigits;
             return n;
-        }
-        initView() {
-            super.initView();
+        };
+        NumberTextInputBinder.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             if (this.editable) {
                 // feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
                 this.controller && this.controller.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
                 editor.MouseOnDisableScroll.register(this.controller);
             }
-        }
-        dispose() {
-            super.dispose();
+        };
+        NumberTextInputBinder.prototype.dispose = function () {
+            _super.prototype.dispose.call(this);
             // feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             this.controller && this.controller.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             editor.MouseOnDisableScroll.unRegister(this.controller);
-        }
-        onValueChanged() {
+        };
+        NumberTextInputBinder.prototype.onValueChanged = function () {
             var value = this.space[this.attribute];
             if (!isNaN(this.minValue)) {
                 value = Math.max(this.minValue, value);
@@ -6538,9 +6842,9 @@ var editor;
                 value = Math.min(this.maxValue, value);
             }
             this.space[this.attribute] = value;
-            super.onValueChanged();
-        }
-        onMouseDown(e) {
+            _super.prototype.onValueChanged.call(this);
+        };
+        NumberTextInputBinder.prototype.onMouseDown = function (e) {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             //
             this.mouseDownPosition = mousePos;
@@ -6548,23 +6852,23 @@ var editor;
             //
             feng3d.windowEventProxy.on("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
-        }
-        onStageMouseMove() {
+        };
+        NumberTextInputBinder.prototype.onStageMouseMove = function () {
             this.space[this.attribute] = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
-        }
-        onStageMouseUp() {
+        };
+        NumberTextInputBinder.prototype.onStageMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
-        }
-        ontxtfocusin() {
-            super.ontxtfocusin();
+        };
+        NumberTextInputBinder.prototype.ontxtfocusin = function () {
+            _super.prototype.ontxtfocusin.call(this);
             feng3d.windowEventProxy.on("keydown", this.onWindowKeyDown, this);
-        }
-        ontxtfocusout() {
-            super.ontxtfocusout();
+        };
+        NumberTextInputBinder.prototype.ontxtfocusout = function () {
+            _super.prototype.ontxtfocusout.call(this);
             feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
-        }
-        onWindowKeyDown(event) {
+        };
+        NumberTextInputBinder.prototype.onWindowKeyDown = function (event) {
             if (event.key == "ArrowUp") {
                 this.space[this.attribute] += this.step * this.stepDownup;
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
@@ -6574,35 +6878,41 @@ var editor;
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
             }
             this.invalidateView();
-        }
-    }
+        };
+        return NumberTextInputBinder;
+    }(editor.TextInputBinder));
     editor.NumberTextInputBinder = NumberTextInputBinder;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class NumberSliderTextInputBinder extends editor.NumberTextInputBinder {
-        initView() {
-            super.initView();
+    var NumberSliderTextInputBinder = /** @class */ (function (_super) {
+        __extends(NumberSliderTextInputBinder, _super);
+        function NumberSliderTextInputBinder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        NumberSliderTextInputBinder.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             if (this.editable) {
                 this.slider.addEventListener(egret.Event.CHANGE, this._onSliderChanged, this);
             }
             this.slider.enabled = this.slider.touchEnabled = this.slider.touchChildren = this.editable;
-        }
-        dispose() {
-            super.dispose();
+        };
+        NumberSliderTextInputBinder.prototype.dispose = function () {
+            _super.prototype.dispose.call(this);
             this.slider.removeEventListener(egret.Event.CHANGE, this._onSliderChanged, this);
-        }
-        updateView() {
-            super.updateView();
+        };
+        NumberSliderTextInputBinder.prototype.updateView = function () {
+            _super.prototype.updateView.call(this);
             this.slider.minimum = isNaN(this.minValue) ? Number.MIN_VALUE : this.minValue;
             this.slider.maximum = isNaN(this.maxValue) ? Number.MAX_VALUE : this.maxValue;
             this.slider.snapInterval = this.step;
             this.slider.value = this.space[this.attribute];
-        }
-        _onSliderChanged() {
+        };
+        NumberSliderTextInputBinder.prototype._onSliderChanged = function () {
             this.space[this.attribute] = this.slider.value;
-        }
-    }
+        };
+        return NumberSliderTextInputBinder;
+    }(editor.NumberTextInputBinder));
     editor.NumberSliderTextInputBinder = NumberSliderTextInputBinder;
 })(editor || (editor = {}));
 var editor;
@@ -6612,106 +6922,118 @@ var editor;
      *
      * 当鼠标在指定对象上按下时禁止滚动，鼠标弹起后取消禁止滚动
      */
-    class MouseOnDisableScroll {
-        static register(sprite) {
+    var MouseOnDisableScroll = /** @class */ (function () {
+        function MouseOnDisableScroll() {
+        }
+        MouseOnDisableScroll.register = function (sprite) {
             if (!sprite)
                 return;
             sprite.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-        }
-        static unRegister(sprite) {
+        };
+        MouseOnDisableScroll.unRegister = function (sprite) {
             if (!sprite)
                 return;
             sprite.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
-        }
-        static onMouseDown(e) {
+        };
+        MouseOnDisableScroll.onMouseDown = function (e) {
             feng3d.shortcut.activityState("disableScroll");
             //
             feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
-        }
-        static onStageMouseUp() {
+        };
+        MouseOnDisableScroll.onStageMouseUp = function () {
             feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
             feng3d.shortcut.deactivityState("disableScroll");
-        }
-    }
+        };
+        return MouseOnDisableScroll;
+    }());
     editor.MouseOnDisableScroll = MouseOnDisableScroll;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class TerrainView extends eui.Component {
-        constructor() {
-            super();
-            this.skinName = "TerrainView";
+    var TerrainView = /** @class */ (function (_super) {
+        __extends(TerrainView, _super);
+        function TerrainView() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "TerrainView";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        TerrainView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+        };
+        TerrainView.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        TerrainView.prototype.updateView = function () {
             if (!this.stage)
                 return;
-        }
-    }
+        };
+        return TerrainView;
+    }(eui.Component));
     editor.TerrainView = TerrainView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OVTerrain = class OVTerrain extends editor.TerrainView {
-        constructor(objectViewInfo) {
-            super();
-            this._objectViewInfo = objectViewInfo;
-            this.space = objectViewInfo.owner;
+    var OVTerrain = /** @class */ (function (_super) {
+        __extends(OVTerrain, _super);
+        function OVTerrain(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._objectViewInfo = objectViewInfo;
+            _this.space = objectViewInfo.owner;
+            return _this;
         }
-        getAttributeView(attributeName) {
+        OVTerrain.prototype.getAttributeView = function (attributeName) {
             return null;
-        }
-        getblockView(blockName) {
+        };
+        OVTerrain.prototype.getblockView = function (blockName) {
             return null;
-        }
-    };
-    OVTerrain = __decorate([
-        feng3d.OVComponent()
-    ], OVTerrain);
+        };
+        OVTerrain = __decorate([
+            feng3d.OVComponent()
+        ], OVTerrain);
+        return OVTerrain;
+    }(editor.TerrainView));
     editor.OVTerrain = OVTerrain;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OVFolderAsset = class OVFolderAsset extends eui.Component {
-        constructor(objectViewInfo) {
-            super();
-            this.skinName = "OVFolderAsset";
-            this._objectViewInfo = objectViewInfo;
-            this.space = objectViewInfo.owner;
+    var OVFolderAsset = /** @class */ (function (_super) {
+        __extends(OVFolderAsset, _super);
+        function OVFolderAsset(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this.skinName = "OVFolderAsset";
+            _this._objectViewInfo = objectViewInfo;
+            _this.space = objectViewInfo.owner;
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        OVFolderAsset.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.openBtn.addEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
             this.updateView();
-        }
-        $onRemoveFromStage() {
+        };
+        OVFolderAsset.prototype.$onRemoveFromStage = function () {
             this.openBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
-            super.$onRemoveFromStage();
-        }
-        updateView() {
+            _super.prototype.$onRemoveFromStage.call(this);
+        };
+        OVFolderAsset.prototype.updateView = function () {
             if (!this.stage)
                 return;
             this.nameLabel.name = this.space.fileName;
-        }
-        getAttributeView(attributeName) {
+        };
+        OVFolderAsset.prototype.getAttributeView = function (attributeName) {
             return null;
-        }
-        getblockView(blockName) {
+        };
+        OVFolderAsset.prototype.getblockView = function (blockName) {
             return null;
-        }
-        onOpenBtnClick() {
+        };
+        OVFolderAsset.prototype.onOpenBtnClick = function () {
             editor.editorAsset.showFloder = editor.editorAsset.getAssetByID(this.space.assetId);
-        }
-    };
-    OVFolderAsset = __decorate([
-        feng3d.OVComponent()
-    ], OVFolderAsset);
+        };
+        OVFolderAsset = __decorate([
+            feng3d.OVComponent()
+        ], OVFolderAsset);
+        return OVFolderAsset;
+    }(eui.Component));
     editor.OVFolderAsset = OVFolderAsset;
 })(editor || (editor = {}));
 var editor;
@@ -6719,33 +7041,39 @@ var editor;
     /**
      * 默认基础对象界面
      */
-    let OVBaseDefault = class OVBaseDefault extends eui.Component {
-        constructor(objectViewInfo) {
-            super();
-            this._space = objectViewInfo.owner;
-            this.skinName = "OVBaseDefault";
+    var OVBaseDefault = /** @class */ (function (_super) {
+        __extends(OVBaseDefault, _super);
+        function OVBaseDefault(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._space = objectViewInfo.owner;
+            _this.skinName = "OVBaseDefault";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        OVBaseDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.updateView();
-        }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.updateView();
-        }
-        getAttributeView(attributeName) {
+        };
+        Object.defineProperty(OVBaseDefault.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OVBaseDefault.prototype.getAttributeView = function (attributeName) {
             return null;
-        }
-        getblockView(blockName) {
+        };
+        OVBaseDefault.prototype.getblockView = function (blockName) {
             return null;
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OVBaseDefault.prototype.updateView = function () {
             this.image.visible = false;
             this.label.visible = true;
             var value = this._space;
@@ -6760,11 +7088,12 @@ var editor;
                     string = string.substr(0, 1000) + "\n.......";
                 this.label.text = string;
             }
-        }
-    };
-    OVBaseDefault = __decorate([
-        feng3d.OVComponent()
-    ], OVBaseDefault);
+        };
+        OVBaseDefault = __decorate([
+            feng3d.OVComponent()
+        ], OVBaseDefault);
+        return OVBaseDefault;
+    }(eui.Component));
     editor.OVBaseDefault = OVBaseDefault;
 })(editor || (editor = {}));
 var editor;
@@ -6772,26 +7101,28 @@ var editor;
     /**
      * 默认使用块的对象界面
      */
-    let OVDefault = class OVDefault extends eui.Component {
+    var OVDefault = /** @class */ (function (_super) {
+        __extends(OVDefault, _super);
         /**
          * 对象界面数据
          */
-        constructor(objectViewInfo) {
-            super();
-            this._objectViewInfo = objectViewInfo;
-            this._space = objectViewInfo.owner;
-            this.skinName = "OVDefault";
+        function OVDefault(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._objectViewInfo = objectViewInfo;
+            _this._space = objectViewInfo.owner;
+            _this.skinName = "OVDefault";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        OVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             //
             this.invalidateView();
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        OVDefault.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.dispose();
-        }
-        initview() {
+        };
+        OVDefault.prototype.initview = function () {
             if (this.blockViews)
                 return;
             this.blockViews = [];
@@ -6803,8 +7134,8 @@ var editor;
                 this.group.addChild(displayObject);
                 this.blockViews.push(displayObject);
             }
-        }
-        dispose() {
+        };
+        OVDefault.prototype.dispose = function () {
             if (!this.blockViews)
                 return;
             for (var i = 0; i < this.blockViews.length; i++) {
@@ -6813,38 +7144,42 @@ var editor;
                 this.group.removeChild(displayObject);
             }
             this.blockViews = null;
-        }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.dispose();
-            this.invalidateView();
-        }
-        invalidateView() {
+        };
+        Object.defineProperty(OVDefault.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.dispose();
+                this.invalidateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OVDefault.prototype.invalidateView = function () {
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OVDefault.prototype.updateView = function () {
             if (!this.stage)
                 return;
             this.initview();
             for (var i = 0; i < this.blockViews.length; i++) {
                 this.blockViews[i].updateView();
             }
-        }
-        getblockView(blockName) {
+        };
+        OVDefault.prototype.getblockView = function (blockName) {
             for (var i = 0; i < this.blockViews.length; i++) {
                 if (this.blockViews[i].blockName == blockName) {
                     return this.blockViews[i];
                 }
             }
             return null;
-        }
-        getAttributeView(attributeName) {
+        };
+        OVDefault.prototype.getAttributeView = function (attributeName) {
             for (var i = 0; i < this.blockViews.length; i++) {
                 var attributeView = this.blockViews[i].getAttributeView(attributeName);
                 if (attributeView != null) {
@@ -6852,81 +7187,90 @@ var editor;
                 }
             }
             return null;
-        }
-    };
-    OVDefault = __decorate([
-        feng3d.OVComponent()
-    ], OVDefault);
+        };
+        OVDefault = __decorate([
+            feng3d.OVComponent()
+        ], OVDefault);
+        return OVDefault;
+    }(eui.Component));
     editor.OVDefault = OVDefault;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OVTransform = class OVTransform extends eui.Component {
-        constructor(objectViewInfo) {
-            super();
-            this._objectViewInfo = objectViewInfo;
-            this._space = objectViewInfo.owner;
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "OVTransform";
+    var OVTransform = /** @class */ (function (_super) {
+        __extends(OVTransform, _super);
+        function OVTransform(objectViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._objectViewInfo = objectViewInfo;
+            _this._space = objectViewInfo.owner;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "OVTransform";
+            return _this;
         }
-        onComplete() {
+        OVTransform.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
             this.updateView();
-        }
-        onAddedToStage() {
+        };
+        OVTransform.prototype.onAddedToStage = function () {
+            var _this = this;
             this._space.on("transformChanged", this.updateView, this);
             //
             this.updateView();
-            ["x", "y", "z", "sx", "sy", "sz"].forEach(v => {
-                this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
-                    controller: this[v + "Label"],
+            ["x", "y", "z", "sx", "sy", "sz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"],
                 }));
             });
-            ["rx", "ry", "rz"].forEach(v => {
-                this.addBinder(new editor.NumberTextInputBinder().init({
-                    space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
-                    controller: this[v + "Label"], step: 0.1,
+            ["rx", "ry", "rz"].forEach(function (v) {
+                _this.addBinder(new editor.NumberTextInputBinder().init({
+                    space: _this.space, attribute: v, textInput: _this[v + "TextInput"], editable: true,
+                    controller: _this[v + "Label"], step: 0.1,
                 }));
             });
-        }
-        onRemovedFromStage() {
+        };
+        OVTransform.prototype.onRemovedFromStage = function () {
             this._space.off("transformChanged", this.updateView, this);
             //
-        }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            if (this._space)
-                this._space.off("transformChanged", this.updateView, this);
-            this._space = value;
-            if (this._space)
-                this._space.on("transformChanged", this.updateView, this);
-            this.updateView();
-        }
-        getAttributeView(attributeName) {
+        };
+        Object.defineProperty(OVTransform.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                if (this._space)
+                    this._space.off("transformChanged", this.updateView, this);
+                this._space = value;
+                if (this._space)
+                    this._space.on("transformChanged", this.updateView, this);
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OVTransform.prototype.getAttributeView = function (attributeName) {
             return null;
-        }
-        getblockView(blockName) {
+        };
+        OVTransform.prototype.getblockView = function (blockName) {
             return null;
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OVTransform.prototype.updateView = function () {
             var transform = this.space;
             if (!transform)
                 return;
-        }
-    };
-    OVTransform = __decorate([
-        feng3d.OVComponent()
-    ], OVTransform);
+        };
+        OVTransform = __decorate([
+            feng3d.OVComponent()
+        ], OVTransform);
+        return OVTransform;
+    }(eui.Component));
     editor.OVTransform = OVTransform;
 })(editor || (editor = {}));
 var editor;
@@ -6934,28 +7278,30 @@ var editor;
     /**
      * 默认对象属性块界面
      */
-    let OBVDefault = class OBVDefault extends eui.Component {
+    var OBVDefault = /** @class */ (function (_super) {
+        __extends(OBVDefault, _super);
         /**
          * @inheritDoc
          */
-        constructor(blockViewInfo) {
-            super();
-            this._space = blockViewInfo.owner;
-            this._blockName = blockViewInfo.name;
-            this.itemList = blockViewInfo.itemList;
-            this.skinName = "OBVDefault";
+        function OBVDefault(blockViewInfo) {
+            var _this = _super.call(this) || this;
+            _this._space = blockViewInfo.owner;
+            _this._blockName = blockViewInfo.name;
+            _this.itemList = blockViewInfo.itemList;
+            _this.skinName = "OBVDefault";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        OBVDefault.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.initView();
             this.titleButton.addEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        OBVDefault.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.titleButton.removeEventListener(egret.MouseEvent.CLICK, this.onTitleButtonClick, this);
             this.dispose();
-        }
-        initView() {
+        };
+        OBVDefault.prototype.initView = function () {
             if (this._blockName != null && this._blockName.length > 0) {
                 this.addChildAt(this.border, 0);
                 this.group.addChildAt(this.titleGroup, 0);
@@ -6974,8 +7320,8 @@ var editor;
                 this.contentGroup.addChild(displayObject);
                 this.attributeViews.push(displayObject);
             }
-        }
-        dispose() {
+        };
+        OBVDefault.prototype.dispose = function () {
             for (var i = 0; i < this.attributeViews.length; i++) {
                 var displayObject = this.attributeViews[i];
                 displayObject.objectView = null;
@@ -6983,73 +7329,93 @@ var editor;
                 this.contentGroup.removeChild(displayObject);
             }
             this.attributeViews.length = 0;
-        }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            for (var i = 0; i < this.attributeViews.length; i++) {
-                this.attributeViews[i].space = this._space;
-            }
-        }
-        get blockName() {
-            return this._blockName;
-        }
-        updateView() {
+        };
+        Object.defineProperty(OBVDefault.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                for (var i = 0; i < this.attributeViews.length; i++) {
+                    this.attributeViews[i].space = this._space;
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OBVDefault.prototype, "blockName", {
+            get: function () {
+                return this._blockName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OBVDefault.prototype.updateView = function () {
             for (var i = 0; i < this.attributeViews.length; i++) {
                 this.attributeViews[i].updateView();
             }
-        }
-        getAttributeView(attributeName) {
+        };
+        OBVDefault.prototype.getAttributeView = function (attributeName) {
             for (var i = 0; i < this.attributeViews.length; i++) {
                 if (this.attributeViews[i].attributeName == attributeName) {
                     return this.attributeViews[i];
                 }
             }
             return null;
-        }
-        onTitleButtonClick() {
+        };
+        OBVDefault.prototype.onTitleButtonClick = function () {
             this.currentState = this.currentState == "hide" ? "show" : "hide";
-        }
-    };
-    OBVDefault = __decorate([
-        feng3d.OBVComponent()
-    ], OBVDefault);
+        };
+        OBVDefault = __decorate([
+            feng3d.OBVComponent()
+        ], OBVDefault);
+        return OBVDefault;
+    }(eui.Component));
     editor.OBVDefault = OBVDefault;
 })(editor || (editor = {}));
 var feng3d;
 (function (feng3d) {
-    class ObjectViewEvent extends egret.Event {
-    }
-    ObjectViewEvent.VALUE_CHANGE = "valuechange";
+    var ObjectViewEvent = /** @class */ (function (_super) {
+        __extends(ObjectViewEvent, _super);
+        function ObjectViewEvent() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ObjectViewEvent.VALUE_CHANGE = "valuechange";
+        return ObjectViewEvent;
+    }(egret.Event));
     feng3d.ObjectViewEvent = ObjectViewEvent;
 })(feng3d || (feng3d = {}));
 var editor;
 (function (editor) {
-    class OAVBase extends eui.Component {
-        constructor(attributeViewInfo) {
-            super();
+    var OAVBase = /** @class */ (function (_super) {
+        __extends(OAVBase, _super);
+        function OAVBase(attributeViewInfo) {
+            var _this = _super.call(this) || this;
             // 占用，避免出现label命名的组件
-            this.label = "";
-            this._space = attributeViewInfo.owner;
-            this._attributeName = attributeViewInfo.name;
-            this._attributeType = attributeViewInfo.type;
-            this._attributeViewInfo = attributeViewInfo;
-            if (!this._attributeViewInfo.editable)
-                this.alpha = 0.8;
+            _this.label = "";
+            _this._space = attributeViewInfo.owner;
+            _this._attributeName = attributeViewInfo.name;
+            _this._attributeType = attributeViewInfo.type;
+            _this._attributeViewInfo = attributeViewInfo;
+            if (!_this._attributeViewInfo.editable)
+                _this.alpha = 0.8;
+            return _this;
         }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.dispose();
-            this.initView();
-            this.updateView();
-        }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        Object.defineProperty(OAVBase.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.dispose();
+                this.initView();
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVBase.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             var componentParam = this._attributeViewInfo.componentParam;
             if (componentParam) {
                 for (var key in componentParam) {
@@ -7068,45 +7434,54 @@ var editor;
                 editor.toolTip.register(this.labelLab, this._attributeViewInfo.tooltip);
             this.initView();
             this.updateView();
-        }
-        $onRemoveFromStage() {
+        };
+        OAVBase.prototype.$onRemoveFromStage = function () {
             editor.toolTip.unregister(this.labelLab);
-            super.$onRemoveFromStage();
+            _super.prototype.$onRemoveFromStage.call(this);
             this.dispose();
-        }
+        };
         /**
          * 初始化
          */
-        initView() {
-        }
+        OAVBase.prototype.initView = function () {
+        };
         /**
          * 销毁
          */
-        dispose() {
-        }
+        OAVBase.prototype.dispose = function () {
+        };
         /**
          * 更新
          */
-        updateView() {
-        }
-        get attributeName() {
-            return this._attributeName;
-        }
-        get attributeValue() {
-            return this._space[this._attributeName];
-        }
-        set attributeValue(value) {
-            if (this._space[this._attributeName] != value) {
-                this._space[this._attributeName] = value;
-                var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-                objectViewEvent.space = this._space;
-                objectViewEvent.attributeName = this._attributeName;
-                objectViewEvent.attributeValue = this.attributeValue;
-                this.dispatchEvent(objectViewEvent);
-            }
-            this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        }
-    }
+        OAVBase.prototype.updateView = function () {
+        };
+        Object.defineProperty(OAVBase.prototype, "attributeName", {
+            get: function () {
+                return this._attributeName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVBase.prototype, "attributeValue", {
+            get: function () {
+                return this._space[this._attributeName];
+            },
+            set: function (value) {
+                if (this._space[this._attributeName] != value) {
+                    this._space[this._attributeName] = value;
+                    var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+                    objectViewEvent.space = this._space;
+                    objectViewEvent.attributeName = this._attributeName;
+                    objectViewEvent.attributeValue = this.attributeValue;
+                    this.dispatchEvent(objectViewEvent);
+                }
+                this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        return OAVBase;
+    }(eui.Component));
     editor.OAVBase = OAVBase;
 })(editor || (editor = {}));
 var editor;
@@ -7114,48 +7489,55 @@ var editor;
     /**
      * 默认对象属性界面
      */
-    let OAVDefault = class OAVDefault extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVDefault";
+    var OAVDefault = /** @class */ (function (_super) {
+        __extends(OAVDefault, _super);
+        function OAVDefault(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVDefault";
+            return _this;
         }
-        set dragparam(param) {
-            if (param) {
-                //
-                editor.drag.register(this, (dragsource) => {
-                    if (param.datatype)
-                        dragsource[param.datatype] = this.attributeValue;
-                }, [param.accepttype], (dragSource) => {
-                    this.attributeValue = dragSource[param.accepttype];
-                });
-            }
-        }
-        initView() {
+        Object.defineProperty(OAVDefault.prototype, "dragparam", {
+            set: function (param) {
+                var _this = this;
+                if (param) {
+                    //
+                    editor.drag.register(this, function (dragsource) {
+                        if (param.datatype)
+                            dragsource[param.datatype] = _this.attributeValue;
+                    }, [param.accepttype], function (dragSource) {
+                        _this.attributeValue = dragSource[param.accepttype];
+                    });
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVDefault.prototype.initView = function () {
             this.text.percentWidth = 100;
             this.text.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             if (this._attributeViewInfo.editable)
                 feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-        }
-        dispose() {
+        };
+        OAVDefault.prototype.dispose = function () {
             editor.drag.unregister(this);
             if (this._attributeViewInfo.editable)
                 feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.text.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-        ontxtfocusin() {
+        };
+        OAVDefault.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
-        }
-        ontxtfocusout() {
+        };
+        OAVDefault.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OAVDefault.prototype.updateView = function () {
             this.text.enabled = this._attributeViewInfo.editable;
             var value = this.attributeValue;
             if (value === undefined) {
@@ -7170,11 +7552,11 @@ var editor;
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
                 this.text.enabled = false;
             }
-        }
-        onDoubleClick() {
+        };
+        OAVDefault.prototype.onDoubleClick = function () {
             editor.editorData.selectObject(this.attributeValue);
-        }
-        onTextChange() {
+        };
+        OAVDefault.prototype.onTextChange = function () {
             if (this._textfocusintxt) {
                 switch (this._attributeType) {
                     case "String":
@@ -7189,41 +7571,45 @@ var editor;
                         this.attributeValue = Boolean(this.text.text);
                         break;
                     default:
-                        console.error(`无法处理类型${this._attributeType}!`);
+                        console.error("\u65E0\u6CD5\u5904\u7406\u7C7B\u578B" + this._attributeType + "!");
                 }
             }
-        }
-    };
-    OAVDefault = __decorate([
-        feng3d.OAVComponent()
-    ], OAVDefault);
+        };
+        OAVDefault = __decorate([
+            feng3d.OAVComponent()
+        ], OAVDefault);
+        return OAVDefault;
+    }(editor.OAVBase));
     editor.OAVDefault = OAVDefault;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVBoolean = class OAVBoolean extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "BooleanAttrViewSkin";
+    var OAVBoolean = /** @class */ (function (_super) {
+        __extends(OAVBoolean, _super);
+        function OAVBoolean(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "BooleanAttrViewSkin";
+            return _this;
         }
-        initView() {
+        OAVBoolean.prototype.initView = function () {
             if (this._attributeViewInfo.editable)
                 this.checkBox.addEventListener(egret.Event.CHANGE, this.onChange, this);
             this.checkBox.enabled = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVBoolean.prototype.dispose = function () {
             this.checkBox.removeEventListener(egret.Event.CHANGE, this.onChange, this);
-        }
-        updateView() {
+        };
+        OAVBoolean.prototype.updateView = function () {
             this.checkBox.selected = this.attributeValue;
-        }
-        onChange(event) {
+        };
+        OAVBoolean.prototype.onChange = function (event) {
             this.attributeValue = this.checkBox.selected;
-        }
-    };
-    OAVBoolean = __decorate([
-        feng3d.OAVComponent()
-    ], OAVBoolean);
+        };
+        OAVBoolean = __decorate([
+            feng3d.OAVComponent()
+        ], OAVBoolean);
+        return OAVBoolean;
+    }(editor.OAVBase));
     editor.OAVBoolean = OAVBoolean;
 })(editor || (editor = {}));
 var editor;
@@ -7231,58 +7617,64 @@ var editor;
     /**
      * 默认对象属性界面
      */
-    let OAVNumber = class OAVNumber extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
+    var OAVNumber = /** @class */ (function (_super) {
+        __extends(OAVNumber, _super);
+        function OAVNumber(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
             /**
              * 步长，精度
              */
-            this.step = 0.001;
+            _this.step = 0.001;
             /**
              * 键盘上下方向键步长
              */
-            this.stepDownup = 0.001;
+            _this.stepDownup = 0.001;
             /**
              * 移动一个像素时增加的步长数量
              */
-            this.stepScale = 1;
+            _this.stepScale = 1;
             /**
              * 最小值
              */
-            this.minValue = NaN;
+            _this.minValue = NaN;
             /**
              * 最小值
              */
-            this.maxValue = NaN;
-            this.skinName = "OAVNumber";
+            _this.maxValue = NaN;
+            _this.skinName = "OAVNumber";
+            return _this;
         }
-        initView() {
-            super.initView();
+        OAVNumber.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.space, attribute: this._attributeName, textInput: this.text, editable: this._attributeViewInfo.editable,
                 controller: this.labelLab, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
-        }
-    };
-    OAVNumber = __decorate([
-        feng3d.OAVComponent()
-    ], OAVNumber);
+        };
+        OAVNumber = __decorate([
+            feng3d.OAVComponent()
+        ], OAVNumber);
+        return OAVNumber;
+    }(editor.OAVBase));
     editor.OAVNumber = OAVNumber;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVString = class OAVString extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVString";
+    var OAVString = /** @class */ (function (_super) {
+        __extends(OAVString, _super);
+        function OAVString(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVString";
+            return _this;
         }
-        initView() {
+        OAVString.prototype.initView = function () {
             this.addBinder(new editor.TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, }));
-        }
-    };
-    OAVString = __decorate([
-        feng3d.OAVComponent()
-    ], OAVString);
+        };
+        OAVString = __decorate([
+            feng3d.OAVComponent()
+        ], OAVString);
+        return OAVString;
+    }(editor.OAVBase));
     editor.OAVString = OAVString;
 })(editor || (editor = {}));
 var editor;
@@ -7290,25 +7682,28 @@ var editor;
     /**
      * 默认对象属性界面
      */
-    let OAVMultiText = class OAVMultiText extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVMultiText";
+    var OAVMultiText = /** @class */ (function (_super) {
+        __extends(OAVMultiText, _super);
+        function OAVMultiText(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMultiText";
+            return _this;
         }
-        initView() {
+        OAVMultiText.prototype.initView = function () {
             if (this._attributeViewInfo.editable)
                 feng3d.watcher.watch(this.space, this._attributeName, this.updateView, this);
-        }
-        dispose() {
+        };
+        OAVMultiText.prototype.dispose = function () {
             feng3d.watcher.unwatch(this.space, this._attributeName, this.updateView, this);
-        }
-        updateView() {
+        };
+        OAVMultiText.prototype.updateView = function () {
             this.txtLab.text = this.attributeValue;
-        }
-    };
-    OAVMultiText = __decorate([
-        feng3d.OAVComponent()
-    ], OAVMultiText);
+        };
+        OAVMultiText = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMultiText);
+        return OAVMultiText;
+    }(editor.OAVBase));
     editor.OAVMultiText = OAVMultiText;
 })(editor || (editor = {}));
 var editor;
@@ -7316,33 +7711,35 @@ var editor;
     /**
      * Vector2属性界面
      */
-    let OAVVector2 = class OAVVector2 extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
+    var OAVVector2 = /** @class */ (function (_super) {
+        __extends(OAVVector2, _super);
+        function OAVVector2(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
             /**
              * 步长，精度
              */
-            this.step = 0.001;
+            _this.step = 0.001;
             /**
              * 键盘上下方向键步长
              */
-            this.stepDownup = 10;
+            _this.stepDownup = 10;
             /**
              * 移动一个像素时增加的步长数量
              */
-            this.stepScale = 1;
+            _this.stepScale = 1;
             /**
              * 最小值
              */
-            this.minValue = NaN;
+            _this.minValue = NaN;
             /**
              * 最小值
              */
-            this.maxValue = NaN;
-            this.skinName = "OAVVector2";
+            _this.maxValue = NaN;
+            _this.skinName = "OAVVector2";
+            return _this;
         }
-        initView() {
-            super.initView();
+        OAVVector2.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
@@ -7351,11 +7748,12 @@ var editor;
                 space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.yLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
-        }
-    };
-    OAVVector2 = __decorate([
-        feng3d.OAVComponent()
-    ], OAVVector2);
+        };
+        OAVVector2 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVVector2);
+        return OAVVector2;
+    }(editor.OAVBase));
     editor.OAVVector2 = OAVVector2;
 })(editor || (editor = {}));
 var editor;
@@ -7363,33 +7761,35 @@ var editor;
     /**
      * Vector3属性界面
      */
-    let OAVVector3 = class OAVVector3 extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
+    var OAVVector3 = /** @class */ (function (_super) {
+        __extends(OAVVector3, _super);
+        function OAVVector3(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
             /**
              * 步长，精度
              */
-            this.step = 0.001;
+            _this.step = 0.001;
             /**
              * 键盘上下方向键步长
              */
-            this.stepDownup = 0.001;
+            _this.stepDownup = 0.001;
             /**
              * 移动一个像素时增加的步长数量
              */
-            this.stepScale = 1;
+            _this.stepScale = 1;
             /**
              * 最小值
              */
-            this.minValue = NaN;
+            _this.minValue = NaN;
             /**
              * 最小值
              */
-            this.maxValue = NaN;
-            this.skinName = "OAVVector3";
+            _this.maxValue = NaN;
+            _this.skinName = "OAVVector3";
+            return _this;
         }
-        initView() {
-            super.initView();
+        OAVVector3.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
@@ -7402,11 +7802,12 @@ var editor;
                 space: this.attributeValue, attribute: "z", textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.zLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
-        }
-    };
-    OAVVector3 = __decorate([
-        feng3d.OAVComponent()
-    ], OAVVector3);
+        };
+        OAVVector3 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVVector3);
+        return OAVVector3;
+    }(editor.OAVBase));
     editor.OAVVector3 = OAVVector3;
 })(editor || (editor = {}));
 var editor;
@@ -7414,33 +7815,35 @@ var editor;
     /**
      * Vector4属性界面
      */
-    let OAVVector4 = class OAVVector4 extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
+    var OAVVector4 = /** @class */ (function (_super) {
+        __extends(OAVVector4, _super);
+        function OAVVector4(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
             /**
              * 步长，精度
              */
-            this.step = 0.001;
+            _this.step = 0.001;
             /**
              * 键盘上下方向键步长
              */
-            this.stepDownup = 0.001;
+            _this.stepDownup = 0.001;
             /**
              * 移动一个像素时增加的步长数量
              */
-            this.stepScale = 1;
+            _this.stepScale = 1;
             /**
              * 最小值
              */
-            this.minValue = NaN;
+            _this.minValue = NaN;
             /**
              * 最小值
              */
-            this.maxValue = NaN;
-            this.skinName = "OAVVector4";
+            _this.maxValue = NaN;
+            _this.skinName = "OAVVector4";
+            return _this;
         }
-        initView() {
-            super.initView();
+        OAVVector4.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             this.addBinder(new editor.NumberTextInputBinder().init({
                 space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
@@ -7457,40 +7860,55 @@ var editor;
                 space: this.attributeValue, attribute: "w", textInput: this.wTextInput, editable: this._attributeViewInfo.editable,
                 controller: this.wLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
             }));
-        }
-    };
-    OAVVector4 = __decorate([
-        feng3d.OAVComponent()
-    ], OAVVector4);
+        };
+        OAVVector4 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVVector4);
+        return OAVVector4;
+    }(editor.OAVBase));
     editor.OAVVector4 = OAVVector4;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVArray = class OAVArray extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVArray";
+    var OAVArray = /** @class */ (function (_super) {
+        __extends(OAVArray, _super);
+        function OAVArray(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVArray";
+            return _this;
         }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.updateView();
-        }
-        get attributeName() {
-            return this._attributeName;
-        }
-        get attributeValue() {
-            return this._space[this._attributeName];
-        }
-        set attributeValue(value) {
-            if (this._space[this._attributeName] != value) {
-                this._space[this._attributeName] = value;
-            }
-            this.updateView();
-        }
-        initView() {
+        Object.defineProperty(OAVArray.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVArray.prototype, "attributeName", {
+            get: function () {
+                return this._attributeName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVArray.prototype, "attributeValue", {
+            get: function () {
+                return this._space[this._attributeName];
+            },
+            set: function (value) {
+                if (this._space[this._attributeName] != value) {
+                    this._space[this._attributeName] = value;
+                }
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVArray.prototype.initView = function () {
             this.attributeViews = [];
             var attributeValue = this.attributeValue;
             this.sizeTxt.text = this.attributeValue.length.toString();
@@ -7503,8 +7921,8 @@ var editor;
             this.currentState = "hide";
             this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleGroupClick, this);
             this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
-        }
-        dispose() {
+        };
+        OAVArray.prototype.dispose = function () {
             this.titleGroup.removeEventListener(egret.MouseEvent.CLICK, this.onTitleGroupClick, this);
             this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
             this.attributeViews = [];
@@ -7513,11 +7931,11 @@ var editor;
                 this.contentGroup.removeChild(displayObject);
             }
             this.attributeViews = null;
-        }
-        onTitleGroupClick() {
+        };
+        OAVArray.prototype.onTitleGroupClick = function () {
             this.currentState = this.currentState == "hide" ? "show" : "hide";
-        }
-        onsizeTxtfocusout() {
+        };
+        OAVArray.prototype.onsizeTxtfocusout = function () {
             var size = parseInt(this.sizeTxt.text);
             var attributeValue = this.attributeValue;
             var attributeViews = this.attributeViews;
@@ -7539,14 +7957,17 @@ var editor;
                     this.contentGroup.addChild(attributeViews[i]);
                 }
             }
-        }
-    };
-    OAVArray = __decorate([
-        feng3d.OAVComponent()
-    ], OAVArray);
+        };
+        OAVArray = __decorate([
+            feng3d.OAVComponent()
+        ], OAVArray);
+        return OAVArray;
+    }(editor.OAVBase));
     editor.OAVArray = OAVArray;
-    class OAVArrayItem extends editor.OAVDefault {
-        constructor(arr, index, componentParam) {
+    var OAVArrayItem = /** @class */ (function (_super) {
+        __extends(OAVArrayItem, _super);
+        function OAVArrayItem(arr, index, componentParam) {
+            var _this = this;
             var attributeViewInfo = {
                 name: index + "",
                 editable: true,
@@ -7554,102 +7975,117 @@ var editor;
                 owner: arr,
                 type: "number",
             };
-            super(attributeViewInfo);
+            _this = _super.call(this, attributeViewInfo) || this;
+            return _this;
         }
-        initView() {
-            super.initView();
+        OAVArrayItem.prototype.initView = function () {
+            _super.prototype.initView.call(this);
             this.labelLab.width = 60;
-        }
-    }
+        };
+        return OAVArrayItem;
+    }(editor.OAVDefault));
     editor.OAVArrayItem = OAVArrayItem;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVEnum = class OAVEnum extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVEnum";
+    var OAVEnum = /** @class */ (function (_super) {
+        __extends(OAVEnum, _super);
+        function OAVEnum(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVEnum";
+            return _this;
         }
-        set enumClass(obj) {
-            this.list = [];
-            for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    if (isNaN(Number(key)))
-                        this.list.push({ label: key, value: obj[key] });
+        Object.defineProperty(OAVEnum.prototype, "enumClass", {
+            set: function (obj) {
+                this.list = [];
+                for (var key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        if (isNaN(Number(key)))
+                            this.list.push({ label: key, value: obj[key] });
+                    }
                 }
-            }
-        }
-        initView() {
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVEnum.prototype.initView = function () {
             if (this._attributeViewInfo.editable) {
                 this.combobox.addEventListener(egret.Event.CHANGE, this.onComboxChange, this);
             }
             this.combobox.touchEnabled = this.combobox.touchChildren = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVEnum.prototype.dispose = function () {
             this.combobox.removeEventListener(egret.Event.CHANGE, this.onComboxChange, this);
-        }
-        updateView() {
+        };
+        OAVEnum.prototype.updateView = function () {
+            var _this = this;
             this.combobox.dataProvider = this.list;
             if (this.list) {
-                this.combobox.data = this.list.reduce((prevalue, item) => {
+                this.combobox.data = this.list.reduce(function (prevalue, item) {
                     if (prevalue)
                         return prevalue;
-                    if (item.value == this.attributeValue)
+                    if (item.value == _this.attributeValue)
                         return item;
                     return null;
                 }, null);
             }
-        }
-        onComboxChange() {
+        };
+        OAVEnum.prototype.onComboxChange = function () {
             this.attributeValue = this.combobox.data.value;
-        }
-    };
-    OAVEnum = __decorate([
-        feng3d.OAVComponent()
-    ], OAVEnum);
+        };
+        OAVEnum = __decorate([
+            feng3d.OAVComponent()
+        ], OAVEnum);
+        return OAVEnum;
+    }(editor.OAVBase));
     editor.OAVEnum = OAVEnum;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVImage = class OAVImage extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVImage";
-            this.alpha = 1;
+    var OAVImage = /** @class */ (function (_super) {
+        __extends(OAVImage, _super);
+        function OAVImage(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVImage";
+            _this.alpha = 1;
+            return _this;
         }
-        initView() {
+        OAVImage.prototype.initView = function () {
             var texture = this.space;
             this.image.source = texture.dataURL;
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-        }
-        dispose() {
-        }
-        updateView() {
-        }
-        onResize() {
+        };
+        OAVImage.prototype.dispose = function () {
+        };
+        OAVImage.prototype.updateView = function () {
+        };
+        OAVImage.prototype.onResize = function () {
             this.image.width = this.width;
             this.image.height = this.width;
             this.height = this.width;
-        }
-    };
-    OAVImage = __decorate([
-        feng3d.OAVComponent()
-    ], OAVImage);
+        };
+        OAVImage = __decorate([
+            feng3d.OAVComponent()
+        ], OAVImage);
+        return OAVImage;
+    }(editor.OAVBase));
     editor.OAVImage = OAVImage;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVCubeMap = class OAVCubeMap extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVCubeMap";
-            this.alpha = 1;
+    var OAVCubeMap = /** @class */ (function (_super) {
+        __extends(OAVCubeMap, _super);
+        function OAVCubeMap(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVCubeMap";
+            _this.alpha = 1;
+            return _this;
         }
-        initView() {
+        OAVCubeMap.prototype.initView = function () {
             this.images = [this.px, this.py, this.pz, this.nx, this.ny, this.nz];
             this.btns = [this.pxBtn, this.pyBtn, this.pzBtn, this.nxBtn, this.nyBtn, this.nzBtn];
             // var param: { accepttype: keyof DragData; datatype?: string; } = { accepttype: "image" };
-            for (let i = 0; i < propertys.length; i++) {
+            for (var i = 0; i < propertys.length; i++) {
                 this.updateImage(i);
                 // drag.register(image,
                 // 	(dragsource) => { },
@@ -7663,11 +8099,11 @@ var editor;
                 // this.btns[i].touchChildren = this.btns[i].touchEnabled = this._attributeViewInfo.editable;
             }
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-        }
-        updateImage(i) {
-            const image = this.images[i];
+        };
+        OAVCubeMap.prototype.updateImage = function (i) {
+            var image = this.images[i];
             var textureCube = this.space;
-            textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], (img) => {
+            textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], function (img) {
                 if (img) {
                     image.source = feng3d.dataTransform.imageToDataURL(img);
                 }
@@ -7675,44 +8111,46 @@ var editor;
                     image.source = null;
                 }
             });
-        }
-        onImageClick(e) {
+        };
+        OAVCubeMap.prototype.onImageClick = function (e) {
+            var _this = this;
             var index = this.btns.indexOf(e.currentTarget);
             if (index != -1) {
                 var textureCube = this.space;
                 var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
                 var menus = [{
-                        label: `None`, click: () => {
+                        label: "None", click: function () {
                             textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
-                            this.updateImage(index);
-                            this.dispatchValueChange(index);
+                            _this.updateImage(index);
+                            _this.dispatchValueChange(index);
                         }
                     }];
-                texture2ds.forEach(d => {
+                texture2ds.forEach(function (d) {
                     menus.push({
-                        label: d.name, click: () => {
+                        label: d.name,
+                        click: function () {
                             textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
-                            this.updateImage(index);
-                            this.dispatchValueChange(index);
+                            _this.updateImage(index);
+                            _this.dispatchValueChange(index);
                         }
                     });
                 });
                 editor.menu.popup(menus);
             }
-        }
-        dispatchValueChange(index) {
+        };
+        OAVCubeMap.prototype.dispatchValueChange = function (index) {
             var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
             objectViewEvent.space = this._space;
             objectViewEvent.attributeName = propertys[index];
             this.dispatchEvent(objectViewEvent);
             //
             feng3d.objectevent.dispatch(this._space, "propertyValueChanged");
-        }
-        dispose() {
-        }
-        updateView() {
-        }
-        onResize() {
+        };
+        OAVCubeMap.prototype.dispose = function () {
+        };
+        OAVCubeMap.prototype.updateView = function () {
+        };
+        OAVCubeMap.prototype.onResize = function () {
             var w4 = Math.round(this.width / 4);
             this.px.width = this.py.width = this.pz.width = this.nx.width = this.ny.width = this.nz.width = w4;
             this.px.height = this.py.height = this.pz.height = this.nx.height = this.ny.height = this.nz.height = w4;
@@ -7737,45 +8175,61 @@ var editor;
             this.nzGroup.y = w4;
             //
             this.height = w4 * 3;
-        }
-    };
-    OAVCubeMap = __decorate([
-        feng3d.OAVComponent()
-    ], OAVCubeMap);
+        };
+        OAVCubeMap = __decorate([
+            feng3d.OAVComponent()
+        ], OAVCubeMap);
+        return OAVCubeMap;
+    }(editor.OAVBase));
     editor.OAVCubeMap = OAVCubeMap;
     var propertys = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVComponentList = class OAVComponentList extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVComponentListSkin";
+    var OAVComponentList = /** @class */ (function (_super) {
+        __extends(OAVComponentList, _super);
+        function OAVComponentList(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVComponentListSkin";
+            return _this;
         }
-        onAddComponentButtonClick() {
+        OAVComponentList.prototype.onAddComponentButtonClick = function () {
             editor.menu.popup(editor.menuConfig.getCreateComponentMenu(this.space));
-        }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.dispose();
-            this.initView();
-        }
-        get attributeName() {
-            return this._attributeName;
-        }
-        get attributeValue() {
-            return this._space[this._attributeName];
-        }
-        set attributeValue(value) {
-            if (this._space[this._attributeName] != value) {
-                this._space[this._attributeName] = value;
-            }
-            this.updateView();
-        }
-        initView() {
+        };
+        Object.defineProperty(OAVComponentList.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.dispose();
+                this.initView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVComponentList.prototype, "attributeName", {
+            get: function () {
+                return this._attributeName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVComponentList.prototype, "attributeValue", {
+            get: function () {
+                return this._space[this._attributeName];
+            },
+            set: function (value) {
+                if (this._space[this._attributeName] != value) {
+                    this._space[this._attributeName] = value;
+                }
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVComponentList.prototype.initView = function () {
+            var _this = this;
             this.group.layout.gap = -1;
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
@@ -7783,14 +8237,14 @@ var editor;
             }
             this.space.on("addComponent", this.onAddCompont, this);
             this.space.on("removeComponent", this.onRemoveComponent, this);
-            editor.drag.register(this.addComponentButton, null, ["file_script"], (dragdata) => {
-                dragdata.getDragData("file_script").forEach(v => {
-                    this.space.addScript(v.scriptName);
+            editor.drag.register(this.addComponentButton, null, ["file_script"], function (dragdata) {
+                dragdata.getDragData("file_script").forEach(function (v) {
+                    _this.space.addScript(v.scriptName);
                 });
             });
             this.addComponentButton.addEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-        }
-        dispose() {
+        };
+        OAVComponentList.prototype.dispose = function () {
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
                 this.removedComponentView(components[i]);
@@ -7799,78 +8253,84 @@ var editor;
             this.space.off("removeComponent", this.onRemoveComponent, this);
             editor.drag.unregister(this.addComponentButton);
             this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
-        }
-        addComponentView(component) {
+        };
+        OAVComponentList.prototype.addComponentView = function (component) {
             if (component.hideFlags & feng3d.HideFlags.HideInInspector)
                 return;
             var displayObject = new editor.ComponentView(component);
             displayObject.percentWidth = 100;
             this.group.addChild(displayObject);
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OAVComponentList.prototype.updateView = function () {
             for (var i = 0, n = this.group.numChildren; i < n; i++) {
                 var child = this.group.getChildAt(i);
                 if (child instanceof editor.ComponentView)
                     child.updateView();
             }
-        }
-        removedComponentView(component) {
+        };
+        OAVComponentList.prototype.removedComponentView = function (component) {
             for (var i = this.group.numChildren - 1; i >= 0; i--) {
                 var displayObject = this.group.getChildAt(i);
                 if (displayObject instanceof editor.ComponentView && displayObject.component == component) {
                     this.group.removeChild(displayObject);
                 }
             }
-        }
-        onAddCompont(event) {
+        };
+        OAVComponentList.prototype.onAddCompont = function (event) {
             if (event.data.component.gameObject == this.space)
                 this.addComponentView(event.data.component);
-        }
-        onRemoveComponent(event) {
+        };
+        OAVComponentList.prototype.onRemoveComponent = function (event) {
             if (event.data.component.gameObject == this.space)
                 this.removedComponentView(event.data.component);
-        }
-    };
-    OAVComponentList = __decorate([
-        feng3d.OAVComponent()
-    ], OAVComponentList);
+        };
+        OAVComponentList = __decorate([
+            feng3d.OAVComponent()
+        ], OAVComponentList);
+        return OAVComponentList;
+    }(editor.OAVBase));
     editor.OAVComponentList = OAVComponentList;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVFunction = class OAVFunction extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVFunction";
+    var OAVFunction = /** @class */ (function (_super) {
+        __extends(OAVFunction, _super);
+        function OAVFunction(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVFunction";
+            return _this;
         }
-        initView() {
+        OAVFunction.prototype.initView = function () {
             this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
-        }
-        dispose() {
+        };
+        OAVFunction.prototype.dispose = function () {
             this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
-        }
-        updateView() {
-        }
-        click(event) {
+        };
+        OAVFunction.prototype.updateView = function () {
+        };
+        OAVFunction.prototype.click = function (event) {
             this._space[this._attributeName]();
-        }
-    };
-    OAVFunction = __decorate([
-        feng3d.OAVComponent()
-    ], OAVFunction);
+        };
+        OAVFunction = __decorate([
+            feng3d.OAVComponent()
+        ], OAVFunction);
+        return OAVFunction;
+    }(editor.OAVBase));
     editor.OAVFunction = OAVFunction;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVColorPicker = class OAVColorPicker extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVColorPicker";
+    var OAVColorPicker = /** @class */ (function (_super) {
+        __extends(OAVColorPicker, _super);
+        function OAVColorPicker(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVColorPicker";
+            return _this;
         }
-        initView() {
+        OAVColorPicker.prototype.initView = function () {
             if (this._attributeViewInfo.editable) {
                 this.colorPicker.addEventListener(egret.Event.CHANGE, this.onChange, this);
                 this.input.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -7878,31 +8338,31 @@ var editor;
                 this.input.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
             }
             this.colorPicker.touchEnabled = this.colorPicker.touchChildren = this.input.enabled = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVColorPicker.prototype.dispose = function () {
             this.colorPicker.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             this.input.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.input.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.input.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-        updateView() {
+        };
+        OAVColorPicker.prototype.updateView = function () {
             var color = this.attributeValue;
             this.colorPicker.value = color;
             this.input.text = color.toHexString();
-        }
-        onChange(event) {
+        };
+        OAVColorPicker.prototype.onChange = function (event) {
             //
             this.attributeValue = this.colorPicker.value.clone();
             this.input.text = this.attributeValue.toHexString();
-        }
-        ontxtfocusin() {
+        };
+        OAVColorPicker.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
-        }
-        ontxtfocusout() {
+        };
+        OAVColorPicker.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
             this.input.text = this.attributeValue.toHexString();
-        }
-        onTextChange() {
+        };
+        OAVColorPicker.prototype.onTextChange = function () {
             if (this._textfocusintxt) {
                 var text = this.input.text;
                 if (this.attributeValue instanceof feng3d.Color3) {
@@ -7914,34 +8374,37 @@ var editor;
                     this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
                 }
             }
-        }
-    };
-    OAVColorPicker = __decorate([
-        feng3d.OAVComponent()
-    ], OAVColorPicker);
+        };
+        OAVColorPicker = __decorate([
+            feng3d.OAVComponent()
+        ], OAVColorPicker);
+        return OAVColorPicker;
+    }(editor.OAVBase));
     editor.OAVColorPicker = OAVColorPicker;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVMaterialName = class OAVMaterialName extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OVMaterial";
+    var OAVMaterialName = /** @class */ (function (_super) {
+        __extends(OAVMaterialName, _super);
+        function OAVMaterialName(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OVMaterial";
+            return _this;
         }
-        initView() {
+        OAVMaterialName.prototype.initView = function () {
             this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
             feng3d.globalDispatcher.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
             this.shaderComboBox.touchChildren = this.shaderComboBox.touchEnabled = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVMaterialName.prototype.dispose = function () {
             this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
             feng3d.globalDispatcher.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
-        }
-        updateView() {
+        };
+        OAVMaterialName.prototype.updateView = function () {
             var material = this.space;
             this.nameLabel.text = material.shaderName;
-            var data = feng3d.shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v }; });
-            var selected = data.reduce((prevalue, item) => {
+            var data = feng3d.shaderlib.getShaderNames().sort().map(function (v) { return { label: v, value: v }; });
+            var selected = data.reduce(function (prevalue, item) {
                 if (prevalue)
                     return prevalue;
                 if (item.value == material.shaderName)
@@ -7950,88 +8413,96 @@ var editor;
             }, null);
             this.shaderComboBox.dataProvider = data;
             this.shaderComboBox.data = selected;
-        }
-        onShaderComboBoxChange() {
+        };
+        OAVMaterialName.prototype.onShaderComboBoxChange = function () {
             this.attributeValue = this.shaderComboBox.data.value;
             this.objectView.space = this.space;
-        }
-    };
-    OAVMaterialName = __decorate([
-        feng3d.OAVComponent()
-    ], OAVMaterialName);
+        };
+        OAVMaterialName = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMaterialName);
+        return OAVMaterialName;
+    }(editor.OAVBase));
     editor.OAVMaterialName = OAVMaterialName;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVObjectView = class OAVObjectView extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OVDefault";
-            this.alpha = 1;
+    var OAVObjectView = /** @class */ (function (_super) {
+        __extends(OAVObjectView, _super);
+        function OAVObjectView(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OVDefault";
+            _this.alpha = 1;
+            return _this;
         }
-        initView() {
+        OAVObjectView.prototype.initView = function () {
+            var _this = this;
             var arr = [];
             if (Array.isArray(this.attributeValue))
                 arr = this.attributeValue;
             else
                 arr.push(this.attributeValue);
             this.views = [];
-            arr.forEach(element => {
+            arr.forEach(function (element) {
                 var editable = true;
                 if (element instanceof feng3d.Feng3dObject)
                     editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
                 var view = feng3d.objectview.getObjectView(element, { editable: editable });
                 view.percentWidth = 100;
-                this.group.addChild(view);
-                this.views.push(view);
+                _this.group.addChild(view);
+                _this.views.push(view);
                 if (element instanceof feng3d.EventDispatcher) {
-                    element.on("refreshView", this.onRefreshView, this);
+                    element.on("refreshView", _this.onRefreshView, _this);
                 }
             });
-        }
-        updateView() {
-        }
+        };
+        OAVObjectView.prototype.updateView = function () {
+        };
         /**
          * 销毁
          */
-        dispose() {
-            this.views.forEach(element => {
-                this.group.removeChild(element);
+        OAVObjectView.prototype.dispose = function () {
+            var _this = this;
+            this.views.forEach(function (element) {
+                _this.group.removeChild(element);
                 if (element.space instanceof feng3d.EventDispatcher) {
-                    element.space.on("refreshView", this.onRefreshView, this);
+                    element.space.on("refreshView", _this.onRefreshView, _this);
                 }
             });
             this.views.length = 0;
-        }
-        onRefreshView(event) {
+        };
+        OAVObjectView.prototype.onRefreshView = function (event) {
             this.dispose();
             this.initView();
-        }
-    };
-    OAVObjectView = __decorate([
-        feng3d.OAVComponent()
-    ], OAVObjectView);
+        };
+        OAVObjectView = __decorate([
+            feng3d.OAVComponent()
+        ], OAVObjectView);
+        return OAVObjectView;
+    }(editor.OAVBase));
     editor.OAVObjectView = OAVObjectView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVAccordionObjectView = class OAVAccordionObjectView extends editor.OAVBase {
+    var OAVAccordionObjectView = /** @class */ (function (_super) {
+        __extends(OAVAccordionObjectView, _super);
         /**
          * 对象界面数据
          */
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "ParticleComponentView";
+        function OAVAccordionObjectView(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "ParticleComponentView";
+            return _this;
         }
         /**
          * 更新界面
          */
-        updateView() {
+        OAVAccordionObjectView.prototype.updateView = function () {
             this.updateEnableCB();
             if (this.componentView)
                 this.componentView.updateView();
-        }
-        initView() {
+        };
+        OAVAccordionObjectView.prototype.initView = function () {
             var componentName = feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
             this.accordion.titleName = componentName;
             this.componentView = feng3d.objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
@@ -8040,70 +8511,74 @@ var editor;
             this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
             feng3d.watcher.watch(this.attributeValue, "enabled", this.updateEnableCB, this);
             this.updateView();
-        }
-        dispose() {
+        };
+        OAVAccordionObjectView.prototype.dispose = function () {
             this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
             feng3d.watcher.unwatch(this.attributeValue, "enabled", this.updateEnableCB, this);
-        }
-        updateEnableCB() {
+        };
+        OAVAccordionObjectView.prototype.updateEnableCB = function () {
             this.enabledCB.selected = this.attributeValue.enabled;
-        }
-        onEnableCBChange() {
+        };
+        OAVAccordionObjectView.prototype.onEnableCBChange = function () {
             this.attributeValue.enabled = this.enabledCB.selected;
-        }
-    };
-    OAVAccordionObjectView = __decorate([
-        feng3d.OAVComponent()
-    ], OAVAccordionObjectView);
+        };
+        OAVAccordionObjectView = __decorate([
+            feng3d.OAVComponent()
+        ], OAVAccordionObjectView);
+        return OAVAccordionObjectView;
+    }(editor.OAVBase));
     editor.OAVAccordionObjectView = OAVAccordionObjectView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVGameObjectName = class OAVGameObjectName extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVGameObjectName";
+    var OAVGameObjectName = /** @class */ (function (_super) {
+        __extends(OAVGameObjectName, _super);
+        function OAVGameObjectName(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVGameObjectName";
+            return _this;
         }
-        initView() {
+        OAVGameObjectName.prototype.initView = function () {
             this.visibleCB.addEventListener(egret.MouseEvent.CLICK, this.onVisibleCBClick, this);
             this.mouseEnabledCB.addEventListener(egret.MouseEvent.CLICK, this.onMouseEnabledCBClick, this);
             this.nameInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.nameInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.nameInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-        dispose() {
+        };
+        OAVGameObjectName.prototype.dispose = function () {
             this.visibleCB.removeEventListener(egret.MouseEvent.CLICK, this.onVisibleCBClick, this);
             this.mouseEnabledCB.removeEventListener(egret.MouseEvent.CLICK, this.onMouseEnabledCBClick, this);
             this.nameInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
             this.nameInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.nameInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-        updateView() {
+        };
+        OAVGameObjectName.prototype.updateView = function () {
             this.visibleCB.selected = this.space.visible;
             this.mouseEnabledCB.selected = this.space.mouseEnabled;
             this.nameInput.text = this.space.name;
-        }
-        onVisibleCBClick() {
+        };
+        OAVGameObjectName.prototype.onVisibleCBClick = function () {
             this.space.visible = !this.space.visible;
-        }
-        onMouseEnabledCBClick() {
+        };
+        OAVGameObjectName.prototype.onMouseEnabledCBClick = function () {
             this.space.mouseEnabled = !this.space.mouseEnabled;
-        }
-        ontxtfocusin() {
+        };
+        OAVGameObjectName.prototype.ontxtfocusin = function () {
             this._textfocusintxt = true;
-        }
-        ontxtfocusout() {
+        };
+        OAVGameObjectName.prototype.ontxtfocusout = function () {
             this._textfocusintxt = false;
-        }
-        onTextChange() {
+        };
+        OAVGameObjectName.prototype.onTextChange = function () {
             if (this._textfocusintxt) {
                 this.space.name = this.nameInput.text;
             }
-        }
-    };
-    OAVGameObjectName = __decorate([
-        feng3d.OAVComponent()
-    ], OAVGameObjectName);
+        };
+        OAVGameObjectName = __decorate([
+            feng3d.OAVComponent()
+        ], OAVGameObjectName);
+        return OAVGameObjectName;
+    }(editor.OAVBase));
     editor.OAVGameObjectName = OAVGameObjectName;
 })(editor || (editor = {}));
 var editor;
@@ -8111,41 +8586,46 @@ var editor;
     /**
      * 挑选（拾取）OAV界面
      */
-    let OAVPick = class OAVPick extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVPick";
+    var OAVPick = /** @class */ (function (_super) {
+        __extends(OAVPick, _super);
+        function OAVPick(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVPick";
+            return _this;
         }
-        initView() {
+        OAVPick.prototype.initView = function () {
+            var _this = this;
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             if (this._attributeViewInfo.editable) {
                 this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
                 var param = this._attributeViewInfo.componentParam;
-                editor.drag.register(this, (dragsource) => {
+                editor.drag.register(this, function (dragsource) {
                     if (param.datatype)
-                        dragsource.addDragData(param.datatype, this.attributeValue);
-                }, [param.accepttype], (dragSource) => {
-                    this.attributeValue = dragSource.getDragData(param.accepttype)[0];
+                        dragsource.addDragData(param.datatype, _this.attributeValue);
+                }, [param.accepttype], function (dragSource) {
+                    _this.attributeValue = dragSource.getDragData(param.accepttype)[0];
                 });
             }
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-        }
-        dispose() {
+        };
+        OAVPick.prototype.dispose = function () {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
             editor.drag.unregister(this);
             feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
-        }
-        onPickBtnClick() {
+        };
+        OAVPick.prototype.onPickBtnClick = function () {
+            var _this = this;
             var param = this._attributeViewInfo.componentParam;
             if (param.accepttype) {
                 if (param.accepttype == "texture2d") {
                     var menus = [];
                     var texture2ds = editor.editorRS.getLoadedAssetDatasByType(feng3d.Texture2D);
-                    texture2ds.forEach(item => {
+                    texture2ds.forEach(function (item) {
                         menus.push({
-                            label: item.name, click: () => {
-                                this.attributeValue = item;
+                            label: item.name,
+                            click: function () {
+                                _this.attributeValue = item;
                             }
                         });
                     });
@@ -8154,22 +8634,24 @@ var editor;
                 else if (param.accepttype == "texturecube") {
                     var menus = [];
                     var textureCubes = editor.editorRS.getLoadedAssetDatasByType(feng3d.TextureCube);
-                    textureCubes.forEach(item => {
+                    textureCubes.forEach(function (item) {
                         menus.push({
-                            label: item.name, click: () => {
-                                this.attributeValue = item;
+                            label: item.name,
+                            click: function () {
+                                _this.attributeValue = item;
                             }
                         });
                     });
                     editor.menu.popup(menus);
                 }
                 else if (param.accepttype == "audio") {
-                    var menus = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = ""; } }];
                     var audioFiles = editor.editorRS.getAssetsByType(feng3d.AudioAsset);
-                    audioFiles.forEach(item => {
+                    audioFiles.forEach(function (item) {
                         menus.push({
-                            label: item.fileName, click: () => {
-                                this.attributeValue = item.assetPath;
+                            label: item.fileName,
+                            click: function () {
+                                _this.attributeValue = item.assetPath;
                             }
                         });
                     }, []);
@@ -8177,12 +8659,12 @@ var editor;
                 }
                 else if (param.accepttype == "file_script") {
                     var scriptFiles = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
-                    var menus = [{ label: `None`, click: () => { this.attributeValue = null; } }];
-                    scriptFiles.forEach(element => {
+                    var menus = [{ label: "None", click: function () { _this.attributeValue = null; } }];
+                    scriptFiles.forEach(function (element) {
                         menus.push({
                             label: element.scriptName,
-                            click: () => {
-                                this.attributeValue = element.scriptName;
+                            click: function () {
+                                _this.attributeValue = element.scriptName;
                             }
                         });
                     });
@@ -8191,11 +8673,11 @@ var editor;
                 else if (param.accepttype == "material") {
                     var assets = editor.editorRS.getLoadedAssetDatasByType(feng3d.Material);
                     var menus = [];
-                    assets.forEach(element => {
+                    assets.forEach(function (element) {
                         menus.push({
                             label: element.name,
-                            click: () => {
-                                this.attributeValue = element;
+                            click: function () {
+                                _this.attributeValue = element;
                             }
                         });
                     });
@@ -8204,22 +8686,22 @@ var editor;
                 else if (param.accepttype == "geometry") {
                     var geometrys = editor.editorRS.getLoadedAssetDatasByType(feng3d.Geometry);
                     var menus = [];
-                    geometrys.forEach(element => {
+                    geometrys.forEach(function (element) {
                         menus.push({
                             label: element.name,
-                            click: () => {
-                                this.attributeValue = element;
+                            click: function () {
+                                _this.attributeValue = element;
                             }
                         });
                     });
                     editor.menu.popup(menus);
                 }
             }
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OAVPick.prototype.updateView = function () {
             if (this.attributeValue === undefined) {
                 this.text.text = String(this.attributeValue);
             }
@@ -8230,16 +8712,17 @@ var editor;
                 this.text.text = this.attributeValue["name"] || "";
                 this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             }
-        }
-        onDoubleClick() {
+        };
+        OAVPick.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object") {
                 editor.editorData.selectObject(this.attributeValue);
             }
-        }
-    };
-    OAVPick = __decorate([
-        feng3d.OAVComponent()
-    ], OAVPick);
+        };
+        OAVPick = __decorate([
+            feng3d.OAVComponent()
+        ], OAVPick);
+        return OAVPick;
+    }(editor.OAVBase));
     editor.OAVPick = OAVPick;
 })(editor || (editor = {}));
 var editor;
@@ -8247,131 +8730,153 @@ var editor;
     /**
      * 挑选（拾取）OAV界面
      */
-    let OAVTexture2D = class OAVTexture2D extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVTexture2D";
+    var OAVTexture2D = /** @class */ (function (_super) {
+        __extends(OAVTexture2D, _super);
+        function OAVTexture2D(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVTexture2D";
+            return _this;
         }
-        initView() {
+        OAVTexture2D.prototype.initView = function () {
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             if (this._attributeViewInfo.editable)
                 this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-        }
-        dispose() {
+        };
+        OAVTexture2D.prototype.dispose = function () {
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
             feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
-        }
-        ontxtClick() {
+        };
+        OAVTexture2D.prototype.ontxtClick = function () {
+            var _this = this;
             var menus = [];
             var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
-            texture2ds.forEach(texture2d => {
+            texture2ds.forEach(function (texture2d) {
                 menus.push({
-                    label: texture2d.name, click: () => {
-                        this.attributeValue = texture2d;
-                        this.once(egret.Event.ENTER_FRAME, this.updateView, this);
+                    label: texture2d.name,
+                    click: function () {
+                        _this.attributeValue = texture2d;
+                        _this.once(egret.Event.ENTER_FRAME, _this.updateView, _this);
                     }
                 });
             });
             editor.menu.popup(menus);
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OAVTexture2D.prototype.updateView = function () {
             var texture = this.attributeValue;
             this.image.source = texture.dataURL;
-        }
-        onDoubleClick() {
+        };
+        OAVTexture2D.prototype.onDoubleClick = function () {
             if (this.attributeValue && typeof this.attributeValue == "object")
                 editor.editorData.selectObject(this.attributeValue);
-        }
-    };
-    OAVTexture2D = __decorate([
-        feng3d.OAVComponent()
-    ], OAVTexture2D);
+        };
+        OAVTexture2D = __decorate([
+            feng3d.OAVComponent()
+        ], OAVTexture2D);
+        return OAVTexture2D;
+    }(editor.OAVBase));
     editor.OAVTexture2D = OAVTexture2D;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVParticleComponentList = class OAVParticleComponentList extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVParticleComponentList";
+    var OAVParticleComponentList = /** @class */ (function (_super) {
+        __extends(OAVParticleComponentList, _super);
+        function OAVParticleComponentList(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVParticleComponentList";
+            return _this;
         }
-        get space() {
-            return this._space;
-        }
-        set space(value) {
-            this._space = value;
-            this.dispose();
-            this.initView();
-        }
-        get attributeName() {
-            return this._attributeName;
-        }
-        get attributeValue() {
-            return this._space[this._attributeName];
-        }
-        set attributeValue(value) {
-            if (this._space[this._attributeName] != value) {
-                this._space[this._attributeName] = value;
-            }
-            this.updateView();
-        }
-        initView() {
+        Object.defineProperty(OAVParticleComponentList.prototype, "space", {
+            get: function () {
+                return this._space;
+            },
+            set: function (value) {
+                this._space = value;
+                this.dispose();
+                this.initView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVParticleComponentList.prototype, "attributeName", {
+            get: function () {
+                return this._attributeName;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(OAVParticleComponentList.prototype, "attributeValue", {
+            get: function () {
+                return this._space[this._attributeName];
+            },
+            set: function (value) {
+                if (this._space[this._attributeName] != value) {
+                    this._space[this._attributeName] = value;
+                }
+                this.updateView();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        OAVParticleComponentList.prototype.initView = function () {
             this.group.layout.gap = -1;
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
                 this.addComponentView(components[i]);
             }
-        }
-        dispose() {
+        };
+        OAVParticleComponentList.prototype.dispose = function () {
             var components = this.attributeValue;
             for (var i = 0; i < components.length; i++) {
                 this.removedComponentView(components[i]);
             }
-        }
+        };
         /**
          * 更新界面
          */
-        updateView() {
+        OAVParticleComponentList.prototype.updateView = function () {
             for (var i = 0, n = this.group.numChildren; i < n; i++) {
                 var child = this.group.getChildAt(i);
                 if (child instanceof editor.ParticleComponentView)
                     child.updateView();
             }
-        }
-        addComponentView(component) {
+        };
+        OAVParticleComponentList.prototype.addComponentView = function (component) {
             var o;
             var displayObject = new editor.ParticleComponentView(component);
             displayObject.percentWidth = 100;
             this.group.addChild(displayObject);
-        }
-        removedComponentView(component) {
+        };
+        OAVParticleComponentList.prototype.removedComponentView = function (component) {
             for (var i = this.group.numChildren - 1; i >= 0; i--) {
                 var displayObject = this.group.getChildAt(i);
                 if (displayObject instanceof editor.ParticleComponentView && displayObject.component == component) {
                     this.group.removeChild(displayObject);
                 }
             }
-        }
-    };
-    OAVParticleComponentList = __decorate([
-        feng3d.OAVComponent()
-    ], OAVParticleComponentList);
+        };
+        OAVParticleComponentList = __decorate([
+            feng3d.OAVComponent()
+        ], OAVParticleComponentList);
+        return OAVParticleComponentList;
+    }(editor.OAVBase));
     editor.OAVParticleComponentList = OAVParticleComponentList;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVFeng3dPreView = class OAVFeng3dPreView extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVFeng3dPreView";
-            this.alpha = 1;
+    var OAVFeng3dPreView = /** @class */ (function (_super) {
+        __extends(OAVFeng3dPreView, _super);
+        function OAVFeng3dPreView(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVFeng3dPreView";
+            _this.alpha = 1;
+            return _this;
         }
-        initView() {
+        OAVFeng3dPreView.prototype.initView = function () {
             this.cameraRotation = editor.feng3dScreenShot.camera.transform.rotation.clone();
             this.onResize();
             this.addEventListener(egret.Event.RESIZE, this.onResize, this);
@@ -8379,21 +8884,21 @@ var editor;
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.ticker.on(100, this.onDrawObject, this);
             editor.MouseOnDisableScroll.register(this);
-        }
-        dispose() {
+        };
+        OAVFeng3dPreView.prototype.dispose = function () {
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.ticker.off(100, this.onDrawObject, this);
             editor.MouseOnDisableScroll.unRegister(this);
-        }
-        onMouseDown() {
+        };
+        OAVFeng3dPreView.prototype.onMouseDown = function () {
             this.preMousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var rect = this.getGlobalBounds();
             if (rect.contains(this.preMousePos.x, this.preMousePos.y)) {
                 feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
                 feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             }
-        }
-        onMouseMove() {
+        };
+        OAVFeng3dPreView.prototype.onMouseMove = function () {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var X_AXIS = editor.feng3dScreenShot.camera.transform.rightVector;
             var Y_AXIS = editor.feng3dScreenShot.camera.transform.upVector;
@@ -8401,8 +8906,8 @@ var editor;
             editor.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
             this.cameraRotation = editor.feng3dScreenShot.camera.transform.rotation.clone();
             this.preMousePos = mousePos;
-        }
-        onDrawObject() {
+        };
+        OAVFeng3dPreView.prototype.onDrawObject = function () {
             if (this.space instanceof feng3d.GameObject) {
                 editor.feng3dScreenShot.drawGameObject(this.space, this.cameraRotation);
             }
@@ -8413,108 +8918,118 @@ var editor;
                 editor.feng3dScreenShot.drawMaterial(this.space, this.cameraRotation);
             }
             this.image.source = editor.feng3dScreenShot.toDataURL(this.width, this.height);
-        }
-        onMouseUp() {
+        };
+        OAVFeng3dPreView.prototype.onMouseUp = function () {
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-        }
-        updateView() {
-        }
-        onResize() {
+        };
+        OAVFeng3dPreView.prototype.updateView = function () {
+        };
+        OAVFeng3dPreView.prototype.onResize = function () {
             this.height = this.width;
             this.image.width = this.image.height = this.width;
-        }
-    };
-    OAVFeng3dPreView = __decorate([
-        feng3d.OAVComponent()
-    ], OAVFeng3dPreView);
+        };
+        OAVFeng3dPreView = __decorate([
+            feng3d.OAVComponent()
+        ], OAVFeng3dPreView);
+        return OAVFeng3dPreView;
+    }(editor.OAVBase));
     editor.OAVFeng3dPreView = OAVFeng3dPreView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVMinMaxCurve = class OAVMinMaxCurve extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVMinMaxCurve";
+    var OAVMinMaxCurve = /** @class */ (function (_super) {
+        __extends(OAVMinMaxCurve, _super);
+        function OAVMinMaxCurve(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMinMaxCurve";
+            return _this;
         }
-        initView() {
+        OAVMinMaxCurve.prototype.initView = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxCurveView.addEventListener(egret.Event.CHANGE, this.onChange, this);
             }
             this.minMaxCurveView.minMaxCurve = this.attributeValue;
             this.minMaxCurveView.touchEnabled = this.minMaxCurveView.touchChildren = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVMinMaxCurve.prototype.dispose = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxCurveView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             }
-        }
-        updateView() {
-        }
-        onChange() {
-        }
-    };
-    OAVMinMaxCurve = __decorate([
-        feng3d.OAVComponent()
-    ], OAVMinMaxCurve);
+        };
+        OAVMinMaxCurve.prototype.updateView = function () {
+        };
+        OAVMinMaxCurve.prototype.onChange = function () {
+        };
+        OAVMinMaxCurve = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMinMaxCurve);
+        return OAVMinMaxCurve;
+    }(editor.OAVBase));
     editor.OAVMinMaxCurve = OAVMinMaxCurve;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVMinMaxCurveVector3 = class OAVMinMaxCurveVector3 extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVMinMaxCurveVector3";
+    var OAVMinMaxCurveVector3 = /** @class */ (function (_super) {
+        __extends(OAVMinMaxCurveVector3, _super);
+        function OAVMinMaxCurveVector3(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMinMaxCurveVector3";
+            return _this;
         }
-        initView() {
+        OAVMinMaxCurveVector3.prototype.initView = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxCurveVector3View.addEventListener(egret.Event.CHANGE, this.onChange, this);
             }
             this.minMaxCurveVector3View.minMaxCurveVector3 = this.attributeValue;
             this.minMaxCurveVector3View.touchEnabled = this.minMaxCurveVector3View.touchChildren = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVMinMaxCurveVector3.prototype.dispose = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxCurveVector3View.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             }
-        }
-        updateView() {
-        }
-        onChange() {
-        }
-    };
-    OAVMinMaxCurveVector3 = __decorate([
-        feng3d.OAVComponent()
-    ], OAVMinMaxCurveVector3);
+        };
+        OAVMinMaxCurveVector3.prototype.updateView = function () {
+        };
+        OAVMinMaxCurveVector3.prototype.onChange = function () {
+        };
+        OAVMinMaxCurveVector3 = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMinMaxCurveVector3);
+        return OAVMinMaxCurveVector3;
+    }(editor.OAVBase));
     editor.OAVMinMaxCurveVector3 = OAVMinMaxCurveVector3;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let OAVMinMaxGradient = class OAVMinMaxGradient extends editor.OAVBase {
-        constructor(attributeViewInfo) {
-            super(attributeViewInfo);
-            this.skinName = "OAVMinMaxGradient";
+    var OAVMinMaxGradient = /** @class */ (function (_super) {
+        __extends(OAVMinMaxGradient, _super);
+        function OAVMinMaxGradient(attributeViewInfo) {
+            var _this = _super.call(this, attributeViewInfo) || this;
+            _this.skinName = "OAVMinMaxGradient";
+            return _this;
         }
-        initView() {
+        OAVMinMaxGradient.prototype.initView = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
             }
             this.minMaxGradientView.minMaxGradient = this.attributeValue;
             this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
-        }
-        dispose() {
+        };
+        OAVMinMaxGradient.prototype.dispose = function () {
             if (this._attributeViewInfo.editable) {
                 this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
             }
-        }
-        updateView() {
-        }
-        onChange() {
-        }
-    };
-    OAVMinMaxGradient = __decorate([
-        feng3d.OAVComponent()
-    ], OAVMinMaxGradient);
+        };
+        OAVMinMaxGradient.prototype.updateView = function () {
+        };
+        OAVMinMaxGradient.prototype.onChange = function () {
+        };
+        OAVMinMaxGradient = __decorate([
+            feng3d.OAVComponent()
+        ], OAVMinMaxGradient);
+        return OAVMinMaxGradient;
+    }(editor.OAVBase));
     editor.OAVMinMaxGradient = OAVMinMaxGradient;
 })(editor || (editor = {}));
 var editor;
@@ -8522,34 +9037,40 @@ var editor;
     /**
      * 属性面板（检查器）
      */
-    class InspectorView extends eui.Component {
-        constructor() {
-            super();
+    var InspectorView = /** @class */ (function (_super) {
+        __extends(InspectorView, _super);
+        function InspectorView() {
+            var _this = _super.call(this) || this;
             /**
              * 历史选中对象列表
              */
-            this._historySelectedObject = [];
+            _this._historySelectedObject = [];
             /**
              * 最多存储历史选中对象数量
              */
-            this._maxHistorySelectedObject = 10;
-            this._dataChanged = false;
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "InspectorViewSkin";
-            this.moduleName = InspectorView.moduleName;
+            _this._maxHistorySelectedObject = 10;
+            _this._dataChanged = false;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "InspectorViewSkin";
+            _this.moduleName = InspectorView.moduleName;
+            return _this;
         }
-        get historySelectedObjectLength() {
-            return this._historySelectedObject.length;
-        }
+        Object.defineProperty(InspectorView.prototype, "historySelectedObjectLength", {
+            get: function () {
+                return this._historySelectedObject.length;
+            },
+            enumerable: false,
+            configurable: true
+        });
         /**
          *
          */
-        preSelectedObjects() {
+        InspectorView.prototype.preSelectedObjects = function () {
             this._historySelectedObject.pop();
             var v = this._historySelectedObject.pop();
             editor.editorData.selectedObjects = v;
-        }
-        showData(data) {
+        };
+        InspectorView.prototype.showData = function (data) {
             if (this._viewData == data)
                 return;
             if (this._viewData) {
@@ -8558,12 +9079,13 @@ var editor;
             //
             this._viewData = data;
             this.updateView();
-        }
-        onSaveShowData(event) {
+        };
+        InspectorView.prototype.onSaveShowData = function (event) {
             this.saveShowData(event.data);
-        }
-        updateView() {
-            this.typeLab.text = ``;
+        };
+        InspectorView.prototype.updateView = function () {
+            var _this = this;
+            this.typeLab.text = "";
             this.backButton.visible = this._historySelectedObject.length > 1;
             if (this._view && this._view.parent) {
                 this._view.parent.removeChild(this._view);
@@ -8580,10 +9102,10 @@ var editor;
                     else {
                         if (!this._viewData.isLoaded) {
                             var viewData = this._viewData;
-                            viewData.load(() => {
+                            viewData.load(function () {
                                 console.assert(!!viewData.asset);
-                                if (viewData == this._viewData)
-                                    this.updateShowData(viewData.asset);
+                                if (viewData == _this._viewData)
+                                    _this.updateShowData(viewData.asset);
                             });
                         }
                     }
@@ -8595,17 +9117,17 @@ var editor;
             else {
                 this.group.addChild(this.emptyLabel);
             }
-        }
+        };
         /**
          * 保存显示数据
          */
-        saveShowData(callback) {
+        InspectorView.prototype.saveShowData = function (callback) {
             if (this._dataChanged) {
                 if (this._viewData.assetId) {
                     var feng3dAsset = feng3d.rs.getAssetById(this._viewData.assetId);
                     if (feng3dAsset) {
-                        editor.editorRS.writeAsset(feng3dAsset, (err) => {
-                            console.assert(!err, `资源 ${feng3dAsset.assetId} 保存失败！`);
+                        editor.editorRS.writeAsset(feng3dAsset, function (err) {
+                            console.assert(!err, "\u8D44\u6E90 " + feng3dAsset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                             callback && callback();
                         });
                     }
@@ -8618,15 +9140,15 @@ var editor;
             else {
                 callback && callback();
             }
-        }
-        onComplete() {
+        };
+        InspectorView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        InspectorView.prototype.onAddedToStage = function () {
             this.backButton.visible = this._historySelectedObject.length > 1;
             this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
@@ -8635,23 +9157,23 @@ var editor;
             feng3d.globalDispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
             //
             this.updateView();
-        }
-        onRemovedFromStage() {
+        };
+        InspectorView.prototype.onRemovedFromStage = function () {
             this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
             feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
             //
             feng3d.globalDispatcher.off("inspector.update", this.updateView, this);
             feng3d.globalDispatcher.off("inspector.saveShowData", this.onSaveShowData, this);
-        }
-        onSelectedObjectsChanged() {
+        };
+        InspectorView.prototype.onSelectedObjectsChanged = function () {
             this._historySelectedObject.push(editor.editorData.selectedObjects);
             if (this._historySelectedObject.length > this._maxHistorySelectedObject)
                 this._historySelectedObject.shift();
             var data = editor.inspectorMultiObject.convertInspectorObject(editor.editorData.selectedObjects);
             this.showData(data);
-        }
-        updateShowData(showdata) {
-            this.typeLab.text = `${showdata.constructor["name"]}`;
+        };
+        InspectorView.prototype.updateShowData = function (showdata) {
+            this.typeLab.text = "" + showdata.constructor["name"];
             if (this._view)
                 this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
             var editable = true;
@@ -8662,8 +9184,8 @@ var editor;
             this.group.addChild(this._view);
             this.group.scrollV = 0;
             this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
-        }
-        onValueChanged(e) {
+        };
+        InspectorView.prototype.onValueChanged = function (e) {
             this._dataChanged = true;
             if (this._viewData instanceof feng3d.FileAsset) {
                 if (this._viewData.assetId) {
@@ -8674,12 +9196,13 @@ var editor;
             else if (this._viewData instanceof editor.AssetNode) {
                 this._viewData.updateImage();
             }
-        }
-        onBackButton() {
+        };
+        InspectorView.prototype.onBackButton = function () {
             this.preSelectedObjects();
-        }
-    }
-    InspectorView.moduleName = "Inspector";
+        };
+        InspectorView.moduleName = "Inspector";
+        return InspectorView;
+    }(eui.Component));
     editor.InspectorView = InspectorView;
     editor.Modules.moduleViewCls[InspectorView.moduleName] = InspectorView;
 })(editor || (editor = {}));
@@ -8690,11 +9213,13 @@ var editor;
      *
      * 处理多个对象在检查器中显示问题
      */
-    class InspectorMultiObject {
-        convertInspectorObject(objects) {
+    var InspectorMultiObject = /** @class */ (function () {
+        function InspectorMultiObject() {
+        }
+        InspectorMultiObject.prototype.convertInspectorObject = function (objects) {
             if (objects.length == 0)
                 return 0;
-            objects = objects.map(element => {
+            objects = objects.map(function (element) {
                 if (element instanceof editor.AssetNode) {
                     if (element.asset.data)
                         element = element.asset.data;
@@ -8706,110 +9231,118 @@ var editor;
             if (objects.length == 1)
                 return objects[0];
             var data = {};
-            objects.forEach(element => {
+            objects.forEach(function (element) {
                 var type = feng3d.classUtils.getQualifiedClassName(element);
                 var list = data[type] = data[type] || [];
                 list.push(element);
             });
             var l = [];
-            for (const type in data) {
+            for (var type in data) {
                 var element = data[type];
-                l.push(`${element.length} ${type}`);
+                l.push(element.length + " " + type);
             }
-            l.unshift(`${objects.length} Objects\n`);
+            l.unshift(objects.length + " Objects\n");
             return l.join("\n\t");
-        }
-    }
+        };
+        return InspectorMultiObject;
+    }());
     editor.InspectorMultiObject = InspectorMultiObject;
     editor.inspectorMultiObject = new InspectorMultiObject();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class HierarchyTreeItemRenderer extends editor.TreeItemRenderer {
-        constructor() {
-            super();
-            this.skinName = "HierarchyTreeItemRenderer";
+    var HierarchyTreeItemRenderer = /** @class */ (function (_super) {
+        __extends(HierarchyTreeItemRenderer, _super);
+        function HierarchyTreeItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "HierarchyTreeItemRenderer";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
-            editor.drag.register(this, (dragSource) => {
-                this.data.setdargSource(dragSource);
-            }, ["gameobject", "file_gameobject", "file_script"], (dragdata) => {
-                this.data.acceptDragDrop(dragdata);
+        HierarchyTreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
+            var _this = this;
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
+            editor.drag.register(this, function (dragSource) {
+                _this.data.setdargSource(dragSource);
+            }, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
+                _this.data.acceptDragDrop(dragdata);
             });
             editor.MouseOnDisableScroll.register(this);
             //
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-        $onRemoveFromStage() {
+        };
+        HierarchyTreeItemRenderer.prototype.$onRemoveFromStage = function () {
             editor.drag.unregister(this);
             editor.MouseOnDisableScroll.unRegister(this);
-            super.$onRemoveFromStage();
+            _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-        onclick() {
+        };
+        HierarchyTreeItemRenderer.prototype.onclick = function () {
             editor.editorData.selectObject(this.data.gameobject);
-        }
-        onDoubleClick() {
+        };
+        HierarchyTreeItemRenderer.prototype.onDoubleClick = function () {
             feng3d.shortcut.dispatch("lookToSelectedGameObject");
-        }
-        onrightclick() {
+        };
+        HierarchyTreeItemRenderer.prototype.onrightclick = function () {
+            var _this = this;
             var menus = [];
             //scene无法删除
             if (this.data.gameobject.scene.gameObject != this.data.gameobject) {
                 menus.push({
-                    label: "复制", click: () => {
-                        var objects = editor.editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+                    label: "复制",
+                    click: function () {
+                        var objects = editor.editorData.selectedObjects.filter(function (v) { return v instanceof feng3d.GameObject; });
                         editor.editorData.copyObjects = objects;
                     }
                 }, {
                     label: "粘贴",
-                    click: () => {
+                    click: function () {
                         var undoSelectedObjects = editor.editorData.selectedObjects;
                         //
-                        var objects = editor.editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+                        var objects = editor.editorData.copyObjects.filter(function (v) { return v instanceof feng3d.GameObject; });
                         if (objects.length == 0)
                             return;
-                        var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
-                        newGameObjects.forEach(v => {
-                            this.data.gameobject.parent.addChild(v);
+                        var newGameObjects = objects.map(function (v) { return feng3d.serialization.clone(v); });
+                        newGameObjects.forEach(function (v) {
+                            _this.data.gameobject.parent.addChild(v);
                         });
                         editor.editorData.selectMultiObject(newGameObjects);
                         // undo
-                        editor.editorData.undoList.push(() => {
-                            newGameObjects.forEach(v => {
+                        editor.editorData.undoList.push(function () {
+                            newGameObjects.forEach(function (v) {
                                 v.remove();
                             });
                             editor.editorData.selectMultiObject(undoSelectedObjects, false);
                         });
                     }
                 }, { type: 'separator' }, {
-                    label: "副本", click: () => {
+                    label: "副本",
+                    click: function () {
                         var undoSelectedObjects = editor.editorData.selectedObjects;
                         //
-                        var objects = editor.editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
-                        var newGameObjects = objects.map(v => {
+                        var objects = editor.editorData.selectedObjects.filter(function (v) { return v instanceof feng3d.GameObject; });
+                        var newGameObjects = objects.map(function (v) {
                             var no = feng3d.serialization.clone(v);
                             v.parent.addChild(no);
                             return no;
                         });
                         editor.editorData.selectMultiObject(newGameObjects);
                         // undo
-                        editor.editorData.undoList.push(() => {
-                            newGameObjects.forEach(v => {
+                        editor.editorData.undoList.push(function () {
+                            newGameObjects.forEach(function (v) {
                                 v.remove();
                             });
                             editor.editorData.selectMultiObject(undoSelectedObjects, false);
                         });
                     }
                 }, {
-                    label: "删除", click: () => {
-                        this.data.gameobject.parent.removeChild(this.data.gameobject);
-                        var index = editor.editorData.selectedObjects.indexOf(this.data.gameobject);
+                    label: "删除",
+                    click: function () {
+                        _this.data.gameobject.parent.removeChild(_this.data.gameobject);
+                        var index = editor.editorData.selectedObjects.indexOf(_this.data.gameobject);
                         if (index != -1) {
                             var selectedObjects = editor.editorData.selectedObjects.concat();
                             selectedObjects.splice(index, 1);
@@ -8821,20 +9354,23 @@ var editor;
             menus = menus.concat({ type: 'separator' }, editor.menuConfig.getCreateObjectMenu());
             if (menus.length > 0)
                 editor.menu.popup(menus);
-        }
-    }
+        };
+        return HierarchyTreeItemRenderer;
+    }(editor.TreeItemRenderer));
     editor.HierarchyTreeItemRenderer = HierarchyTreeItemRenderer;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class HierarchyView extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "HierarchyViewSkin";
-            this.moduleName = HierarchyView.moduleName;
+    var HierarchyView = /** @class */ (function (_super) {
+        __extends(HierarchyView, _super);
+        function HierarchyView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "HierarchyViewSkin";
+            _this.moduleName = HierarchyView.moduleName;
+            return _this;
         }
-        onComplete() {
+        HierarchyView.prototype.onComplete = function () {
             this.list.itemRenderer = editor.HierarchyTreeItemRenderer;
             this.hierachyScroller.viewport = this.list;
             this.listData = this.list.dataProvider = new eui.ArrayCollection();
@@ -8843,9 +9379,9 @@ var editor;
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
-            editor.drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], (dragdata) => {
+        };
+        HierarchyView.prototype.onAddedToStage = function () {
+            editor.drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], function (dragdata) {
                 editor.hierarchy.rootnode.acceptDragDrop(dragdata);
             });
             this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
@@ -8853,58 +9389,59 @@ var editor;
             feng3d.watcher.watch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
             this.onRootNode(editor.hierarchy.rootnode);
             this.invalidHierarchy();
-        }
-        onRemovedFromStage() {
+        };
+        HierarchyView.prototype.onRemovedFromStage = function () {
             editor.drag.unregister(this.list);
             this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
             this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
             feng3d.watcher.unwatch(editor.hierarchy, "rootnode", this.onRootNodeChanged, this);
             this.offRootNode(editor.hierarchy.rootnode);
-        }
-        onRootNodeChanged(newValue, oldvalue) {
+        };
+        HierarchyView.prototype.onRootNodeChanged = function (newValue, oldvalue) {
             this.offRootNode(oldvalue);
             this.onRootNode(editor.hierarchy.rootnode);
             this.invalidHierarchy();
-        }
-        onRootNode(node) {
+        };
+        HierarchyView.prototype.onRootNode = function (node) {
             if (node) {
                 node.on("added", this.invalidHierarchy, this);
                 node.on("removed", this.invalidHierarchy, this);
                 node.on("openChanged", this.invalidHierarchy, this);
             }
-        }
-        offRootNode(node) {
+        };
+        HierarchyView.prototype.offRootNode = function (node) {
             if (node) {
                 node.off("added", this.invalidHierarchy, this);
                 node.off("removed", this.invalidHierarchy, this);
                 node.off("openChanged", this.invalidHierarchy, this);
             }
-        }
-        invalidHierarchy() {
+        };
+        HierarchyView.prototype.invalidHierarchy = function () {
             feng3d.ticker.nextframe(this.updateHierarchyTree, this);
-        }
-        updateHierarchyTree() {
+        };
+        HierarchyView.prototype.updateHierarchyTree = function () {
             if (!editor.hierarchy.rootnode)
                 return;
             var nodes = editor.hierarchy.rootnode.getShowNodes();
             this.listData.replaceAll(nodes);
-        }
-        onListClick(e) {
+        };
+        HierarchyView.prototype.onListClick = function (e) {
             if (e.target == this.list) {
                 editor.editorData.selectObject(null);
             }
-        }
-        onListRightClick(e) {
+        };
+        HierarchyView.prototype.onListRightClick = function (e) {
             if (e.target == this.list) {
                 editor.editorData.selectObject(null);
                 editor.menu.popup(editor.menuConfig.getCreateObjectMenu());
             }
-        }
-    }
-    /**
-     * 模块名称
-     */
-    HierarchyView.moduleName = "Hierarchy";
+        };
+        /**
+         * 模块名称
+         */
+        HierarchyView.moduleName = "Hierarchy";
+        return HierarchyView;
+    }(eui.Component));
     editor.HierarchyView = HierarchyView;
     editor.Modules.moduleViewCls[HierarchyView.moduleName] = HierarchyView;
 })(editor || (editor = {}));
@@ -8913,37 +9450,40 @@ var editor;
     /**
      * 动画面板
      */
-    class AnimationView extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "AnimationView";
-            this.moduleName = AnimationView.moduleName;
+    var AnimationView = /** @class */ (function (_super) {
+        __extends(AnimationView, _super);
+        function AnimationView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "AnimationView";
+            _this.moduleName = AnimationView.moduleName;
+            return _this;
         }
-        onComplete() {
+        AnimationView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        AnimationView.prototype.onAddedToStage = function () {
             //
             this.updateView();
-        }
-        onRemovedFromStage() {
-        }
-        updateView() {
-        }
-    }
-    AnimationView.moduleName = "Animation";
+        };
+        AnimationView.prototype.onRemovedFromStage = function () {
+        };
+        AnimationView.prototype.updateView = function () {
+        };
+        AnimationView.moduleName = "Animation";
+        return AnimationView;
+    }(eui.Component));
     editor.AnimationView = AnimationView;
     editor.Modules.moduleViewCls[AnimationView.moduleName] = AnimationView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class EditorAsset {
-        constructor() {
+    var EditorAsset = /** @class */ (function () {
+        function EditorAsset() {
             /**
              * 资源ID字典
              */
@@ -8959,97 +9499,99 @@ var editor;
          * 初始化项目
          * @param callback
          */
-        initproject(callback) {
-            editor.editorRS.init(() => {
-                this._assetIDMap = {};
-                this._assetPathMap = {};
+        EditorAsset.prototype.initproject = function (callback) {
+            var _this = this;
+            editor.editorRS.init(function () {
+                _this._assetIDMap = {};
+                _this._assetPathMap = {};
                 var allAssets = editor.editorRS.getAllAssets();
-                allAssets.map(asset => {
+                allAssets.map(function (asset) {
                     var node = new editor.AssetNode(asset);
-                    this.addAsset(node);
+                    _this.addAsset(node);
                     return node;
-                }).forEach(element => {
+                }).forEach(function (element) {
                     if (element.asset.parentAsset) {
-                        var parentNode = this.getAssetByID(element.asset.parentAsset.assetId);
+                        var parentNode = _this.getAssetByID(element.asset.parentAsset.assetId);
                         parentNode.addChild(element);
                     }
                 });
-                this.rootFile = this.getAssetByID(editor.editorRS.root.assetId);
-                this.showFloder = this.rootFile;
-                this.rootFile.isOpen = true;
+                _this.rootFile = _this.getAssetByID(editor.editorRS.root.assetId);
+                _this.showFloder = _this.rootFile;
+                _this.rootFile.isOpen = true;
                 callback();
             });
-        }
+        };
         /**
          * 添加新资源
          *
          * @param node 资源
          */
-        addAsset(node) {
+        EditorAsset.prototype.addAsset = function (node) {
             if (this._assetIDMap[node.asset.assetId])
                 throw "添加重复资源！";
             if (this._assetPathMap[node.asset.assetPath])
                 throw "添加重复资源！";
             this._assetIDMap[node.asset.assetId] = node;
             this._assetPathMap[node.asset.assetPath] = node;
-        }
-        readScene(path, callback) {
-            editor.editorRS.fs.readObject(path, (err, obj) => {
+        };
+        EditorAsset.prototype.readScene = function (path, callback) {
+            editor.editorRS.fs.readObject(path, function (err, obj) {
                 if (err) {
                     callback(err, null);
                     return;
                 }
-                editor.editorRS.deserializeWithAssets(obj, (object) => {
+                editor.editorRS.deserializeWithAssets(obj, function (object) {
                     var scene = object.getComponent("Scene");
                     callback(null, scene);
                 });
             });
-        }
+        };
         /**
          * 根据资源编号获取文件
          *
          * @param assetId 文件路径
          */
-        getAssetByID(assetId) {
+        EditorAsset.prototype.getAssetByID = function (assetId) {
             return this._assetIDMap[assetId];
-        }
+        };
         /**
          * 根据资源路径获取文件
          *
          * @param path 资源路径
          */
-        getAssetByPath(path) {
+        EditorAsset.prototype.getAssetByPath = function (path) {
             return this._assetPathMap[path];
-        }
+        };
         /**
          * 删除资源
          *
          * @param assetNode 资源
          */
-        deleteAsset(assetNode, callback) {
-            editor.editorRS.deleteAsset(assetNode.asset, (err) => {
+        EditorAsset.prototype.deleteAsset = function (assetNode, callback) {
+            var _this = this;
+            editor.editorRS.deleteAsset(assetNode.asset, function (err) {
                 if (err) {
                     callback && callback(err);
                     return;
                 }
-                delete this._assetIDMap[assetNode.asset.assetId];
-                delete this._assetPathMap[assetNode.asset.assetPath];
+                delete _this._assetIDMap[assetNode.asset.assetId];
+                delete _this._assetPathMap[assetNode.asset.assetPath];
                 feng3d.globalDispatcher.dispatch("asset.deletefile", { id: assetNode.asset.assetId });
                 callback && callback(err);
             });
-        }
+        };
         /**
          * 保存资源
          *
          * @param assetNode 资源
          * @param callback 完成回调
          */
-        saveAsset(assetNode, callback) {
-            editor.editorRS.writeAsset(assetNode.asset, (err) => {
-                console.assert(!err, `资源 ${assetNode.asset.assetId} 保存失败！`);
+        EditorAsset.prototype.saveAsset = function (assetNode, callback) {
+            editor.editorRS.writeAsset(assetNode.asset, function (err) {
+                console.assert(!err, "\u8D44\u6E90 " + assetNode.asset.assetId + " \u4FDD\u5B58\u5931\u8D25\uFF01");
                 callback && callback();
             });
-        }
+        };
         /**
          * 新增资源
          *
@@ -9059,14 +9601,15 @@ var editor;
          * @param folderNode 所在文件夹，如果值为null时默认添加到根文件夹中
          * @param callback 完成回调函数
          */
-        createAsset(folderPath, cls, fileName, value, callback) {
+        EditorAsset.prototype.createAsset = function (folderPath, cls, fileName, value, callback) {
+            var _this = this;
             var folderNode = this.getAssetByPath(folderPath);
             var folder = folderNode.asset;
-            editor.editorRS.createAsset(cls, fileName, value, folder, (err, asset) => {
+            editor.editorRS.createAsset(cls, fileName, value, folder, function (err, asset) {
                 if (asset) {
                     var assetNode = new editor.AssetNode(asset);
                     assetNode.isLoaded = true;
-                    this.addAsset(assetNode);
+                    _this.addAsset(assetNode);
                     folderNode.addChild(assetNode);
                     editor.editorData.selectObject(assetNode);
                     callback && callback(null, assetNode);
@@ -9075,11 +9618,12 @@ var editor;
                     alert(err.message);
                 }
             });
-        }
+        };
         /**
          * 弹出文件菜单
          */
-        popupmenu(assetNode) {
+        EditorAsset.prototype.popupmenu = function (assetNode) {
+            var _this = this;
             var folder = assetNode.asset;
             // 资源所在文件夹
             var folderPath = assetNode.asset.assetPath;
@@ -9090,98 +9634,115 @@ var editor;
                     label: "Create",
                     submenu: [
                         {
-                            label: "Folder", click: () => {
-                                this.createAsset(folderPath, feng3d.FolderAsset, "NewFolder");
+                            label: "Folder",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.FolderAsset, "NewFolder");
                             }
                         },
                         {
-                            label: "TS Script", click: () => {
+                            label: "TS Script",
+                            click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewScript");
-                                this.createAsset(folderPath, feng3d.ScriptAsset, fileName, { textContent: editor.assetFileTemplates.getNewScript(fileName) }, () => {
+                                _this.createAsset(folderPath, feng3d.ScriptAsset, fileName, { textContent: editor.assetFileTemplates.getNewScript(fileName) }, function () {
                                     feng3d.globalDispatcher.dispatch("script.compile");
                                 });
                             }
                         },
                         {
-                            label: "Shader", click: () => {
+                            label: "Shader",
+                            click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewShader");
-                                this.createAsset(folderPath, feng3d.ShaderAsset, fileName, { textContent: editor.assetFileTemplates.getNewShader(fileName) }, () => {
+                                _this.createAsset(folderPath, feng3d.ShaderAsset, fileName, { textContent: editor.assetFileTemplates.getNewShader(fileName) }, function () {
                                     feng3d.globalDispatcher.dispatch("script.compile");
                                 });
                             }
                         },
                         {
-                            label: "js", click: () => {
-                                this.createAsset(folderPath, feng3d.JSAsset, "NewJs");
+                            label: "js",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.JSAsset, "NewJs");
                             }
                         },
                         {
-                            label: "Json", click: () => {
-                                this.createAsset(folderPath, feng3d.JsonAsset, "New Json");
+                            label: "Json",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.JsonAsset, "New Json");
                             }
                         },
                         {
-                            label: "Txt", click: () => {
-                                this.createAsset(folderPath, feng3d.TextAsset, "New Text");
+                            label: "Txt",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.TextAsset, "New Text");
                             }
                         },
                         { type: "separator" },
                         {
-                            label: "立方体贴图", click: () => {
-                                this.createAsset(folderPath, feng3d.TextureCubeAsset, "new TextureCube", { data: new feng3d.TextureCube() });
+                            label: "立方体贴图",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.TextureCubeAsset, "new TextureCube", { data: new feng3d.TextureCube() });
                             }
                         },
                         {
-                            label: "Material", click: () => {
-                                this.createAsset(folderPath, feng3d.MaterialAsset, "New Material", { data: new feng3d.Material() });
+                            label: "Material",
+                            click: function () {
+                                _this.createAsset(folderPath, feng3d.MaterialAsset, "New Material", { data: new feng3d.Material() });
                             }
                         },
                         {
                             label: "几何体",
                             submenu: [
                                 {
-                                    label: "平面", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New PlaneGeometry", { data: new feng3d.PlaneGeometry() });
+                                    label: "平面",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New PlaneGeometry", { data: new feng3d.PlaneGeometry() });
                                     }
                                 },
                                 {
-                                    label: "立方体", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New CubeGeometry", { data: new feng3d.CubeGeometry() });
+                                    label: "立方体",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New CubeGeometry", { data: new feng3d.CubeGeometry() });
                                     }
                                 },
                                 {
-                                    label: "球体", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New SphereGeometry", { data: new feng3d.SphereGeometry() });
+                                    label: "球体",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New SphereGeometry", { data: new feng3d.SphereGeometry() });
                                     }
                                 },
                                 {
-                                    label: "胶囊体", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New CapsuleGeometry", { data: new feng3d.CapsuleGeometry() });
+                                    label: "胶囊体",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New CapsuleGeometry", { data: new feng3d.CapsuleGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆柱体", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New CylinderGeometry", { data: new feng3d.CylinderGeometry() });
+                                    label: "圆柱体",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New CylinderGeometry", { data: new feng3d.CylinderGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆锥体", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New ConeGeometry", { data: new feng3d.ConeGeometry() });
+                                    label: "圆锥体",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New ConeGeometry", { data: new feng3d.ConeGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆环", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New TorusGeometry", { data: new feng3d.TorusGeometry() });
+                                    label: "圆环",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New TorusGeometry", { data: new feng3d.TorusGeometry() });
                                     }
                                 },
                                 {
-                                    label: "线段", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New SegmentGeometry", { data: new feng3d.SegmentGeometry() });
+                                    label: "线段",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New SegmentGeometry", { data: new feng3d.SegmentGeometry() });
                                     }
                                 },
                                 {
-                                    label: "地形", click: () => {
-                                        this.createAsset(folderPath, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
+                                    label: "地形",
+                                    click: function () {
+                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
                                     }
                                 },
                             ],
@@ -9189,93 +9750,103 @@ var editor;
                     ]
                 },
                 {
-                    label: "Show In Explorer", click: () => {
+                    label: "Show In Explorer",
+                    click: function () {
                         var fullpath = editor.editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
                         editor.nativeAPI.showFileInExplorer(fullpath);
-                    }, enable: !!editor.nativeAPI
+                    },
+                    enable: !!editor.nativeAPI
                 }, {
-                    label: "使用VSCode打开项目", click: () => {
-                        editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, (err) => {
+                    label: "使用VSCode打开项目",
+                    click: function () {
+                        editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, function (err) {
                             if (err)
                                 throw err;
                         });
-                    }, enable: !!editor.nativeAPI,
+                    },
+                    enable: !!editor.nativeAPI,
                 },
                 {
                     label: "Open",
-                    click: () => {
+                    click: function () {
                         if (assetNode.asset instanceof feng3d.StringAsset) {
                             feng3d.globalDispatcher.dispatch("openScript", assetNode.asset);
                         }
                     },
                 },
                 {
-                    label: "Delete", click: () => {
+                    label: "Delete",
+                    click: function () {
                         assetNode.delete();
-                    }, enable: assetNode != this.rootFile && assetNode != this.showFloder,
+                    },
+                    enable: assetNode != this.rootFile && assetNode != this.showFloder,
                 },
                 {
                     label: "Rename",
-                    click: () => {
+                    click: function () {
                         alert("未实现");
                     }
                 },
                 { type: "separator" },
                 {
                     label: "Import New Asset...",
-                    click: () => {
-                        editor.editorRS.selectFile((fileList) => {
+                    click: function () {
+                        editor.editorRS.selectFile(function (fileList) {
                             var files = [];
-                            for (let i = 0; i < fileList.length; i++) {
+                            for (var i = 0; i < fileList.length; i++) {
                                 files[i] = fileList[i];
                             }
-                            this.inputFiles(files);
+                            _this.inputFiles(files);
                         });
                     },
                     enable: assetNode.isDirectory,
                 },
                 {
-                    label: "Export Package...", click: () => {
+                    label: "Export Package...",
+                    click: function () {
                         assetNode.export();
-                    }, enable: !assetNode.isDirectory,
+                    },
+                    enable: !assetNode.isDirectory,
                 },
             ];
             // 解析菜单
             this.parserMenu(menuconfig, assetNode);
             menuconfig.push({
                 label: "去除背景色",
-                click: () => {
+                click: function () {
                     var image = assetNode.asset["image"];
                     var imageUtil = new feng3d.ImageUtil().fromImage(image);
                     var backColor = new feng3d.Color4(222 / 255, 222 / 255, 222 / 255);
                     imageUtil.clearBackColor(backColor);
-                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, 1, (img) => {
+                    feng3d.dataTransform.imagedataToImage(imageUtil.imageData, 1, function (img) {
                         assetNode.asset["image"] = img;
-                        this.saveAsset(assetNode);
+                        _this.saveAsset(assetNode);
                     });
                 },
                 enable: assetNode.asset.data instanceof feng3d.Texture2D,
             });
             editor.menu.popup(menuconfig);
-        }
+        };
         /**
          * 保存对象
          *
          * @param object 对象
          * @param callback
          */
-        saveObject(object, callback) {
-            this.createAsset(this.showFloder.asset.assetPath, feng3d.GameObjectAsset, object.name, { data: object }, (err, assetNode) => {
+        EditorAsset.prototype.saveObject = function (object, callback) {
+            this.createAsset(this.showFloder.asset.assetPath, feng3d.GameObjectAsset, object.name, { data: object }, function (err, assetNode) {
                 callback && callback(assetNode);
             });
-        }
+        };
         /**
          *
          * @param files 需要导入的文件列表
          * @param callback 完成回调
          * @param assetNodes 生成资源文件列表（不用赋值，函数递归时使用）
          */
-        inputFiles(files, callback, assetNodes = []) {
+        EditorAsset.prototype.inputFiles = function (files, callback, assetNodes) {
+            var _this = this;
+            if (assetNodes === void 0) { assetNodes = []; }
             if (files.length == 0) {
                 editor.editorData.selectMultiObject(assetNodes);
                 callback && callback(assetNodes);
@@ -9283,38 +9854,39 @@ var editor;
             }
             var file = files.shift();
             var reader = new FileReader();
-            reader.addEventListener('load', (event) => {
+            reader.addEventListener('load', function (event) {
                 var result = event.target["result"];
-                var showFloder = this.showFloder.asset.assetPath;
-                var createAssetCallback = (err, assetNode) => {
+                var showFloder = _this.showFloder.asset.assetPath;
+                var createAssetCallback = function (err, assetNode) {
                     if (err) {
                         alert(err.message);
                     }
                     else {
                         assetNodes.push(assetNode);
                     }
-                    this.inputFiles(files, callback, assetNodes);
+                    _this.inputFiles(files, callback, assetNodes);
                 };
                 var fileName = file.name;
                 if (feng3d.regExps.image.test(file.name)) {
-                    feng3d.dataTransform.arrayBufferToImage(result, (img) => {
+                    feng3d.dataTransform.arrayBufferToImage(result, function (img) {
                         var texture2D = new feng3d.Texture2D();
                         texture2D["_pixels"] = img;
-                        this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: texture2D }, createAssetCallback);
+                        _this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: texture2D }, createAssetCallback);
                     });
                 }
                 else if (feng3d.regExps.audio.test(file.name)) {
-                    this.createAsset(showFloder, feng3d.AudioAsset, fileName, { arraybuffer: result }, createAssetCallback);
+                    _this.createAsset(showFloder, feng3d.AudioAsset, fileName, { arraybuffer: result }, createAssetCallback);
                 }
                 else {
-                    this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: result }, createAssetCallback);
+                    _this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: result }, createAssetCallback);
                 }
             }, false);
             reader.readAsArrayBuffer(file);
-        }
-        runProjectScript(callback) {
-            editor.editorRS.fs.readString("project.js", (err, content) => {
-                if (content != this._preProjectJsContent) {
+        };
+        EditorAsset.prototype.runProjectScript = function (callback) {
+            var _this = this;
+            editor.editorRS.fs.readString("project.js", function (err, content) {
+                if (content != _this._preProjectJsContent) {
                     //
                     var windowEval = eval.bind(window);
                     try {
@@ -9327,104 +9899,108 @@ var editor;
                         console.warn(error);
                     }
                 }
-                this._preProjectJsContent = content;
+                _this._preProjectJsContent = content;
                 callback && callback();
             });
-        }
+        };
         /**
          * 解析菜单
          * @param menuconfig 菜单
          * @param assetNode 文件
          */
-        parserMenu(menuconfig, assetNode) {
+        EditorAsset.prototype.parserMenu = function (menuconfig, assetNode) {
             if (assetNode.asset instanceof feng3d.FileAsset) {
                 var filePath = assetNode.asset.assetPath;
                 var extensions = feng3d.pathUtils.extname(filePath);
                 switch (extensions) {
                     case "mdl":
-                        menuconfig.push({ label: "解析", click: () => feng3d.mdlLoader.load(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.mdlLoader.load(filePath); } });
                         break;
                     case "obj":
-                        menuconfig.push({ label: "解析", click: () => feng3d.objLoader.load(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.objLoader.load(filePath); } });
                         break;
                     case "mtl":
-                        menuconfig.push({ label: "解析", click: () => feng3d.mtlLoader.load(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.mtlLoader.load(filePath); } });
                         break;
                     case "fbx":
-                        menuconfig.push({ label: "解析", click: () => editor.threejsLoader.load(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return editor.threejsLoader.load(filePath); } });
                         break;
                     case "md5mesh":
-                        menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.load(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.load(filePath); } });
                         break;
                     case "md5anim":
-                        menuconfig.push({ label: "解析", click: () => feng3d.md5Loader.loadAnim(filePath) });
+                        menuconfig.push({ label: "解析", click: function () { return feng3d.md5Loader.loadAnim(filePath); } });
                         break;
                 }
             }
-        }
-        showFloderChanged(property, oldValue, newValue) {
+        };
+        EditorAsset.prototype.showFloderChanged = function (property, oldValue, newValue) {
             this.showFloder.openParents();
             feng3d.globalDispatcher.dispatch("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
-        }
-        onParsed(e) {
+        };
+        EditorAsset.prototype.onParsed = function (e) {
             var data = e.data;
             if (data instanceof feng3d.FileAsset) {
                 this.saveObject(data.data);
             }
-        }
-    }
-    __decorate([
-        feng3d.watch("showFloderChanged")
-    ], EditorAsset.prototype, "showFloder", void 0);
+        };
+        __decorate([
+            feng3d.watch("showFloderChanged")
+        ], EditorAsset.prototype, "showFloder", void 0);
+        return EditorAsset;
+    }());
     editor.EditorAsset = EditorAsset;
     editor.editorAsset = new EditorAsset();
 })(editor || (editor = {}));
 var codeeditoWin;
 var editor;
 (function (editor) {
-    class AssetFileItemRenderer extends eui.ItemRenderer {
-        constructor() {
-            super();
-            this.itemSelected = false;
-            this.skinName = "AssetFileItemRenderer";
+    var AssetFileItemRenderer = /** @class */ (function (_super) {
+        __extends(AssetFileItemRenderer, _super);
+        function AssetFileItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.itemSelected = false;
+            _this.skinName = "AssetFileItemRenderer";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        AssetFileItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
             this.selectedfilechanged();
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        AssetFileItemRenderer.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        }
-        dataChanged() {
-            super.dataChanged();
+        };
+        AssetFileItemRenderer.prototype.dataChanged = function () {
+            var _this = this;
+            _super.prototype.dataChanged.call(this);
             if (this.data) {
                 if (this.data.isDirectory) {
-                    editor.drag.register(this, (dragsource) => {
-                        this.data.setdargSource(dragsource);
-                    }, ["assetNodes"], (dragdata) => {
-                        this.data.acceptDragDrop(dragdata);
+                    editor.drag.register(this, function (dragsource) {
+                        _this.data.setdargSource(dragsource);
+                    }, ["assetNodes"], function (dragdata) {
+                        _this.data.acceptDragDrop(dragdata);
                     });
                 }
                 else {
                     if (!this.data.isLoaded) {
                         var data = this.data;
-                        data.load(() => {
+                        data.load(function () {
                             console.assert(data.isLoaded);
-                            if (data == this.data)
-                                this.dataChanged();
+                            if (data == _this.data)
+                                _this.dataChanged();
                         });
                         return;
                     }
-                    editor.drag.register(this, (dragsource) => {
-                        this.data.setdargSource(dragsource);
+                    editor.drag.register(this, function (dragsource) {
+                        _this.data.setdargSource(dragsource);
                     }, []);
                 }
             }
@@ -9432,8 +10008,8 @@ var editor;
                 editor.drag.unregister(this);
             }
             this.selectedfilechanged();
-        }
-        ondoubleclick() {
+        };
+        AssetFileItemRenderer.prototype.ondoubleclick = function () {
             if (this.data.isDirectory) {
                 editor.editorAsset.showFloder = this.data;
             }
@@ -9443,8 +10019,8 @@ var editor;
                     editor.editorData.gameScene = scene;
                 }
             }
-        }
-        onclick() {
+        };
+        AssetFileItemRenderer.prototype.onclick = function () {
             // 处理按下shift键时
             var isShift = feng3d.shortcut.keyState.getKeyState("shift");
             if (isShift) {
@@ -9464,27 +10040,28 @@ var editor;
                 editor.editorData.selectObject(this.data);
                 preAssetFile = this.data;
             }
-        }
-        onrightclick(e) {
+        };
+        AssetFileItemRenderer.prototype.onrightclick = function (e) {
             e.stopPropagation();
             editor.editorData.selectObject(this.data);
             editor.editorAsset.popupmenu(this.data);
-        }
-        selectedfilechanged() {
+        };
+        AssetFileItemRenderer.prototype.selectedfilechanged = function () {
             var selected = false;
             if (this.data) {
                 var selectedAssetFile = editor.editorData.selectedAssetNodes;
                 selected = selectedAssetFile.indexOf(this.data) != -1;
                 if (!selected) {
-                    var assetids = editor.editorData.selectedObjects.map(v => v.assetId);
+                    var assetids = editor.editorData.selectedObjects.map(function (v) { return v.assetId; });
                     selected = assetids.indexOf(this.data.asset.assetId) != -1;
                 }
             }
             if (this.itemSelected != selected) {
                 this.itemSelected = selected;
             }
-        }
-    }
+        };
+        return AssetFileItemRenderer;
+    }(eui.ItemRenderer));
     editor.AssetFileItemRenderer = AssetFileItemRenderer;
     var preAssetFile;
 })(editor || (editor = {}));
@@ -9493,44 +10070,47 @@ var editor;
     /**
      * 资源树结点
      */
-    class AssetNode extends editor.TreeNode {
+    var AssetNode = /** @class */ (function (_super) {
+        __extends(AssetNode, _super);
         /**
          * 构建
          *
          * @param asset 资源
          */
-        constructor(asset) {
-            super();
-            this.children = [];
+        function AssetNode(asset) {
+            var _this = _super.call(this) || this;
+            _this.children = [];
             /**
              * 是否已加载
              */
-            this.isLoaded = false;
-            this.asset = asset;
-            this.isDirectory = asset.assetType == feng3d.AssetType.folder;
-            this.label = asset.fileName;
+            _this.isLoaded = false;
+            _this.asset = asset;
+            _this.isDirectory = asset.assetType == feng3d.AssetType.folder;
+            _this.label = asset.fileName;
             // 更新图标
-            if (this.isDirectory) {
-                this.image = "folder_png";
+            if (_this.isDirectory) {
+                _this.image = "folder_png";
             }
             else {
-                this.image = "file_png";
+                _this.image = "file_png";
             }
-            asset.readPreview((err, image) => {
+            asset.readPreview(function (err, image) {
                 if (image) {
-                    this.image = feng3d.dataTransform.imageToDataURL(image);
+                    _this.image = feng3d.dataTransform.imageToDataURL(image);
                 }
                 else {
-                    this.updateImage();
+                    _this.updateImage();
                 }
             });
+            return _this;
         }
         /**
          * 加载
          *
          * @param callback 加载完成回调
          */
-        load(callback) {
+        AssetNode.prototype.load = function (callback) {
+            var _this = this;
             if (this.isLoaded) {
                 callback && callback();
                 return;
@@ -9540,105 +10120,107 @@ var editor;
                 return;
             }
             this.isLoading = true;
-            editor.editorRS.readAsset(this.asset.assetId, (err, asset) => {
+            editor.editorRS.readAsset(this.asset.assetId, function (err, asset) {
                 console.assert(!err);
-                this.isLoading = false;
-                this.isLoaded = true;
+                _this.isLoading = false;
+                _this.isLoaded = true;
                 callback && callback();
-                this.dispatch("loaded", this);
+                _this.dispatch("loaded", _this);
             });
-        }
+        };
         /**
          * 更新预览图
          */
-        updateImage() {
+        AssetNode.prototype.updateImage = function () {
+            var _this = this;
             if (this.asset instanceof feng3d.TextureAsset) {
                 var texture = this.asset.data;
                 this.image = editor.feng3dScreenShot.drawTexture(texture);
-                feng3d.dataTransform.dataURLToImage(this.image, (image) => {
-                    this.asset.writePreview(image);
+                feng3d.dataTransform.dataURLToImage(this.image, function (image) {
+                    _this.asset.writePreview(image);
                 });
             }
             else if (this.asset instanceof feng3d.TextureCubeAsset) {
                 var textureCube = this.asset.data;
-                textureCube.onLoadCompleted(() => {
-                    this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) => {
-                        this.asset.writePreview(image);
+                textureCube.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawTextureCube(textureCube);
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        _this.asset.writePreview(image);
                     });
                 });
             }
             else if (this.asset instanceof feng3d.MaterialAsset) {
                 var mat = this.asset;
-                mat.data.onLoadCompleted(() => {
-                    this.image = editor.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) => {
-                        this.asset.writePreview(image);
+                mat.data.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        _this.asset.writePreview(image);
                     });
                 });
             }
             else if (this.asset instanceof feng3d.GeometryAsset) {
                 this.image = editor.feng3dScreenShot.drawGeometry(this.asset.data).toDataURL();
-                feng3d.dataTransform.dataURLToImage(this.image, (image) => {
-                    this.asset.writePreview(image);
+                feng3d.dataTransform.dataURLToImage(this.image, function (image) {
+                    _this.asset.writePreview(image);
                 });
             }
             else if (this.asset instanceof feng3d.GameObjectAsset) {
                 var gameObject = this.asset.data;
-                gameObject.onLoadCompleted(() => {
-                    this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
-                    feng3d.dataTransform.dataURLToImage(this.image, (image) => {
-                        this.asset.writePreview(image);
+                gameObject.onLoadCompleted(function () {
+                    _this.image = editor.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
+                    feng3d.dataTransform.dataURLToImage(_this.image, function (image) {
+                        _this.asset.writePreview(image);
                     });
                 });
             }
-        }
+        };
         /**
          * 删除
          */
-        delete() {
-            this.children.forEach(element => {
+        AssetNode.prototype.delete = function () {
+            this.children.forEach(function (element) {
                 element.delete();
             });
             this.remove();
             editor.editorAsset.deleteAsset(this);
-        }
+        };
         /**
          * 获取文件夹列表
          *
          * @param includeClose 是否包含关闭的文件夹
          */
-        getFolderList(includeClose = false) {
+        AssetNode.prototype.getFolderList = function (includeClose) {
+            if (includeClose === void 0) { includeClose = false; }
             var folders = [];
             if (this.isDirectory) {
                 folders.push(this);
             }
             if (this.isOpen || includeClose) {
-                this.children.forEach(v => {
+                this.children.forEach(function (v) {
                     var cfolders = v.getFolderList();
                     folders = folders.concat(cfolders);
                 });
             }
             return folders;
-        }
+        };
         /**
          * 获取文件列表
          */
-        getFileList() {
+        AssetNode.prototype.getFileList = function () {
             var files = [];
             files.push(this);
-            this.children.forEach(v => {
+            this.children.forEach(function (v) {
                 var cfiles = v.getFileList();
                 files = files.concat(cfiles);
             });
             return files;
-        }
+        };
         /**
          * 提供拖拽数据
          *
          * @param dragsource
          */
-        setdargSource(dragsource) {
+        AssetNode.prototype.setdargSource = function (dragsource) {
             var extension = this.asset.assetType;
             switch (extension) {
                 case feng3d.AssetType.gameobject:
@@ -9667,42 +10249,43 @@ var editor;
                     break;
             }
             dragsource.addDragData("assetNodes", this);
-        }
+        };
         /**
          * 接受拖拽数据
          *
          * @param dragdata
          */
-        acceptDragDrop(dragdata) {
+        AssetNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
             if (!(this.asset instanceof feng3d.FolderAsset))
                 return;
             var folder = this.asset;
-            dragdata.getDragData("assetNodes").forEach(v => {
-                editor.editorRS.moveAsset(v.asset, folder, (err) => {
+            dragdata.getDragData("assetNodes").forEach(function (v) {
+                editor.editorRS.moveAsset(v.asset, folder, function (err) {
                     if (!err) {
-                        this.addChild(v);
+                        _this.addChild(v);
                     }
                     else {
                         feng3d.globalDispatcher.dispatch("message.error", err.message);
                     }
                 });
             });
-        }
+        };
         /**
          * 导出
          */
-        export() {
+        AssetNode.prototype.export = function () {
             var zip = new JSZip();
             var path = this.asset.assetPath;
             if (!feng3d.pathUtils.isDirectory(path))
                 path = feng3d.pathUtils.dirname(path);
             var filename = this.label;
-            editor.editorRS.fs.getAllPathsInFolder(path, (err, filepaths) => {
+            editor.editorRS.fs.getAllPathsInFolder(path, function (err, filepaths) {
                 readfiles();
                 function readfiles() {
                     if (filepaths.length > 0) {
                         var filepath = filepaths.shift();
-                        editor.editorRS.fs.readArrayBuffer(filepath, (err, data) => {
+                        editor.editorRS.fs.readArrayBuffer(filepath, function (err, data) {
                             //处理文件夹
                             data && zip.file(filepath, data);
                             readfiles();
@@ -9710,69 +10293,74 @@ var editor;
                     }
                     else {
                         zip.generateAsync({ type: "blob" }).then(function (content) {
-                            saveAs(content, `${filename}.zip`);
+                            saveAs(content, filename + ".zip");
                         });
                     }
                 }
             });
-        }
-    }
-    __decorate([
-        feng3d.serialize
-    ], AssetNode.prototype, "children", void 0);
+        };
+        __decorate([
+            feng3d.serialize
+        ], AssetNode.prototype, "children", void 0);
+        return AssetNode;
+    }(editor.TreeNode));
     editor.AssetNode = AssetNode;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class AssetTreeItemRenderer extends editor.TreeItemRenderer {
-        constructor() {
-            super();
-            this.skinName = "AssetTreeItemRenderer";
+    var AssetTreeItemRenderer = /** @class */ (function (_super) {
+        __extends(AssetTreeItemRenderer, _super);
+        function AssetTreeItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "AssetTreeItemRenderer";
+            return _this;
         }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        AssetTreeItemRenderer.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             editor.MouseOnDisableScroll.register(this);
             feng3d.watcher.watch(editor.editorAsset, "showFloder", this.showFloderChanged, this);
             this.showFloderChanged();
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        AssetTreeItemRenderer.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
             editor.MouseOnDisableScroll.unRegister(this);
             feng3d.watcher.unwatch(editor.editorAsset, "showFloder", this.showFloderChanged, this);
-        }
-        dataChanged() {
-            super.dataChanged();
+        };
+        AssetTreeItemRenderer.prototype.dataChanged = function () {
+            var _this = this;
+            _super.prototype.dataChanged.call(this);
             if (this.data) {
-                editor.drag.register(this, (dragsource) => {
-                    this.data.setdargSource(dragsource);
-                }, ["assetNodes"], (dragdata) => {
-                    this.data.acceptDragDrop(dragdata);
+                editor.drag.register(this, function (dragsource) {
+                    _this.data.setdargSource(dragsource);
+                }, ["assetNodes"], function (dragdata) {
+                    _this.data.acceptDragDrop(dragdata);
                 });
             }
             else {
                 editor.drag.unregister(this);
             }
             this.showFloderChanged();
-        }
-        showFloderChanged() {
+        };
+        AssetTreeItemRenderer.prototype.showFloderChanged = function () {
             this.selected = this.data ? editor.editorAsset.showFloder == this.data : false;
-        }
-        onclick() {
+        };
+        AssetTreeItemRenderer.prototype.onclick = function () {
             editor.editorAsset.showFloder = this.data;
-        }
-        onrightclick(e) {
+        };
+        AssetTreeItemRenderer.prototype.onrightclick = function (e) {
             if (this.data.parent != null) {
                 editor.editorAsset.popupmenu(this.data);
             }
             else {
                 editor.editorAsset.popupmenu(this.data);
             }
-        }
-    }
+        };
+        return AssetTreeItemRenderer;
+    }(editor.TreeItemRenderer));
     editor.AssetTreeItemRenderer = AssetTreeItemRenderer;
 })(editor || (editor = {}));
 var editor;
@@ -9780,36 +10368,38 @@ var editor;
     /**
      * 项目模块视图
      */
-    class ProjectView extends eui.Component {
-        constructor() {
-            super();
+    var ProjectView = /** @class */ (function (_super) {
+        __extends(ProjectView, _super);
+        function ProjectView() {
+            var _this = _super.call(this) || this;
             //
-            this._assettreeInvalid = true;
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "ProjectView";
+            _this._assettreeInvalid = true;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "ProjectView";
             //
-            this.moduleName = ProjectView.moduleName;
-            editor.editorui.assetview = this;
+            _this.moduleName = ProjectView.moduleName;
+            editor.editorui.assetview = _this;
             //
-            this._areaSelectRect = new editor.AreaSelectRect();
+            _this._areaSelectRect = new editor.AreaSelectRect();
             //
-            this.fileDrag = new FileDrag(this);
+            _this.fileDrag = new FileDrag(_this);
+            return _this;
         }
-        onComplete() {
+        ProjectView.prototype.onComplete = function () {
             this.assetTreeList.itemRenderer = editor.AssetTreeItemRenderer;
             this.filelist.itemRenderer = editor.AssetFileItemRenderer;
             this.floderScroller.viewport = this.filelist;
             this.assetTreeScroller.viewport = this.assetTreeList;
             this.listData = this.assetTreeList.dataProvider = new eui.ArrayCollection();
             this.filelistData = this.filelist.dataProvider = new eui.ArrayCollection();
-        }
-        $onAddToStage(stage, nestLevel) {
-            super.$onAddToStage(stage, nestLevel);
+        };
+        ProjectView.prototype.$onAddToStage = function (stage, nestLevel) {
+            _super.prototype.$onAddToStage.call(this, stage, nestLevel);
             this.excludeTxt.text = "";
             this.filepathLabel.text = "";
             //
-            editor.drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject"], (dragSource) => {
-                dragSource.getDragData("gameobject").forEach(v => {
+            editor.drag.register(this.filelistgroup, function (dragsource) { }, ["gameobject"], function (dragSource) {
+                dragSource.getDragData("gameobject").forEach(function (v) {
                     editor.editorAsset.saveObject(v);
                 });
             });
@@ -9826,9 +10416,9 @@ var editor;
             this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
             feng3d.globalDispatcher.on("asset.showAsset", this.onShowAsset, this);
-        }
-        $onRemoveFromStage() {
-            super.$onRemoveFromStage();
+        };
+        ProjectView.prototype.$onRemoveFromStage = function () {
+            _super.prototype.$onRemoveFromStage.call(this);
             this.includeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.excludeTxt.removeEventListener(egret.Event.CHANGE, this.onfilter, this);
             this.filelist.removeEventListener(egret.MouseEvent.CLICK, this.onfilelistclick, this);
@@ -9842,30 +10432,31 @@ var editor;
             //
             editor.drag.unregister(this.filelistgroup);
             this.fileDrag.removeEventListener();
-        }
-        initlist() {
+        };
+        ProjectView.prototype.initlist = function () {
             this.invalidateAssettree();
             editor.editorAsset.rootFile.on("openChanged", this.invalidateAssettree, this);
             editor.editorAsset.rootFile.on("added", this.invalidateAssettree, this);
             editor.editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
             feng3d.watcher.watch(editor.editorAsset, "showFloder", this.updateShowFloder, this);
-        }
-        update() {
+        };
+        ProjectView.prototype.update = function () {
             if (this._assettreeInvalid) {
                 this.updateAssetTree();
                 this.updateShowFloder();
                 this._assettreeInvalid = false;
             }
-        }
-        invalidateAssettree() {
+        };
+        ProjectView.prototype.invalidateAssettree = function () {
             this._assettreeInvalid = true;
             feng3d.ticker.nextframe(this.update, this);
-        }
-        updateAssetTree() {
+        };
+        ProjectView.prototype.updateAssetTree = function () {
             var folders = editor.editorAsset.rootFile.getFolderList();
             this.listData.replaceAll(folders);
-        }
-        updateShowFloder(host, property, oldvalue) {
+        };
+        ProjectView.prototype.updateShowFloder = function (host, property, oldvalue) {
+            var _this = this;
             var floder = editor.editorAsset.showFloder;
             if (!floder)
                 return;
@@ -9873,7 +10464,7 @@ var editor;
             do {
                 if (textFlow.length > 0)
                     textFlow.unshift({ text: " > " });
-                textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.asset.assetId}` } });
+                textFlow.unshift({ text: floder.label, style: { "href": "event:" + floder.asset.assetId } });
                 floder = floder.parent;
             } while (floder);
             this.floderpathTxt.textFlow = textFlow;
@@ -9890,19 +10481,19 @@ var editor;
             catch (error) {
                 includeReg = new RegExp("");
             }
-            var fileinfos = children.filter((value) => {
-                if (this.includeTxt.text) {
+            var fileinfos = children.filter(function (value) {
+                if (_this.includeTxt.text) {
                     if (!includeReg.test(value.label))
                         return false;
                 }
-                if (this.excludeTxt.text) {
+                if (_this.excludeTxt.text) {
                     if (excludeReg.test(value.label))
                         return false;
                 }
                 return true;
             });
-            var nodes = fileinfos.map((value) => { return value; });
-            nodes = nodes.sort((a, b) => {
+            var nodes = fileinfos.map(function (value) { return value; });
+            nodes = nodes.sort(function (a, b) {
                 if (a.isDirectory > b.isDirectory)
                     return -1;
                 if (a.isDirectory < b.isDirectory)
@@ -9914,34 +10505,34 @@ var editor;
             this.filelistData.replaceAll(nodes);
             this.filelist.scrollV = 0;
             this.selectedfilechanged();
-        }
-        onfilter() {
+        };
+        ProjectView.prototype.onfilter = function () {
             this.updateShowFloder();
-        }
-        selectedfilechanged() {
+        };
+        ProjectView.prototype.selectedfilechanged = function () {
             var selectedAssetFile = editor.editorData.selectedAssetNodes;
             if (selectedAssetFile.length > 0)
-                this.filepathLabel.text = selectedAssetFile.map(v => {
+                this.filepathLabel.text = selectedAssetFile.map(function (v) {
                     return v.asset.fileName + v.asset.extenson;
                 }).join(",");
             else
                 this.filepathLabel.text = "";
-        }
-        onShowAsset() {
-        }
-        onfilelistclick(e) {
+        };
+        ProjectView.prototype.onShowAsset = function () {
+        };
+        ProjectView.prototype.onfilelistclick = function (e) {
             if (e.target == this.filelist) {
                 editor.editorData.clearSelectedObjects();
             }
-        }
-        onfilelistrightclick(e) {
+        };
+        ProjectView.prototype.onfilelistrightclick = function (e) {
             editor.editorData.clearSelectedObjects();
             editor.editorAsset.popupmenu(editor.editorAsset.showFloder);
-        }
-        onfloderpathTxtLink(evt) {
+        };
+        ProjectView.prototype.onfloderpathTxtLink = function (evt) {
             editor.editorAsset.showFloder = editor.editorAsset.getAssetByID(evt.text);
-        }
-        onMouseDown(e) {
+        };
+        ProjectView.prototype.onMouseDown = function (e) {
             if (e.target != this.filelist)
                 return;
             if (feng3d.shortcut.getState("splitGroupDraging"))
@@ -9949,8 +10540,8 @@ var editor;
             this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
-        }
-        onMouseMove() {
+        };
+        ProjectView.prototype.onMouseMove = function () {
             var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
             var rectangle = this.filelist.getGlobalBounds();
             //
@@ -9962,28 +10553,29 @@ var editor;
             var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
             var areaRect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
             //
-            var datas = this.filelist.$indexToRenderer.filter(v => {
+            var datas = this.filelist.$indexToRenderer.filter(function (v) {
                 var rectangle = v.getGlobalBounds();
                 return areaRect.intersects(rectangle);
-            }).map(v => v.data);
+            }).map(function (v) { return v.data; });
             editor.editorData.selectMultiObject(datas);
-        }
-        onMouseUp() {
+        };
+        ProjectView.prototype.onMouseUp = function () {
             this._areaSelectRect.hide();
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
-        }
-    }
-    ProjectView.moduleName = "Project";
+        };
+        ProjectView.moduleName = "Project";
+        return ProjectView;
+    }(eui.Component));
     editor.ProjectView = ProjectView;
-    class FileDrag {
-        constructor(displayobject) {
-            this.addEventListener = () => {
+    var FileDrag = /** @class */ (function () {
+        function FileDrag(displayobject) {
+            this.addEventListener = function () {
                 document.addEventListener("dragenter", dragenter, false);
                 document.addEventListener("dragover", dragover, false);
                 document.addEventListener("drop", drop, false);
             };
-            this.removeEventListener = () => {
+            this.removeEventListener = function () {
                 document.removeEventListener("dragenter", dragenter, false);
                 document.removeEventListener("dragover", dragover, false);
                 document.removeEventListener("drop", drop, false);
@@ -10002,7 +10594,7 @@ var editor;
                 var dt = e.dataTransfer;
                 var fileList = dt.files;
                 var files = [];
-                for (let i = 0; i < fileList.length; i++) {
+                for (var i = 0; i < fileList.length; i++) {
                     files[i] = fileList[i];
                 }
                 if (displayobject.getTransformedBounds(displayobject.stage).contains(e.clientX, e.clientY)) {
@@ -10010,129 +10602,54 @@ var editor;
                 }
             }
         }
-    }
+        return FileDrag;
+    }());
     editor.Modules.moduleViewCls[ProjectView.moduleName] = ProjectView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class AssetFileTemplates {
+    var AssetFileTemplates = /** @class */ (function () {
+        function AssetFileTemplates() {
+        }
         /**
          *
          * @param scriptName 脚本名称（类名）
          */
-        getNewScript(scriptName) {
+        AssetFileTemplates.prototype.getNewScript = function (scriptName) {
             return scriptTemplate.replace("NewScript", scriptName);
-        }
+        };
         /**
          *
          * @param shadername shader名称
          */
-        getNewShader(shadername) {
+        AssetFileTemplates.prototype.getNewShader = function (shadername) {
             return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
-        }
-    }
+        };
+        return AssetFileTemplates;
+    }());
     editor.AssetFileTemplates = AssetFileTemplates;
     editor.assetFileTemplates = new AssetFileTemplates();
-    var scriptTemplate = `
-class NewScript extends feng3d.Script
-{
-
-    /** 
-     * 测试属性 
-     */
-    @feng3d.serialize
-    @feng3d.oav()
-    t_attr = new feng3d.Color4();
-
-    /**
-     * 初始化时调用
-     */
-    init()
-    {
-
-    }
-
-    /**
-     * 更新
-     */
-    update()
-    {
-
-    }
-
-    /**
-     * 销毁时调用
-     */
-    dispose()
-    {
-
-    }
-}`;
-    var shaderTemplate = `
-class NewShaderUniforms
-{
-    /** 
-     * 颜色 
-     */
-    @feng3d.serialize
-    @feng3d.oav()
-    u_color = new feng3d.Color4();
-}
-
-feng3d.shaderConfig.shaders["NewShader"] = {
-    cls: NewShaderUniforms,
-    vertex: \`
-    
-    attribute vec3 a_position;
-    
-    uniform mat4 u_modelMatrix;
-    uniform mat4 u_viewProjection;
-    
-    void main() {
-    
-        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);
-        gl_Position = u_viewProjection * globalPosition;
-    }\`,
-    fragment: \`
-    
-    precision mediump float;
-    
-    uniform vec4 u_color;
-    
-    void main() {
-        
-        gl_FragColor = u_color;
-    }
-    \`,
-};
-
-type NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };
-interface MaterialFactory
-{
-    create(shader: "NewShader", raw?: feng3d.gPartial<NewShaderMaterial>): NewShaderMaterial;
-}
-
-interface MaterialRawMap
-{
-    NewShader: feng3d.gPartial<NewShaderMaterial>;
-}`;
+    var scriptTemplate = "\nclass NewScript extends feng3d.Script\n{\n\n    /** \n     * \u6D4B\u8BD5\u5C5E\u6027 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    t_attr = new feng3d.Color4();\n\n    /**\n     * \u521D\u59CB\u5316\u65F6\u8C03\u7528\n     */\n    init()\n    {\n\n    }\n\n    /**\n     * \u66F4\u65B0\n     */\n    update()\n    {\n\n    }\n\n    /**\n     * \u9500\u6BC1\u65F6\u8C03\u7528\n     */\n    dispose()\n    {\n\n    }\n}";
+    var shaderTemplate = "\nclass NewShaderUniforms\n{\n    /** \n     * \u989C\u8272 \n     */\n    @feng3d.serialize\n    @feng3d.oav()\n    u_color = new feng3d.Color4();\n}\n\nfeng3d.shaderConfig.shaders[\"NewShader\"] = {\n    cls: NewShaderUniforms,\n    vertex: `\n    \n    attribute vec3 a_position;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    void main() {\n    \n        vec4 globalPosition = u_modelMatrix * vec4(a_position, 1.0);\n        gl_Position = u_viewProjection * globalPosition;\n    }`,\n    fragment: `\n    \n    precision mediump float;\n    \n    uniform vec4 u_color;\n    \n    void main() {\n        \n        gl_FragColor = u_color;\n    }\n    `,\n};\n\ntype NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };\ninterface MaterialFactory\n{\n    create(shader: \"NewShader\", raw?: feng3d.gPartial<NewShaderMaterial>): NewShaderMaterial;\n}\n\ninterface MaterialRawMap\n{\n    NewShader: feng3d.gPartial<NewShaderMaterial>;\n}";
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class TopView extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "TopView";
+    var TopView = /** @class */ (function (_super) {
+        __extends(TopView, _super);
+        function TopView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "TopView";
+            return _this;
         }
-        onComplete() {
+        TopView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        TopView.prototype.onAddedToStage = function () {
             this.moveButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.rotateButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.scaleButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -10147,15 +10664,15 @@ var editor;
             var menuItems = editor.menuConfig.getMainMenu();
             var menuItem = editor.menu.handleShow({ submenu: menuItems });
             menuItems = menuItem.submenu;
-            menuItems = menuItems.filter(v => v.type != "separator");
+            menuItems = menuItems.filter(function (v) { return v.type != "separator"; });
             var dataProvider = new eui.ArrayCollection();
             dataProvider.replaceAll(menuItems);
             //
             this.menuList.itemRenderer = TopMenuItemRenderer;
             this.menuList.dataProvider = dataProvider;
             this.updateview();
-        }
-        onRemovedFromStage() {
+        };
+        TopView.prototype.onRemovedFromStage = function () {
             this.moveButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.rotateButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
             this.scaleButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
@@ -10169,11 +10686,11 @@ var editor;
             if (editor.runwin)
                 editor.runwin.close();
             editor.runwin = null;
-        }
-        onHelpButtonClick() {
+        };
+        TopView.prototype.onHelpButtonClick = function () {
             window.open("http://feng3d.com");
-        }
-        onButtonClick(event) {
+        };
+        TopView.prototype.onButtonClick = function (event) {
             switch (event.currentTarget) {
                 case this.moveButton:
                     editor.editorData.toolType = editor.MRSToolType.MOVE;
@@ -10191,9 +10708,9 @@ var editor;
                     editor.editorData.isBaryCenter = !editor.editorData.isBaryCenter;
                     break;
                 case this.playBtn:
-                    var e = feng3d.globalDispatcher.dispatch("inspector.saveShowData", () => {
-                        let obj = feng3d.serialization.serialize(editor.editorData.gameScene.gameObject);
-                        editor.editorRS.fs.writeObject("default.scene.json", obj, (err) => {
+                    var e = feng3d.globalDispatcher.dispatch("inspector.saveShowData", function () {
+                        var obj = feng3d.serialization.serialize(editor.editorData.gameScene.gameObject);
+                        editor.editorRS.fs.writeObject("default.scene.json", obj, function (err) {
                             if (err) {
                                 console.warn(err);
                                 return;
@@ -10201,7 +10718,7 @@ var editor;
                             if (editor.editorRS.fs.type == feng3d.FSType.indexedDB) {
                                 if (editor.runwin)
                                     editor.runwin.close();
-                                editor.runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editor.editorcache.projectname}`);
+                                editor.runwin = window.open("run.html?fstype=" + feng3d.fs.type + "&project=" + editor.editorcache.projectname);
                                 return;
                             }
                             var path = editor.editorRS.fs.getAbsolutePath("index.html");
@@ -10213,66 +10730,70 @@ var editor;
                     var a = e;
                     break;
                 case this.qrcodeButton:
-                    setTimeout(() => {
+                    setTimeout(function () {
                         $('#output').show();
                     }, 10);
                     break;
             }
-        }
-        updateview() {
+        };
+        TopView.prototype.updateview = function () {
             this.labelLab.text = editor.editorcache.projectname;
             this.moveButton.selected = editor.editorData.toolType == editor.MRSToolType.MOVE;
             this.rotateButton.selected = editor.editorData.toolType == editor.MRSToolType.ROTATION;
             this.scaleButton.selected = editor.editorData.toolType == editor.MRSToolType.SCALE;
             this.worldButton.selected = !editor.editorData.isWoldCoordinate;
             this.centerButton.selected = editor.editorData.isBaryCenter;
-        }
-    }
+        };
+        return TopView;
+    }(eui.Component));
     editor.TopView = TopView;
     var showMenuItem;
     var items;
-    class TopMenuItemRenderer extends eui.ItemRenderer {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "TopMenuItemRender";
+    var TopMenuItemRenderer = /** @class */ (function (_super) {
+        __extends(TopMenuItemRenderer, _super);
+        function TopMenuItemRenderer() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "TopMenuItemRender";
+            return _this;
         }
-        dataChanged() {
-            super.dataChanged();
+        TopMenuItemRenderer.prototype.dataChanged = function () {
+            _super.prototype.dataChanged.call(this);
             this.updateView();
-        }
-        onComplete() {
+        };
+        TopMenuItemRenderer.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        TopMenuItemRenderer.prototype.onAddedToStage = function () {
             this.addEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false, 1000);
             this.updateView();
-        }
-        onRemovedFromStage() {
+        };
+        TopMenuItemRenderer.prototype.onRemovedFromStage = function () {
             this.removeEventListener(egret.MouseEvent.CLICK, this.onItemMouseDown, this, false);
-        }
-        updateView() {
+        };
+        TopMenuItemRenderer.prototype.updateView = function () {
             if (!this.data)
                 return;
             this.touchEnabled = true;
             this.touchChildren = true;
             this.skin.currentState = "normal";
             this.selectedRect.visible = false;
-        }
-        onItemMouseDown(event) {
+        };
+        TopMenuItemRenderer.prototype.onItemMouseDown = function (event) {
             if (showMenuItem)
                 return;
             var list = this.parent;
             console.assert(list instanceof eui.List);
-            items = list.$children.filter(v => v instanceof TopMenuItemRenderer).map((v) => { return { item: v, rect: v.getGlobalBounds() }; });
+            items = list.$children.filter(function (v) { return v instanceof TopMenuItemRenderer; }).map(function (v) { return { item: v, rect: v.getGlobalBounds() }; });
             showMenu(this);
             feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
-        }
-    }
+        };
+        return TopMenuItemRenderer;
+    }(eui.ItemRenderer));
     editor.TopMenuItemRenderer = TopMenuItemRenderer;
     function showMenu(item) {
         removeMenu();
@@ -10286,7 +10807,7 @@ var editor;
     }
     function onMenuMouseMove() {
         var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        var overitem = items.filter(v => v.rect.contains(p.x, p.y))[0];
+        var overitem = items.filter(function (v) { return v.rect.contains(p.x, p.y); })[0];
         if (!overitem)
             return;
         if (showMenuItem.item == overitem.item)
@@ -10308,26 +10829,29 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class NavigationView extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "NavigationView";
-            this.moduleName = NavigationView.moduleName;
+    var NavigationView = /** @class */ (function (_super) {
+        __extends(NavigationView, _super);
+        function NavigationView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "NavigationView";
+            _this.moduleName = NavigationView.moduleName;
+            return _this;
         }
-        onComplete() {
+        NavigationView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
-        }
-        onRemovedFromStage() {
-        }
-    }
-    NavigationView.moduleName = "Navigation";
+        };
+        NavigationView.prototype.onAddedToStage = function () {
+        };
+        NavigationView.prototype.onRemovedFromStage = function () {
+        };
+        NavigationView.moduleName = "Navigation";
+        return NavigationView;
+    }(eui.Component));
     editor.NavigationView = NavigationView;
     editor.Modules.moduleViewCls[NavigationView.moduleName] = NavigationView;
 })(editor || (editor = {}));
@@ -10338,42 +10862,44 @@ var editor;
      *
      * 用于管理分割界面，以及处理界面布局
      */
-    class MainSplitView extends eui.Component {
-        constructor() {
-            super();
-            this.skinName = "MainSplitView";
+    var MainSplitView = /** @class */ (function (_super) {
+        __extends(MainSplitView, _super);
+        function MainSplitView() {
+            var _this = _super.call(this) || this;
+            _this.skinName = "MainSplitView";
+            return _this;
         }
-        childrenCreated() {
-            super.childrenCreated();
+        MainSplitView.prototype.childrenCreated = function () {
+            _super.prototype.childrenCreated.call(this);
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        MainSplitView.prototype.onAddedToStage = function () {
             feng3d.globalDispatcher.on("viewLayout.changed", this._saveViewLayout, this);
             feng3d.globalDispatcher.on("viewLayout.reset", this._resetLayout, this);
             this._initViewLayout();
-        }
-        onRemovedFromStage() {
+        };
+        MainSplitView.prototype.onRemovedFromStage = function () {
             feng3d.globalDispatcher.off("viewLayout.changed", this._saveViewLayout, this);
             feng3d.globalDispatcher.off("viewLayout.reset", this._resetLayout, this);
-        }
-        _initViewLayout() {
+        };
+        MainSplitView.prototype._initViewLayout = function () {
             if (!this.view) {
                 editor.editorcache.viewLayout = editor.editorcache.viewLayout || editor.viewLayoutConfig.Default;
                 //
                 this.view = this._createViews(editor.editorcache.viewLayout);
                 this.addChild(this.view);
             }
-        }
-        _saveViewLayout() {
+        };
+        MainSplitView.prototype._saveViewLayout = function () {
             var sp = this.getChildAt(0);
             var data = this._getData(sp);
             editor.editorcache.viewLayout = data;
-        }
-        _resetLayout(event) {
+        };
+        MainSplitView.prototype._resetLayout = function (event) {
             editor.editorcache.viewLayout = event.data || editor.viewLayoutConfig.Default;
             if (this.view != null) {
                 this.view.remove();
@@ -10381,19 +10907,20 @@ var editor;
                 this.view = null;
             }
             this._initViewLayout();
-        }
-        _resolve(sp) {
+        };
+        MainSplitView.prototype._resolve = function (sp) {
+            var _this = this;
             if (sp instanceof editor.SplitGroup) {
-                sp.$children.forEach(v => this._resolve(v));
+                sp.$children.forEach(function (v) { return _this._resolve(v); });
             }
             if (sp instanceof editor.TabView) {
-                sp["_moduleViews"].forEach(v => {
+                sp["_moduleViews"].forEach(function (v) {
                     editor.modules.recycleModuleView(v);
                 });
             }
-        }
-        _getData(sp) {
-            let data = {};
+        };
+        MainSplitView.prototype._getData = function (sp) {
+            var data = {};
             data.x = sp.x;
             data.y = sp.y;
             data.width = sp.width;
@@ -10415,8 +10942,8 @@ var editor;
                     data.layout = "VerticalLayout";
                 }
                 var children = [];
-                for (let i = 0; i < sp.numChildren; i++) {
-                    const element = sp.getChildAt(i);
+                for (var i = 0; i < sp.numChildren; i++) {
+                    var element = sp.getChildAt(i);
                     children[i] = this._getData(element);
                 }
                 data.children = children;
@@ -10426,22 +10953,22 @@ var editor;
                 data.modules = sp.getModuleNames();
             }
             return data;
-        }
-        _createViews(data) {
+        };
+        MainSplitView.prototype._createViews = function (data) {
             var displayObject;
             if (data.type == "SplitGroup") {
                 var splitGroup = displayObject = new editor.SplitGroup();
                 if (data.layout == "HorizontalLayout") {
-                    let horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
+                    var horizontalLayout = splitGroup.layout = new eui.HorizontalLayout();
                     horizontalLayout.gap = 2;
                 }
                 else if (data.layout == "VerticalLayout") {
-                    let verticalLayout = splitGroup.layout = new eui.VerticalLayout();
+                    var verticalLayout = splitGroup.layout = new eui.VerticalLayout();
                     verticalLayout.gap = 2;
                 }
                 var children = data.children;
-                for (let i = 0; i < children.length; i++) {
-                    let child = this._createViews(children[i]);
+                for (var i = 0; i < children.length; i++) {
+                    var child = this._createViews(children[i]);
                     splitGroup.addChild(child);
                 }
             }
@@ -10475,38 +11002,42 @@ var editor;
             displayObject.width = data.width;
             displayObject.height = data.height;
             return displayObject;
-        }
-    }
+        };
+        return MainSplitView;
+    }(eui.Component));
     editor.MainSplitView = MainSplitView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MainView extends eui.Component {
-        constructor() {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "MainViewSkin";
+    var MainView = /** @class */ (function (_super) {
+        __extends(MainView, _super);
+        function MainView() {
+            var _this = _super.call(this) || this;
+            _this.once(eui.UIEvent.COMPLETE, _this.onComplete, _this);
+            _this.skinName = "MainViewSkin";
+            return _this;
         }
-        onComplete() {
+        MainView.prototype.onComplete = function () {
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
             if (this.stage) {
                 this.onAddedToStage();
             }
-        }
-        onAddedToStage() {
+        };
+        MainView.prototype.onAddedToStage = function () {
             window.addEventListener("resize", this.onresize.bind(this));
             this.onresize();
-        }
-        onRemovedFromStage() {
+        };
+        MainView.prototype.onRemovedFromStage = function () {
             window.removeEventListener("resize", this.onresize.bind(this));
-        }
-        onresize() {
+        };
+        MainView.prototype.onresize = function () {
             this.stage.setContentSize(window.innerWidth, window.innerHeight);
             editor.editorui.mainview.width = this.stage.stageWidth;
             editor.editorui.mainview.height = this.stage.stageHeight;
-        }
-    }
+        };
+        return MainView;
+    }(eui.Component));
     editor.MainView = MainView;
 })(editor || (editor = {}));
 //////////////////////////////////////////////////////////////////////////////////////
@@ -10539,7 +11070,9 @@ var editor;
 //////////////////////////////////////////////////////////////////////////////////////
 var editor;
 (function (editor) {
-    class AssetAdapter {
+    var AssetAdapter = /** @class */ (function () {
+        function AssetAdapter() {
+        }
         /**
          * @language zh_CN
          * 解析素材
@@ -10547,12 +11080,12 @@ var editor;
          * @param compFunc 解析完成回调函数，示例：callBack(content:any,source:string):void;
          * @param thisObject callBack的 this 引用
          */
-        getAsset(source, compFunc, thisObject) {
+        AssetAdapter.prototype.getAsset = function (source, compFunc, thisObject) {
             function onGetRes(data) {
                 compFunc.call(thisObject, data, source);
             }
             if (RES.hasRes(source)) {
-                let data = RES.getRes(source);
+                var data = RES.getRes(source);
                 if (data) {
                     onGetRes(data);
                 }
@@ -10563,8 +11096,9 @@ var editor;
             else {
                 RES.getResByUrl(source, onGetRes, this, RES.ResourceItem.TYPE_IMAGE);
             }
-        }
-    }
+        };
+        return AssetAdapter;
+    }());
     editor.AssetAdapter = AssetAdapter;
 })(editor || (editor = {}));
 //////////////////////////////////////////////////////////////////////////////////////
@@ -10597,23 +11131,26 @@ var editor;
 //////////////////////////////////////////////////////////////////////////////////////
 var editor;
 (function (editor) {
-    class LoadingUI extends egret.Sprite {
-        constructor() {
-            super();
-            this.createView();
+    var LoadingUI = /** @class */ (function (_super) {
+        __extends(LoadingUI, _super);
+        function LoadingUI() {
+            var _this = _super.call(this) || this;
+            _this.createView();
+            return _this;
         }
-        createView() {
+        LoadingUI.prototype.createView = function () {
             this.textField = new egret.TextField();
             this.addChild(this.textField);
             this.textField.y = 300;
             this.textField.width = 480;
             this.textField.height = 100;
             this.textField.textAlign = "center";
-        }
-        setProgress(current, total) {
-            this.textField.text = `Loading...${current}/${total}`;
-        }
-    }
+        };
+        LoadingUI.prototype.setProgress = function (current, total) {
+            this.textField.text = "Loading..." + current + "/" + total;
+        };
+        return LoadingUI;
+    }(egret.Sprite));
     editor.LoadingUI = LoadingUI;
 })(editor || (editor = {}));
 //////////////////////////////////////////////////////////////////////////////////////
@@ -10646,18 +11183,21 @@ var editor;
 //////////////////////////////////////////////////////////////////////////////////////
 var editor;
 (function (editor) {
-    class MainUI extends eui.UILayer {
-        constructor(onComplete = null) {
-            super();
-            this.isThemeLoadEnd = false;
-            this.isResourceLoadEnd = false;
-            this.onComplete = onComplete;
+    var MainUI = /** @class */ (function (_super) {
+        __extends(MainUI, _super);
+        function MainUI(onComplete) {
+            if (onComplete === void 0) { onComplete = null; }
+            var _this = _super.call(this) || this;
+            _this.isThemeLoadEnd = false;
+            _this.isResourceLoadEnd = false;
+            _this.onComplete = onComplete;
+            return _this;
         }
-        createChildren() {
-            super.createChildren();
+        MainUI.prototype.createChildren = function () {
+            _super.prototype.createChildren.call(this);
             //inject the custom material parser
             //注入自定义的素材解析器
-            let assetAdapter = new editor.AssetAdapter();
+            var assetAdapter = new editor.AssetAdapter();
             egret.registerImplementation("eui.IAssetAdapter", assetAdapter);
             egret.registerImplementation("eui.IThemeAdapter", new editor.ThemeAdapter());
             //Config loading process interface
@@ -10668,36 +11208,36 @@ var editor;
             //初始化Resource资源加载库
             RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
             RES.loadConfig("./resource/default.res.json", "./resource/");
-        }
+        };
         /**
          * 配置文件加载完成,开始预加载皮肤主题资源和preload资源组。
          * Loading of configuration file is complete, start to pre-load the theme configuration file and the preload resource group
          */
-        onConfigComplete(event) {
+        MainUI.prototype.onConfigComplete = function (event) {
             RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
             // load skin theme configuration file, you can manually modify the file. And replace the default skin.
             //加载皮肤主题配置文件,可以手动修改这个文件。替换默认皮肤。
-            let theme = new eui.Theme("./resource/default.thm.json", this.stage);
+            var theme = new eui.Theme("./resource/default.thm.json", this.stage);
             theme.once(eui.UIEvent.COMPLETE, this.onThemeLoadComplete, this);
             RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
             RES.addEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this);
             RES.addEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
             RES.addEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, this.onItemLoadError, this);
             RES.loadGroup("preload");
-        }
+        };
         /**
          * 主题文件加载完成,开始预加载
          * Loading of theme configuration file is complete, start to pre-load the
          */
-        onThemeLoadComplete() {
+        MainUI.prototype.onThemeLoadComplete = function () {
             this.isThemeLoadEnd = true;
             this.createScene();
-        }
+        };
         /**
          * preload资源组加载完成
          * preload resource group is loaded
          */
-        onResourceLoadComplete(event) {
+        MainUI.prototype.onResourceLoadComplete = function (event) {
             if (event.groupName == "preload") {
                 this.stage.removeChild(this.loadingView);
                 RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
@@ -10707,40 +11247,41 @@ var editor;
                 this.isResourceLoadEnd = true;
                 this.createScene();
             }
-        }
-        createScene() {
+        };
+        MainUI.prototype.createScene = function () {
             if (this.isThemeLoadEnd && this.isResourceLoadEnd && this.onComplete) {
                 this.onComplete();
             }
-        }
+        };
         /**
          * 资源组加载出错
          *  The resource group loading failed
          */
-        onItemLoadError(event) {
+        MainUI.prototype.onItemLoadError = function (event) {
             console.warn("Url:" + event.resItem.url + " has failed to load");
-        }
+        };
         /**
          * 资源组加载出错
          * Resource group loading failed
          */
-        onResourceLoadError(event) {
+        MainUI.prototype.onResourceLoadError = function (event) {
             //TODO
             console.warn("Group:" + event.groupName + " has failed to load");
             //忽略加载失败的项目
             //ignore loading failed projects
             this.onResourceLoadComplete(event);
-        }
+        };
         /**
          * preload资源组加载进度
          * loading process of preload resource
          */
-        onResourceProgress(event) {
+        MainUI.prototype.onResourceProgress = function (event) {
             if (event.groupName == "preload") {
                 this.loadingView.setProgress(event.itemsLoaded, event.itemsTotal);
             }
-        }
-    }
+        };
+        return MainUI;
+    }(eui.UILayer));
     editor.MainUI = MainUI;
 })(editor || (editor = {}));
 //////////////////////////////////////////////////////////////////////////////////////
@@ -10773,7 +11314,9 @@ var editor;
 //////////////////////////////////////////////////////////////////////////////////////
 var editor;
 (function (editor) {
-    class ThemeAdapter {
+    var ThemeAdapter = /** @class */ (function () {
+        function ThemeAdapter() {
+        }
         /**
          * 解析主题
          * @param url 待解析的主题url
@@ -10781,7 +11324,7 @@ var editor;
          * @param errorFunc 解析失败回调函数，示例：errorFunc():void;
          * @param thisObject 回调的this引用
          */
-        getTheme(url, compFunc, errorFunc, thisObject) {
+        ThemeAdapter.prototype.getTheme = function (url, compFunc, errorFunc, thisObject) {
             function onGetRes(e) {
                 compFunc.call(thisObject, e);
             }
@@ -10793,8 +11336,9 @@ var editor;
             }
             RES.addEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, onError, null);
             RES.getResByUrl(url, onGetRes, this, RES.ResourceItem.TYPE_TEXT);
-        }
-    }
+        };
+        return ThemeAdapter;
+    }());
     editor.ThemeAdapter = ThemeAdapter;
 })(editor || (editor = {}));
 var editor;
@@ -10806,7 +11350,7 @@ var editor;
     /**
      * 游戏对象控制器类型
      */
-    let MRSToolType;
+    var MRSToolType;
     (function (MRSToolType) {
         /**
          * 移动
@@ -10824,8 +11368,8 @@ var editor;
     /**
      * 编辑器数据
      */
-    class EditorData {
-        constructor() {
+    var EditorData = /** @class */ (function () {
+        function EditorData() {
             this._selectedObjects = [];
             /**
              * 被复制的对象
@@ -10845,37 +11389,41 @@ var editor;
              */
             this.undoList = [];
         }
-        /**
-         * 选中对象，游戏对象与资源文件列表
-         * 选中对象时尽量使用 selectObject 方法设置选中对象
-         */
-        get selectedObjects() {
-            return this._selectedObjects;
-        }
-        set selectedObjects(v) {
-            v = v.filter(v => !!v);
-            if (!v)
-                v = [];
-            if (v == this._selectedObjects)
-                return;
-            if (v.length == this.selectedObjects.length && Array.unique(v.concat(this._selectedObjects)).length == v.length)
-                return;
-            this._selectedObjects = v;
-            this._selectedGameObjectsInvalid = true;
-            this._selectedAssetFileInvalid = true;
-            this._transformGameObjectInvalid = true;
-            this._transformBoxInvalid = true;
-            feng3d.globalDispatcher.dispatch("editor.selectedObjectsChanged");
-        }
-        clearSelectedObjects() {
+        Object.defineProperty(EditorData.prototype, "selectedObjects", {
+            /**
+             * 选中对象，游戏对象与资源文件列表
+             * 选中对象时尽量使用 selectObject 方法设置选中对象
+             */
+            get: function () {
+                return this._selectedObjects;
+            },
+            set: function (v) {
+                v = v.filter(function (v) { return !!v; });
+                if (!v)
+                    v = [];
+                if (v == this._selectedObjects)
+                    return;
+                if (v.length == this.selectedObjects.length && Array.unique(v.concat(this._selectedObjects)).length == v.length)
+                    return;
+                this._selectedObjects = v;
+                this._selectedGameObjectsInvalid = true;
+                this._selectedAssetFileInvalid = true;
+                this._transformGameObjectInvalid = true;
+                this._transformBoxInvalid = true;
+                feng3d.globalDispatcher.dispatch("editor.selectedObjectsChanged");
+            },
+            enumerable: false,
+            configurable: true
+        });
+        EditorData.prototype.clearSelectedObjects = function () {
             this.selectedObjects = [];
-        }
+        };
         /**
          * 选择对象
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectObject(object) {
+        EditorData.prototype.selectObject = function (object) {
             var selecteds = this.selectedObjects.concat();
             var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
             if (!isAdd)
@@ -10888,13 +11436,13 @@ var editor;
                 selecteds.splice(index, 1);
             //
             this.selectedObjects = selecteds;
-        }
+        };
         /**
          * 选择对象
          * 该方法会处理 按ctrl键附加选中对象操作
          * @param objs 选中的对象
          */
-        selectMultiObject(objs, isAdd) {
+        EditorData.prototype.selectMultiObject = function (objs, isAdd) {
             var selecteds = this.selectedObjects.concat();
             if (isAdd === undefined) {
                 isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
@@ -10902,7 +11450,7 @@ var editor;
             if (!isAdd)
                 selecteds.length = 0;
             //
-            objs.forEach(v => {
+            objs.forEach(function (v) {
                 var index = selecteds.indexOf(v);
                 if (index == -1)
                     selecteds.push(v);
@@ -10911,123 +11459,155 @@ var editor;
             });
             //
             this.selectedObjects = selecteds;
-        }
-        /**
-         * 使用的控制工具类型
-         */
-        get toolType() {
-            return this._toolType;
-        }
-        set toolType(v) {
-            if (this._toolType == v)
-                return;
-            this._toolType = v;
-            feng3d.globalDispatcher.dispatch("editor.toolTypeChanged");
-        }
-        /**
-         * 选中游戏对象列表
-         */
-        get selectedGameObjects() {
-            if (this._selectedGameObjectsInvalid) {
-                this._selectedGameObjects.length = 0;
-                this.selectedObjects.forEach(v => {
-                    if (v instanceof feng3d.GameObject)
-                        this._selectedGameObjects.push(v);
-                });
-                this._selectedGameObjectsInvalid = false;
-            }
-            return this._selectedGameObjects;
-        }
-        /**
-         * 坐标原点是否在质心
-         */
-        get isBaryCenter() {
-            return this._isBaryCenter;
-        }
-        set isBaryCenter(v) {
-            if (this._isBaryCenter == v)
-                return;
-            this._isBaryCenter = v;
-            this._transformBoxInvalid = true;
-            feng3d.globalDispatcher.dispatch("editor.isBaryCenterChanged");
-        }
-        /**
-         * 是否使用世界坐标
-         */
-        get isWoldCoordinate() {
-            return this._isWoldCoordinate;
-        }
-        set isWoldCoordinate(v) {
-            if (this._isWoldCoordinate == v)
-                return;
-            this._isWoldCoordinate = v;
-            feng3d.globalDispatcher.dispatch("editor.isWoldCoordinateChanged");
-        }
-        /**
-         * 变换对象
-         */
-        get transformGameObject() {
-            if (this._transformGameObjectInvalid) {
-                var length = this.selectedGameObjects.length;
-                if (length > 0)
-                    this._transformGameObject = this.selectedGameObjects[length - 1];
-                else
-                    this._transformGameObject = null;
-                this._transformGameObjectInvalid = false;
-            }
-            return this._transformGameObject;
-        }
-        get transformBox() {
-            if (this._transformBoxInvalid) {
-                var length = this.selectedGameObjects.length;
-                if (length > 0) {
-                    this._transformBox = null;
-                    this.selectedGameObjects.forEach(cv => {
-                        var box = cv.worldBounds;
-                        if (editor.editorData.isBaryCenter || this._transformBox == null) {
-                            this._transformBox = box.clone();
-                        }
-                        else {
-                            this._transformBox.union(box);
-                        }
+        };
+        Object.defineProperty(EditorData.prototype, "toolType", {
+            /**
+             * 使用的控制工具类型
+             */
+            get: function () {
+                return this._toolType;
+            },
+            set: function (v) {
+                if (this._toolType == v)
+                    return;
+                this._toolType = v;
+                feng3d.globalDispatcher.dispatch("editor.toolTypeChanged");
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "selectedGameObjects", {
+            /**
+             * 选中游戏对象列表
+             */
+            get: function () {
+                var _this = this;
+                if (this._selectedGameObjectsInvalid) {
+                    this._selectedGameObjects.length = 0;
+                    this.selectedObjects.forEach(function (v) {
+                        if (v instanceof feng3d.GameObject)
+                            _this._selectedGameObjects.push(v);
                     });
+                    this._selectedGameObjectsInvalid = false;
                 }
-                else {
-                    this._transformBox = null;
+                return this._selectedGameObjects;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "isBaryCenter", {
+            /**
+             * 坐标原点是否在质心
+             */
+            get: function () {
+                return this._isBaryCenter;
+            },
+            set: function (v) {
+                if (this._isBaryCenter == v)
+                    return;
+                this._isBaryCenter = v;
+                this._transformBoxInvalid = true;
+                feng3d.globalDispatcher.dispatch("editor.isBaryCenterChanged");
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "isWoldCoordinate", {
+            /**
+             * 是否使用世界坐标
+             */
+            get: function () {
+                return this._isWoldCoordinate;
+            },
+            set: function (v) {
+                if (this._isWoldCoordinate == v)
+                    return;
+                this._isWoldCoordinate = v;
+                feng3d.globalDispatcher.dispatch("editor.isWoldCoordinateChanged");
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "transformGameObject", {
+            /**
+             * 变换对象
+             */
+            get: function () {
+                if (this._transformGameObjectInvalid) {
+                    var length = this.selectedGameObjects.length;
+                    if (length > 0)
+                        this._transformGameObject = this.selectedGameObjects[length - 1];
+                    else
+                        this._transformGameObject = null;
+                    this._transformGameObjectInvalid = false;
                 }
-                this._transformBoxInvalid = false;
-            }
-            return this._transformBox;
-        }
-        /**
-         * 选中游戏对象列表
-         */
-        get selectedAssetNodes() {
-            if (this._selectedAssetFileInvalid) {
-                this._selectedAssetNodes.length = 0;
-                this.selectedObjects.forEach(v => {
-                    if (v instanceof editor.AssetNode)
-                        this._selectedAssetNodes.push(v);
-                });
-                this._selectedAssetFileInvalid = false;
-            }
-            return this._selectedAssetNodes;
-        }
+                return this._transformGameObject;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "transformBox", {
+            get: function () {
+                var _this = this;
+                if (this._transformBoxInvalid) {
+                    var length = this.selectedGameObjects.length;
+                    if (length > 0) {
+                        this._transformBox = null;
+                        this.selectedGameObjects.forEach(function (cv) {
+                            var box = cv.worldBounds;
+                            if (editor.editorData.isBaryCenter || _this._transformBox == null) {
+                                _this._transformBox = box.clone();
+                            }
+                            else {
+                                _this._transformBox.union(box);
+                            }
+                        });
+                    }
+                    else {
+                        this._transformBox = null;
+                    }
+                    this._transformBoxInvalid = false;
+                }
+                return this._transformBox;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorData.prototype, "selectedAssetNodes", {
+            /**
+             * 选中游戏对象列表
+             */
+            get: function () {
+                var _this = this;
+                if (this._selectedAssetFileInvalid) {
+                    this._selectedAssetNodes.length = 0;
+                    this.selectedObjects.forEach(function (v) {
+                        if (v instanceof editor.AssetNode)
+                            _this._selectedAssetNodes.push(v);
+                    });
+                    this._selectedAssetFileInvalid = false;
+                }
+                return this._selectedAssetNodes;
+            },
+            enumerable: false,
+            configurable: true
+        });
         /**
          * 获取编辑器资源绝对路径
          * @param url 编辑器资源相对路径
          */
-        getEditorAssetPath(url) {
+        EditorData.prototype.getEditorAssetPath = function (url) {
             return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
-        }
-    }
+        };
+        return EditorData;
+    }());
     editor.EditorData = EditorData;
     editor.editorData = new EditorData();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MRSToolTarget {
-        constructor() {
+    var MRSToolTarget = /** @class */ (function () {
+        function MRSToolTarget() {
             this._startScaleVec = [];
             this._position = new feng3d.Vector3();
             this._rotation = new feng3d.Vector3();
@@ -11036,33 +11616,42 @@ var editor;
             //
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
         }
-        get controllerTool() {
-            return this._controllerTool;
-        }
-        set controllerTool(value) {
-            this._controllerTool = value;
-            if (this._controllerTool) {
-                this._controllerTool.position = this._position;
-                this._controllerTool.rotation = this._rotation;
-            }
-        }
-        set controllerTargets(value) {
-            if (this._controllerTargets) {
-                this._controllerTargets.forEach(v => {
-                    v.off("scenetransformChanged", this.invalidateControllerImage, this);
-                });
-            }
-            this._controllerTargets = value;
-            if (this._controllerTargets) {
-                this._controllerTargets.forEach(v => {
-                    v.on("scenetransformChanged", this.invalidateControllerImage, this);
-                });
-            }
-            this.invalidateControllerImage();
-        }
-        onSelectedGameObjectChange() {
+        Object.defineProperty(MRSToolTarget.prototype, "controllerTool", {
+            get: function () {
+                return this._controllerTool;
+            },
+            set: function (value) {
+                this._controllerTool = value;
+                if (this._controllerTool) {
+                    this._controllerTool.position = this._position;
+                    this._controllerTool.rotation = this._rotation;
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(MRSToolTarget.prototype, "controllerTargets", {
+            set: function (value) {
+                var _this = this;
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.off("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
+                this._controllerTargets = value;
+                if (this._controllerTargets) {
+                    this._controllerTargets.forEach(function (v) {
+                        v.on("scenetransformChanged", _this.invalidateControllerImage, _this);
+                    });
+                }
+                this.invalidateControllerImage();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        MRSToolTarget.prototype.onSelectedGameObjectChange = function () {
             //筛选出 工具控制的对象
-            var transforms = editor.editorData.selectedGameObjects.reduce((result, item) => {
+            var transforms = editor.editorData.selectedGameObjects.reduce(function (result, item) {
                 result.push(item.transform);
                 return result;
             }, []);
@@ -11072,11 +11661,11 @@ var editor;
             else {
                 this.controllerTargets = null;
             }
-        }
-        invalidateControllerImage() {
+        };
+        MRSToolTarget.prototype.invalidateControllerImage = function () {
             feng3d.ticker.nextframe(this.updateControllerImage, this);
-        }
-        updateControllerImage() {
+        };
+        MRSToolTarget.prototype.updateControllerImage = function () {
             if (!this._controllerTargets || this._controllerTargets.length == 0)
                 return;
             var transform = this._controllerTargets[this._controllerTargets.length - 1];
@@ -11100,11 +11689,11 @@ var editor;
                 this._controllerTool.position = position;
                 this._controllerTool.rotation = rotation;
             }
-        }
+        };
         /**
          * 开始移动
          */
-        startTranslation() {
+        MRSToolTarget.prototype.startTranslation = function () {
             this._startTransformDic = new Map();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
@@ -11112,8 +11701,8 @@ var editor;
                 var transform = objects[i];
                 this._startTransformDic.set(transform, this.getTransformData(transform));
             }
-        }
-        translation(addPos) {
+        };
+        MRSToolTarget.prototype.translation = function (addPos) {
             if (!this._controllerTargets)
                 return;
             var objects = this._controllerTargets.concat();
@@ -11126,11 +11715,11 @@ var editor;
                     localMove = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localMove);
                 gameobject.position = transform.position.addTo(localMove);
             }
-        }
-        stopTranslation() {
+        };
+        MRSToolTarget.prototype.stopTranslation = function () {
             this._startTransformDic = null;
-        }
-        startRotate() {
+        };
+        MRSToolTarget.prototype.startRotate = function () {
             this._startTransformDic = new Map();
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
@@ -11138,13 +11727,13 @@ var editor;
                 var transform = objects[i];
                 this._startTransformDic.set(transform, this.getTransformData(transform));
             }
-        }
+        };
         /**
          * 绕指定轴旋转
          * @param angle 旋转角度
          * @param normal 旋转轴
          */
-        rotate1(angle, normal) {
+        MRSToolTarget.prototype.rotate1 = function (angle, normal) {
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             var localnormal;
@@ -11175,7 +11764,7 @@ var editor;
                     }
                 }
             }
-        }
+        };
         /**
          * 按指定角旋转
          * @param angle1 第一方向旋转角度
@@ -11183,7 +11772,7 @@ var editor;
          * @param angle2 第二方向旋转角度
          * @param normal2 第二方向旋转轴
          */
-        rotate2(angle1, normal1, angle2, normal2) {
+        MRSToolTarget.prototype.rotate2 = function (angle1, normal1, angle2, normal2) {
             var objects = this._controllerTargets.concat();
             objects.push(this._controllerTool);
             var gameobject = objects[0];
@@ -11225,16 +11814,16 @@ var editor;
                     }
                 }
             }
-        }
-        stopRote() {
+        };
+        MRSToolTarget.prototype.stopRote = function () {
             this._startTransformDic = null;
-        }
-        startScale() {
+        };
+        MRSToolTarget.prototype.startScale = function () {
             for (var i = 0; i < this._controllerTargets.length; i++) {
                 this._startScaleVec[i] = this._controllerTargets[i].scale.clone();
             }
-        }
-        doScale(scale) {
+        };
+        MRSToolTarget.prototype.doScale = function (scale) {
             console.assert(!!scale.length);
             for (var i = 0; i < this._controllerTargets.length; i++) {
                 var result = this._startScaleVec[i].multiplyTo(scale);
@@ -11242,14 +11831,14 @@ var editor;
                 this._controllerTargets[i].sy = result.y;
                 this._controllerTargets[i].sz = result.z;
             }
-        }
-        stopScale() {
+        };
+        MRSToolTarget.prototype.stopScale = function () {
             this._startScaleVec.length = 0;
-        }
-        getTransformData(transform) {
+        };
+        MRSToolTarget.prototype.getTransformData = function (transform) {
             return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
-        }
-        rotateRotation(rotation, axis, angle) {
+        };
+        MRSToolTarget.prototype.rotateRotation = function (rotation, axis, angle) {
             var rotationmatrix = new feng3d.Matrix4x4();
             rotationmatrix.fromRotation(rotation.x, rotation.y, rotation.z);
             rotationmatrix.appendRotation(axis, angle);
@@ -11260,15 +11849,17 @@ var editor;
                 newrotation.y = 180 - newrotation.y;
                 newrotation.z += 180;
             }
-            function toround(a, b, c = 360) {
+            function toround(a, b, c) {
+                if (c === void 0) { c = 360; }
                 return Math.round((b - a) / c) * c + a;
             }
             newrotation.x = toround(newrotation.x, rotation.x);
             newrotation.y = toround(newrotation.y, rotation.y);
             newrotation.z = toround(newrotation.z, rotation.z);
             return newrotation;
-        }
-    }
+        };
+        return MRSToolTarget;
+    }());
     editor.MRSToolTarget = MRSToolTarget;
 })(editor || (editor = {}));
 var editor;
@@ -11276,13 +11867,17 @@ var editor;
     /**
      * 移动工具模型组件
      */
-    let MToolModel = class MToolModel extends feng3d.Component {
-        init() {
-            super.init();
+    var MToolModel = /** @class */ (function (_super) {
+        __extends(MToolModel, _super);
+        function MToolModel() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        MToolModel.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.gameObject.name = "GameObjectMoveModel";
             this.initModels();
-        }
-        initModels() {
+        };
+        MToolModel.prototype.initModels = function () {
             this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent("CoordinateAxis");
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.transform.rz = -90;
@@ -11313,23 +11908,26 @@ var editor;
             this.gameObject.addChild(this.xyPlane.gameObject);
             this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent("CoordinateCube");
             this.gameObject.addChild(this.oCube.gameObject);
-        }
-    };
-    MToolModel = __decorate([
-        feng3d.RegisterComponent()
-    ], MToolModel);
+        };
+        MToolModel = __decorate([
+            feng3d.RegisterComponent()
+        ], MToolModel);
+        return MToolModel;
+    }(feng3d.Component));
     editor.MToolModel = MToolModel;
-    let CoordinateAxis = class CoordinateAxis extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.color = new feng3d.Color4(1, 0, 0, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
-            this.length = 100;
+    var CoordinateAxis = /** @class */ (function (_super) {
+        __extends(CoordinateAxis, _super);
+        function CoordinateAxis() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+            _this.length = 100;
             //
-            this.selected = false;
+            _this.selected = false;
+            return _this;
         }
-        init() {
-            super.init();
+        CoordinateAxis.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             var xLine = new feng3d.GameObject();
             var model = xLine.addComponent("Renderable");
@@ -11355,31 +11953,34 @@ var editor;
             this.gameObject.addChild(mouseHit);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinateAxis.prototype.update = function () {
             if (!this.isinit)
                 return;
             var color = this.selected ? this.selectedColor : this.color;
             this.segmentMaterial.uniforms.u_segmentColor = color;
             //
             this.material.uniforms.u_diffuseInput = color;
-        }
-    };
-    CoordinateAxis = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinateAxis);
+        };
+        CoordinateAxis = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinateAxis);
+        return CoordinateAxis;
+    }(feng3d.Component));
     editor.CoordinateAxis = CoordinateAxis;
-    let CoordinateCube = class CoordinateCube extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.isinit = false;
-            this.color = new feng3d.Color4(1, 1, 1, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+    var CoordinateCube = /** @class */ (function (_super) {
+        __extends(CoordinateCube, _super);
+        function CoordinateCube() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isinit = false;
+            _this.color = new feng3d.Color4(1, 1, 1, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
             //
-            this.selected = false;
+            _this.selected = false;
+            return _this;
         }
-        init() {
-            super.init();
+        CoordinateCube.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             //
             this.oCube = new feng3d.GameObject();
@@ -11391,32 +11992,39 @@ var editor;
             this.gameObject.addChild(this.oCube);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinateCube.prototype.update = function () {
             if (!this.isinit)
                 return;
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
-        }
-    };
-    CoordinateCube = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinateCube);
+        };
+        CoordinateCube = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinateCube);
+        return CoordinateCube;
+    }(feng3d.Component));
     editor.CoordinateCube = CoordinateCube;
-    let CoordinatePlane = class CoordinatePlane extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.color = new feng3d.Color4(1, 0, 0, 0.2);
-            this.borderColor = new feng3d.Color4(1, 0, 0, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 0, 0, 0.5);
-            this.selectedborderColor = new feng3d.Color4(1, 1, 0, 0.99);
-            this._width = 20;
+    var CoordinatePlane = /** @class */ (function (_super) {
+        __extends(CoordinatePlane, _super);
+        function CoordinatePlane() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.color = new feng3d.Color4(1, 0, 0, 0.2);
+            _this.borderColor = new feng3d.Color4(1, 0, 0, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 0, 0, 0.5);
+            _this.selectedborderColor = new feng3d.Color4(1, 1, 0, 0.99);
+            _this._width = 20;
             //
-            this.selected = false;
+            _this.selected = false;
+            return _this;
         }
-        //
-        get width() { return this._width; }
-        init() {
-            super.init();
+        Object.defineProperty(CoordinatePlane.prototype, "width", {
+            //
+            get: function () { return this._width; },
+            enumerable: false,
+            configurable: true
+        });
+        CoordinatePlane.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             var plane = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "plane" });
             var model = plane.addComponent("Renderable");
@@ -11434,8 +12042,8 @@ var editor;
             this.gameObject.addChild(border);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinatePlane.prototype.update = function () {
             if (!this.isinit)
                 return;
             this.colorMaterial.uniforms.u_diffuseInput = this.selected ? this.selectedColor : this.color;
@@ -11447,11 +12055,12 @@ var editor;
             this.segmentGeometry.segments.push({ start: new feng3d.Vector3(this._width, 0, this._width), end: new feng3d.Vector3(0, 0, this._width), startColor: color, endColor: color });
             color = this.selected ? this.selectedborderColor : this.borderColor;
             this.segmentGeometry.segments.push({ start: new feng3d.Vector3(0, 0, this._width), end: new feng3d.Vector3(0, 0, 0), startColor: color, endColor: color });
-        }
-    };
-    CoordinatePlane = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinatePlane);
+        };
+        CoordinatePlane = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinatePlane);
+        return CoordinatePlane;
+    }(feng3d.Component));
     editor.CoordinatePlane = CoordinatePlane;
 })(editor || (editor = {}));
 var editor;
@@ -11459,13 +12068,17 @@ var editor;
     /**
      * 旋转工具模型组件
      */
-    let RToolModel = class RToolModel extends feng3d.Component {
-        init() {
-            super.init();
+    var RToolModel = /** @class */ (function (_super) {
+        __extends(RToolModel, _super);
+        function RToolModel() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        RToolModel.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.gameObject.name = "GameObjectRotationModel";
             this.initModels();
-        }
-        initModels() {
+        };
+        RToolModel.prototype.initModels = function () {
             this.xAxis = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xAxis" }).addComponent("CoordinateRotationAxis");
             this.xAxis.color.setTo(1, 0, 0, 1);
             this.xAxis.update();
@@ -11489,29 +12102,32 @@ var editor;
             this.freeAxis.color.setTo(1, 1, 1);
             this.freeAxis.update();
             this.gameObject.addChild(this.freeAxis.gameObject);
-        }
-    };
-    RToolModel = __decorate([
-        feng3d.RegisterComponent()
-    ], RToolModel);
+        };
+        RToolModel = __decorate([
+            feng3d.RegisterComponent()
+        ], RToolModel);
+        return RToolModel;
+    }(feng3d.Component));
     editor.RToolModel = RToolModel;
-    let CoordinateRotationAxis = class CoordinateRotationAxis extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.radius = 80;
-            this.color = new feng3d.Color4(1, 0, 0, 0.99);
-            this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+    var CoordinateRotationAxis = /** @class */ (function (_super) {
+        __extends(CoordinateRotationAxis, _super);
+        function CoordinateRotationAxis() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.radius = 80;
+            _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+            _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
             //
-            this.selected = false;
+            _this.selected = false;
+            return _this;
         }
-        init() {
-            super.init();
+        CoordinateRotationAxis.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             feng3d.watcher.watch(this, "filterNormal", this.update, this);
             this.initModels();
-        }
-        initModels() {
+        };
+        CoordinateRotationAxis.prototype.initModels = function () {
             var border = new feng3d.GameObject();
             var model = border.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
@@ -11532,8 +12148,8 @@ var editor;
             this.gameObject.addChild(mouseHit);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinateRotationAxis.prototype.update = function () {
             if (!this.isinit)
                 return;
             this.sector.radius = this.radius;
@@ -11561,8 +12177,8 @@ var editor;
                     }
                 }
             }
-        }
-        showSector(startPos, endPos) {
+        };
+        CoordinateRotationAxis.prototype.showSector = function (startPos, endPos) {
             var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
             var localStartPos = inverseGlobalMatrix.transformVector(startPos);
             var localEndPos = inverseGlobalMatrix.transformVector(endPos);
@@ -11576,32 +12192,35 @@ var editor;
             }
             this.sector.update(min, max);
             this.gameObject.addChild(this.sector.gameObject);
-        }
-        hideSector() {
+        };
+        CoordinateRotationAxis.prototype.hideSector = function () {
             if (this.sector.gameObject.parent)
                 this.sector.gameObject.parent.removeChild(this.sector.gameObject);
-        }
-    };
-    CoordinateRotationAxis = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinateRotationAxis);
+        };
+        CoordinateRotationAxis = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinateRotationAxis);
+        return CoordinateRotationAxis;
+    }(feng3d.Component));
     editor.CoordinateRotationAxis = CoordinateRotationAxis;
     /**
      * 扇形对象
      */
-    let SectorGameObject = class SectorGameObject extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.borderColor = new feng3d.Color4(0, 1, 1, 0.6);
-            this.radius = 80;
-            this._start = 0;
-            this._end = 0;
+    var SectorGameObject = /** @class */ (function (_super) {
+        __extends(SectorGameObject, _super);
+        function SectorGameObject() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.borderColor = new feng3d.Color4(0, 1, 1, 0.6);
+            _this.radius = 80;
+            _this._start = 0;
+            _this._end = 0;
+            return _this;
         }
         /**
          * 构建3D对象
          */
-        init() {
-            super.init();
+        SectorGameObject.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.gameObject.name = "sector";
             var model = this.gameObject.addComponent("Renderable");
             this.geometry = model.geometry = new feng3d.CustomGeometry();
@@ -11619,8 +12238,10 @@ var editor;
             this.gameObject.addChild(border);
             this.isinit = true;
             this.update(0, 0);
-        }
-        update(start = 0, end = 0) {
+        };
+        SectorGameObject.prototype.update = function (start, end) {
+            if (start === void 0) { start = 0; }
+            if (end === void 0) { end = 0; }
             if (!this.isinit)
                 return;
             this._start = Math.min(start, end);
@@ -11655,28 +12276,31 @@ var editor;
                 { start: new feng3d.Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
                 { start: new feng3d.Vector3(), end: endPoint, startColor: this.borderColor, endColor: this.borderColor },
             ];
-        }
-    };
-    SectorGameObject = __decorate([
-        feng3d.RegisterComponent()
-    ], SectorGameObject);
+        };
+        SectorGameObject = __decorate([
+            feng3d.RegisterComponent()
+        ], SectorGameObject);
+        return SectorGameObject;
+    }(feng3d.Component));
     editor.SectorGameObject = SectorGameObject;
-    let CoordinateRotationFreeAxis = class CoordinateRotationFreeAxis extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.radius = 80;
-            this.color = new feng3d.Color4(1, 0, 0, 0.99);
-            this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+    var CoordinateRotationFreeAxis = /** @class */ (function (_super) {
+        __extends(CoordinateRotationFreeAxis, _super);
+        function CoordinateRotationFreeAxis() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.radius = 80;
+            _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+            _this.backColor = new feng3d.Color4(0.6, 0.6, 0.6, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
             //
-            this.selected = false;
+            _this.selected = false;
+            return _this;
         }
-        init() {
-            super.init();
+        CoordinateRotationFreeAxis.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             this.initModels();
-        }
-        initModels() {
+        };
+        CoordinateRotationFreeAxis.prototype.initModels = function () {
             var border = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "border" });
             var model = border.addComponent("Renderable");
             var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
@@ -11693,8 +12317,8 @@ var editor;
             this.gameObject.addChild(this.sector.gameObject);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinateRotationFreeAxis.prototype.update = function () {
             if (!this.isinit)
                 return;
             this.sector.radius = this.radius;
@@ -11710,11 +12334,12 @@ var editor;
                 }
             }
             this.segmentGeometry.segments = segments;
-        }
-    };
-    CoordinateRotationFreeAxis = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinateRotationFreeAxis);
+        };
+        CoordinateRotationFreeAxis = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinateRotationFreeAxis);
+        return CoordinateRotationFreeAxis;
+    }(feng3d.Component));
     editor.CoordinateRotationFreeAxis = CoordinateRotationFreeAxis;
 })(editor || (editor = {}));
 var editor;
@@ -11722,13 +12347,17 @@ var editor;
     /**
      * 缩放工具模型组件
      */
-    let SToolModel = class SToolModel extends feng3d.Component {
-        init() {
-            super.init();
+    var SToolModel = /** @class */ (function (_super) {
+        __extends(SToolModel, _super);
+        function SToolModel() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SToolModel.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.gameObject.name = "GameObjectScaleModel";
             this.initModels();
-        }
-        initModels() {
+        };
+        SToolModel.prototype.initModels = function () {
             this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent("CoordinateScaleCube");
             this.xCube.color.setTo(1, 0, 0, 1);
             this.xCube.update();
@@ -11746,25 +12375,28 @@ var editor;
             this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent("CoordinateCube");
             this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
             this.gameObject.addChild(this.oCube.gameObject);
-        }
-    };
-    SToolModel = __decorate([
-        feng3d.RegisterComponent()
-    ], SToolModel);
+        };
+        SToolModel = __decorate([
+            feng3d.RegisterComponent()
+        ], SToolModel);
+        return SToolModel;
+    }(feng3d.Component));
     editor.SToolModel = SToolModel;
-    let CoordinateScaleCube = class CoordinateScaleCube extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.color = new feng3d.Color4(1, 0, 0, 0.99);
-            this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
-            this.length = 100;
+    var CoordinateScaleCube = /** @class */ (function (_super) {
+        __extends(CoordinateScaleCube, _super);
+        function CoordinateScaleCube() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.color = new feng3d.Color4(1, 0, 0, 0.99);
+            _this.selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+            _this.length = 100;
             //
-            this.selected = false;
+            _this.selected = false;
             //
-            this.scaleValue = 1;
+            _this.scaleValue = 1;
+            return _this;
         }
-        init() {
-            super.init();
+        CoordinateScaleCube.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "selected", this.update, this);
             feng3d.watcher.watch(this, "scaleValue", this.update, this);
             var xLine = new feng3d.GameObject();
@@ -11787,8 +12419,8 @@ var editor;
             this.gameObject.addChild(mouseHit);
             this.isinit = true;
             this.update();
-        }
-        update() {
+        };
+        CoordinateScaleCube.prototype.update = function () {
             if (!this.isinit)
                 return;
             this.coordinateCube.color = this.color;
@@ -11798,96 +12430,111 @@ var editor;
             //
             this.coordinateCube.transform.y = this.length * this.scaleValue;
             this.coordinateCube.selected = this.selected;
-        }
-    };
-    CoordinateScaleCube = __decorate([
-        feng3d.RegisterComponent()
-    ], CoordinateScaleCube);
+        };
+        CoordinateScaleCube = __decorate([
+            feng3d.RegisterComponent()
+        ], CoordinateScaleCube);
+        return CoordinateScaleCube;
+    }(feng3d.Component));
     editor.CoordinateScaleCube = CoordinateScaleCube;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MRSToolBase extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.ismouseDown = false;
+    var MRSToolBase = /** @class */ (function (_super) {
+        __extends(MRSToolBase, _super);
+        function MRSToolBase() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.ismouseDown = false;
+            return _this;
         }
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
-        init() {
-            super.init();
+        Object.defineProperty(MRSToolBase.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.invalidate(); },
+            enumerable: false,
+            configurable: true
+        });
+        MRSToolBase.prototype.init = function () {
+            _super.prototype.init.call(this);
             var holdSizeComponent = this.gameObject.addComponent("HoldSizeComponent");
             holdSizeComponent.holdSize = 0.005;
             //
             this.on("addedToScene", this.onAddedToScene, this);
             this.on("removedFromScene", this.onRemovedFromScene, this);
-        }
-        onAddedToScene() {
+        };
+        MRSToolBase.prototype.onAddedToScene = function () {
             this.mrsToolTarget.controllerTool = this.transform;
             //
             feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
             feng3d.ticker.onframe(this.updateToolModel, this);
-        }
-        onRemovedFromScene() {
+        };
+        MRSToolBase.prototype.onRemovedFromScene = function () {
             this.mrsToolTarget.controllerTool = null;
             //
             feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
             feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
             feng3d.ticker.offframe(this.updateToolModel, this);
-        }
-        invalidate() {
+        };
+        MRSToolBase.prototype.invalidate = function () {
             feng3d.ticker.nextframe(this.update, this);
-        }
-        update() {
+        };
+        MRSToolBase.prototype.update = function () {
             var holdSizeComponent = this.gameObject.getComponent("HoldSizeComponent");
             holdSizeComponent.camera = this._editorCamera;
-        }
-        onItemMouseDown(event) {
+        };
+        MRSToolBase.prototype.onItemMouseDown = function (event) {
             feng3d.shortcut.activityState("inTransforming");
-        }
-        get toolModel() {
-            return this._toolModel;
-        }
-        set toolModel(value) {
-            if (this._toolModel)
-                this.gameObject.removeChild(this._toolModel.gameObject);
-            this._toolModel = value;
-            ;
-            if (this._toolModel) {
-                this.gameObject.addChild(this._toolModel.gameObject);
-            }
-        }
-        get selectedItem() {
-            return this._selectedItem;
-        }
-        set selectedItem(value) {
-            if (this._selectedItem == value)
-                return;
-            if (this._selectedItem)
-                this._selectedItem.selected = false;
-            this._selectedItem = value;
-            if (this._selectedItem)
-                this._selectedItem.selected = true;
-        }
-        updateToolModel() {
-        }
-        onMouseDown() {
+        };
+        Object.defineProperty(MRSToolBase.prototype, "toolModel", {
+            get: function () {
+                return this._toolModel;
+            },
+            set: function (value) {
+                if (this._toolModel)
+                    this.gameObject.removeChild(this._toolModel.gameObject);
+                this._toolModel = value;
+                ;
+                if (this._toolModel) {
+                    this.gameObject.addChild(this._toolModel.gameObject);
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(MRSToolBase.prototype, "selectedItem", {
+            get: function () {
+                return this._selectedItem;
+            },
+            set: function (value) {
+                if (this._selectedItem == value)
+                    return;
+                if (this._selectedItem)
+                    this._selectedItem.selected = false;
+                this._selectedItem = value;
+                if (this._selectedItem)
+                    this._selectedItem.selected = true;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        MRSToolBase.prototype.updateToolModel = function () {
+        };
+        MRSToolBase.prototype.onMouseDown = function () {
             this.selectedItem = null;
             this.ismouseDown = true;
-        }
-        onMouseUp() {
+        };
+        MRSToolBase.prototype.onMouseUp = function () {
             this.ismouseDown = false;
             this.movePlane3D = null;
             this.startSceneTransform = null;
-            feng3d.ticker.nextframe(() => {
+            feng3d.ticker.nextframe(function () {
                 feng3d.shortcut.deactivityState("inTransforming");
             });
-        }
+        };
         /**
          * 获取鼠标射线与移动平面的交点（模型空间）
          */
-        getLocalMousePlaneCross() {
+        MRSToolBase.prototype.getLocalMousePlaneCross = function () {
             //射线与平面交点
             var crossPos = this.getMousePlaneCross();
             //把交点从世界转换为模型空间
@@ -11895,14 +12542,15 @@ var editor;
             inverseGlobalMatrix.invert();
             crossPos = inverseGlobalMatrix.transformVector(crossPos);
             return crossPos;
-        }
-        getMousePlaneCross() {
+        };
+        MRSToolBase.prototype.getMousePlaneCross = function () {
             var line3D = this.gameObject.scene.mouseRay3D;
             //射线与平面交点
             var crossPos = this.movePlane3D.intersectWithLine3(line3D);
             return crossPos;
-        }
-    }
+        };
+        return MRSToolBase;
+    }(feng3d.Component));
     editor.MRSToolBase = MRSToolBase;
 })(editor || (editor = {}));
 var editor;
@@ -11910,20 +12558,22 @@ var editor;
     /**
      * 位移工具
      */
-    let MTool = class MTool extends editor.MRSToolBase {
-        constructor() {
-            super(...arguments);
+    var MTool = /** @class */ (function (_super) {
+        __extends(MTool, _super);
+        function MTool() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 用于判断是否改变了XYZ
              */
-            this.changeXYZ = new feng3d.Vector3();
+            _this.changeXYZ = new feng3d.Vector3();
+            return _this;
         }
-        init() {
-            super.init();
+        MTool.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.toolModel = new feng3d.GameObject().addComponent("MToolModel");
-        }
-        onAddedToScene() {
-            super.onAddedToScene();
+        };
+        MTool.prototype.onAddedToScene = function () {
+            _super.prototype.onAddedToScene.call(this);
             this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
@@ -11931,9 +12581,9 @@ var editor;
             this.toolModel.xzPlane.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.xyPlane.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
-        }
-        onRemovedFromScene() {
-            super.onRemovedFromScene();
+        };
+        MTool.prototype.onRemovedFromScene = function () {
+            _super.prototype.onRemovedFromScene.call(this);
             this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
@@ -11941,15 +12591,15 @@ var editor;
             this.toolModel.xzPlane.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.xyPlane.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
-        }
-        onItemMouseDown(event) {
+        };
+        MTool.prototype.onItemMouseDown = function (event) {
             if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
             if (!this.editorCamera)
                 return;
-            super.onItemMouseDown(event);
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -12010,8 +12660,8 @@ var editor;
             this.mrsToolTarget.startTranslation();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        }
-        onMouseMove() {
+        };
+        MTool.prototype.onMouseMove = function () {
             var crossPos = this.getLocalMousePlaneCross();
             var addPos = crossPos.subTo(this.startPlanePos);
             addPos.x *= this.changeXYZ.x;
@@ -12021,16 +12671,16 @@ var editor;
             sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
             var sceneAddpos = sceneTransform.getPosition().subTo(this.startSceneTransform.getPosition());
             this.mrsToolTarget.translation(sceneAddpos);
-        }
-        onMouseUp() {
-            super.onMouseUp();
+        };
+        MTool.prototype.onMouseUp = function () {
+            _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             this.mrsToolTarget.stopTranslation();
             this.startPos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
-        }
-        updateToolModel() {
+        };
+        MTool.prototype.updateToolModel = function () {
             //鼠标按下时不更新
             if (this.ismouseDown)
                 return;
@@ -12044,44 +12694,49 @@ var editor;
             this.toolModel.xzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.xzPlane.width;
             this.toolModel.yzPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.yzPlane.width;
             this.toolModel.yzPlane.transform.z = localCameraPos.z > 0 ? 0 : -this.toolModel.yzPlane.width;
-        }
-    };
-    MTool = __decorate([
-        feng3d.RegisterComponent()
-    ], MTool);
+        };
+        MTool = __decorate([
+            feng3d.RegisterComponent()
+        ], MTool);
+        return MTool;
+    }(editor.MRSToolBase));
     editor.MTool = MTool;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let RTool = class RTool extends editor.MRSToolBase {
-        init() {
-            super.init();
-            this.toolModel = new feng3d.GameObject().addComponent("RToolModel");
+    var RTool = /** @class */ (function (_super) {
+        __extends(RTool, _super);
+        function RTool() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        onAddedToScene() {
-            super.onAddedToScene();
+        RTool.prototype.init = function () {
+            _super.prototype.init.call(this);
+            this.toolModel = new feng3d.GameObject().addComponent("RToolModel");
+        };
+        RTool.prototype.onAddedToScene = function () {
+            _super.prototype.onAddedToScene.call(this);
             this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.freeAxis.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.cameraAxis.on("mousedown", this.onItemMouseDown, this);
-        }
-        onRemovedFromScene() {
-            super.onRemovedFromScene();
+        };
+        RTool.prototype.onRemovedFromScene = function () {
+            _super.prototype.onRemovedFromScene.call(this);
             this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.freeAxis.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
-        }
-        onItemMouseDown(event) {
+        };
+        RTool.prototype.onItemMouseDown = function (event) {
             if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
             if (!this.editorCamera)
                 return;
-            super.onItemMouseDown(event);
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -12125,8 +12780,8 @@ var editor;
             this.mrsToolTarget.startRotate();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        }
-        onMouseMove() {
+        };
+        RTool.prototype.onMouseMove = function () {
             if (!this.editorCamera)
                 return;
             switch (this.selectedItem) {
@@ -12169,9 +12824,9 @@ var editor;
                     this.mrsToolTarget.startRotate();
                     break;
             }
-        }
-        onMouseUp() {
-            super.onMouseUp();
+        };
+        RTool.prototype.onMouseUp = function () {
+            _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             if (this.selectedItem instanceof editor.CoordinateRotationAxis) {
                 this.selectedItem.hideSector();
@@ -12180,8 +12835,8 @@ var editor;
             this.startMousePos = null;
             this.startPlanePos = null;
             this.startSceneTransform = null;
-        }
-        updateToolModel() {
+        };
+        RTool.prototype.updateToolModel = function () {
             if (!this.editorCamera)
                 return;
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix.clone();
@@ -12199,49 +12854,52 @@ var editor;
             var rotation = temp.decompose()[1];
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
-        }
-    };
-    RTool = __decorate([
-        feng3d.RegisterComponent()
-    ], RTool);
+        };
+        RTool = __decorate([
+            feng3d.RegisterComponent()
+        ], RTool);
+        return RTool;
+    }(editor.MRSToolBase));
     editor.RTool = RTool;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let STool = class STool extends editor.MRSToolBase {
-        constructor() {
-            super(...arguments);
+    var STool = /** @class */ (function (_super) {
+        __extends(STool, _super);
+        function STool() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 用于判断是否改变了XYZ
              */
-            this.changeXYZ = new feng3d.Vector3();
+            _this.changeXYZ = new feng3d.Vector3();
+            return _this;
         }
-        init() {
-            super.init();
+        STool.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.toolModel = new feng3d.GameObject().addComponent("SToolModel");
-        }
-        onAddedToScene() {
-            super.onAddedToScene();
+        };
+        STool.prototype.onAddedToScene = function () {
+            _super.prototype.onAddedToScene.call(this);
             this.toolModel.xCube.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.yCube.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.zCube.on("mousedown", this.onItemMouseDown, this);
             this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
-        }
-        onRemovedFromScene() {
-            super.onRemovedFromScene();
+        };
+        STool.prototype.onRemovedFromScene = function () {
+            _super.prototype.onRemovedFromScene.call(this);
             this.toolModel.xCube.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.yCube.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.zCube.off("mousedown", this.onItemMouseDown, this);
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
-        }
-        onItemMouseDown(event) {
+        };
+        STool.prototype.onItemMouseDown = function (event) {
             if (!feng3d.shortcut.getState("mouseInView3D"))
                 return;
             if (feng3d.shortcut.keyState.getKeyState("alt"))
                 return;
             if (!this.editorCamera)
                 return;
-            super.onItemMouseDown(event);
+            _super.prototype.onItemMouseDown.call(this, event);
             //全局矩阵
             var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
@@ -12284,8 +12942,8 @@ var editor;
             this.mrsToolTarget.startScale();
             //
             feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        }
-        onMouseMove() {
+        };
+        STool.prototype.onMouseMove = function () {
             var addPos = new feng3d.Vector3();
             var addScale = new feng3d.Vector3();
             if (this.selectedItem == this.toolModel.oCube) {
@@ -12316,9 +12974,9 @@ var editor;
             this.toolModel.xCube.scaleValue = addScale.x;
             this.toolModel.yCube.scaleValue = addScale.y;
             this.toolModel.zCube.scaleValue = addScale.z;
-        }
-        onMouseUp() {
-            super.onMouseUp();
+        };
+        STool.prototype.onMouseUp = function () {
+            _super.prototype.onMouseUp.call(this);
             feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
             this.mrsToolTarget.stopScale();
             this.startPlanePos = null;
@@ -12327,11 +12985,12 @@ var editor;
             this.toolModel.xCube.scaleValue = 1;
             this.toolModel.yCube.scaleValue = 1;
             this.toolModel.zCube.scaleValue = 1;
-        }
-    };
-    STool = __decorate([
-        feng3d.RegisterComponent()
-    ], STool);
+        };
+        STool = __decorate([
+            feng3d.RegisterComponent()
+        ], STool);
+        return STool;
+    }(editor.MRSToolBase));
     editor.STool = STool;
 })(editor || (editor = {}));
 var editor;
@@ -12341,7 +13000,7 @@ var editor;
      */
     function setAwaysVisible(component) {
         var models = component.getComponentsInChildren("Renderable");
-        models.forEach(element => {
+        models.forEach(function (element) {
             if (element.material && !element.material.assetId) {
                 element.material.renderParams.depthtest = false;
             }
@@ -12350,15 +13009,21 @@ var editor;
     /**
      * 位移旋转缩放工具
      */
-    let MRSTool = class MRSTool extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.mrsToolTarget = new editor.MRSToolTarget();
+    var MRSTool = /** @class */ (function (_super) {
+        __extends(MRSTool, _super);
+        function MRSTool() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.mrsToolTarget = new editor.MRSToolTarget();
+            return _this;
         }
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
-        init() {
-            super.init();
+        Object.defineProperty(MRSTool.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.invalidate(); },
+            enumerable: false,
+            configurable: true
+        });
+        MRSTool.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
             this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent("MTool");
             this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent("RTool");
@@ -12374,8 +13039,8 @@ var editor;
             //
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
             feng3d.globalDispatcher.on("editor.toolTypeChanged", this.onToolTypeChange, this);
-        }
-        dispose() {
+        };
+        MRSTool.prototype.dispose = function () {
             //
             this.currentTool = null;
             //
@@ -12391,18 +13056,18 @@ var editor;
             //
             feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
             feng3d.globalDispatcher.off("editor.toolTypeChanged", this.onToolTypeChange, this);
-            super.dispose();
-        }
-        invalidate() {
+            _super.prototype.dispose.call(this);
+        };
+        MRSTool.prototype.invalidate = function () {
             feng3d.ticker.nextframe(this.update, this);
-        }
-        update() {
+        };
+        MRSTool.prototype.update = function () {
             this.mTool.editorCamera = this._editorCamera;
             this.rTool.editorCamera = this._editorCamera;
             this.sTool.editorCamera = this._editorCamera;
-        }
-        onSelectedGameObjectChange() {
-            var objects = editor.editorData.selectedGameObjects.filter(v => !(v.hideFlags & feng3d.HideFlags.DontTransform));
+        };
+        MRSTool.prototype.onSelectedGameObjectChange = function () {
+            var objects = editor.editorData.selectedGameObjects.filter(function (v) { return !(v.hideFlags & feng3d.HideFlags.DontTransform); });
             //筛选出 工具控制的对象
             if (objects.length > 0) {
                 this.gameObject.addChild(this.mrsToolObject);
@@ -12410,8 +13075,8 @@ var editor;
             else {
                 this.mrsToolObject.remove();
             }
-        }
-        onToolTypeChange() {
+        };
+        MRSTool.prototype.onToolTypeChange = function () {
             switch (editor.editorData.toolType) {
                 case editor.MRSToolType.MOVE:
                     this.currentTool = this.mTool;
@@ -12423,90 +13088,99 @@ var editor;
                     this.currentTool = this.sTool;
                     break;
             }
-        }
-        set currentTool(value) {
-            if (this._currentTool == value)
-                return;
-            if (this._currentTool) {
-                this._currentTool.gameObject.remove();
-            }
-            this._currentTool = value;
-            if (this._currentTool) {
-                this.mrsToolObject.addChild(this._currentTool.gameObject);
-            }
-        }
-    };
-    MRSTool = __decorate([
-        feng3d.RegisterComponent()
-    ], MRSTool);
+        };
+        Object.defineProperty(MRSTool.prototype, "currentTool", {
+            set: function (value) {
+                if (this._currentTool == value)
+                    return;
+                if (this._currentTool) {
+                    this._currentTool.gameObject.remove();
+                }
+                this._currentTool = value;
+                if (this._currentTool) {
+                    this.mrsToolObject.addChild(this._currentTool.gameObject);
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        MRSTool = __decorate([
+            feng3d.RegisterComponent()
+        ], MRSTool);
+        return MRSTool;
+    }(feng3d.Component));
     editor.MRSTool = MRSTool;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class HierarchyNode extends editor.TreeNode {
-        constructor(obj) {
-            super(obj);
-            this.isOpen = false;
+    var HierarchyNode = /** @class */ (function (_super) {
+        __extends(HierarchyNode, _super);
+        function HierarchyNode(obj) {
+            var _this = _super.call(this, obj) || this;
+            _this.isOpen = false;
             /**
              * 父结点
              */
-            this.parent = null;
+            _this.parent = null;
             /**
              * 子结点列表
              */
-            this.children = [];
-            feng3d.watcher.watch(this.gameobject, "name", this.update, this);
-            this.update();
+            _this.children = [];
+            feng3d.watcher.watch(_this.gameobject, "name", _this.update, _this);
+            _this.update();
+            return _this;
         }
         /**
          * 提供拖拽数据
          *
          * @param dragSource
          */
-        setdargSource(dragSource) {
+        HierarchyNode.prototype.setdargSource = function (dragSource) {
             dragSource.addDragData("gameobject", this.gameobject);
-        }
+        };
         /**
          * 接受拖拽数据
          *
          * @param dragdata
          */
-        acceptDragDrop(dragdata) {
-            dragdata.getDragData("gameobject").forEach(v => {
-                if (!v.contains(this.gameobject)) {
+        HierarchyNode.prototype.acceptDragDrop = function (dragdata) {
+            var _this = this;
+            dragdata.getDragData("gameobject").forEach(function (v) {
+                if (!v.contains(_this.gameobject)) {
                     var localToWorldMatrix = v.transform.localToWorldMatrix;
-                    this.gameobject.addChild(v);
+                    _this.gameobject.addChild(v);
                     v.transform.localToWorldMatrix = localToWorldMatrix;
                     //
                     editor.hierarchy.getNode(v).openParents();
                 }
             });
-            dragdata.getDragData("file_gameobject").forEach(v => {
-                let gameobject = editor.hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+            dragdata.getDragData("file_gameobject").forEach(function (v) {
+                var gameobject = editor.hierarchy.addGameoObjectFromAsset(v, _this.gameobject);
                 editor.hierarchy.getNode(gameobject).openParents();
             });
-            dragdata.getDragData("file_script").forEach(v => {
-                this.gameobject.addScript(v.scriptName);
+            dragdata.getDragData("file_script").forEach(function (v) {
+                _this.gameobject.addScript(v.scriptName);
             });
-        }
+        };
         /**
          * 销毁
          */
-        destroy() {
+        HierarchyNode.prototype.destroy = function () {
             feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
             this.gameobject = null;
-            super.destroy();
-        }
-        update() {
+            _super.prototype.destroy.call(this);
+        };
+        HierarchyNode.prototype.update = function () {
             this.label = this.gameobject.name;
-        }
-    }
+        };
+        return HierarchyNode;
+    }(editor.TreeNode));
     editor.HierarchyNode = HierarchyNode;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class Hierarchy {
-        constructor() {
+    var Hierarchy = /** @class */ (function () {
+        function Hierarchy() {
             this._selectedGameObjects = [];
             feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
             feng3d.watcher.watch(this, "rootGameObject", this.rootGameObjectChanged, this);
@@ -12514,30 +13188,31 @@ var editor;
         /**
          * 获取选中结点
          */
-        getSelectedNode() {
-            var node = editor.editorData.selectedGameObjects.reduce((pv, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
+        Hierarchy.prototype.getSelectedNode = function () {
+            var _this = this;
+            var node = editor.editorData.selectedGameObjects.reduce(function (pv, cv) { pv = pv || _this.getNode(cv); return pv; }, null);
             return node;
-        }
+        };
         /**
          * 获取结点
          */
-        getNode(gameObject) {
+        Hierarchy.prototype.getNode = function (gameObject) {
             var node = nodeMap.get(gameObject);
             return node;
-        }
-        delete(gameobject) {
+        };
+        Hierarchy.prototype.delete = function (gameobject) {
             var node = nodeMap.get(gameobject);
             if (node) {
                 node.destroy();
                 nodeMap.delete(gameobject);
             }
-        }
+        };
         /**
          * 添加游戏对象到层级树
          *
          * @param gameobject 游戏对象
          */
-        addGameObject(gameobject) {
+        Hierarchy.prototype.addGameObject = function (gameobject) {
             if (gameobject.getComponent("Transform2D")) {
                 this.addUI(gameobject);
                 return;
@@ -12548,13 +13223,13 @@ var editor;
             else
                 this.rootnode.gameobject.addChild(gameobject);
             editor.editorData.selectObject(gameobject);
-        }
+        };
         /**
          * 添加UI
          *
          * @param gameobject
          */
-        addUI(gameobject) {
+        Hierarchy.prototype.addUI = function (gameobject) {
             var selectedNode = this.getSelectedNode();
             if (selectedNode && selectedNode.gameobject.getComponent("Transform2D")) {
                 selectedNode.gameobject.addChild(gameobject);
@@ -12568,8 +13243,8 @@ var editor;
                 canvas.gameObject.addChild(gameobject);
             }
             editor.editorData.selectObject(gameobject);
-        }
-        addGameoObjectFromAsset(gameobjectAsset, parent) {
+        };
+        Hierarchy.prototype.addGameoObjectFromAsset = function (gameobjectAsset, parent) {
             var gameobject = gameobjectAsset.getAssetData();
             console.assert(!gameobject.parent);
             if (parent)
@@ -12578,8 +13253,8 @@ var editor;
                 this.rootnode.gameobject.addChild(gameobject);
             editor.editorData.selectObject(gameobject);
             return gameobject;
-        }
-        rootGameObjectChanged(newValue, oldValue) {
+        };
+        Hierarchy.prototype.rootGameObjectChanged = function (newValue, oldValue) {
             if (oldValue) {
                 oldValue.off("addChild", this.ongameobjectadded, this);
                 oldValue.off("removeChild", this.ongameobjectremoved, this);
@@ -12589,29 +13264,31 @@ var editor;
                 newValue.on("addChild", this.ongameobjectadded, this);
                 newValue.on("removeChild", this.ongameobjectremoved, this);
             }
-        }
-        onSelectedGameObjectChanged() {
-            this._selectedGameObjects.forEach(element => {
-                var node = this.getNode(element);
+        };
+        Hierarchy.prototype.onSelectedGameObjectChanged = function () {
+            var _this = this;
+            this._selectedGameObjects.forEach(function (element) {
+                var node = _this.getNode(element);
                 if (node)
                     node.selected = false;
                 else
                     debugger; // 为什么为空，是否被允许？
             });
             this._selectedGameObjects = editor.editorData.selectedGameObjects.concat();
-            this._selectedGameObjects.forEach(element => {
-                var node = this.getNode(element);
+            this._selectedGameObjects.forEach(function (element) {
+                var node = _this.getNode(element);
                 node.selected = true;
             });
-        }
-        ongameobjectadded(event) {
+        };
+        Hierarchy.prototype.ongameobjectadded = function (event) {
             this.add(event.data.child);
-        }
-        ongameobjectremoved(event) {
+        };
+        Hierarchy.prototype.ongameobjectremoved = function (event) {
             var node = nodeMap.get(event.data.child);
             this.remove(node);
-        }
-        init(gameobject) {
+        };
+        Hierarchy.prototype.init = function (gameobject) {
+            var _this = this;
             if (this.rootnode)
                 this.rootnode.destroy();
             nodeMap.clear();
@@ -12619,11 +13296,12 @@ var editor;
             nodeMap.set(gameobject, node);
             node.isOpen = true;
             this.rootnode = node;
-            gameobject.children.forEach(element => {
-                this.add(element);
+            gameobject.children.forEach(function (element) {
+                _this.add(element);
             });
-        }
-        add(gameobject) {
+        };
+        Hierarchy.prototype.add = function (gameobject) {
+            var _this = this;
             if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
                 return;
             var node = nodeMap.get(gameobject);
@@ -12638,49 +13316,59 @@ var editor;
                 }
                 parentnode.addChild(node);
             }
-            gameobject.children.forEach(element => {
-                this.add(element);
+            gameobject.children.forEach(function (element) {
+                _this.add(element);
             });
             return node;
-        }
-        remove(node) {
+        };
+        Hierarchy.prototype.remove = function (node) {
+            var _this = this;
             if (!node)
                 return;
-            node.children.forEach(element => {
-                this.remove(element);
+            node.children.forEach(function (element) {
+                _this.remove(element);
             });
             node.remove();
-        }
-    }
+        };
+        return Hierarchy;
+    }());
     editor.Hierarchy = Hierarchy;
     var nodeMap = new Map();
     editor.hierarchy = new Hierarchy();
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let SceneRotateTool = class SceneRotateTool extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.isload = false;
+    var SceneRotateTool = /** @class */ (function (_super) {
+        __extends(SceneRotateTool, _super);
+        function SceneRotateTool() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isload = false;
+            return _this;
         }
-        get view() { return this._view; }
-        set view(v) { this._view = v; this.load(); }
-        init() {
-            super.init();
+        Object.defineProperty(SceneRotateTool.prototype, "view", {
+            get: function () { return this._view; },
+            set: function (v) { this._view = v; this.load(); },
+            enumerable: false,
+            configurable: true
+        });
+        SceneRotateTool.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.load();
-        }
-        load() {
+        };
+        SceneRotateTool.prototype.load = function () {
+            var _this = this;
             if (!this.view)
                 return;
             if (this.isload)
                 return;
             this.isload = true;
-            feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) => {
+            feng3d.loader.loadText(editor.editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), function (content) {
                 var rotationToolModel = feng3d.serialization.deserialize(JSON.parse(content));
-                this.onLoaded(rotationToolModel);
+                _this.onLoaded(rotationToolModel);
             });
-        }
-        onLoaded(rotationToolModel) {
+        };
+        SceneRotateTool.prototype.onLoaded = function (rotationToolModel) {
+            var _this = this;
             var arrowsX = this.arrowsX = rotationToolModel.find("arrowsX");
             var arrowsY = this.arrowsY = rotationToolModel.find("arrowsY");
             var arrowsZ = this.arrowsZ = rotationToolModel.find("arrowsZ");
@@ -12693,27 +13381,27 @@ var editor;
             var planeNX = rotationToolModel.find("planeNX");
             var planeNY = rotationToolModel.find("planeNY");
             var planeNZ = rotationToolModel.find("planeNZ");
-            var { toolView: toolView, canvas } = this.newView();
+            var _a = this.newView(), toolView = _a.toolView, canvas = _a.canvas;
             toolView.root.addChild(rotationToolModel);
             rotationToolModel.transform.sx = 0.01;
             rotationToolModel.transform.sy = 0.01;
             rotationToolModel.transform.sz = 0.01;
             rotationToolModel.transform.z = 0.80;
             var arr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ, planeX, planeY, planeZ, planeNX, planeNY, planeNZ];
-            arr.forEach(element => {
-                element.on("click", this.onclick, this);
+            arr.forEach(function (element) {
+                element.on("click", _this.onclick, _this);
             });
             var arrowsArr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ];
-            feng3d.ticker.onframe(() => {
-                var rect = this.view.canvas.getBoundingClientRect();
+            feng3d.ticker.onframe(function () {
+                var rect = _this.view.canvas.getBoundingClientRect();
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
-                var rotation = this.view.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
+                var rotation = _this.view.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
                 rotationToolModel.transform.rotation = rotation;
                 //隐藏角度
                 var visibleAngle = Math.cos(15 * Math.DEG2RAD);
                 //隐藏正面箭头
-                arrowsArr.forEach(element => {
+                arrowsArr.forEach(function (element) {
                     if (Math.abs(element.transform.localToWorldMatrix.up.dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
                         element.visible = true;
                     else
@@ -12729,7 +13417,7 @@ var editor;
                     feng3d.shortcut.deactivityState("mouseInSceneRotateTool");
                 }
             });
-            feng3d.windowEventProxy.on("mouseup", (e) => {
+            feng3d.windowEventProxy.on("mouseup", function (e) {
                 var canvasRect = canvas.getBoundingClientRect();
                 var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
                 if (!bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
@@ -12738,40 +13426,46 @@ var editor;
                 if (e.button == 2) {
                     editor.menu.popup([
                         {
-                            label: "右视图", click: () => {
-                                this.clickItem(arrowsX);
+                            label: "右视图",
+                            click: function () {
+                                _this.clickItem(arrowsX);
                             }
                         },
                         {
-                            label: "顶视图", click: () => {
-                                this.clickItem(arrowsY);
+                            label: "顶视图",
+                            click: function () {
+                                _this.clickItem(arrowsY);
                             }
                         },
                         {
-                            label: "前视图", click: () => {
-                                this.clickItem(arrowsZ);
+                            label: "前视图",
+                            click: function () {
+                                _this.clickItem(arrowsZ);
                             }
                         },
                         {
-                            label: "左视图", click: () => {
-                                this.clickItem(arrowsNX);
+                            label: "左视图",
+                            click: function () {
+                                _this.clickItem(arrowsNX);
                             }
                         },
                         {
-                            label: "底视图", click: () => {
-                                this.clickItem(arrowsNY);
+                            label: "底视图",
+                            click: function () {
+                                _this.clickItem(arrowsNY);
                             }
                         },
                         {
-                            label: "后视图", click: () => {
-                                this.clickItem(arrowsNZ);
+                            label: "后视图",
+                            click: function () {
+                                _this.clickItem(arrowsNZ);
                             }
                         },
                     ]);
                 }
             });
-        }
-        newView() {
+        };
+        SceneRotateTool.prototype.newView = function () {
             var canvas = document.createElement("canvas");
             document.getElementById("SceneRotateToolLayer").appendChild(canvas);
             canvas.style.position = "absolute";
@@ -12782,12 +13476,12 @@ var editor;
             toolView.scene.background.a = 0.0;
             toolView.scene.ambientColor.setTo(0.2, 0.2, 0.2);
             toolView.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
-            return { toolView: toolView, canvas };
-        }
-        onclick(e) {
+            return { toolView: toolView, canvas: canvas };
+        };
+        SceneRotateTool.prototype.onclick = function (e) {
             this.clickItem(e.currentTarget);
-        }
-        clickItem(item) {
+        };
+        SceneRotateTool.prototype.clickItem = function (item) {
             var front_view = new feng3d.Vector3(0, 0, 0); //前视图
             var back_view = new feng3d.Vector3(0, 180, 0); //后视图
             var right_view = new feng3d.Vector3(0, 90, 0); //右视图
@@ -12822,8 +13516,8 @@ var editor;
                 feng3d.globalDispatcher.dispatch("editorCameraRotate", result);
                 this.onEditorCameraRotate(result);
             }
-        }
-        onEditorCameraRotate(resultRotation) {
+        };
+        SceneRotateTool.prototype.onEditorCameraRotate = function (resultRotation) {
             var camera = this.view.camera;
             var forward = camera.transform.forwardVector;
             var lookDistance;
@@ -12847,7 +13541,7 @@ var editor;
             sourceQuat.fromEulerAngles(camera.transform.rx * Math.DEG2RAD, camera.transform.ry * Math.DEG2RAD, camera.transform.rz * Math.DEG2RAD);
             var rate = { rate: 0.0 };
             egret.Tween.get(rate, {
-                onChange: () => {
+                onChange: function () {
                     var cameraQuat = sourceQuat.slerpTo(targetQuat, rate.rate);
                     camera.transform.orientation = cameraQuat;
                     //
@@ -12857,11 +13551,12 @@ var editor;
                     camera.transform.position = rotateCenter.addTo(translation);
                 },
             }).to({ rate: 1 }, 300, egret.Ease.sineIn);
-        }
-    };
-    SceneRotateTool = __decorate([
-        feng3d.RegisterComponent()
-    ], SceneRotateTool);
+        };
+        SceneRotateTool = __decorate([
+            feng3d.RegisterComponent()
+        ], SceneRotateTool);
+        return SceneRotateTool;
+    }(feng3d.Component));
     editor.SceneRotateTool = SceneRotateTool;
 })(editor || (editor = {}));
 var editor;
@@ -12869,34 +13564,40 @@ var editor;
     /**
      * 地面网格
      */
-    let GroundGrid = class GroundGrid extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.num = 100;
+    var GroundGrid = /** @class */ (function (_super) {
+        __extends(GroundGrid, _super);
+        function GroundGrid() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.num = 100;
+            return _this;
         }
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) {
-            if (this._editorCamera == v)
-                return;
-            if (this._editorCamera) {
-                this._editorCamera.transform.off("transformChanged", this.update, this);
-            }
-            this._editorCamera = v;
-            if (this._editorCamera) {
-                this._editorCamera.transform.on("transformChanged", this.update, this);
-                this.update();
-            }
-        }
-        init() {
-            super.init();
+        Object.defineProperty(GroundGrid.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) {
+                if (this._editorCamera == v)
+                    return;
+                if (this._editorCamera) {
+                    this._editorCamera.transform.off("transformChanged", this.update, this);
+                }
+                this._editorCamera = v;
+                if (this._editorCamera) {
+                    this._editorCamera.transform.on("transformChanged", this.update, this);
+                    this.update();
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        GroundGrid.prototype.init = function () {
+            _super.prototype.init.call(this);
             var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
             groundGridObject.mouseEnabled = false;
             this._gameObject.addChild(groundGridObject);
             var model = groundGridObject.addComponent("Renderable");
             this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
             model.material = feng3d.Material.getDefault("Segment-Material");
-        }
-        update() {
+        };
+        GroundGrid.prototype.update = function () {
             if (!this.editorCamera)
                 return;
             var cameraGlobalPosition = this.editorCamera.transform.worldPosition;
@@ -12921,27 +13622,31 @@ var editor;
                 segments.push({ start: new feng3d.Vector3(i * step + startX, 0, -halfNum * step + startZ), end: new feng3d.Vector3(i * step + startX, 0, halfNum * step + startZ), startColor: color, endColor: color });
             }
             this.segmentGeometry.segments = segments;
-        }
-    };
-    __decorate([
-        feng3d.oav()
-    ], GroundGrid.prototype, "num", void 0);
-    GroundGrid = __decorate([
-        feng3d.RegisterComponent()
-    ], GroundGrid);
+        };
+        __decorate([
+            feng3d.oav()
+        ], GroundGrid.prototype, "num", void 0);
+        GroundGrid = __decorate([
+            feng3d.RegisterComponent()
+        ], GroundGrid);
+        return GroundGrid;
+    }(feng3d.Component));
     editor.GroundGrid = GroundGrid;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class EditorView extends feng3d.View {
-        constructor() {
-            super(...arguments);
-            this.wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
+    var EditorView = /** @class */ (function (_super) {
+        __extends(EditorView, _super);
+        function EditorView() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
+            return _this;
         }
         /**
          * 绘制场景
          */
-        render() {
+        EditorView.prototype.render = function () {
+            var _this = this;
             if (editor.editorData.gameScene != this.scene) {
                 if (this.scene) {
                     this.scene.runEnvironment = feng3d.RunEnvironment.feng3d;
@@ -12956,7 +13661,7 @@ var editor;
                 this.editorComponent.scene = this.scene;
                 this.editorComponent.editorCamera = this.camera;
             }
-            super.render();
+            _super.prototype.render.call(this);
             if (this.contextLost)
                 return;
             if (this.editorScene) {
@@ -12970,92 +13675,107 @@ var editor;
                     this.selectedObject = selectedObject;
             }
             if (this.scene) {
-                editor.editorData.selectedGameObjects.forEach(element => {
+                editor.editorData.selectedGameObjects.forEach(function (element) {
                     if (element.getComponent("Renderable") && !element.getComponent("ParticleSystem"))
-                        feng3d.wireframeRenderer.drawGameObject(this.gl, element.getComponent("Renderable"), this.scene, this.camera, this.wireframeColor);
+                        feng3d.wireframeRenderer.drawGameObject(_this.gl, element.getComponent("Renderable"), _this.scene, _this.camera, _this.wireframeColor);
                 });
             }
-        }
-    }
+        };
+        return EditorView;
+    }(feng3d.View));
     editor.EditorView = EditorView;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let EditorComponent = class EditorComponent extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.directionLightIconMap = new Map();
-            this.pointLightIconMap = new Map();
-            this.spotLightIconMap = new Map();
-            this.cameraIconMap = new Map();
+    var EditorComponent = /** @class */ (function (_super) {
+        __extends(EditorComponent, _super);
+        function EditorComponent() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.directionLightIconMap = new Map();
+            _this.pointLightIconMap = new Map();
+            _this.spotLightIconMap = new Map();
+            _this.cameraIconMap = new Map();
+            return _this;
         }
-        get scene() {
-            return this._scene;
-        }
-        set scene(v) {
-            if (this._scene == v)
-                return;
-            if (this._scene) {
-                this.scene.off("addComponent", this.onAddComponent, this);
-                this.scene.off("removeComponent", this.onRemoveComponent, this);
-                this.scene.getComponentsInChildren("Component").forEach(element => {
-                    this.removeComponent(element);
-                });
-            }
-            this._scene = v;
-            if (this._scene) {
-                this.scene.getComponentsInChildren("Component").forEach(element => {
-                    this.addComponent(element);
-                });
-                this.scene.on("addComponent", this.onAddComponent, this);
-                this.scene.on("removeComponent", this.onRemoveComponent, this);
-                this.scene.on("addChild", this.onAddChild, this);
-                this.scene.on("removeChild", this.onRemoveChild, this);
-            }
-        }
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { if (this._editorCamera == v)
-            return; this._editorCamera = v; this.update(); }
+        Object.defineProperty(EditorComponent.prototype, "scene", {
+            get: function () {
+                return this._scene;
+            },
+            set: function (v) {
+                var _this = this;
+                if (this._scene == v)
+                    return;
+                if (this._scene) {
+                    this.scene.off("addComponent", this.onAddComponent, this);
+                    this.scene.off("removeComponent", this.onRemoveComponent, this);
+                    this.scene.getComponentsInChildren("Component").forEach(function (element) {
+                        _this.removeComponent(element);
+                    });
+                }
+                this._scene = v;
+                if (this._scene) {
+                    this.scene.getComponentsInChildren("Component").forEach(function (element) {
+                        _this.addComponent(element);
+                    });
+                    this.scene.on("addComponent", this.onAddComponent, this);
+                    this.scene.on("removeComponent", this.onRemoveComponent, this);
+                    this.scene.on("addChild", this.onAddChild, this);
+                    this.scene.on("removeChild", this.onRemoveChild, this);
+                }
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(EditorComponent.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { if (this._editorCamera == v)
+                return; this._editorCamera = v; this.update(); },
+            enumerable: false,
+            configurable: true
+        });
         /**
          * 销毁
          */
-        dispose() {
+        EditorComponent.prototype.dispose = function () {
             this.scene = null;
-            super.dispose();
-        }
-        onAddChild(event) {
+            _super.prototype.dispose.call(this);
+        };
+        EditorComponent.prototype.onAddChild = function (event) {
+            var _this = this;
             var components = event.data.child.getComponentsInChildren();
-            components.forEach(v => {
-                this.addComponent(v);
+            components.forEach(function (v) {
+                _this.addComponent(v);
             });
-        }
-        onRemoveChild(event) {
+        };
+        EditorComponent.prototype.onRemoveChild = function (event) {
+            var _this = this;
             var components = event.data.child.getComponentsInChildren();
-            components.forEach(v => {
-                this.removeComponent(v);
+            components.forEach(function (v) {
+                _this.removeComponent(v);
             });
-        }
-        onAddComponent(event) {
+        };
+        EditorComponent.prototype.onAddComponent = function (event) {
             this.addComponent(event.data.component);
-        }
-        onRemoveComponent(event) {
+        };
+        EditorComponent.prototype.onRemoveComponent = function (event) {
             this.removeComponent(event.data.component);
-        }
-        update() {
-            this.directionLightIconMap.forEach(v => {
-                v.editorCamera = this.editorCamera;
+        };
+        EditorComponent.prototype.update = function () {
+            var _this = this;
+            this.directionLightIconMap.forEach(function (v) {
+                v.editorCamera = _this.editorCamera;
             });
-            this.pointLightIconMap.forEach(v => {
-                v.editorCamera = this.editorCamera;
+            this.pointLightIconMap.forEach(function (v) {
+                v.editorCamera = _this.editorCamera;
             });
-            this.spotLightIconMap.forEach(v => {
-                v.editorCamera = this.editorCamera;
+            this.spotLightIconMap.forEach(function (v) {
+                v.editorCamera = _this.editorCamera;
             });
-            this.cameraIconMap.forEach(v => {
-                v.editorCamera = this.editorCamera;
+            this.cameraIconMap.forEach(function (v) {
+                v.editorCamera = _this.editorCamera;
             });
-        }
-        addComponent(component) {
+        };
+        EditorComponent.prototype.addComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
                 var directionLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent("DirectionLightIcon"), { light: component, editorCamera: this.editorCamera });
                 this.gameObject.addChild(directionLightIcon.gameObject);
@@ -13076,8 +13796,8 @@ var editor;
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }
-        }
-        removeComponent(component) {
+        };
+        EditorComponent.prototype.removeComponent = function (component) {
             if (component instanceof feng3d.DirectionalLight) {
                 feng3d.serialization.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
                 this.directionLightIconMap.delete(component);
@@ -13094,11 +13814,12 @@ var editor;
                 feng3d.serialization.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
                 this.cameraIconMap.delete(component);
             }
-        }
-    };
-    EditorComponent = __decorate([
-        feng3d.RegisterComponent()
-    ], EditorComponent);
+        };
+        EditorComponent = __decorate([
+            feng3d.RegisterComponent()
+        ], EditorComponent);
+        return EditorComponent;
+    }(feng3d.Component));
     editor.EditorComponent = EditorComponent;
 })(editor || (editor = {}));
 var editor;
@@ -13106,8 +13827,8 @@ var editor;
     /**
      * feng3d预览图工具
      */
-    class Feng3dScreenShot {
-        constructor() {
+    var Feng3dScreenShot = /** @class */ (function () {
+        function Feng3dScreenShot() {
             this.defaultGeometry = feng3d.Geometry.getDefault("Sphere");
             this.defaultMaterial = feng3d.Material.getDefault("Default-Material");
             this.materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshRenderer" }] });
@@ -13138,7 +13859,7 @@ var editor;
          * 绘制贴图
          * @param texture 贴图
          */
-        drawTexture(texture) {
+        Feng3dScreenShot.prototype.drawTexture = function (texture) {
             var image = texture.activePixels;
             var w = 64;
             var h = 64;
@@ -13156,12 +13877,12 @@ var editor;
             //
             var dataUrl = canvas2D.toDataURL();
             return dataUrl;
-        }
+        };
         /**
          * 绘制立方体贴图
          * @param textureCube 立方体贴图
          */
-        drawTextureCube(textureCube) {
+        Feng3dScreenShot.prototype.drawTextureCube = function (textureCube) {
             var pixels = textureCube["_pixels"];
             var canvas2D = document.createElement("canvas");
             var width = 64;
@@ -13217,12 +13938,13 @@ var editor;
             //
             var dataUrl = canvas2D.toDataURL();
             return dataUrl;
-        }
+        };
         /**
          * 绘制材质
          * @param material 材质
          */
-        drawMaterial(material, cameraRotation = new feng3d.Vector3(20, -90, 0)) {
+        Feng3dScreenShot.prototype.drawMaterial = function (material, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(20, -90, 0); }
             var mode = this.materialObject.getComponent("Renderable");
             mode.geometry = this.defaultGeometry;
             mode.material = material;
@@ -13230,38 +13952,42 @@ var editor;
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
             this._drawGameObject(this.materialObject);
             return this;
-        }
+        };
         /**
          * 绘制材质
          * @param geometry 材质
          */
-        drawGeometry(geometry, cameraRotation = new feng3d.Vector3(-20, 120, 0)) {
+        Feng3dScreenShot.prototype.drawGeometry = function (geometry, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(-20, 120, 0); }
             var model = this.geometryObject.getComponent("Renderable");
             model.geometry = geometry;
             model.material = this.defaultMaterial;
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
             this._drawGameObject(this.geometryObject);
             return this;
-        }
+        };
         /**
          * 绘制游戏对象
          * @param gameObject 游戏对象
          */
-        drawGameObject(gameObject, cameraRotation = new feng3d.Vector3(20, -120, 0)) {
+        Feng3dScreenShot.prototype.drawGameObject = function (gameObject, cameraRotation) {
+            if (cameraRotation === void 0) { cameraRotation = new feng3d.Vector3(20, -120, 0); }
             cameraRotation && (this.camera.transform.rotation = cameraRotation);
             this._drawGameObject(gameObject);
             return this;
-        }
+        };
         /**
          * 转换为DataURL
          */
-        toDataURL(width = 64, height = 64) {
+        Feng3dScreenShot.prototype.toDataURL = function (width, height) {
+            if (width === void 0) { width = 64; }
+            if (height === void 0) { height = 64; }
             this.view.setSize(width, height);
             this.view.render();
             var dataUrl = this.view.canvas.toDataURL();
             return dataUrl;
-        }
-        updateCameraPosition(gameObject) {
+        };
+        Feng3dScreenShot.prototype.updateCameraPosition = function (gameObject) {
             //
             var bounds = gameObject.worldBounds;
             var scenePosition = bounds.getCenter();
@@ -13281,15 +14007,16 @@ var editor;
                 localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
             }
             this.camera.transform.position = localLookPos;
-        }
-        _drawGameObject(gameObject) {
+        };
+        Feng3dScreenShot.prototype._drawGameObject = function (gameObject) {
             this.container.removeChildren();
             //
             this.container.addChild(gameObject);
             //
             this.updateCameraPosition(gameObject);
-        }
-    }
+        };
+        return Feng3dScreenShot;
+    }());
     editor.Feng3dScreenShot = Feng3dScreenShot;
     editor.feng3dScreenShot = new Feng3dScreenShot();
 })(editor || (editor = {}));
@@ -13298,8 +14025,8 @@ var editor;
     /**
      * 导航代理
      */
-    class NavigationAgent {
-        constructor() {
+    var NavigationAgent = /** @class */ (function () {
+        function NavigationAgent() {
             /**
              * 距离边缘半径
              */
@@ -13317,30 +14044,33 @@ var editor;
              */
             this.maxSlope = 45; //[0,60]
         }
-    }
-    __decorate([
-        feng3d.oav()
-    ], NavigationAgent.prototype, "radius", void 0);
-    __decorate([
-        feng3d.oav()
-    ], NavigationAgent.prototype, "height", void 0);
-    __decorate([
-        feng3d.oav()
-    ], NavigationAgent.prototype, "stepHeight", void 0);
-    __decorate([
-        feng3d.oav()
-    ], NavigationAgent.prototype, "maxSlope", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "radius", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "stepHeight", void 0);
+        __decorate([
+            feng3d.oav()
+        ], NavigationAgent.prototype, "maxSlope", void 0);
+        return NavigationAgent;
+    }());
     editor.NavigationAgent = NavigationAgent;
     /**
      * 导航组件，提供生成导航网格功能
      */
-    let Navigation = class Navigation extends feng3d.Component {
-        constructor() {
-            super(...arguments);
-            this.agent = new NavigationAgent();
+    var Navigation = /** @class */ (function (_super) {
+        __extends(Navigation, _super);
+        function Navigation() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.agent = new NavigationAgent();
+            return _this;
         }
-        init() {
-            super.init();
+        Navigation.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
             this._navobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
             var pointsObject = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -13370,17 +14100,17 @@ var editor;
                     },]
             });
             this._navobject.addChild(pointsObject);
-        }
+        };
         /**
          * 清楚oav网格模型
          */
-        clear() {
+        Navigation.prototype.clear = function () {
             this._navobject && this._navobject.remove();
-        }
+        };
         /**
          * 计算导航网格数据
          */
-        bake() {
+        Navigation.prototype.bake = function () {
             var geometrys = this._getNavGeometrys(this.gameObject.scene.gameObject);
             if (geometrys.length == 0) {
                 this._navobject && this._navobject.remove();
@@ -13392,19 +14122,20 @@ var editor;
             this._recastnavigation = this._recastnavigation || new editor.Recastnavigation();
             this._recastnavigation.doRecastnavigation(geometry, this.agent);
             var voxels = this._recastnavigation.getVoxels();
-            var voxels0 = voxels.filter(v => v.flag == editor.VoxelFlag.Default);
-            var voxels1 = voxels.filter(v => v.flag != editor.VoxelFlag.Default);
-            var voxels2 = voxels.filter(v => !!(v.flag & editor.VoxelFlag.IsContour));
-            this._allowedVoxelsPointGeometry.points = voxels0.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
-            this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
+            var voxels0 = voxels.filter(function (v) { return v.flag == editor.VoxelFlag.Default; });
+            var voxels1 = voxels.filter(function (v) { return v.flag != editor.VoxelFlag.Default; });
+            var voxels2 = voxels.filter(function (v) { return !!(v.flag & editor.VoxelFlag.IsContour); });
+            this._allowedVoxelsPointGeometry.points = voxels0.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
+            this._rejectivedVoxelsPointGeometry.points = voxels1.map(function (v) { return { position: new feng3d.Vector3(v.x, v.y, v.z) }; });
             // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
-        }
+        };
         /**
          * 获取参与导航的几何体列表
          * @param gameobject
          * @param geometrys
          */
-        _getNavGeometrys(gameobject, geometrys) {
+        Navigation.prototype._getNavGeometrys = function (gameobject, geometrys) {
+            var _this = this;
             geometrys = geometrys || [];
             if (!gameobject.visible)
                 return geometrys;
@@ -13418,25 +14149,26 @@ var editor;
                 //
                 geometrys.push({ positions: positions, indices: indices });
             }
-            gameobject.children.forEach(element => {
-                this._getNavGeometrys(element, geometrys);
+            gameobject.children.forEach(function (element) {
+                _this._getNavGeometrys(element, geometrys);
             });
             return geometrys;
-        }
-    };
-    __decorate([
-        feng3d.oav({ component: "OAVObjectView" })
-    ], Navigation.prototype, "agent", void 0);
-    __decorate([
-        feng3d.oav()
-    ], Navigation.prototype, "clear", null);
-    __decorate([
-        feng3d.oav()
-    ], Navigation.prototype, "bake", null);
-    Navigation = __decorate([
-        feng3d.AddComponentMenu("Navigation/Navigation"),
-        feng3d.RegisterComponent()
-    ], Navigation);
+        };
+        __decorate([
+            feng3d.oav({ component: "OAVObjectView" })
+        ], Navigation.prototype, "agent", void 0);
+        __decorate([
+            feng3d.oav()
+        ], Navigation.prototype, "clear", null);
+        __decorate([
+            feng3d.oav()
+        ], Navigation.prototype, "bake", null);
+        Navigation = __decorate([
+            feng3d.AddComponentMenu("Navigation/Navigation"),
+            feng3d.RegisterComponent()
+        ], Navigation);
+        return Navigation;
+    }(feng3d.Component));
     editor.Navigation = Navigation;
 })(editor || (editor = {}));
 // see https://github.com/sshirokov/ThreeBSP
@@ -13463,8 +14195,8 @@ var feng3d;
      * 横跨
      */
     var SPANNING = 3;
-    class ThreeBSP {
-        constructor(geometry) {
+    var ThreeBSP = /** @class */ (function () {
+        function ThreeBSP(geometry) {
             if (geometry instanceof ThreeBSPNode) {
                 this.tree = geometry;
             }
@@ -13472,49 +14204,50 @@ var feng3d;
                 this.tree = new ThreeBSPNode(geometry);
             }
         }
-        toGeometry() {
+        ThreeBSP.prototype.toGeometry = function () {
             var data = this.tree.getGeometryData();
             return data;
-        }
+        };
         /**
          * 相减
          * @param other
          */
-        subtract(other) {
+        ThreeBSP.prototype.subtract = function (other) {
             var them = other.tree.clone(), us = this.tree.clone();
             us.invert().clipTo(them);
             them.clipTo(us).invert().clipTo(us).invert();
             return new ThreeBSP(us.build(them.allPolygons()).invert());
-        }
+        };
         ;
         /**
          * 相加
          * @param other
          */
-        union(other) {
+        ThreeBSP.prototype.union = function (other) {
             var them = other.tree.clone(), us = this.tree.clone();
             us.clipTo(them);
             them.clipTo(us).invert().clipTo(us).invert();
             return new ThreeBSP(us.build(them.allPolygons()));
-        }
+        };
         ;
         /**
          * 相交
          * @param other
          */
-        intersect(other) {
+        ThreeBSP.prototype.intersect = function (other) {
             var them = other.tree.clone(), us = this.tree.clone();
             them.clipTo(us.invert()).invert().clipTo(us.clipTo(them));
             return new ThreeBSP(us.build(them.allPolygons()).invert());
-        }
+        };
         ;
-    }
+        return ThreeBSP;
+    }());
     feng3d.ThreeBSP = ThreeBSP;
     /**
      * 顶点
      */
-    class ThreeBSPVertex {
-        constructor(position, normal, uv) {
+    var ThreeBSPVertex = /** @class */ (function () {
+        function ThreeBSPVertex(position, normal, uv) {
             this.position = position;
             this.normal = normal || new feng3d.Vector3();
             this.uv = uv || new feng3d.Vector2();
@@ -13522,33 +14255,34 @@ var feng3d;
         /**
          * 克隆
          */
-        clone() {
+        ThreeBSPVertex.prototype.clone = function () {
             return new ThreeBSPVertex(this.position.clone(), this.normal.clone(), this.uv.clone());
-        }
+        };
         ;
         /**
          *
          * @param v 线性插值
          * @param alpha
          */
-        lerp(v, alpha) {
+        ThreeBSPVertex.prototype.lerp = function (v, alpha) {
             this.position.lerpNumber(v.position, alpha);
             this.uv.lerpNumber(v.uv, alpha);
             this.normal.lerpNumber(v.position, alpha);
             return this;
-        }
+        };
         ;
-        interpolate(v, alpha) {
+        ThreeBSPVertex.prototype.interpolate = function (v, alpha) {
             return this.clone().lerp(v, alpha);
-        }
+        };
         ;
-    }
+        return ThreeBSPVertex;
+    }());
     feng3d.ThreeBSPVertex = ThreeBSPVertex;
     /**
      * 多边形
      */
-    class ThreeBSPPolygon {
-        constructor(vertices) {
+    var ThreeBSPPolygon = /** @class */ (function () {
+        function ThreeBSPPolygon(vertices) {
             this.vertices = vertices || [];
             if (this.vertices.length) {
                 this.calculateProperties();
@@ -13558,7 +14292,7 @@ var feng3d;
          * 获取多边形几何体数据
          * @param data
          */
-        getGeometryData(data) {
+        ThreeBSPPolygon.prototype.getGeometryData = function (data) {
             data = data || { positions: [], uvs: [], normals: [] };
             var vertices = data.positions = data.positions || [];
             var uvs = data.uvs = data.uvs || [];
@@ -13570,55 +14304,56 @@ var feng3d;
                 normals.push(this.normal.x, this.normal.y, this.normal.z, this.normal.x, this.normal.y, this.normal.z, this.normal.x, this.normal.y, this.normal.z);
             }
             return data;
-        }
+        };
         /**
          * 计算法线与w值
          */
-        calculateProperties() {
+        ThreeBSPPolygon.prototype.calculateProperties = function () {
             var a = this.vertices[0].position, b = this.vertices[1].position, c = this.vertices[2].position;
             this.normal = b.clone().subTo(a).crossTo(c.clone().subTo(a)).normalize();
             this.w = this.normal.clone().dot(a);
             return this;
-        }
+        };
         ;
         /**
          * 克隆
          */
-        clone() {
-            var vertices = this.vertices.map((v) => { return v.clone(); });
+        ThreeBSPPolygon.prototype.clone = function () {
+            var vertices = this.vertices.map(function (v) { return v.clone(); });
             return new ThreeBSPPolygon(vertices);
-        }
+        };
         ;
         /**
          * 翻转多边形
          */
-        invert() {
+        ThreeBSPPolygon.prototype.invert = function () {
             this.normal.scaleNumber(-1);
             this.w *= -1;
             this.vertices.reverse();
             return this;
-        }
+        };
         ;
         /**
          * 获取顶点与多边形所在平面相对位置
          * @param vertex
          */
-        classifyVertex(vertex) {
+        ThreeBSPPolygon.prototype.classifyVertex = function (vertex) {
             var side = this.normal.dot(vertex.position) - this.w;
             if (side < -EPSILON)
                 return BACK;
             if (side > EPSILON)
                 return FRONT;
             return COPLANAR;
-        }
+        };
         /**
          * 计算与另外一个多边形的相对位置
          * @param polygon
          */
-        classifySide(polygon) {
+        ThreeBSPPolygon.prototype.classifySide = function (polygon) {
+            var _this = this;
             var front = 0, back = 0;
-            polygon.vertices.forEach(v => {
-                var side = this.classifyVertex(v);
+            polygon.vertices.forEach(function (v) {
+                var side = _this.classifyVertex(v);
                 if (side == FRONT)
                     front += 1;
                 else if (side == BACK)
@@ -13634,12 +14369,13 @@ var feng3d;
                 return COPLANAR;
             }
             return SPANNING;
-        }
+        };
         /**
          * 切割多边形
          * @param poly
          */
-        tessellate(poly) {
+        ThreeBSPPolygon.prototype.tessellate = function (poly) {
+            var _this = this;
             if (this.classifySide(poly) !== SPANNING) {
                 return [poly];
             }
@@ -13647,11 +14383,11 @@ var feng3d;
             var b = [];
             var count = poly.vertices.length;
             //切割多边形的每条边
-            poly.vertices.forEach((item, i) => {
+            poly.vertices.forEach(function (item, i) {
                 var vi = poly.vertices[i];
                 var vj = poly.vertices[(i + 1) % count];
-                var ti = this.classifyVertex(vi);
-                var tj = this.classifyVertex(vj);
+                var ti = _this.classifyVertex(vi);
+                var tj = _this.classifyVertex(vj);
                 if (ti !== BACK) {
                     f.push(vi);
                 }
@@ -13660,7 +14396,7 @@ var feng3d;
                 }
                 // 切割横跨多边形的边
                 if ((ti | tj) === SPANNING) {
-                    var t = (this.w - this.normal.dot(vi.position)) / this.normal.dot(vj.clone().position.subTo(vi.position));
+                    var t = (_this.w - _this.normal.dot(vi.position)) / _this.normal.dot(vj.clone().position.subTo(vi.position));
                     var v = vi.interpolate(vj, t);
                     f.push(v);
                     b.push(v);
@@ -13675,7 +14411,7 @@ var feng3d;
                 polys.push(new ThreeBSPPolygon(b));
             }
             return polys;
-        }
+        };
         /**
          * 切割多边形并进行分类
          * @param polygon 被切割多边形
@@ -13684,9 +14420,10 @@ var feng3d;
          * @param front 多边形在正面
          * @param back 多边形在反面
          */
-        subdivide(polygon, coplanar_front, coplanar_back, front, back) {
-            this.tessellate(polygon).forEach(poly => {
-                var side = this.classifySide(poly);
+        ThreeBSPPolygon.prototype.subdivide = function (polygon, coplanar_front, coplanar_back, front, back) {
+            var _this = this;
+            this.tessellate(polygon).forEach(function (poly) {
+                var side = _this.classifySide(poly);
                 switch (side) {
                     case FRONT:
                         front.push(poly);
@@ -13695,7 +14432,7 @@ var feng3d;
                         back.push(poly);
                         break;
                     case COPLANAR:
-                        if (this.normal.dot(poly.normal) > 0) {
+                        if (_this.normal.dot(poly.normal) > 0) {
                             coplanar_front.push(poly);
                         }
                         else {
@@ -13706,15 +14443,16 @@ var feng3d;
                         throw new Error("BUG: Polygon of classification " + side + " in subdivision");
                 }
             });
-        }
+        };
         ;
-    }
+        return ThreeBSPPolygon;
+    }());
     feng3d.ThreeBSPPolygon = ThreeBSPPolygon;
     /**
      * 结点
      */
-    class ThreeBSPNode {
-        constructor(data) {
+    var ThreeBSPNode = /** @class */ (function () {
+        function ThreeBSPNode(data) {
             this.polygons = [];
             if (!data)
                 return;
@@ -13724,7 +14462,7 @@ var feng3d;
             var indices = data.indices;
             // 初始化多边形
             var polygons = [];
-            for (let i = 0, n = indices.length; i < n; i += 3) {
+            for (var i = 0, n = indices.length; i < n; i += 3) {
                 var polygon = new ThreeBSPPolygon();
                 var i0 = indices[i];
                 var i1 = indices[i + 1];
@@ -13744,44 +14482,45 @@ var feng3d;
         /**
          * 获取几何体数据
          */
-        getGeometryData() {
+        ThreeBSPNode.prototype.getGeometryData = function () {
             var data = { positions: [], uvs: [], normals: [], indices: [] };
             var polygons = this.allPolygons();
-            polygons.forEach(polygon => {
+            polygons.forEach(function (polygon) {
                 polygon.getGeometryData(data);
             });
-            for (let i = 0, indices = data.indices, n = data.positions.length / 3; i < n; i++) {
+            for (var i = 0, indices = data.indices, n = data.positions.length / 3; i < n; i++) {
                 indices.push(i);
             }
             return data;
-        }
+        };
         /**
          * 克隆
          */
-        clone() {
+        ThreeBSPNode.prototype.clone = function () {
             var node = new ThreeBSPNode();
             node.divider = this.divider && this.divider.clone();
-            node.polygons = this.polygons.map(element => {
+            node.polygons = this.polygons.map(function (element) {
                 return element.clone();
             });
             node.front = this.front && this.front.clone();
             node.back = this.back && this.back.clone();
             return node;
-        }
+        };
         ;
         /**
          * 构建树结点
          * @param polygons 多边形列表
          */
-        build(polygons) {
+        ThreeBSPNode.prototype.build = function (polygons) {
+            var _this = this;
             // 以第一个多边形为切割面
             if (this.divider == null) {
                 this.divider = polygons[0].clone();
             }
             var front = [], back = [];
             //进行切割并分类
-            polygons.forEach(poly => {
-                this.divider.subdivide(poly, this.polygons, this.polygons, front, back);
+            polygons.forEach(function (poly) {
+                _this.divider.subdivide(poly, _this.polygons, _this.polygons, front, back);
             });
             // 继续切割平面前的多边形
             if (front.length > 0) {
@@ -13794,15 +14533,15 @@ var feng3d;
                 this.back.build(back);
             }
             return this;
-        }
+        };
         ;
         /**
          * 判定是否为凸面体
          * @param polys
          */
-        isConvex(polys) {
-            polys.every(inner => {
-                return polys.every(outer => {
+        ThreeBSPNode.prototype.isConvex = function (polys) {
+            polys.every(function (inner) {
+                return polys.every(function (outer) {
                     if (inner !== outer && outer.classifySide(inner) !== BACK) {
                         return false;
                     }
@@ -13810,23 +14549,23 @@ var feng3d;
                 });
             });
             return true;
-        }
+        };
         ;
         /**
          * 所有多边形
          */
-        allPolygons() {
+        ThreeBSPNode.prototype.allPolygons = function () {
             var front = (this.front && this.front.allPolygons()) || [];
             var back = (this.back && this.back.allPolygons()) || [];
             var polygons = this.polygons.slice().concat(front).concat(back);
             return polygons;
-        }
+        };
         ;
         /**
          * 翻转
          */
-        invert() {
-            this.polygons.forEach(poly => {
+        ThreeBSPNode.prototype.invert = function () {
+            this.polygons.forEach(function (poly) {
                 poly.invert();
             });
             this.divider && this.divider.invert();
@@ -13836,20 +14575,21 @@ var feng3d;
             this.back = this.front;
             this.front = temp;
             return this;
-        }
+        };
         ;
         /**
          * 裁剪多边形
          * @param polygons
          */
-        clipPolygons(polygons) {
+        ThreeBSPNode.prototype.clipPolygons = function (polygons) {
+            var _this = this;
             if (!this.divider) {
                 return polygons.slice();
             }
             var front = [];
             var back = [];
-            polygons.forEach(polygon => {
-                this.divider.subdivide(polygon, front, back, front, back);
+            polygons.forEach(function (polygon) {
+                _this.divider.subdivide(polygon, front, back, front, back);
             });
             if (this.front) {
                 front = this.front.clipPolygons(front);
@@ -13861,38 +14601,40 @@ var feng3d;
                 return front.concat(back);
             }
             return front;
-        }
+        };
         ;
-        clipTo(node) {
+        ThreeBSPNode.prototype.clipTo = function (node) {
             this.polygons = node.clipPolygons(this.polygons);
             this.front && this.front.clipTo(node);
             this.back && this.back.clipTo(node);
             return this;
-        }
+        };
         ;
-    }
+        return ThreeBSPNode;
+    }());
     feng3d.ThreeBSPNode = ThreeBSPNode;
 })(feng3d || (feng3d = {}));
 var navigation;
 (function (navigation) {
-    class NavigationProcess {
-        constructor(geometry) {
+    var NavigationProcess = /** @class */ (function () {
+        function NavigationProcess(geometry) {
             this.data = new NavigationData();
             this.data.init(geometry);
         }
-        checkMaxSlope(maxSlope) {
+        NavigationProcess.prototype.checkMaxSlope = function (maxSlope) {
+            var _this = this;
             var up = new feng3d.Vector3(0, 1, 0);
             var mincos = Math.cos(maxSlope * Math.DEG2RAD);
             var keys = Map.getKeys(this.data.trianglemap);
-            keys.forEach(element => {
-                var normal = this.data.trianglemap.get(element).getNormal();
+            keys.forEach(function (element) {
+                var normal = _this.data.trianglemap.get(element).getNormal();
                 var dot = normal.dot(up);
                 if (dot < mincos) {
-                    this.data.trianglemap.delete(element);
+                    _this.data.trianglemap.delete(element);
                 }
             });
-        }
-        checkAgentRadius(agentRadius) {
+        };
+        NavigationProcess.prototype.checkAgentRadius = function (agentRadius) {
             var trianglemap = this.data.trianglemap;
             var linemap = this.data.linemap;
             var pointmap = this.data.pointmap;
@@ -13909,7 +14651,7 @@ var navigation;
             // pointmap.getValues().forEach(handlePoint);
             // 方案2：遍历所有边缘边，把所有在边缘边左边角内的点移到左边角平分线上，所有在边缘边右边角内的移到右边角平分线上，
             line0s.forEach(handleLine0);
-            trianglemap.forEach(triangle => {
+            trianglemap.forEach(function (triangle) {
                 if (triangle.getNormal().dot(new feng3d.Vector3(0, 1, 0)) < 0)
                     trianglemap.delete(triangle.index);
             }); //删除面向-y方向的三角形
@@ -13928,10 +14670,10 @@ var navigation;
                 var cd = line0.direction;
                 var rd = line0map.get(line0.rightline).direction;
                 // 顶点坐标
-                var p0 = [ls.p0, ls.p1].filter((p) => { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
-                var p1 = [ls.p0, ls.p1].filter((p) => { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
-                var p2 = [rs.p0, rs.p1].filter((p) => { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
-                var p3 = [rs.p0, rs.p1].filter((p) => { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
+                var p0 = [ls.p0, ls.p1].filter(function (p) { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
+                var p1 = [ls.p0, ls.p1].filter(function (p) { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
+                var p2 = [rs.p0, rs.p1].filter(function (p) { return cs.p0.equals(p) || cs.p1.equals(p); })[0];
+                var p3 = [rs.p0, rs.p1].filter(function (p) { return !cs.p0.equals(p) && !cs.p1.equals(p); })[0];
                 // 角平分线上点坐标
                 var lp = getHalfAnglePoint(p1, ld, cd, agentRadius);
                 var rp = getHalfAnglePoint(p2, cd, rd, agentRadius);
@@ -13967,7 +14709,7 @@ var navigation;
                         //标记该点以被处理
                         hpmap[point.index] = true;
                         // 搜索临近点
-                        point.getNearbyPoints().forEach((p) => {
+                        point.getNearbyPoints().forEach(function (p) {
                             if (hpmap[p])
                                 return;
                             if (points.indexOf(p) != -1)
@@ -13998,7 +14740,7 @@ var navigation;
              */
             function handlePoint(point) {
                 var p = point.getPoint();
-                var crossline0s = line0s.reduce((result, line0) => {
+                var crossline0s = line0s.reduce(function (result, line0) {
                     var distance = line0.segment.getPointDistance(p);
                     if (distance < agentRadius) {
                         result.push([line0, distance]);
@@ -14013,14 +14755,14 @@ var navigation;
                 else {
                     //如果多于两条线段，取距离最近两条
                     if (crossline0s.length > 2) {
-                        crossline0s.sort((a, b) => { return a[1] - b[1]; });
+                        crossline0s.sort(function (a, b) { return a[1] - b[1]; });
                     }
                     //对角线方向
                     var djx = crossline0s[0][0].direction.addTo(crossline0s[1][0].direction).normalize();
                     //查找两条线段的共同点
                     var points0 = linemap.get(crossline0s[0][0].index).points;
                     var points1 = linemap.get(crossline0s[1][0].index).points;
-                    var ps = points0.filter((v) => { return points1.indexOf(v) != -1; });
+                    var ps = points0.filter(function (v) { return points1.indexOf(v) != -1; });
                     if (ps.length == 1) {
                         var cross = pointmap.get(ps[0]).getPoint();
                         var cos = djx.dot(crossline0s[0][0].segment.p1.subTo(crossline0s[0][0].segment.p0).normalize());
@@ -14041,29 +14783,29 @@ var navigation;
             function createLine0(line) {
                 var line0 = new Line0();
                 line0.index = line.index;
-                var points = line.points.map((v) => { var point = pointmap.get(v); return new feng3d.Vector3(point.value[0], point.value[1], point.value[2]); });
+                var points = line.points.map(function (v) { var point = pointmap.get(v); return new feng3d.Vector3(point.value[0], point.value[1], point.value[2]); });
                 line0.segment = new feng3d.Segment3(points[0], points[1]);
                 //
                 var triangle = trianglemap.get(line.triangles[0]);
                 if (!triangle)
                     return;
-                var linepoints = line.points.map((v) => { return pointmap.get(v); });
-                var otherPoint = pointmap.get(triangle.points.filter((v) => {
+                var linepoints = line.points.map(function (v) { return pointmap.get(v); });
+                var otherPoint = pointmap.get(triangle.points.filter(function (v) {
                     return line.points.indexOf(v) == -1;
                 })[0]).getPoint();
                 line0.direction = line0.segment.getNormalWithPoint(otherPoint);
-                line0.leftline = pointmap.get(line.points[0]).lines.filter((line) => {
+                line0.leftline = pointmap.get(line.points[0]).lines.filter(function (line) {
                     if (line == line0.index)
                         return false;
-                    var prelines = lines.filter((l) => {
+                    var prelines = lines.filter(function (l) {
                         return l.index == line;
                     });
                     return prelines.length == 1;
                 })[0];
-                line0.rightline = pointmap.get(line.points[1]).lines.filter((line) => {
+                line0.rightline = pointmap.get(line.points[1]).lines.filter(function (line) {
                     if (line == line0.index)
                         return false;
-                    var prelines = lines.filter((l) => {
+                    var prelines = lines.filter(function (l) {
                         return l.index == line;
                     });
                     return prelines.length == 1;
@@ -14071,8 +14813,8 @@ var navigation;
                 line0map.set(line0.index, line0);
                 return line0;
             }
-        }
-        checkAgentHeight(agentHeight) {
+        };
+        NavigationProcess.prototype.checkAgentHeight = function (agentHeight) {
             this.data.resetData();
             //
             var pointmap = this.data.pointmap;
@@ -14089,65 +14831,68 @@ var navigation;
             //
             function handlePoint(point) {
                 // 测试点是否通过所有三角形测试
-                var result = triangle0s.every(triangle0 => {
+                var result = triangle0s.every(function (triangle0) {
                     return true;
                 });
                 // 测试失败时删除该点关联的三角形
                 if (!result) {
-                    point.triangles.forEach(triangleindex => {
+                    point.triangles.forEach(function (triangleindex) {
                         trianglemap.delete(triangleindex);
                     });
                 }
             }
-        }
-        getGeometry() {
+        };
+        NavigationProcess.prototype.getGeometry = function () {
             return this.data.getGeometry();
-        }
-        debugShowLines1(line0s, length) {
+        };
+        NavigationProcess.prototype.debugShowLines1 = function (line0s, length) {
             var segments = [];
-            line0s.forEach(element => {
+            line0s.forEach(function (element) {
                 var p0 = element.segment.p0.addTo(element.segment.p1).scaleNumber(0.5);
                 var p1 = p0.addTo(element.direction.clone().normalize(length));
                 segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
             });
             segmentGeometry.segments = segments;
-        }
-        debugShowLines(lines) {
+        };
+        NavigationProcess.prototype.debugShowLines = function (lines) {
+            var _this = this;
             createSegment();
             segmentGeometry.segments.length = 0;
-            lines.forEach(element => {
-                var points = element.points.map((pointindex) => {
-                    var value = this.data.pointmap.get(pointindex).value;
+            lines.forEach(function (element) {
+                var points = element.points.map(function (pointindex) {
+                    var value = _this.data.pointmap.get(pointindex).value;
                     return new feng3d.Vector3(value[0], value[1], value[2]);
                 });
                 segmentGeometry.addSegment({ start: points[0], end: points[1] });
             });
-        }
+        };
         /**
          * 获取所有独立边
          */
-        getAllSingleLine() {
+        NavigationProcess.prototype.getAllSingleLine = function () {
+            var _this = this;
             var lines = [];
             var needLine = [];
-            this.data.linemap.forEach(element => {
-                element.triangles = element.triangles.filter((triangleIndex) => { return this.data.trianglemap.has(triangleIndex); });
+            this.data.linemap.forEach(function (element) {
+                element.triangles = element.triangles.filter(function (triangleIndex) { return _this.data.trianglemap.has(triangleIndex); });
                 if (element.triangles.length == 1)
                     lines.push(element);
                 else if (element.triangles.length == 0)
                     needLine.push(element);
             });
-            needLine.forEach(element => {
-                this.data.linemap.delete(element.index);
+            needLine.forEach(function (element) {
+                _this.data.linemap.delete(element.index);
             });
             return lines;
-        }
-    }
+        };
+        return NavigationProcess;
+    }());
     navigation.NavigationProcess = NavigationProcess;
     /**
      * 点
      */
-    class Point {
-        constructor(pointmap, linemap, trianglemap) {
+    var Point = /** @class */ (function () {
+        function Point(pointmap, linemap, trianglemap) {
             /**
              * 点连接的线段索引列表
              */
@@ -14164,48 +14909,51 @@ var navigation;
          * 设置该点位置
          * @param p
          */
-        setPoint(p) {
+        Point.prototype.setPoint = function (p) {
             this.value = [p.x, p.y, p.z];
-        }
+        };
         /**
          * 获取该点位置
          */
-        getPoint() {
+        Point.prototype.getPoint = function () {
             return new feng3d.Vector3(this.value[0], this.value[1], this.value[2]);
-        }
+        };
         /**
          * 获取相邻点索引列表
          */
-        getNearbyPoints() {
-            var points = this.triangles.reduce((points, triangleid) => {
-                var triangle = this.trianglemap.get(triangleid);
+        Point.prototype.getNearbyPoints = function () {
+            var _this = this;
+            var points = this.triangles.reduce(function (points, triangleid) {
+                var triangle = _this.trianglemap.get(triangleid);
                 if (!triangle)
                     return points;
-                triangle.points.forEach(point => {
-                    if (point != this.index)
+                triangle.points.forEach(function (point) {
+                    if (point != _this.index)
                         points.push(point);
                 });
                 return points;
             }, []);
             return points;
-        }
-    }
+        };
+        return Point;
+    }());
     /**
      * 边
      */
-    class Line {
-        constructor() {
+    var Line = /** @class */ (function () {
+        function Line() {
             /**
              * 线段连接的三角形索引列表
              */
             this.triangles = [];
         }
-    }
+        return Line;
+    }());
     /**
      * 三角形
      */
-    class Triangle {
-        constructor(pointmap, linemap, trianglemap) {
+    var Triangle = /** @class */ (function () {
+        function Triangle(pointmap, linemap, trianglemap) {
             /**
              * 包含的三个边索引
              */
@@ -14214,30 +14962,37 @@ var navigation;
             this.linemap = linemap;
             this.trianglemap = trianglemap;
         }
-        getTriangle3D() {
+        Triangle.prototype.getTriangle3D = function () {
+            var _this = this;
             var points = [];
-            this.points.forEach(element => {
-                var pointvalue = this.pointmap.get(element).value;
+            this.points.forEach(function (element) {
+                var pointvalue = _this.pointmap.get(element).value;
                 points.push(new feng3d.Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
             });
             var triangle3D = new feng3d.Triangle3(points[0], points[1], points[2]);
             return triangle3D;
-        }
+        };
         /**
          * 获取法线
          */
-        getNormal() {
+        Triangle.prototype.getNormal = function () {
             var normal = this.getTriangle3D().getNormal();
             return normal;
-        }
-    }
+        };
+        return Triangle;
+    }());
     /**
      * 边
      */
-    class Line0 {
-    }
-    class NavigationData {
-        init(geometry) {
+    var Line0 = /** @class */ (function () {
+        function Line0() {
+        }
+        return Line0;
+    }());
+    var NavigationData = /** @class */ (function () {
+        function NavigationData() {
+        }
+        NavigationData.prototype.init = function (geometry) {
             var positions = geometry.positions;
             var indices = geometry.indices;
             console.assert(indices.length % 3 == 0);
@@ -14252,13 +15007,13 @@ var navigation;
             var lineAutoIndex = 0;
             var linecache = {};
             //
-            for (let i = 0, n = positions.length; i < n; i += 3) {
+            for (var i = 0, n = positions.length; i < n; i += 3) {
                 var point = createPoint(positions[i], positions[i + 1], positions[i + 2]);
                 pointindexmap[i / 3] = point.index;
             }
-            indices = indices.map((pointindex) => { return pointindexmap[pointindex]; });
+            indices = indices.map(function (pointindex) { return pointindexmap[pointindex]; });
             //
-            for (let i = 0, n = indices.length; i < n; i += 3) {
+            for (var i = 0, n = indices.length; i < n; i += 3) {
                 var triangle = new Triangle(pointmap, linemap, trianglemap);
                 triangle.index = i / 3;
                 triangle.points = [indices[i], indices[i + 1], indices[i + 2]];
@@ -14268,7 +15023,7 @@ var navigation;
                 pointmap.get(indices[i + 1]).triangles.push(triangle.index);
                 pointmap.get(indices[i + 2]).triangles.push(triangle.index);
                 //
-                var points = triangle.points.concat().sort().map((value) => { return pointmap.get(value); });
+                var points = triangle.points.concat().sort().map(function (value) { return pointmap.get(value); });
                 createLine(points[0], points[1], triangle);
                 createLine(points[0], points[2], triangle);
                 createLine(points[1], points[2], triangle);
@@ -14304,43 +15059,45 @@ var navigation;
                 }
                 return point;
             }
-        }
-        getGeometry() {
+        };
+        NavigationData.prototype.getGeometry = function () {
+            var _this = this;
             var positions = [];
             var pointIndexMap = new Map();
             var autoId = 0;
             var indices = [];
-            this.trianglemap.forEach(element => {
-                var points = element.points.map((pointIndex) => {
+            this.trianglemap.forEach(function (element) {
+                var points = element.points.map(function (pointIndex) {
                     if (pointIndexMap.has(pointIndex)) {
                         return pointIndexMap.get(pointIndex);
                     }
-                    positions.push.apply(positions, this.pointmap.get(pointIndex).value);
+                    positions.push.apply(positions, _this.pointmap.get(pointIndex).value);
                     pointIndexMap.set(pointIndex, autoId++);
                     return autoId - 1;
                 });
                 indices.push.apply(indices, points);
             });
             return { positions: positions, indices: indices };
-        }
-        resetData() {
+        };
+        NavigationData.prototype.resetData = function () {
             var geometry = this.getGeometry();
             this.clearData();
             this.init(geometry);
-        }
-        clearData() {
-            this.pointmap.forEach(point => {
+        };
+        NavigationData.prototype.clearData = function () {
+            this.pointmap.forEach(function (point) {
                 point.pointmap = point.linemap = point.trianglemap = null;
             });
             this.pointmap.clear();
-            this.linemap.forEach(line => {
+            this.linemap.forEach(function (line) {
             });
             this.linemap.clear();
-            this.trianglemap.forEach(triangle => {
+            this.trianglemap.forEach(function (triangle) {
             });
             this.trianglemap.clear();
-        }
-    }
+        };
+        return NavigationData;
+    }());
 })(navigation || (navigation = {}));
 var segmentGeometry;
 var debugSegment;
@@ -14348,7 +15105,7 @@ var debugSegment;
 var pointGeometry;
 var debugPoint;
 function createSegment() {
-    console.error(`未实现`);
+    console.error("\u672A\u5B9E\u73B0");
     var parentobject;
     if (!debugSegment) {
         debugSegment = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "segment" });
@@ -14392,8 +15149,8 @@ var editor;
      * #### 参考
      * @see https://github.com/recastnavigation/recastnavigation
      */
-    class Recastnavigation {
-        constructor() {
+    var Recastnavigation = /** @class */ (function () {
+        function Recastnavigation() {
             /**
              * 用于体素区分是否同属一个三角形
              */
@@ -14402,7 +15159,8 @@ var editor;
         /**
          * 执行重铸导航
          */
-        doRecastnavigation(mesh, agent = new editor.NavigationAgent(), voxelSize) {
+        Recastnavigation.prototype.doRecastnavigation = function (mesh, agent, voxelSize) {
+            if (agent === void 0) { agent = new editor.NavigationAgent(); }
             this._aabb = feng3d.Box3.formPositions(mesh.positions);
             this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
             this._agent = agent;
@@ -14413,35 +15171,35 @@ var editor;
             this._numZ = size.z + 1;
             //
             this._voxels = [];
-            for (let x = 0; x < this._numX; x++) {
+            for (var x = 0; x < this._numX; x++) {
                 this._voxels[x] = [];
-                for (let y = 0; y < this._numY; y++) {
+                for (var y = 0; y < this._numY; y++) {
                     this._voxels[x][y] = [];
                 }
             }
             this._voxelizationMesh(mesh.indices, mesh.positions);
             this._applyAgent();
-        }
+        };
         /**
          * 获取体素列表
          */
-        getVoxels() {
+        Recastnavigation.prototype.getVoxels = function () {
             var voxels = [];
-            for (let x = 0; x < this._numX; x++) {
-                for (let y = 0; y < this._numY; y++) {
-                    for (let z = 0; z < this._numZ; z++) {
+            for (var x = 0; x < this._numX; x++) {
+                for (var y = 0; y < this._numY; y++) {
+                    for (var z = 0; z < this._numZ; z++) {
                         if (this._voxels[x][y][z])
                             voxels.push(this._voxels[x][y][z]);
                     }
                 }
             }
             return voxels;
-        }
+        };
         /**
          * 栅格化网格
          */
-        _voxelizationMesh(indices, positions) {
-            for (let i = 0, n = indices.length; i < n; i += 3) {
+        Recastnavigation.prototype._voxelizationMesh = function (indices, positions) {
+            for (var i = 0, n = indices.length; i < n; i += 3) {
                 var pi0 = indices[i] * 3;
                 var p0 = [positions[pi0], positions[pi0 + 1], positions[pi0 + 2]];
                 var pi1 = indices[i + 1] * 3;
@@ -14450,54 +15208,55 @@ var editor;
                 var p2 = [positions[pi2], positions[pi2 + 1], positions[pi2 + 2]];
                 this._voxelizationTriangle(p0, p1, p2);
             }
-        }
+        };
         /**
          * 栅格化三角形
          * @param p0 三角形第一个顶点
          * @param p1 三角形第二个顶点
          * @param p2 三角形第三个顶点
          */
-        _voxelizationTriangle(p0, p1, p2) {
+        Recastnavigation.prototype._voxelizationTriangle = function (p0, p1, p2) {
+            var _this = this;
             var triangle = feng3d.Triangle3.fromPositions(p0.concat(p1).concat(p2));
             var normal = triangle.getNormal();
             var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
-            result.forEach((v, i) => {
-                this._voxels[v.xi][v.yi][v.zi] = {
+            result.forEach(function (v, i) {
+                _this._voxels[v.xi][v.yi][v.zi] = {
                     x: v.xv,
                     y: v.yv,
                     z: v.zv,
                     normal: normal,
-                    triangleId: this._triangleId,
+                    triangleId: _this._triangleId,
                     flag: VoxelFlag.Default,
                 };
             });
             this._triangleId++;
-        }
+        };
         /**
          * 应用代理进行计算出可行走体素
          */
-        _applyAgent() {
+        Recastnavigation.prototype._applyAgent = function () {
             this._agent.maxSlope;
             this._applyAgentMaxSlope();
             this._applyAgentHeight();
             // this._applyAgentRadius();
-        }
+        };
         /**
          * 筛选出允许行走坡度的体素
          */
-        _applyAgentMaxSlope() {
+        Recastnavigation.prototype._applyAgentMaxSlope = function () {
             var mincos = Math.cos(this._agent.maxSlope * Math.DEG2RAD);
-            this.getVoxels().forEach(v => {
+            this.getVoxels().forEach(function (v) {
                 var dot = v.normal.dot(feng3d.Vector3.Y_AXIS);
                 if (dot < mincos)
                     v.flag = v.flag | VoxelFlag.DontMaxSlope;
             });
-        }
-        _applyAgentHeight() {
-            for (let x = 0; x < this._numX; x++) {
-                for (let z = 0; z < this._numZ; z++) {
+        };
+        Recastnavigation.prototype._applyAgentHeight = function () {
+            for (var x = 0; x < this._numX; x++) {
+                for (var z = 0; z < this._numZ; z++) {
                     var preVoxel = null;
-                    for (let y = this._numY - 1; y >= 0; y--) {
+                    for (var y = this._numY - 1; y >= 0; y--) {
                         var voxel = this._voxels[x][y][z];
                         if (!voxel)
                             continue;
@@ -14509,20 +15268,20 @@ var editor;
                     }
                 }
             }
-        }
-        _applyAgentRadius() {
+        };
+        Recastnavigation.prototype._applyAgentRadius = function () {
             this._calculateContour();
-        }
-        _calculateContour() {
-            for (let x = 0; x < this._numX; x++) {
-                for (let y = 0; y < this._numY; y++) {
-                    for (let z = 0; z < this._numZ; z++) {
+        };
+        Recastnavigation.prototype._calculateContour = function () {
+            for (var x = 0; x < this._numX; x++) {
+                for (var y = 0; y < this._numY; y++) {
+                    for (var z = 0; z < this._numZ; z++) {
                         this._checkContourVoxel(x, y, z);
                     }
                 }
             }
-        }
-        _checkContourVoxel(x, y, z) {
+        };
+        Recastnavigation.prototype._checkContourVoxel = function (x, y, z) {
             var voxel = this._voxels[x][y][z];
             if (!voxel)
                 return;
@@ -14552,16 +15311,17 @@ var editor;
                 voxel.flag = voxel.flag | VoxelFlag.IsContour;
                 return;
             } // 右
-        }
-        _isVoxelFlagDefault(x, y, z) {
+        };
+        Recastnavigation.prototype._isVoxelFlagDefault = function (x, y, z) {
             var voxel = this._voxels[x][y][z];
             if (!voxel)
                 return false;
             return voxel.flag == VoxelFlag.Default;
-        }
-    }
+        };
+        return Recastnavigation;
+    }());
     editor.Recastnavigation = Recastnavigation;
-    let VoxelFlag;
+    var VoxelFlag;
     (function (VoxelFlag) {
         VoxelFlag[VoxelFlag["Default"] = 0] = "Default";
         VoxelFlag[VoxelFlag["DontMaxSlope"] = 1] = "DontMaxSlope";
@@ -14574,22 +15334,29 @@ var editor;
     /**
      * 编辑器脚本
      */
-    class EditorScript extends feng3d.Behaviour {
-        constructor() {
-            super(...arguments);
-            this.flag = feng3d.RunEnvironment.editor;
+    var EditorScript = /** @class */ (function (_super) {
+        __extends(EditorScript, _super);
+        function EditorScript() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.flag = feng3d.RunEnvironment.editor;
+            return _this;
         }
-    }
+        return EditorScript;
+    }(feng3d.Behaviour));
     editor.EditorScript = EditorScript;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class MouseRayTestScript extends editor.EditorScript {
-        init() {
-            super.init();
-            feng3d.windowEventProxy.on("click", this.onclick, this);
+    var MouseRayTestScript = /** @class */ (function (_super) {
+        __extends(MouseRayTestScript, _super);
+        function MouseRayTestScript() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        onclick() {
+        MouseRayTestScript.prototype.init = function () {
+            _super.prototype.init.call(this);
+            feng3d.windowEventProxy.on("click", this.onclick, this);
+        };
+        MouseRayTestScript.prototype.onclick = function () {
             var mouseRay3D = this.gameObject.scene.mouseRay3D;
             var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
             var model = gameobject.addComponent("Renderable");
@@ -14603,7 +15370,7 @@ var editor;
             direction = gameobject.transform.inverseTransformDirection(direction);
             gameobject.transform.position = position;
             var num = 1000;
-            var translate = () => {
+            var translate = function () {
                 gameobject.transform.translate(direction, 15);
                 if (num > 0) {
                     setTimeout(function () {
@@ -14616,30 +15383,39 @@ var editor;
                 num--;
             };
             translate();
-        }
-        update() {
-        }
+        };
+        MouseRayTestScript.prototype.update = function () {
+        };
         /**
          * 销毁
          */
-        dispose() {
+        MouseRayTestScript.prototype.dispose = function () {
             feng3d.windowEventProxy.off("click", this.onclick, this);
-        }
-    }
+        };
+        return MouseRayTestScript;
+    }(editor.EditorScript));
     editor.MouseRayTestScript = MouseRayTestScript;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let DirectionLightIcon = class DirectionLightIcon extends editor.EditorScript {
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-        init() {
-            super.init();
+    var DirectionLightIcon = /** @class */ (function (_super) {
+        __extends(DirectionLightIcon, _super);
+        function DirectionLightIcon() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(DirectionLightIcon.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.initicon(); },
+            enumerable: false,
+            configurable: true
+        });
+        DirectionLightIcon.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "light", this.onLightChanged, this);
             this.initicon();
             this.on("mousedown", this.onMousedown, this);
-        }
-        initicon() {
+        };
+        DirectionLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
             var linesize = 20;
@@ -14686,14 +15462,14 @@ var editor;
             });
             this.gameObject.addChild(lightLines);
             this.enabled = true;
-        }
-        update() {
+        };
+        DirectionLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
             this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
             this._lightLines.visible = editor.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
-        }
-        dispose() {
+        };
+        DirectionLightIcon.prototype.dispose = function () {
             this.enabled = false;
             this._textureMaterial = null;
             //
@@ -14701,9 +15477,9 @@ var editor;
             this._lightLines.dispose();
             this._lightIcon = null;
             this._lightLines = null;
-            super.dispose();
-        }
-        onLightChanged(newValue, oldValue) {
+            _super.prototype.dispose.call(this);
+        };
+        DirectionLightIcon.prototype.onLightChanged = function (newValue, oldValue) {
             if (oldValue) {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
             }
@@ -14711,35 +15487,44 @@ var editor;
                 this.onScenetransformChanged();
                 newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
             }
-        }
-        onScenetransformChanged() {
+        };
+        DirectionLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
-        }
-        onMousedown() {
+        };
+        DirectionLightIcon.prototype.onMousedown = function () {
             editor.editorData.selectObject(this.light.gameObject);
             feng3d.shortcut.activityState("selectInvalid");
-            feng3d.ticker.once(100, () => {
+            feng3d.ticker.once(100, function () {
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
-        }
-    };
-    DirectionLightIcon = __decorate([
-        feng3d.RegisterComponent()
-    ], DirectionLightIcon);
+        };
+        DirectionLightIcon = __decorate([
+            feng3d.RegisterComponent()
+        ], DirectionLightIcon);
+        return DirectionLightIcon;
+    }(editor.EditorScript));
     editor.DirectionLightIcon = DirectionLightIcon;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let PointLightIcon = class PointLightIcon extends editor.EditorScript {
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-        init() {
-            super.init();
+    var PointLightIcon = /** @class */ (function (_super) {
+        __extends(PointLightIcon, _super);
+        function PointLightIcon() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(PointLightIcon.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.initicon(); },
+            enumerable: false,
+            configurable: true
+        });
+        PointLightIcon.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "light", this.onLightChanged, this);
             this.initicon();
             this.on("mousedown", this.onMousedown, this);
-        }
-        initicon() {
+        };
+        PointLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
             var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -14805,8 +15590,8 @@ var editor;
             this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
-        }
-        update() {
+        };
+        PointLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
             if (!this.editorCamera)
@@ -14901,8 +15686,8 @@ var editor;
                 this._lightLines.visible = false;
                 this._lightpoints.visible = false;
             }
-        }
-        dispose() {
+        };
+        PointLightIcon.prototype.dispose = function () {
             this.enabled = false;
             this._textureMaterial = null;
             //
@@ -14913,9 +15698,9 @@ var editor;
             this._lightLines = null;
             this._lightpoints = null;
             this._segmentGeometry = null;
-            super.dispose();
-        }
-        onLightChanged(newValue, oldValue) {
+            _super.prototype.dispose.call(this);
+        };
+        PointLightIcon.prototype.onLightChanged = function (newValue, oldValue) {
             if (oldValue) {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
             }
@@ -14923,35 +15708,44 @@ var editor;
                 this.onScenetransformChanged();
                 newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
             }
-        }
-        onScenetransformChanged() {
+        };
+        PointLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
-        }
-        onMousedown() {
+        };
+        PointLightIcon.prototype.onMousedown = function () {
             editor.editorData.selectObject(this.light.gameObject);
             // 防止再次调用鼠标拾取
             feng3d.shortcut.activityState("selectInvalid");
-            feng3d.ticker.once(100, () => {
+            feng3d.ticker.once(100, function () {
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
-        }
-    };
-    PointLightIcon = __decorate([
-        feng3d.RegisterComponent()
-    ], PointLightIcon);
+        };
+        PointLightIcon = __decorate([
+            feng3d.RegisterComponent()
+        ], PointLightIcon);
+        return PointLightIcon;
+    }(editor.EditorScript));
     editor.PointLightIcon = PointLightIcon;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let SpotLightIcon = class SpotLightIcon extends editor.EditorScript {
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-        init() {
-            super.init();
+    var SpotLightIcon = /** @class */ (function (_super) {
+        __extends(SpotLightIcon, _super);
+        function SpotLightIcon() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(SpotLightIcon.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.initicon(); },
+            enumerable: false,
+            configurable: true
+        });
+        SpotLightIcon.prototype.init = function () {
+            _super.prototype.init.call(this);
             this.initicon();
             this.on("mousedown", this.onMousedown, this);
-        }
-        initicon() {
+        };
+        SpotLightIcon.prototype.initicon = function () {
             if (!this._editorCamera)
                 return;
             var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
@@ -15005,8 +15799,8 @@ var editor;
             this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
-        }
-        update() {
+        };
+        SpotLightIcon.prototype.update = function () {
             if (!this.light)
                 return;
             this._textureMaterial.uniforms.u_color = this.light.color.toColor4();
@@ -15051,8 +15845,8 @@ var editor;
                 this._lightLines.visible = false;
                 this._lightpoints.visible = false;
             }
-        }
-        dispose() {
+        };
+        SpotLightIcon.prototype.dispose = function () {
             this.enabled = false;
             this._textureMaterial = null;
             //
@@ -15063,9 +15857,9 @@ var editor;
             this._lightLines = null;
             this._lightpoints = null;
             this._segmentGeometry = null;
-            super.dispose();
-        }
-        onLightChanged(property, oldValue, value) {
+            _super.prototype.dispose.call(this);
+        };
+        SpotLightIcon.prototype.onLightChanged = function (property, oldValue, value) {
             if (oldValue) {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
             }
@@ -15073,43 +15867,50 @@ var editor;
                 this.onScenetransformChanged();
                 value.on("scenetransformChanged", this.onScenetransformChanged, this);
             }
-        }
-        onScenetransformChanged() {
+        };
+        SpotLightIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.light.transform.localToWorldMatrix;
-        }
-        onMousedown() {
+        };
+        SpotLightIcon.prototype.onMousedown = function () {
             editor.editorData.selectObject(this.light.gameObject);
             // 防止再次调用鼠标拾取
             feng3d.shortcut.activityState("selectInvalid");
-            feng3d.ticker.once(100, () => {
+            feng3d.ticker.once(100, function () {
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
-        }
-    };
-    __decorate([
-        feng3d.watch("onLightChanged")
-    ], SpotLightIcon.prototype, "light", void 0);
-    SpotLightIcon = __decorate([
-        feng3d.RegisterComponent()
-    ], SpotLightIcon);
+        };
+        __decorate([
+            feng3d.watch("onLightChanged")
+        ], SpotLightIcon.prototype, "light", void 0);
+        SpotLightIcon = __decorate([
+            feng3d.RegisterComponent()
+        ], SpotLightIcon);
+        return SpotLightIcon;
+    }(editor.EditorScript));
     editor.SpotLightIcon = SpotLightIcon;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    let CameraIcon = class CameraIcon extends editor.EditorScript {
-        constructor() {
-            super(...arguments);
-            this._lensChanged = true;
+    var CameraIcon = /** @class */ (function (_super) {
+        __extends(CameraIcon, _super);
+        function CameraIcon() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._lensChanged = true;
+            return _this;
         }
-        get editorCamera() { return this._editorCamera; }
-        set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-        init() {
-            super.init();
+        Object.defineProperty(CameraIcon.prototype, "editorCamera", {
+            get: function () { return this._editorCamera; },
+            set: function (v) { this._editorCamera = v; this.initicon(); },
+            enumerable: false,
+            configurable: true
+        });
+        CameraIcon.prototype.init = function () {
+            _super.prototype.init.call(this);
             feng3d.watcher.watch(this, "camera", this.onCameraChanged, this);
             this.initicon();
             this.on("mousedown", this.onMousedown, this);
-        }
-        initicon() {
+        };
+        CameraIcon.prototype.initicon = function () {
             if (!this.editorCamera)
                 return;
             if (this._lightIcon)
@@ -15164,8 +15965,9 @@ var editor;
             this._pointGeometry = lightpoints.getComponent("Renderable").geometry;
             this.gameObject.addChild(lightpoints);
             this.enabled = true;
-        }
-        update() {
+        };
+        CameraIcon.prototype.update = function () {
+            var _this = this;
             if (!this.camera)
                 return;
             if (editor.editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1) {
@@ -15211,8 +16013,8 @@ var editor;
                     { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) }, { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) }, { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) }, { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) });
                     this._pointGeometry.points = points;
                     this._segmentGeometry.segments.length = 0;
-                    segments.forEach(v => {
-                        this._segmentGeometry.addSegment(v);
+                    segments.forEach(function (v) {
+                        _this._segmentGeometry.addSegment(v);
                     });
                     this._lensChanged = false;
                 }
@@ -15224,8 +16026,8 @@ var editor;
                 this._lightLines.visible = false;
                 this._lightpoints.visible = false;
             }
-        }
-        dispose() {
+        };
+        CameraIcon.prototype.dispose = function () {
             this.enabled = false;
             //
             this._lightIcon.dispose();
@@ -15235,9 +16037,9 @@ var editor;
             this._lightLines = null;
             this._lightpoints = null;
             this._segmentGeometry = null;
-            super.dispose();
-        }
-        onCameraChanged(newValue, oldValue) {
+            _super.prototype.dispose.call(this);
+        };
+        CameraIcon.prototype.onCameraChanged = function (newValue, oldValue) {
             if (oldValue) {
                 oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
                 oldValue.off("lensChanged", this.onLensChanged, this);
@@ -15247,25 +16049,26 @@ var editor;
                 newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
                 newValue.on("lensChanged", this.onLensChanged, this);
             }
-        }
-        onLensChanged() {
+        };
+        CameraIcon.prototype.onLensChanged = function () {
             this._lensChanged = true;
-        }
-        onScenetransformChanged() {
+        };
+        CameraIcon.prototype.onScenetransformChanged = function () {
             this.transform.localToWorldMatrix = this.camera.transform.localToWorldMatrix;
-        }
-        onMousedown() {
+        };
+        CameraIcon.prototype.onMousedown = function () {
             editor.editorData.selectObject(this.camera.gameObject);
             // 防止再次调用鼠标拾取
             feng3d.shortcut.activityState("selectInvalid");
-            feng3d.ticker.once(100, () => {
+            feng3d.ticker.once(100, function () {
                 feng3d.shortcut.deactivityState("selectInvalid");
             });
-        }
-    };
-    CameraIcon = __decorate([
-        feng3d.RegisterComponent()
-    ], CameraIcon);
+        };
+        CameraIcon = __decorate([
+            feng3d.RegisterComponent()
+        ], CameraIcon);
+        return CameraIcon;
+    }(editor.EditorScript));
     editor.CameraIcon = CameraIcon;
 })(editor || (editor = {}));
 var editor;
@@ -15297,7 +16100,7 @@ var editor;
         }
         var paths = getPaths(params.paths);
         // load scripts
-        loadFiles(paths, (pathsNotFound) => {
+        loadFiles(paths, function (pathsNotFound) {
             // success and error callbacks
             if (pathsNotFound.length)
                 (params.error || devnull)(pathsNotFound);
@@ -15315,7 +16118,7 @@ var editor;
      */
     function ready(params) {
         // subscribe to bundle load event
-        subscribe(params.depends, (depsNotFound) => {
+        subscribe(params.depends, function (depsNotFound) {
             // execute callbacks
             if (depsNotFound.length)
                 (params.error || devnull)(depsNotFound);
@@ -15359,7 +16162,7 @@ var editor;
         }
         // define callback function
         var numWaiting = bundleIds.length;
-        var fn = (bundleId, pathsNotFound) => {
+        var fn = function (bundleId, pathsNotFound) {
             if (pathsNotFound.length)
                 depsNotFound.push(bundleId);
             numWaiting--;
@@ -15369,15 +16172,15 @@ var editor;
         // register callback
         var i = bundleIds.length;
         while (i--) {
-            let bundleId = bundleIds[i];
+            var bundleId = bundleIds[i];
             // execute callback if in result cache
-            let r = bundleResultCache[bundleId];
+            var r = bundleResultCache[bundleId];
             if (r) {
                 fn(bundleId, r);
                 continue;
             }
             // add to callback queue
-            let q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
+            var q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
             q.push(fn);
         }
     }
@@ -15426,10 +16229,11 @@ var editor;
      * @param args.before                   加载前回调
      * @param numTries                      当前尝试次数
      */
-    function loadImage(path, callbackFn, args, numTries = 0) {
+    function loadImage(path, callbackFn, args, numTries) {
+        if (numTries === void 0) { numTries = 0; }
         var image = new Image();
         image.crossOrigin = "Anonymous";
-        image.onerror = image.onload = (ev) => {
+        image.onerror = image.onload = function (ev) {
             var result = ev.type;
             // handle retries in case of load failure
             if (result == 'error') {
@@ -15446,7 +16250,7 @@ var editor;
             callbackFn(path, result, ev.defaultPrevented, image);
         };
         //
-        var beforeCallbackFn = args.before || (() => true);
+        var beforeCallbackFn = args.before || (function () { return true; });
         if (beforeCallbackFn(path, image) !== false)
             image.src = path.url;
     }
@@ -15460,9 +16264,10 @@ var editor;
      * @param args.before                   加载前回调
      * @param numTries                      当前尝试次数
      */
-    function loadTxt(path, callbackFn, args, numTries = 0) {
+    function loadTxt(path, callbackFn, args, numTries) {
+        if (numTries === void 0) { numTries = 0; }
         var request = new XMLHttpRequest();
-        request.onreadystatechange = (ev) => {
+        request.onreadystatechange = function (ev) {
             var result = ev.type;
             if (request.readyState == 4) { // 4 = "loaded"
                 request.onreadystatechange = null;
@@ -15482,7 +16287,7 @@ var editor;
         };
         request.open('Get', path.url, true);
         //
-        var beforeCallbackFn = args.before || (() => true);
+        var beforeCallbackFn = args.before || (function () { return true; });
         if (beforeCallbackFn(path, request) !== false)
             request.send();
     }
@@ -15496,7 +16301,8 @@ var editor;
      * @param args.before                   加载前回调
      * @param numTries                      当前尝试次数
      */
-    function loadJsCss(path, callbackFn, args, numTries = 0) {
+    function loadJsCss(path, callbackFn, args, numTries) {
+        if (numTries === void 0) { numTries = 0; }
         var doc = document, isCss, e;
         if (/(^css!|\.css$)/.test(path.url)) {
             isCss = true;
@@ -15540,7 +16346,7 @@ var editor;
             callbackFn(path, result, ev.defaultPrevented, e);
         };
         // add to document (unless callback returns `false`)
-        var beforeCallbackFn = args.before || (() => true);
+        var beforeCallbackFn = args.before || (function () { return true; });
         if (beforeCallbackFn(path, e) !== false)
             doc.head.appendChild(e);
     }
@@ -15554,7 +16360,7 @@ var editor;
         var loadingFiles = [];
         var pathsNotFound = [];
         // define callback function
-        var fn = (path, result, defaultPrevented, content) => {
+        var fn = function (path, result, defaultPrevented, content) {
             // handle error
             if (result == 'error')
                 pathsNotFound.push(path.url);
@@ -15653,22 +16459,25 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
-    class ThreejsLoader {
-        load(url, completed) {
-            editor.editorRS.fs.readArrayBuffer(url, (err, data) => {
-                load(data, (gameobject) => {
+    var ThreejsLoader = /** @class */ (function () {
+        function ThreejsLoader() {
+        }
+        ThreejsLoader.prototype.load = function (url, completed) {
+            editor.editorRS.fs.readArrayBuffer(url, function (err, data) {
+                load(data, function (gameobject) {
                     gameobject.name = feng3d.pathUtils.getName(url);
                     feng3d.globalDispatcher.dispatch("asset.parsed", gameobject);
                 });
             });
-        }
-    }
+        };
+        return ThreejsLoader;
+    }());
     editor.ThreejsLoader = ThreejsLoader;
     editor.threejsLoader = new ThreejsLoader();
     var usenumberfixed = true;
     function load(url, onParseComplete) {
         var skeletonComponent;
-        prepare(() => {
+        prepare(function () {
             //
             var loader = new window["THREE"].FBXLoader();
             if (typeof url == "string") {
@@ -15736,7 +16545,7 @@ var editor;
                     //Bone 由SkeletonComponent自动生成，不用解析
                     break;
                 default:
-                    console.warn(`没有提供 ${object3d.type} 类型对象的解析`);
+                    console.warn("\u6CA1\u6709\u63D0\u4F9B " + object3d.type + " \u7C7B\u578B\u5BF9\u8C61\u7684\u89E3\u6790");
                     break;
             }
             if (object3d.animations && object3d.animations.length > 0) {
@@ -15747,7 +16556,7 @@ var editor;
                     animation.animation = animation.animations[0];
                 }
             }
-            object3d.children.forEach(element => {
+            object3d.children.forEach(function (element) {
                 parse(element, gameobject);
             });
             return gameobject;
@@ -15788,7 +16597,7 @@ var editor;
                     propertyClip.propertyName = "orientation";
                     break;
                 default:
-                    console.warn(`没有处理 propertyName ${result[2]}`);
+                    console.warn("\u6CA1\u6709\u5904\u7406 propertyName " + result[2]);
                     break;
             }
             propertyClip.propertyValues = [];
@@ -15796,7 +16605,7 @@ var editor;
             var times = keyframeTrack.times;
             var values = Array.from(keyframeTrack.values);
             if (usenumberfixed) {
-                values = values.map((v) => { return Number(v.toFixed(6)); });
+                values = values.map(function (v) { return Number(v.toFixed(6)); });
             }
             var len = times.length;
             switch (keyframeTrack.ValueTypeName) {
@@ -15813,7 +16622,7 @@ var editor;
                     }
                     break;
                 default:
-                    console.warn(`没有提供解析 ${keyframeTrack.ValueTypeName} 类型Track数据`);
+                    console.warn("\u6CA1\u6709\u63D0\u4F9B\u89E3\u6790 " + keyframeTrack.ValueTypeName + " \u7C7B\u578BTrack\u6570\u636E");
                     break;
             }
             return propertyClip;
@@ -15859,7 +16668,7 @@ var editor;
                 joints[jointsMapitem[0]].matrix = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
             }
             else {
-                console.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
+                console.warn("\u6CA1\u6709\u5728\u9AA8\u67B6\u4E2D\u627E\u5230 \u9AA8\u9ABC " + bones[i].name);
             }
         }
         return skinSkeleton;
@@ -15872,7 +16681,7 @@ var editor;
                 var element = attributes[key];
                 var array = Array.from(element.array);
                 if (usenumberfixed) {
-                    array = array.map((v) => { return Number(v.toFixed(6)); });
+                    array = array.map(function (v) { return Number(v.toFixed(6)); });
                 }
                 switch (key) {
                     case "position":
@@ -15909,11 +16718,11 @@ var editor;
         perspectiveLen.fov = perspectiveCamera.fov;
         return perspectiveLen;
     }
-    var prepare = (() => {
+    var prepare = (function () {
         var isprepare = false;
         var prepareCallbacks = [];
         var preparing = false;
-        return (callback) => {
+        return function (callback) {
             if (isprepare) {
                 callback();
                 return;
@@ -15949,16 +16758,16 @@ var editor;
                     "threejs/loaders/ctm/lzma.js",
                     "threejs/loaders/ctm/ctm.js",
                     "threejs/loaders/ctm/CTMLoader.js",
-                ].map((value) => { return editor.editorData.getEditorAssetPath(value); }),
+                ].map(function (value) { return editor.editorData.getEditorAssetPath(value); }),
                 bundleId: "threejs",
-                success: () => {
+                success: function () {
                     Number.prototype["format"] = function () {
                         return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
                     };
                     // log("提供解析的 three.js 初始化完成，")
                     isprepare = true;
                     preparing = false;
-                    prepareCallbacks.forEach(element => {
+                    prepareCallbacks.forEach(function (element) {
                         element();
                     });
                 }
@@ -15971,33 +16780,36 @@ var editor;
     /**
      * 菜单配置
      */
-    class MenuConfig {
+    var MenuConfig = /** @class */ (function () {
+        function MenuConfig() {
+        }
         /**
          * 主菜单
          */
-        getMainMenu() {
+        MenuConfig.prototype.getMainMenu = function () {
             var mainMenu = [
                 {
                     label: "文件",
                     submenu: [
                         {
                             label: "新建场景",
-                            click: () => {
+                            click: function () {
                                 editor.editorData.gameScene = feng3d.View.createNewScene();
                             },
                         },
                         {
                             label: "打开场景",
-                            click: () => {
+                            click: function () {
                                 alert("未实现！");
                                 //
                                 // editorData.gameScene = feng3d.View.createNewScene();
                             },
                         },
                         {
-                            label: "新建项目", click: () => {
+                            label: "新建项目",
+                            click: function () {
                                 editor.popupview.popupObject({ newprojectname: "newproject" }, {
-                                    closecallback: (data) => {
+                                    closecallback: function (data) {
                                         if (data.newprojectname && data.newprojectname.length > 0) {
                                             editor.editorcache.projectname = data.newprojectname;
                                             window.location.reload();
@@ -16008,9 +16820,10 @@ var editor;
                         },
                         {
                             label: "打开最近的项目",
-                            submenu: editor.editorcache.lastProjects.map(element => {
+                            submenu: editor.editorcache.lastProjects.map(function (element) {
                                 var menuItem = {
-                                    label: element, click: () => {
+                                    label: element,
+                                    click: function () {
                                         if (editor.editorcache.projectname != element) {
                                             editor.editorcache.projectname = element;
                                             window.location.reload();
@@ -16019,9 +16832,9 @@ var editor;
                                 };
                                 return menuItem;
                             }),
-                            click: () => {
+                            click: function () {
                                 editor.popupview.popupObject({ newprojectname: "newproject" }, {
-                                    closecallback: (data) => {
+                                    closecallback: function (data) {
                                         if (data.newprojectname && data.newprojectname.length > 0) {
                                             editor.editorcache.projectname = data.newprojectname;
                                             window.location.reload();
@@ -16031,19 +16844,21 @@ var editor;
                             }
                         },
                         {
-                            label: "保存场景", click: () => {
+                            label: "保存场景",
+                            click: function () {
                                 var gameobject = editor.hierarchy.rootnode.gameobject;
                                 editor.editorAsset.saveObject(gameobject);
                             }
                         },
                         {
-                            label: "打开项目", click: () => {
-                                editor.editorRS.clearProject(() => {
-                                    editor.editorRS.selectFile((filelist) => {
-                                        editor.editorRS.importProject(filelist.item(0), () => {
-                                            editor.editorAsset.initproject(() => {
-                                                editor.editorAsset.runProjectScript(() => {
-                                                    editor.editorAsset.readScene("default.scene.json", (err, scene) => {
+                            label: "打开项目",
+                            click: function () {
+                                editor.editorRS.clearProject(function () {
+                                    editor.editorRS.selectFile(function (filelist) {
+                                        editor.editorRS.importProject(filelist.item(0), function () {
+                                            editor.editorAsset.initproject(function () {
+                                                editor.editorAsset.runProjectScript(function () {
+                                                    editor.editorAsset.readScene("default.scene.json", function (err, scene) {
                                                         editor.editorData.gameScene = scene;
                                                         editor.editorui.assetview.invalidateAssettree();
                                                         console.log("打开项目完成!");
@@ -16056,35 +16871,41 @@ var editor;
                             }
                         },
                         {
-                            label: "导出项目", click: () => {
-                                editor.editorRS.exportProjectToJSZip(`${editor.editorcache.projectname}.feng3d.zip`);
+                            label: "导出项目",
+                            click: function () {
+                                editor.editorRS.exportProjectToJSZip(editor.editorcache.projectname + ".feng3d.zip");
                             }
                         },
                         {
                             label: "打开网络项目",
                             submenu: [
                                 {
-                                    label: "地形", click: () => {
+                                    label: "地形",
+                                    click: function () {
                                         openDownloadProject("terrain.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "自定义材质", click: () => {
+                                    label: "自定义材质",
+                                    click: function () {
                                         openDownloadProject("customshader.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "水", click: () => {
+                                    label: "水",
+                                    click: function () {
                                         openDownloadProject("water.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "灯光", click: () => {
+                                    label: "灯光",
+                                    click: function () {
                                         openDownloadProject("light.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "声音", click: () => {
+                                    label: "声音",
+                                    click: function () {
                                         openDownloadProject("audio.feng3d.zip");
                                     },
                                 },
@@ -16094,22 +16915,26 @@ var editor;
                             label: "下载网络项目",
                             submenu: [
                                 {
-                                    label: "地形", click: () => {
+                                    label: "地形",
+                                    click: function () {
                                         downloadProject("terrain.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "自定义材质", click: () => {
+                                    label: "自定义材质",
+                                    click: function () {
                                         downloadProject("customshader.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "水", click: () => {
+                                    label: "水",
+                                    click: function () {
                                         downloadProject("water.feng3d.zip");
                                     },
                                 },
                                 {
-                                    label: "灯光", click: () => {
+                                    label: "灯光",
+                                    click: function () {
                                         downloadProject("light.feng3d.zip");
                                     },
                                 },
@@ -16117,18 +16942,18 @@ var editor;
                         },
                         {
                             label: "升级项目",
-                            click: () => {
-                                editor.editorRS.upgradeProject(() => {
+                            click: function () {
+                                editor.editorRS.upgradeProject(function () {
                                     alert("升级完成！");
                                 });
                             },
                         },
                         {
                             label: "清空项目",
-                            click: () => {
+                            click: function () {
                                 editor.editorAsset.rootFile.remove();
-                                editor.editorAsset.initproject(() => {
-                                    editor.editorAsset.runProjectScript(() => {
+                                editor.editorAsset.initproject(function () {
+                                    editor.editorAsset.runProjectScript(function () {
                                         editor.editorData.gameScene = feng3d.View.createNewScene();
                                         editor.editorui.assetview.invalidateAssettree();
                                         console.log("清空项目完成!");
@@ -16143,13 +16968,14 @@ var editor;
                     label: "调试",
                     submenu: [{
                             label: "打开开发者工具",
-                            click: () => {
+                            click: function () {
                                 editor.nativeAPI.openDevTools();
-                            }, show: !!editor.nativeAPI,
+                            },
+                            show: !!editor.nativeAPI,
                         },
                         {
                             label: "编译脚本",
-                            click: () => {
+                            click: function () {
                                 feng3d.globalDispatcher.dispatch("script.compile");
                             },
                         },],
@@ -16163,13 +16989,13 @@ var editor;
                     submenu: [
                         {
                             label: "问题",
-                            click: () => {
+                            click: function () {
                                 window.open("https://github.com/feng3d-labs/editor/issues");
                             },
                         },
                         {
                             label: "文档",
-                            click: () => {
+                            click: function () {
                                 window.open("http://feng3d.com");
                             },
                         },
@@ -16177,18 +17003,18 @@ var editor;
                 },
             ];
             return mainMenu;
-        }
+        };
         /**
          * 获取窗口子菜单
          */
-        getWindowSubMenus() {
+        MenuConfig.prototype.getWindowSubMenus = function () {
             var menus = [
                 {
                     label: "Layouts",
-                    submenu: Object.keys(editor.viewLayoutConfig).map(v => {
+                    submenu: Object.keys(editor.viewLayoutConfig).map(function (v) {
                         return {
                             label: v,
-                            click: () => {
+                            click: function () {
                                 feng3d.globalDispatcher.dispatch("viewLayout.reset", editor.viewLayoutConfig[v]);
                             },
                         };
@@ -16202,10 +17028,10 @@ var editor;
                 editor.ProjectView.moduleName,
                 editor.AnimationView.moduleName,
                 editor.ShortCutSetting.moduleName,
-            ].forEach(v => {
+            ].forEach(function (v) {
                 menus.push({
                     label: v,
-                    click: () => {
+                    click: function () {
                         var tabview = new editor.TabView();
                         tabview.setModuleNames([v]);
                         tabview.left = tabview.right = tabview.top = tabview.bottom = 0;
@@ -16214,15 +17040,16 @@ var editor;
                 });
             });
             return menus;
-        }
+        };
         /**
          * 层级界面创建3D对象列表数据
          */
-        getCreateObjectMenu() {
+        MenuConfig.prototype.getCreateObjectMenu = function () {
             var menu = [
                 //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
                 {
-                    label: "游戏对象", click: () => {
+                    label: "游戏对象",
+                    click: function () {
                         editor.hierarchy.addGameObject(new feng3d.GameObject());
                     }
                 },
@@ -16231,57 +17058,68 @@ var editor;
                     label: "3D对象",
                     submenu: [
                         {
-                            label: "平面", click: () => {
+                            label: "平面",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Plane"));
                             }
                         },
                         {
-                            label: "四边形", click: () => {
+                            label: "四边形",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Quad"));
                             }
                         },
                         {
-                            label: "立方体", click: () => {
+                            label: "立方体",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cube"));
                             }
                         },
                         {
-                            label: "球体", click: () => {
+                            label: "球体",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Sphere"));
                             }
                         },
                         {
-                            label: "胶囊体", click: () => {
+                            label: "胶囊体",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Capsule"));
                             }
                         },
                         {
-                            label: "圆柱体", click: () => {
+                            label: "圆柱体",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cylinder"));
                             }
                         },
                         {
-                            label: "圆锥体", click: () => {
+                            label: "圆锥体",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cone"));
                             }
                         },
                         {
-                            label: "圆环", click: () => {
+                            label: "圆环",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Torus"));
                             }
                         },
                         {
-                            label: "线段", click: () => {
+                            label: "线段",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Segment"));
                             }
                         },
                         {
-                            label: "地形", click: () => {
+                            label: "地形",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
                             }
                         },
                         {
-                            label: "水", click: () => {
+                            label: "水",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Water"));
                             }
                         },
@@ -16291,17 +17129,20 @@ var editor;
                     label: "光源",
                     submenu: [
                         {
-                            label: "点光源", click: () => {
+                            label: "点光源",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Point light"));
                             }
                         },
                         {
-                            label: "方向光源", click: () => {
+                            label: "方向光源",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Directional light"));
                             }
                         },
                         {
-                            label: "聚光灯", click: () => {
+                            label: "聚光灯",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Spot light"));
                             }
                         },
@@ -16311,70 +17152,77 @@ var editor;
                     label: "UI",
                     submenu: [
                         {
-                            label: "矩形", click: () => {
+                            label: "矩形",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Rect"));
                             }
                         },
                         {
-                            label: "图片", click: () => {
+                            label: "图片",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
                             }
                         },
                         {
-                            label: "文本", click: () => {
+                            label: "文本",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Text"));
                             }
                         },
                         {
-                            label: "按钮", click: () => {
+                            label: "按钮",
+                            click: function () {
                                 editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Button"));
                             }
                         },
                     ],
                 },
                 {
-                    label: "粒子系统", click: () => {
+                    label: "粒子系统",
+                    click: function () {
                         editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
                     }
                 },
                 {
-                    label: "摄像机", click: () => {
+                    label: "摄像机",
+                    click: function () {
                         editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
                     }
                 },
             ];
             return menu;
-        }
+        };
         /**
          * 获取创建游戏对象组件菜单
          * @param gameobject 游戏对象
          */
-        getCreateComponentMenu(gameobject) {
+        MenuConfig.prototype.getCreateComponentMenu = function (gameobject) {
             var menu = [];
             // 处理 由 AddComponentMenu 添加的菜单
-            feng3d.menuConfig.component.forEach(item => {
+            feng3d.menuConfig.component.forEach(function (item) {
                 var paths = item.path.split("/");
                 var currentmenu = menu;
                 var currentMenuItem = null;
-                paths.forEach(p => {
+                paths.forEach(function (p) {
                     if (currentMenuItem) {
                         if (!currentMenuItem.submenu)
                             currentMenuItem.submenu = [];
                         currentmenu = currentMenuItem.submenu;
                         currentMenuItem = null;
                     }
-                    currentMenuItem = currentmenu.filter(m => m.label == p)[0];
+                    currentMenuItem = currentmenu.filter(function (m) { return m.label == p; })[0];
                     if (!currentMenuItem) {
                         currentMenuItem = { label: p };
                         currentmenu.push(currentMenuItem);
                     }
                     ;
                 });
-                currentMenuItem.click = () => { gameobject.addComponent(item.type); };
+                currentMenuItem.click = function () { gameobject.addComponent(item.type); };
             });
             return menu;
-        }
-    }
+        };
+        return MenuConfig;
+    }());
     editor.MenuConfig = MenuConfig;
     editor.menuConfig = new MenuConfig();
     /**
@@ -16391,14 +17239,14 @@ var editor;
      */
     function downloadProject(projectname, callback) {
         var path = "projects/" + projectname;
-        feng3d.loader.loadBinary(path, (content) => {
-            editor.editorRS.importProject(content, () => {
-                editor.editorAsset.initproject(() => {
-                    editor.editorAsset.runProjectScript(() => {
-                        editor.editorAsset.readScene("default.scene.json", (err, scene) => {
+        feng3d.loader.loadBinary(path, function (content) {
+            editor.editorRS.importProject(content, function () {
+                editor.editorAsset.initproject(function () {
+                    editor.editorAsset.runProjectScript(function () {
+                        editor.editorAsset.readScene("default.scene.json", function (err, scene) {
                             editor.editorData.gameScene = scene;
                             editor.editorui.assetview.invalidateAssettree();
-                            console.log(`${projectname} 项目下载完成!`);
+                            console.log(projectname + " \u9879\u76EE\u4E0B\u8F7D\u5B8C\u6210!");
                             callback && callback();
                         });
                     });
@@ -16514,15 +17362,15 @@ var shortcutConfig = [
 //////////////////////////////////////////////////////////////////////////////////////
 var ts;
 (function (ts) {
-    let checker;
-    let sourceFiles;
-    let rootFileNames;
-    let dependencyMap;
-    let pathWeightMap;
-    let visitedBlocks;
-    let calledMethods = [];
+    var checker;
+    var sourceFiles;
+    var rootFileNames;
+    var dependencyMap;
+    var pathWeightMap;
+    var visitedBlocks;
+    var calledMethods = [];
     function createMap() {
-        const map = Object.create(null);
+        var map = Object.create(null);
         // Using 'delete' on an object causes V8 to put the object in dictionary mode.
         // This disables creation of hidden classes, which are expensive when an object is
         // constantly changing shape.
@@ -16536,7 +17384,7 @@ var ts;
         checker = program.getTypeChecker();
         visitedBlocks = [];
         buildDependencyMap();
-        let result = sortOnDependency();
+        var result = sortOnDependency();
         sourceFiles = [];
         rootFileNames = [];
         checker = null;
@@ -16549,7 +17397,7 @@ var ts;
         if (file == dependent) {
             return;
         }
-        let list = dependencyMap[file];
+        var list = dependencyMap[file];
         if (!list) {
             list = dependencyMap[file] = [];
         }
@@ -16559,8 +17407,8 @@ var ts;
     }
     function buildDependencyMap() {
         dependencyMap = createMap();
-        for (let i = 0; i < sourceFiles.length; i++) {
-            let sourceFile = sourceFiles[i];
+        for (var i = 0; i < sourceFiles.length; i++) {
+            var sourceFile = sourceFiles[i];
             if (sourceFile.isDeclarationFile) {
                 continue;
             }
@@ -16568,10 +17416,10 @@ var ts;
         }
     }
     function visitFile(sourceFile) {
-        let statements = sourceFile.statements;
-        let length = statements.length;
-        for (let i = 0; i < length; i++) {
-            let statement = statements[i];
+        var statements = sourceFile.statements;
+        var length = statements.length;
+        for (var i = 0; i < length; i++) {
+            var statement = statements[i];
             if (ts.hasModifier(statement, ts.ModifierFlags.Ambient)) { // has the 'declare' keyword
                 continue;
             }
@@ -16584,7 +17432,7 @@ var ts;
         }
         switch (statement.kind) {
             case ts.SyntaxKind.ExpressionStatement:
-                let expression = statement;
+                var expression = statement;
                 visitExpression(expression.expression);
                 break;
             case ts.SyntaxKind.ClassDeclaration:
@@ -16598,7 +17446,7 @@ var ts;
                 visitVariableList(statement.declarationList);
                 break;
             case ts.SyntaxKind.ImportEqualsDeclaration:
-                let importDeclaration = statement;
+                var importDeclaration = statement;
                 checkDependencyAtLocation(importDeclaration.moduleReference);
                 break;
             case ts.SyntaxKind.ModuleDeclaration:
@@ -16608,7 +17456,7 @@ var ts;
                 visitBlock(statement);
                 break;
             case ts.SyntaxKind.IfStatement:
-                const ifStatement = statement;
+                var ifStatement = statement;
                 visitExpression(ifStatement.expression);
                 visitStatement(ifStatement.thenStatement);
                 visitStatement(ifStatement.elseStatement);
@@ -16616,12 +17464,12 @@ var ts;
             case ts.SyntaxKind.DoStatement:
             case ts.SyntaxKind.WhileStatement:
             case ts.SyntaxKind.WithStatement:
-                const doStatement = statement;
+                var doStatement = statement;
                 visitExpression(doStatement.expression);
                 visitStatement(doStatement.statement);
                 break;
             case ts.SyntaxKind.ForStatement:
-                const forStatement = statement;
+                var forStatement = statement;
                 visitExpression(forStatement.condition);
                 visitExpression(forStatement.incrementor);
                 if (forStatement.initializer) {
@@ -16635,7 +17483,7 @@ var ts;
                 break;
             case ts.SyntaxKind.ForInStatement:
             case ts.SyntaxKind.ForOfStatement:
-                const forInStatement = statement;
+                var forInStatement = statement;
                 visitExpression(forInStatement.expression);
                 if (forInStatement.initializer) {
                     if (forInStatement.initializer.kind === ts.SyntaxKind.VariableDeclarationList) {
@@ -16650,13 +17498,13 @@ var ts;
                 visitExpression(statement.expression);
                 break;
             case ts.SyntaxKind.SwitchStatement:
-                const switchStatment = statement;
+                var switchStatment = statement;
                 visitExpression(switchStatment.expression);
-                switchStatment.caseBlock.clauses.forEach(element => {
+                switchStatment.caseBlock.clauses.forEach(function (element) {
                     if (element.kind === ts.SyntaxKind.CaseClause) {
                         visitExpression(element.expression);
                     }
-                    element.statements.forEach(element => {
+                    element.statements.forEach(function (element) {
                         visitStatement(element);
                     });
                 });
@@ -16668,7 +17516,7 @@ var ts;
                 visitExpression(statement.expression);
                 break;
             case ts.SyntaxKind.TryStatement:
-                const tryStatement = statement;
+                var tryStatement = statement;
                 visitBlock(tryStatement.tryBlock);
                 visitBlock(tryStatement.finallyBlock);
                 if (tryStatement.catchClause) {
@@ -16683,7 +17531,8 @@ var ts;
             return;
         }
         if (node.body.kind === ts.SyntaxKind.ModuleBlock) {
-            for (let statement of node.body.statements) {
+            for (var _i = 0, _a = node.body.statements; _i < _a.length; _i++) {
+                var statement = _a[_i];
                 if (ts.hasModifier(statement, ts.ModifierFlags.Ambient)) { // has the 'declare' keyword
                     continue;
                 }
@@ -16692,11 +17541,11 @@ var ts;
         }
     }
     function checkDependencyAtLocation(node) {
-        let symbol = checker.getSymbolAtLocation(node);
+        var symbol = checker.getSymbolAtLocation(node);
         if (!symbol || !symbol.declarations) {
             return;
         }
-        let sourceFile = getSourceFileOfNode(symbol.declarations[0]);
+        var sourceFile = getSourceFileOfNode(symbol.declarations[0]);
         if (!sourceFile || sourceFile.isDeclarationFile) {
             return;
         }
@@ -16706,8 +17555,9 @@ var ts;
         if (!node.heritageClauses) {
             return;
         }
-        let heritageClause = null;
-        for (const clause of node.heritageClauses) {
+        var heritageClause = null;
+        for (var _i = 0, _a = node.heritageClauses; _i < _a.length; _i++) {
+            var clause = _a[_i];
             if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
                 heritageClause = clause;
                 break;
@@ -16716,25 +17566,26 @@ var ts;
         if (!heritageClause) {
             return;
         }
-        let superClasses = heritageClause.types;
+        var superClasses = heritageClause.types;
         if (!superClasses) {
             return;
         }
-        superClasses.forEach(superClass => {
+        superClasses.forEach(function (superClass) {
             checkDependencyAtLocation(superClass.expression);
         });
     }
     function visitStaticMember(node) {
-        let members = node.members;
+        var members = node.members;
         if (!members) {
             return;
         }
-        for (let member of members) {
+        for (var _i = 0, members_1 = members; _i < members_1.length; _i++) {
+            var member = members_1[_i];
             if (!ts.hasModifier(member, ts.ModifierFlags.Static)) {
                 continue;
             }
             if (member.kind == ts.SyntaxKind.PropertyDeclaration) {
-                let property = member;
+                var property = member;
                 visitExpression(property.initializer);
             }
         }
@@ -16743,15 +17594,16 @@ var ts;
         if (node.decorators) {
             visitDecorators(node.decorators);
         }
-        let members = node.members;
+        var members = node.members;
         if (!members) {
             return;
         }
-        for (let member of members) {
-            let decorators;
-            let functionLikeMember;
+        for (var _i = 0, members_2 = members; _i < members_2.length; _i++) {
+            var member = members_2[_i];
+            var decorators = void 0;
+            var functionLikeMember = void 0;
             if (member.kind === ts.SyntaxKind.GetAccessor || member.kind === ts.SyntaxKind.SetAccessor) {
-                const accessors = ts.getAllAccessorDeclarations(node.members, member);
+                var accessors = ts.getAllAccessorDeclarations(node.members, member);
                 if (member !== accessors.firstAccessor) {
                     continue;
                 }
@@ -16771,7 +17623,8 @@ var ts;
                 visitDecorators(decorators);
             }
             if (functionLikeMember) {
-                for (const parameter of functionLikeMember.parameters) {
+                for (var _a = 0, _b = functionLikeMember.parameters; _a < _b.length; _a++) {
+                    var parameter = _b[_a];
                     if (parameter.decorators) {
                         visitDecorators(parameter.decorators);
                     }
@@ -16780,7 +17633,8 @@ var ts;
         }
     }
     function visitDecorators(decorators) {
-        for (let decorator of decorators) {
+        for (var _i = 0, decorators_1 = decorators; _i < decorators_1.length; _i++) {
+            var decorator = decorators_1[_i];
             visitCallExpression(decorator.expression);
         }
     }
@@ -16807,17 +17661,17 @@ var ts;
                 visitObjectLiteralExpression(expression);
                 break;
             case ts.SyntaxKind.ArrayLiteralExpression:
-                let arrayLiteral = expression;
+                var arrayLiteral = expression;
                 arrayLiteral.elements.forEach(visitExpression);
                 break;
             case ts.SyntaxKind.TemplateExpression:
-                let template = expression;
-                template.templateSpans.forEach(span => {
+                var template = expression;
+                template.templateSpans.forEach(function (span) {
                     visitExpression(span.expression);
                 });
                 break;
             case ts.SyntaxKind.ParenthesizedExpression:
-                let parenthesized = expression;
+                var parenthesized = expression;
                 visitExpression(parenthesized.expression);
                 break;
             case ts.SyntaxKind.BinaryExpression:
@@ -16869,20 +17723,21 @@ var ts;
         // AsExpression
     }
     function visitBinaryExpression(binary) {
-        let left = binary.left;
-        let right = binary.right;
+        var left = binary.left;
+        var right = binary.right;
         visitExpression(left);
         visitExpression(right);
         if (binary.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
             (left.kind === ts.SyntaxKind.Identifier || left.kind === ts.SyntaxKind.PropertyAccessExpression) &&
             (right.kind === ts.SyntaxKind.Identifier || right.kind === ts.SyntaxKind.PropertyAccessExpression)) {
-            let symbol = checker.getSymbolAtLocation(left);
+            var symbol = checker.getSymbolAtLocation(left);
             if (!symbol || !symbol.declarations) {
                 return;
             }
-            for (let declaration of symbol.declarations) {
+            for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
+                var declaration = _a[_i];
                 if (declaration.kind === ts.SyntaxKind.VariableDeclaration || declaration.kind === ts.SyntaxKind.PropertyDeclaration) {
-                    let variable = declaration;
+                    var variable = declaration;
                     if (variable.initializer) {
                         continue;
                     }
@@ -16891,7 +17746,8 @@ var ts;
                     }
                     variable.delayInitializerList.push(right);
                     if (variable.callerList) {
-                        for (let callerFileName of variable.callerList) {
+                        for (var _b = 0, _c = variable.callerList; _b < _c.length; _b++) {
+                            var callerFileName = _c[_b];
                             checkCallTarget(callerFileName, right);
                         }
                     }
@@ -16900,7 +17756,7 @@ var ts;
         }
     }
     function visitObjectLiteralExpression(objectLiteral) {
-        objectLiteral.properties.forEach(element => {
+        objectLiteral.properties.forEach(function (element) {
             switch (element.kind) {
                 case ts.SyntaxKind.PropertyAssignment:
                     visitExpression(element.initializer);
@@ -16916,7 +17772,7 @@ var ts;
     }
     function visitCallArguments(callExpression) {
         if (callExpression.arguments) {
-            callExpression.arguments.forEach(argument => {
+            callExpression.arguments.forEach(function (argument) {
                 visitExpression(argument);
             });
         }
@@ -16926,12 +17782,12 @@ var ts;
         visitExpression(expression);
         switch (expression.kind) {
             case ts.SyntaxKind.FunctionExpression:
-                let functionExpression = expression;
+                var functionExpression = expression;
                 visitBlock(functionExpression.body);
                 break;
             case ts.SyntaxKind.PropertyAccessExpression:
             case ts.SyntaxKind.Identifier:
-                let callerFileName = getSourceFileOfNode(expression).fileName;
+                var callerFileName = getSourceFileOfNode(expression).fileName;
                 checkCallTarget(callerFileName, expression);
                 break;
             case ts.SyntaxKind.CallExpression:
@@ -16941,27 +17797,29 @@ var ts;
     }
     function visitReturnedFunction(expression) {
         expression = escapeParenthesized(expression);
-        let returnExpressions = [];
+        var returnExpressions = [];
         if (expression.kind === ts.SyntaxKind.CallExpression) {
-            let expressions = visitReturnedFunction(expression.expression);
-            for (let returnExpression of expressions) {
-                let returns = visitReturnedFunction(returnExpression);
+            var expressions = visitReturnedFunction(expression.expression);
+            for (var _i = 0, expressions_1 = expressions; _i < expressions_1.length; _i++) {
+                var returnExpression = expressions_1[_i];
+                var returns = visitReturnedFunction(returnExpression);
                 returnExpressions = returnExpressions.concat(returns);
             }
             return returnExpressions;
         }
-        let functionBlocks = [];
+        var functionBlocks = [];
         switch (expression.kind) {
             case ts.SyntaxKind.FunctionExpression:
                 functionBlocks.push(expression.body);
                 break;
             case ts.SyntaxKind.PropertyAccessExpression:
             case ts.SyntaxKind.Identifier:
-                let callerFileName = getSourceFileOfNode(expression).fileName;
-                let declarations = [];
+                var callerFileName = getSourceFileOfNode(expression).fileName;
+                var declarations = [];
                 getForwardDeclarations(expression, declarations, callerFileName);
-                for (let declaration of declarations) {
-                    let sourceFile = getSourceFileOfNode(declaration);
+                for (var _a = 0, declarations_1 = declarations; _a < declarations_1.length; _a++) {
+                    var declaration = declarations_1[_a];
+                    var sourceFile = getSourceFileOfNode(declaration);
                     if (!sourceFile || sourceFile.isDeclarationFile) {
                         continue;
                     }
@@ -16972,10 +17830,12 @@ var ts;
                 }
                 break;
         }
-        for (let block of functionBlocks) {
-            for (let statement of block.statements) {
+        for (var _b = 0, functionBlocks_1 = functionBlocks; _b < functionBlocks_1.length; _b++) {
+            var block = functionBlocks_1[_b];
+            for (var _c = 0, _d = block.statements; _c < _d.length; _c++) {
+                var statement = _d[_c];
                 if (statement.kind === ts.SyntaxKind.ReturnStatement) {
-                    let returnExpression = statement.expression;
+                    var returnExpression = statement.expression;
                     returnExpressions.push(returnExpression);
                     visitCallExpression(returnExpression);
                 }
@@ -16990,10 +17850,11 @@ var ts;
         return expression;
     }
     function checkCallTarget(callerFileName, target) {
-        let declarations = [];
+        var declarations = [];
         getForwardDeclarations(target, declarations, callerFileName);
-        for (let declaration of declarations) {
-            let sourceFile = getSourceFileOfNode(declaration);
+        for (var _i = 0, declarations_2 = declarations; _i < declarations_2.length; _i++) {
+            var declaration = declarations_2[_i];
+            var sourceFile = getSourceFileOfNode(declaration);
             if (!sourceFile || sourceFile.isDeclarationFile) {
                 continue;
             }
@@ -17011,11 +17872,12 @@ var ts;
         }
     }
     function getForwardDeclarations(reference, declarations, callerFileName) {
-        let symbol = checker.getSymbolAtLocation(reference);
+        var symbol = checker.getSymbolAtLocation(reference);
         if (!symbol || !symbol.declarations) {
             return;
         }
-        for (let declaration of symbol.declarations) {
+        for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
+            var declaration = _a[_i];
             switch (declaration.kind) {
                 case ts.SyntaxKind.FunctionDeclaration:
                 case ts.SyntaxKind.MethodDeclaration:
@@ -17029,8 +17891,8 @@ var ts;
                     break;
                 case ts.SyntaxKind.VariableDeclaration:
                 case ts.SyntaxKind.PropertyDeclaration:
-                    const variable = declaration;
-                    const initializer = variable.initializer;
+                    var variable = declaration;
+                    var initializer = variable.initializer;
                     if (initializer) {
                         if (initializer.kind === ts.SyntaxKind.Identifier || initializer.kind === ts.SyntaxKind.PropertyAccessExpression) {
                             getForwardDeclarations(initializer, declarations, callerFileName);
@@ -17038,7 +17900,8 @@ var ts;
                     }
                     else {
                         if (variable.delayInitializerList) {
-                            for (let expression of variable.delayInitializerList) {
+                            for (var _b = 0, _c = variable.delayInitializerList; _b < _c.length; _b++) {
+                                var expression = _c[_b];
                                 getForwardDeclarations(expression, declarations, callerFileName);
                             }
                         }
@@ -17056,46 +17919,48 @@ var ts;
         }
     }
     function checkClassInstantiation(node) {
-        let methodNames = [];
-        let superClass = ts.getClassExtendsHeritageElement(node);
+        var methodNames = [];
+        var superClass = ts.getClassExtendsHeritageElement(node);
         if (superClass) {
-            let type = checker.getTypeAtLocation(superClass);
+            var type = checker.getTypeAtLocation(superClass);
             if (type && type.symbol) {
-                let declaration = ts.getDeclarationOfKind(type.symbol, ts.SyntaxKind.ClassDeclaration);
+                var declaration = ts.getDeclarationOfKind(type.symbol, ts.SyntaxKind.ClassDeclaration);
                 if (declaration) {
                     methodNames = checkClassInstantiation(declaration);
                 }
             }
         }
-        let members = node.members;
+        var members = node.members;
         if (!members) {
             return [];
         }
-        let index = calledMethods.length;
-        for (let member of members) {
+        var index = calledMethods.length;
+        for (var _i = 0, members_3 = members; _i < members_3.length; _i++) {
+            var member = members_3[_i];
             if (ts.hasModifier(member, ts.ModifierFlags.Static)) {
                 continue;
             }
             if (member.kind === ts.SyntaxKind.MethodDeclaration) { // called by super class.
-                let methodName = ts.unescapeLeadingUnderscores(ts.getTextOfPropertyName(member.name));
+                var methodName = ts.unescapeLeadingUnderscores(ts.getTextOfPropertyName(member.name));
                 if (methodNames.indexOf(methodName) != -1) {
                     visitBlock(member.body);
                 }
             }
             if (member.kind === ts.SyntaxKind.PropertyDeclaration) {
-                let property = member;
+                var property = member;
                 visitExpression(property.initializer);
             }
             else if (member.kind === ts.SyntaxKind.Constructor) {
-                let constructor = member;
+                var constructor = member;
                 visitBlock(constructor.body);
             }
         }
-        for (let i = index; i < calledMethods.length; i++) {
-            let method = calledMethods[i];
-            for (let memeber of members) {
+        for (var i = index; i < calledMethods.length; i++) {
+            var method = calledMethods[i];
+            for (var _a = 0, members_4 = members; _a < members_4.length; _a++) {
+                var memeber = members_4[_a];
                 if (memeber === method) {
-                    let methodName = ts.unescapeLeadingUnderscores(ts.getTextOfPropertyName(method.name));
+                    var methodName = ts.unescapeLeadingUnderscores(ts.getTextOfPropertyName(method.name));
                     methodNames.push(methodName);
                 }
             }
@@ -17110,7 +17975,8 @@ var ts;
             return;
         }
         visitedBlocks.push(block);
-        for (let statement of block.statements) {
+        for (var _i = 0, _a = block.statements; _i < _a.length; _i++) {
+            var statement = _a[_i];
             visitStatement(statement);
         }
         visitedBlocks.pop();
@@ -17119,25 +17985,26 @@ var ts;
         if (!variables) {
             return;
         }
-        variables.declarations.forEach(declaration => {
+        variables.declarations.forEach(function (declaration) {
             visitExpression(declaration.initializer);
         });
     }
     function sortOnDependency() {
-        let result = {};
+        var result = {};
         result.sortedFileNames = [];
         result.circularReferences = [];
         pathWeightMap = createMap();
-        let dtsFiles = [];
-        let tsFiles = [];
-        for (let sourceFile of sourceFiles) {
-            let path = sourceFile.fileName;
+        var dtsFiles = [];
+        var tsFiles = [];
+        for (var _i = 0, sourceFiles_1 = sourceFiles; _i < sourceFiles_1.length; _i++) {
+            var sourceFile = sourceFiles_1[_i];
+            var path = sourceFile.fileName;
             if (sourceFile.isDeclarationFile) {
                 pathWeightMap[path] = 10000;
                 dtsFiles.push(sourceFile);
                 continue;
             }
-            let references = updatePathWeight(path, 0, [path]);
+            var references = updatePathWeight(path, 0, [path]);
             if (references.length > 0) {
                 result.circularReferences = references;
                 break;
@@ -17150,7 +18017,7 @@ var ts;
             });
             sourceFiles.length = 0;
             rootFileNames.length = 0;
-            dtsFiles.concat(tsFiles).forEach(sourceFile => {
+            dtsFiles.concat(tsFiles).forEach(function (sourceFile) {
                 sourceFiles.push(sourceFile);
                 rootFileNames.push(sourceFile.fileName);
                 result.sortedFileNames.push(sourceFile.fileName);
@@ -17171,16 +18038,17 @@ var ts;
                 return [];
             }
         }
-        let list = dependencyMap[path];
+        var list = dependencyMap[path];
         if (!list) {
             return [];
         }
-        for (let parentPath of list) {
+        for (var _i = 0, list_1 = list; _i < list_1.length; _i++) {
+            var parentPath = list_1[_i];
             if (references.indexOf(parentPath) != -1) {
                 references.push(parentPath);
                 return references;
             }
-            let result = updatePathWeight(parentPath, weight + 1, references.concat(parentPath));
+            var result = updatePathWeight(parentPath, weight + 1, references.concat(parentPath));
             if (result.length > 0) {
                 return result;
             }
@@ -17197,23 +18065,23 @@ var ts;
 /// <reference path="../libs/typescriptServices.d.ts" />
 var editor;
 (function (editor) {
-    class ScriptCompiler {
-        constructor() {
+    var ScriptCompiler = /** @class */ (function () {
+        function ScriptCompiler() {
             feng3d.globalDispatcher.on("script.compile", this.onScriptCompile, this);
             feng3d.globalDispatcher.on("script.gettslibs", this.onGettsLibs, this);
             feng3d.globalDispatcher.on("openScript", this.onOpenScript, this);
             feng3d.globalDispatcher.on("fs.delete", this.onFileChanged, this);
             feng3d.globalDispatcher.on("fs.write", this.onFileChanged, this);
         }
-        onOpenScript(e) {
+        ScriptCompiler.prototype.onOpenScript = function (e) {
             editor.editorData.openScript = e.data;
             if (editor.nativeAPI) {
                 // 使用本地 VSCode 打开
                 var path = editor.editorRS.fs.getAbsolutePath(editor.editorData.openScript.assetPath);
-                editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, (err) => {
+                editor.nativeAPI.openWithVSCode(editor.editorRS.fs.projectname, function (err) {
                     if (err)
                         throw err;
-                    editor.nativeAPI.openWithVSCode(path, (err) => {
+                    editor.nativeAPI.openWithVSCode(path, function (err) {
                         if (err)
                             throw err;
                     });
@@ -17222,56 +18090,58 @@ var editor;
             else {
                 if (codeeditoWin)
                     codeeditoWin.close();
-                codeeditoWin = window.open(`codeeditor.html`);
-                codeeditoWin.onload = () => {
+                codeeditoWin = window.open("codeeditor.html");
+                codeeditoWin.onload = function () {
                     feng3d.globalDispatcher.dispatch("codeeditor.openScript", editor.editorData.openScript);
                 };
             }
-        }
-        onGettsLibs(e) {
+        };
+        ScriptCompiler.prototype.onGettsLibs = function (e) {
             this.loadtslibs(e.data.callback);
-        }
+        };
         /**
          * 加载 tslibs
          *
          * @param callback 完成回调
          */
-        loadtslibs(callback) {
+        ScriptCompiler.prototype.loadtslibs = function (callback) {
+            var _this = this;
             // 加载 ts 配置
-            editor.editorRS.fs.readString("tsconfig.json", (err, str) => {
+            editor.editorRS.fs.readString("tsconfig.json", function (err, str) {
                 console.assert(!err);
-                this.tsconfig = json.parse(str);
-                console.log(this.tsconfig);
+                _this.tsconfig = json.parse(str);
+                console.log(_this.tsconfig);
                 var tslist = editor.editorRS.getAssetsByType(feng3d.ScriptAsset);
-                var files = this.tsconfig.files;
-                files = files.filter(v => v.indexOf("Assets") != 0);
-                files = files.concat(tslist.map(v => v.assetPath));
+                var files = _this.tsconfig.files;
+                files = files.filter(function (v) { return v.indexOf("Assets") != 0; });
+                files = files.concat(tslist.map(function (v) { return v.assetPath; }));
                 //
-                editor.editorRS.fs.readStrings(files, (strs) => {
-                    var tslibs = files.map((f, i) => {
-                        let str = strs[i];
+                editor.editorRS.fs.readStrings(files, function (strs) {
+                    var tslibs = files.map(function (f, i) {
+                        var str = strs[i];
                         if (typeof str == "string")
                             return { path: f, code: str };
-                        console.warn(`没有找到文件 ${f}`);
+                        console.warn("\u6CA1\u6709\u627E\u5230\u6587\u4EF6 " + f);
                         return null;
-                    }).filter(v => !!v);
+                    }).filter(function (v) { return !!v; });
                     callback(tslibs);
                 });
             });
-        }
-        onFileChanged(e) {
+        };
+        ScriptCompiler.prototype.onFileChanged = function (e) {
             if (!e.data)
                 return;
             if (e.data.substr(-3) == ".ts") {
                 feng3d.ticker.once(2000, this.onScriptCompile, this);
             }
-        }
-        onScriptCompile(e) {
-            this.loadtslibs((tslibs) => {
-                this.compile(tslibs, e && e.data && e.data.onComplete);
+        };
+        ScriptCompiler.prototype.onScriptCompile = function (e) {
+            var _this = this;
+            this.loadtslibs(function (tslibs) {
+                _this.compile(tslibs, e && e.data && e.data.onComplete);
             });
-        }
-        getOptions() {
+        };
+        ScriptCompiler.prototype.getOptions = function () {
             var targetMap = {
                 'es3': ts.ScriptTarget.ES3, 'es5': ts.ScriptTarget.ES5, 'es2015': ts.ScriptTarget.ES2015, 'es2016': ts.ScriptTarget.ES2016, 'es2017': ts.ScriptTarget.ES2017, 'es2018': ts.ScriptTarget.ES2018
             };
@@ -17279,14 +18149,14 @@ var editor;
             if (targetMap[options.target])
                 options.target = targetMap[options.target];
             return options;
-        }
-        compile(tslibs, callback) {
+        };
+        ScriptCompiler.prototype.compile = function (tslibs, callback) {
             try {
                 var output = this.transpileModule(tslibs);
-                output.forEach(v => {
+                output.forEach(function (v) {
                     editor.editorRS.fs.writeString(v.name, v.text);
                 });
-                editor.editorAsset.runProjectScript(() => {
+                editor.editorAsset.runProjectScript(function () {
                     feng3d.globalDispatcher.dispatch("asset.scriptChanged");
                 });
             }
@@ -17294,13 +18164,13 @@ var editor;
                 console.log("Error from compilation: " + e + "  " + (e.stack || ""));
             }
             callback && callback(null);
-            feng3d.globalDispatcher.dispatch("message", `编译完成！`);
-        }
-        transpileModule(tslibs) {
+            feng3d.globalDispatcher.dispatch("message", "\u7F16\u8BD1\u5B8C\u6210\uFF01");
+        };
+        ScriptCompiler.prototype.transpileModule = function (tslibs) {
             var options = this.getOptions();
             var tsSourceMap = {};
             var fileNames = [];
-            tslibs.forEach(item => {
+            tslibs.forEach(function (item) {
                 fileNames.push(item.path);
                 tsSourceMap[item.path] = ts.createSourceFile(item.path, item.code, options.target || ts.ScriptTarget.ES5);
             });
@@ -17309,10 +18179,10 @@ var editor;
             // 排序
             var program = this.createProgram(fileNames, options, tsSourceMap, outputs);
             var result = ts.reorderSourceFiles(program);
-            console.log(`ts 排序结果`);
+            console.log("ts \u6392\u5E8F\u7ED3\u679C");
             console.log(result);
             if (result.circularReferences.length > 0) {
-                console.warn(`出现循环引用`);
+                console.warn("\u51FA\u73B0\u5FAA\u73AF\u5F15\u7528");
                 return;
             }
             this.tsconfig.files = result.sortedFileNames;
@@ -17321,8 +18191,8 @@ var editor;
             var program = this.createProgram(result.sortedFileNames, options, tsSourceMap, outputs);
             program.emit();
             return outputs;
-        }
-        createProgram(fileNames, options, tsSourceMap, outputs) {
+        };
+        ScriptCompiler.prototype.createProgram = function (fileNames, options, tsSourceMap, outputs) {
             return ts.createProgram(fileNames, options, {
                 getSourceFile: function (fileName) {
                     return tsSourceMap[fileName];
@@ -17342,8 +18212,9 @@ var editor;
                 directoryExists: function () { return true; },
                 getDirectories: function () { return []; }
             });
-        }
-    }
+        };
+        return ScriptCompiler;
+    }());
     editor.ScriptCompiler = ScriptCompiler;
     editor.scriptCompiler = new ScriptCompiler();
 })(editor || (editor = {}));
@@ -17353,17 +18224,20 @@ var editor;
      * editor的版本号
      */
     editor.version = "2018.08.22";
-    console.log(`editor version ${editor.version}`);
+    console.log("editor version " + editor.version);
     /**
      * 编辑器
      */
-    class Editor extends eui.UILayer {
-        constructor() {
-            super();
+    var Editor = /** @class */ (function (_super) {
+        __extends(Editor, _super);
+        function Editor() {
+            var _this = _super.call(this) || this;
             // giteeOauth.oauth();
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+            _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddedToStage, _this);
+            return _this;
         }
-        onAddedToStage() {
+        Editor.prototype.onAddedToStage = function () {
+            var _this = this;
             editor.editorui.stage = this.stage;
             //
             editor.modules.message = new editor.Message();
@@ -17372,33 +18246,34 @@ var editor;
                 this.initEgret.bind(this),
                 editor.editorRS.initproject.bind(editor.editorRS),
                 this.init.bind(this),
-            ])(() => {
-                console.log(`初始化完成。`);
+            ])(function () {
+                console.log("\u521D\u59CB\u5316\u5B8C\u6210\u3002");
                 // 移除无效入口类显示对象
-                this.parent && this.parent.removeChild(this);
+                _this.parent && _this.parent.removeChild(_this);
             });
-        }
+        };
         /**
          * 初始化 Egret
          *
          * @param callback 完成回调
          */
-        initEgret(callback) {
-            var mainui = new editor.MainUI(() => {
+        Editor.prototype.initEgret = function (callback) {
+            var _this = this;
+            var mainui = new editor.MainUI(function () {
                 //
                 var tooltipLayer = new eui.UILayer();
                 tooltipLayer.touchEnabled = false;
-                this.stage.addChild(tooltipLayer);
+                _this.stage.addChild(tooltipLayer);
                 editor.editorui.tooltipLayer = tooltipLayer;
                 //
                 var popupLayer = new eui.UILayer();
                 popupLayer.touchEnabled = false;
-                this.stage.addChild(popupLayer);
+                _this.stage.addChild(popupLayer);
                 editor.editorui.popupLayer = popupLayer;
                 //
                 var messageLayer = new eui.UILayer();
                 messageLayer.touchEnabled = false;
-                this.stage.addChild(messageLayer);
+                _this.stage.addChild(messageLayer);
                 editor.editorui.messageLayer = messageLayer;
                 //
                 editor.editorcache.projectname = editor.editorcache.projectname || "newproject";
@@ -17406,37 +18281,39 @@ var editor;
                 callback();
             });
             editor.editorui.stage.addChild(mainui);
-        }
-        init(callback) {
+        };
+        Editor.prototype.init = function (callback) {
+            var _this = this;
             document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editor.editorcache.projectname;
             editor.editorcache.setLastProject(editor.editorcache.projectname);
-            editor.editorAsset.initproject(() => {
-                editor.editorAsset.runProjectScript(() => {
-                    editor.editorAsset.readScene("default.scene.json", (err, scene) => {
+            editor.editorAsset.initproject(function () {
+                editor.editorAsset.runProjectScript(function () {
+                    editor.editorAsset.readScene("default.scene.json", function (err, scene) {
                         if (err)
                             editor.editorData.gameScene = feng3d.View.createNewScene();
                         else
                             editor.editorData.gameScene = scene;
                         //
-                        this.initMainView();
+                        _this.initMainView();
                         new editor.Editorshortcut();
                         egret.mouseEventEnvironment();
                         callback();
                     });
                 });
             });
-            window.addEventListener("beforeunload", () => {
-                let obj = feng3d.serialization.serialize(editor.editorData.gameScene.gameObject);
+            window.addEventListener("beforeunload", function () {
+                var obj = feng3d.serialization.serialize(editor.editorData.gameScene.gameObject);
                 editor.editorRS.fs.writeObject("default.scene.json", obj);
             });
-        }
-        initMainView() {
+        };
+        Editor.prototype.initMainView = function () {
             //
             var mainView = new editor.MainView();
             editor.editorui.mainview = mainView;
             this.stage.addChildAt(mainView, 1);
-        }
-    }
+        };
+        return Editor;
+    }(eui.UILayer));
     editor.Editor = Editor;
 })(editor || (editor = {}));
 //# sourceMappingURL=editor.js.map

@@ -5,6 +5,8 @@ declare namespace CANNON {
     type Matrix3x3 = feng3d.Matrix3x3;
     var Quaternion: typeof feng3d.Quaternion;
     type Quaternion = feng3d.Quaternion;
+    var Box3: typeof feng3d.Box3;
+    type Box3 = feng3d.Box3;
 }
 declare namespace CANNON {
     class Transform {
@@ -40,6 +42,20 @@ declare namespace CANNON {
          */
         pointToWorld(localPoint: Vector3, result: Vector3): feng3d.Vector3;
         vectorToWorldFrame(localVector: Vector3, result?: feng3d.Vector3): feng3d.Vector3;
+        /**
+         * Get the representation of an AABB in another frame.
+         * @param frame
+         * @param target
+         * @return The "target" AABB object.
+         */
+        toLocalFrameBox3(box3: Box3, target: Box3): feng3d.Box3;
+        /**
+         * Get the representation of an AABB in the global frame.
+         * @param frame
+         * @param target
+         * @return The "target" AABB object.
+         */
+        toWorldFrameBox3(box3: Box3, target: Box3): feng3d.Box3;
         static vectorToWorldFrame(quaternion: Quaternion, localVector: Vector3, result: Vector3): feng3d.Vector3;
         static vectorToLocalFrame(position: Vector3, quaternion: Quaternion, worldVector: Vector3, result?: feng3d.Vector3): feng3d.Vector3;
     }
@@ -66,81 +82,6 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    /**
-     * Base class for objects that dispatches events.
-     */
-    class EventTarget {
-        private _listeners;
-        /**
-         * Add an event listener
-         * @param  type
-         * @param  listener
-         * @return The self object, for chainability.
-         */
-        addEventListener(type: string, listener: Function): this;
-        /**
-         * Check if an event listener is added
-         * @param type
-         * @param listener
-         */
-        hasEventListener(type: string, listener: Function): boolean;
-        /**
-         * Check if any event listener of the given type is added
-         * @param type
-         */
-        hasAnyEventListener(type: string): boolean;
-        /**
-         * Remove an event listener
-         * @param type
-         * @param listener
-         * @return The self object, for chainability.
-         */
-        removeEventListener(type: string, listener: Function): this;
-        /**
-         * Emit an event.
-         * @param event
-         * @return The self object, for chainability.
-         */
-        dispatchEvent(event: {
-            type: string;
-            target?: EventTarget;
-        }): this;
-    }
-}
-declare namespace CANNON {
-    /**
-     * For pooling objects that can be reused.
-     */
-    class Pool<T> {
-        /**
-         * The pooled objects
-         */
-        objects: T[];
-        /**
-         * Constructor of the objects
-         */
-        type: Object;
-        constructor();
-        /**
-         * Release an object after use
-         */
-        release(...args: T[]): this;
-        /**
-         * Get an object
-         */
-        get(): T;
-        /**
-         * Construct an object. Should be implmented in each subclass.
-         */
-        constructObject(): T;
-        /**
-         * @param size
-         * @return Self, for chaining
-         */
-        resize(size: number): this;
-    }
-}
-declare namespace CANNON {
     class Utils {
         /**
          * Extend an options object with default values.
@@ -149,32 +90,6 @@ declare namespace CANNON {
          * @return The modified options object.
          */
         static defaults(options: Object, defaults: Object): Object;
-    }
-}
-declare namespace CANNON {
-    class Vec3Pool extends Pool<Vector3> {
-        constructor();
-        /**
-         * Construct a vector
-         */
-        constructObject(): feng3d.Vector3;
-    }
-}
-declare namespace CANNON {
-    class TupleDictionary<T> {
-        /**
-         * The data storage
-         */
-        data: {
-            keys: string[];
-        };
-        /**
-         * @param i
-         * @param j
-         */
-        get(i: number, j: number): T;
-        set(i: number, j: number, value: T): void;
-        reset(): void;
     }
 }
 declare namespace CANNON {
@@ -399,7 +314,7 @@ declare namespace CANNON {
         material: Material;
         body: Body;
         faces: number[][];
-        indices: Int16Array;
+        indices: number[];
         vertices: Vector3[] | number[];
         faceNormals: Vector3[];
         convexPolyhedronRepresentation: Shape;
@@ -593,7 +508,7 @@ declare namespace CANNON {
          */
         clipFaceAgainstPlane(inVertices: Vector3[], outVertices: Vector3[], planeNormal: Vector3, planeConstant: number): feng3d.Vector3[];
         computeWorldVertices(position: Vector3, quat: Quaternion): void;
-        computeLocalAABB(aabbmin: any, aabbmax: any): void;
+        computeLocalAABB(aabbmin: Vector3, aabbmax: Vector3): void;
         /**
          * Updates .worldVertices and sets .worldVerticesNeedsUpdate to false.
          *
@@ -798,7 +713,7 @@ declare namespace CANNON {
          * @param yi
          * @param result
          */
-        getAabbAtIndex(xi: number, yi: number, result: AABB): void;
+        getAabbAtIndex(xi: number, yi: number, result: Box3): void;
         /**
          * Get the height in the heightfield at a given position
          *
@@ -895,96 +810,20 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    class AABB {
-        /**
-         * The lower bound of the bounding box.
-         */
-        lowerBound: feng3d.Vector3;
-        /**
-         * The upper bound of the bounding box.
-         */
-        upperBound: feng3d.Vector3;
-        /**
-         *
-         * @param options
-         *
-         * Axis aligned bounding box class.
-         */
-        constructor(lowerBound?: feng3d.Vector3, upperBound?: feng3d.Vector3);
-        /**
-         * Set the AABB bounds from a set of points.
-         * @param points An array of Vec3's.
-         * @param position
-         * @param quaternion
-         * @param skinSize
-         * @return The self object
-         */
-        setFromPoints(points: Vector3[], position?: Vector3, quaternion?: Quaternion, skinSize?: number): this;
-        /**
-         * Copy bounds from an AABB to this AABB
-         * @param aabb Source to copy from
-         * @return The this object, for chainability
-         */
-        copy(aabb: AABB): this;
-        /**
-         * Clone an AABB
-         */
-        clone(): AABB;
-        /**
-         * Extend this AABB so that it covers the given AABB too.
-         * @param aabb
-         */
-        extend(aabb: AABB): void;
-        /**
-         * Returns true if the given AABB overlaps this AABB.
-         * @param aabb
-         */
-        overlaps(aabb: AABB): boolean;
-        /**
-         * Mostly for debugging
-         */
-        volume(): number;
-        /**
-         * Returns true if the given AABB is fully contained in this AABB.
-         * @param aabb
-         */
-        contains(aabb: AABB): boolean;
-        getCorners(a: Vector3, b: Vector3, c: Vector3, d: Vector3, e: Vector3, f: Vector3, g: Vector3, h: Vector3): void;
-        /**
-         * Get the representation of an AABB in another frame.
-         * @param frame
-         * @param target
-         * @return The "target" AABB object.
-         */
-        toLocalFrame(frame: Transform, target: AABB): AABB;
-        /**
-         * Get the representation of an AABB in the global frame.
-         * @param frame
-         * @param target
-         * @return The "target" AABB object.
-         */
-        toWorldFrame(frame: Transform, target: AABB): AABB;
-        /**
-         * Check if the AABB is hit by a ray.
-         */
-        overlapsRay(ray: Ray): boolean;
-    }
-}
-declare namespace CANNON {
     class Trimesh extends Shape {
         vertices: number[];
         /**
          * The normals data.
          */
-        normals: Float32Array;
+        normals: number[];
         /**
          * The local AABB of the mesh.
          */
-        aabb: AABB;
+        aabb: Box3;
         /**
          * References to vertex pairs, making up all unique edges in the trimesh.
          */
-        edges: Int16Array;
+        edges: number[];
         /**
          * Local scaling of the mesh. Use .setScale() to set it.
          */
@@ -1017,7 +856,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array of integers, referencing the queried triangles.
          */
-        getTrianglesInAABB(aabb: AABB, result: number[]): number[];
+        getTrianglesInAABB(aabb: Box3, result: number[]): number[];
         /**
          * @param scale
          */
@@ -1109,7 +948,7 @@ declare namespace CANNON {
          *
          * @param aabb
          */
-        computeLocalAABB(aabb: AABB): void;
+        computeLocalAABB(aabb: Box3): void;
         /**
          * Update the .aabb property
          */
@@ -1146,7 +985,7 @@ declare namespace CANNON {
         /**
          * Boundary of this node
          */
-        aabb: AABB;
+        aabb: Box3;
         /**
          * Contained data at the current node level.
          * @property {Array} data
@@ -1163,7 +1002,7 @@ declare namespace CANNON {
          */
         constructor(options?: {
             root?: OctreeNode<T>;
-            aabb?: AABB;
+            aabb?: Box3;
         });
         reset(): void;
         /**
@@ -1173,7 +1012,7 @@ declare namespace CANNON {
          * @param elementData
          * @return True if successful, otherwise false
          */
-        insert(aabb: AABB, elementData: T, level?: number): boolean;
+        insert(aabb: Box3, elementData: T, level?: number): boolean;
         /**
          * Create 8 equally sized children nodes and put them in the .children array.
          */
@@ -1185,7 +1024,7 @@ declare namespace CANNON {
          * @param result
          * @return The "result" object
          */
-        aabbQuery(aabb: AABB, result: T[]): T[];
+        aabbQuery(aabb: Box3, result: T[]): T[];
         /**
          * Get all data, potentially intersected by a ray.
          *
@@ -1204,88 +1043,16 @@ declare namespace CANNON {
         maxDepth: number;
         /**
          * @class Octree
-         * @param {AABB} aabb The total AABB of the tree
+         * @param {Box3} aabb The total AABB of the tree
          * @param {object} [options]
          * @param {number} [options.maxDepth=8]
          * @extends OctreeNode
          */
-        constructor(aabb?: AABB, options?: {
+        constructor(aabb?: Box3, options?: {
             root?: OctreeNode<T>;
-            aabb?: AABB;
+            aabb?: Box3;
             maxDepth?: number;
         });
-    }
-}
-declare namespace CANNON {
-    class ArrayCollisionMatrix {
-        matrix: number[];
-        /**
-         * Collision "matrix". It's actually a triangular-shaped array of whether two bodies are touching this step, for reference next step
-         */
-        constructor();
-        /**
-         * Get an element
-         *
-         * @param i
-         * @param j
-         */
-        get(i0: {
-            index: number;
-        }, j0: {
-            index: number;
-        }): number;
-        /**
-         * Set an element
-         *
-         * @param i0
-         * @param j0
-         * @param value
-         */
-        set(i0: {
-            index: number;
-        }, j0: {
-            index: number;
-        }, value: boolean): void;
-        /**
-         * Sets all elements to zero
-         */
-        reset(): void;
-        /**
-         * Sets the max number of objects
-         */
-        setNumObjects(n: number): void;
-    }
-}
-declare namespace CANNON {
-    class ObjectCollisionMatrix {
-        /**
-         * The matrix storage
-         */
-        matrix: {};
-        /**
-         * Records what objects are colliding with each other
-         */
-        constructor();
-        get(i0: {
-            id: number;
-        }, j0: {
-            id: number;
-        }): boolean;
-        set(i0: {
-            id: number;
-        }, j0: {
-            id: number;
-        }, value: number): void;
-        /**
-         * Empty the matrix
-         */
-        reset(): void;
-        /**
-         * Set max number of objects
-         *
-         * @param n
-         */
-        setNumObjects(n: number): void;
     }
 }
 declare namespace CANNON {
@@ -1421,7 +1188,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array to store resulting bodies in.
          */
-        aabbQuery(world: World, aabb: AABB, result: Body[]): any[];
+        aabbQuery(world: World, aabb: Box3, result: Body[]): any[];
     }
 }
 declare namespace CANNON {
@@ -1475,7 +1242,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array to store resulting bodies in.
          */
-        aabbQuery(world: World, aabb: AABB, result: Body[]): Body[];
+        aabbQuery(world: World, aabb: Box3, result: Body[]): Body[];
     }
 }
 declare namespace CANNON {
@@ -1530,7 +1297,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array to store resulting bodies in.
          */
-        aabbQuery(world: World, aabb: AABB, result: Body[]): Body[];
+        aabbQuery(world: World, aabb: Box3, result: Body[]): Body[];
     }
 }
 declare namespace CANNON {
@@ -1614,7 +1381,7 @@ declare namespace CANNON {
         /**
          * Get the world AABB of the ray.
          */
-        getAABB(result: AABB): void;
+        getAABB(result: Box3): void;
         private intersectHeightfield;
         private intersectSphere;
         private intersectConvex;
@@ -1641,7 +1408,10 @@ declare namespace CANNON {
          */
         private intersectTrimesh;
         private reportIntersection;
-        static pointInTriangle(p: Vector3, a: Vector3, b: Vector3, c: Vector3): boolean;
+        /**
+         * Check if the AABB is hit by a ray.
+         */
+        overlapsBox3(box3: Box3): boolean;
     }
 }
 declare namespace CANNON {
@@ -1726,22 +1496,28 @@ declare namespace CANNON {
     }
 }
 declare namespace CANNON {
-    class Body extends EventTarget {
+    interface BodyEventMap {
+        wakeup: any;
+        sleepy: any;
+        sleep: any;
+        collide: {
+            body: Body;
+            contact: ContactEquation;
+        };
+    }
+    interface Body {
+        once<K extends keyof BodyEventMap>(type: K, listener: (event: feng3d.Event<BodyEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof BodyEventMap>(type: K, data?: BodyEventMap[K], bubbles?: boolean): feng3d.Event<BodyEventMap[K]>;
+        has<K extends keyof BodyEventMap>(type: K): boolean;
+        on<K extends keyof BodyEventMap>(type: K, listener: (event: feng3d.Event<BodyEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof BodyEventMap>(type?: K, listener?: (event: feng3d.Event<BodyEventMap[K]>) => any, thisObject?: any): void;
+    }
+    class Body extends feng3d.EventDispatcher {
         id: number;
         /**
          * Reference to the world the body is living in
          */
         world: World;
-        /**
-         * Callback function that is used BEFORE stepping the system. Use it to apply forces, for example. Inside the function, "this" will refer to this Body object.
-         * @deprecated Use World events instead
-         */
-        preStep: Function;
-        /**
-         * Callback function that is used AFTER stepping the system. Inside the function, "this" will refer to this Body object.
-         * @deprecated Use World events instead
-         */
-        postStep: Function;
         vlambda: Vector3;
         collisionFilterGroup: number;
         collisionFilterMask: number;
@@ -1847,7 +1623,7 @@ declare namespace CANNON {
         /**
          * World space bounding box of the body and its shapes.
          */
-        aabb: AABB;
+        aabb: Box3;
         /**
          * Indicates if the AABB needs to be updated before use.
          */
@@ -1893,7 +1669,6 @@ declare namespace CANNON {
             angularFactor?: Vector3;
             shape?: Shape;
         });
-        static COLLIDE_EVENT_NAME: string;
         /**
          * A dynamic body is fully simulated. Can be moved manually by the user, but normally they move according to forces. A dynamic body can collide with all body types. A dynamic body always has finite, non-zero mass.
          */
@@ -1911,12 +1686,6 @@ declare namespace CANNON {
         static SLEEPING: number;
         static idCounter: number;
         /**
-         * Dispatched after a sleeping body has woken up.
-         */
-        static wakeupEvent: {
-            type: string;
-        };
-        /**
          * Wake the body up.
          */
         wakeUp(): void;
@@ -1924,19 +1693,6 @@ declare namespace CANNON {
          * Force body sleep
          */
         sleep(): void;
-        /**
-         * Dispatched after a body has gone in to the sleepy state.
-         */
-        static sleepyEvent: {
-            type: string;
-        };
-        /**
-         * Dispatched after a body has fallen asleep.
-         * @event sleep
-         */
-        static sleepEvent: {
-            type: string;
-        };
         /**
          * Called every timestep to update internal sleep timer and change sleep state if needed.
          */
@@ -2229,7 +1985,6 @@ declare namespace CANNON {
          */
         indexUpAxis: number;
         currentVehicleSpeedKmHour: number;
-        preStepCallback: Function;
         constraints: any;
         /**
          * Vehicle helper class that casts rays from the wheel positions towards the ground and applies forces.
@@ -2275,6 +2030,7 @@ declare namespace CANNON {
          * @param world
          */
         addToWorld(world: World): void;
+        _preStepCallback(): void;
         /**
          * Get one of the wheel axles, world-oriented.
          * @param axisIndex
@@ -2725,7 +2481,43 @@ declare namespace CANNON {
     export {};
 }
 declare namespace CANNON {
-    class World extends EventTarget {
+    interface WorldEventMap {
+        addBody: Body;
+        removeBody: Body;
+        preStep: any;
+        /**
+         * Dispatched after the world has stepped forward in time.
+         */
+        postStep: any;
+        beginContact: {
+            bodyA: Body;
+            bodyB: Body;
+        };
+        endContact: {
+            bodyA: Body;
+            bodyB: Body;
+        };
+        beginShapeContact: {
+            bodyA: Body;
+            bodyB: Body;
+            shapeA: Shape;
+            shapeB: Shape;
+        };
+        endShapeContact: {
+            bodyA: Body;
+            bodyB: Body;
+            shapeA: Shape;
+            shapeB: Shape;
+        };
+    }
+    interface World {
+        once<K extends keyof WorldEventMap>(type: K, listener: (event: feng3d.Event<WorldEventMap[K]>) => void, thisObject?: any, priority?: number): void;
+        dispatch<K extends keyof WorldEventMap>(type: K, data?: WorldEventMap[K], bubbles?: boolean): feng3d.Event<WorldEventMap[K]>;
+        has<K extends keyof WorldEventMap>(type: K): boolean;
+        on<K extends keyof WorldEventMap>(type: K, listener: (event: feng3d.Event<WorldEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        off<K extends keyof WorldEventMap>(type?: K, listener?: (event: feng3d.Event<WorldEventMap[K]>) => any, thisObject?: any): void;
+    }
+    class World extends feng3d.EventDispatcher {
         static worldNormal: feng3d.Vector3;
         /**
          * Currently / last used timestep. Is set to -1 if not available. This value is updated before each internal step, which means that it is "fresh" inside event callbacks.
@@ -2770,11 +2562,11 @@ declare namespace CANNON {
         solver: Solver;
         constraints: Constraint[];
         narrowphase: Narrowphase;
-        collisionMatrix: ArrayCollisionMatrix;
+        collisionMatrix: {};
         /**
          * CollisionMatrix from the previous step.
          */
-        collisionMatrixPrevious: ArrayCollisionMatrix;
+        collisionMatrixPrevious: {};
         bodyOverlapKeeper: OverlapKeeper;
         shapeOverlapKeeper: OverlapKeeper;
         /**
@@ -2785,7 +2577,9 @@ declare namespace CANNON {
         /**
          * Used to look up a ContactMaterial given two instances of Material.
          */
-        contactMaterialTable: TupleDictionary<ContactMaterial>;
+        contactMaterialTable: {
+            [key: string]: ContactMaterial;
+        };
         defaultMaterial: Material;
         /**
          * This contact material is used if no suitable contactmaterial is found for a contact.
@@ -2804,20 +2598,6 @@ declare namespace CANNON {
          */
         accumulator: number;
         subsystems: SPHSystem[];
-        /**
-         * Dispatched after a body has been added to the world.
-         */
-        addBodyEvent: {
-            type: string;
-            body: any;
-        };
-        /**
-         * Dispatched after a body has been removed from the world.
-         */
-        removeBodyEvent: {
-            type: string;
-            body: any;
-        };
         idToBodyMap: {
             [id: string]: Body;
         };
@@ -2842,7 +2622,6 @@ declare namespace CANNON {
         getContactMaterial(m1: Material, m2: Material): ContactMaterial;
         /**
          * Get number of objects in the world.
-         * @deprecated
          */
         numObjects(): number;
         /**
@@ -2851,20 +2630,10 @@ declare namespace CANNON {
         collisionMatrixTick(): void;
         /**
          * Add a rigid body to the simulation.
-         * @param body
-         *
-         * @todo If the simulation has not yet started, why recrete and copy arrays for each body? Accumulate in dynamic arrays in this case.
-         * @todo Adding an array of bodies should be possible. This would save some loops too
-         * @deprecated Use .addBody instead
-         */
-        add(body: Body): void;
-        /**
-         * Add a rigid body to the simulation.
          * @method add
          * @param {Body} body
          * @todo If the simulation has not yet started, why recrete and copy arrays for each body? Accumulate in dynamic arrays in this case.
          * @todo Adding an array of bodies should be possible. This would save some loops too
-         * @deprecated Use .addBody instead
          */
         addBody(body: Body): void;
         /**
@@ -2877,14 +2646,6 @@ declare namespace CANNON {
          * @param c
          */
         removeConstraint(c: Constraint): void;
-        /**
-         * Raycast test
-         * @param from
-         * @param to
-         * @param result
-         * @deprecated Use .raycastAll, .raycastClosest or .raycastAny instead.
-         */
-        rayTest(from: Vector3, to: Vector3, result: RaycastResult): void;
         /**
          * Ray cast against all bodies. The provided callback will be executed for each hit with a RaycastResult as single argument.
          * @param from
@@ -2948,12 +2709,6 @@ declare namespace CANNON {
         /**
          * Remove a rigid body from the simulation.
          * @param body
-         * @deprecated Use .removeBody instead
-         */
-        remove(body: Body): void;
-        /**
-         * Remove a rigid body from the simulation.
-         * @param body
          */
         removeBody(body: Body): void;
         getBodyById(id: number): Body;
@@ -3003,10 +2758,6 @@ declare namespace CANNON {
         frictionEquationPool: FrictionEquation[];
         result: ContactEquation[];
         frictionResult: FrictionEquation[];
-        /**
-         * Pooled vectors.
-         */
-        v3pool: Vec3Pool;
         world: World;
         currentContactMaterial: ContactMaterial;
         enableFrictionReduction: boolean;

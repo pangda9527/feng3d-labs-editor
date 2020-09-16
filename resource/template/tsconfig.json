@@ -12,6 +12,7 @@
   },
   "files": [
     "libs/feng3d.d.ts",
+    "libs/feng2d.d.ts",
     "libs/cannon.d.ts",
     "libs/cannon-plugin.d.ts",
   ]
