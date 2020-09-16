@@ -1916,6 +1916,22 @@ var editor;
     }());
     editor.NativeFS = NativeFS;
 })(editor || (editor = {}));
+var templateurls = [
+    ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
+    ["resource/template/app.js", "app.js"],
+    ["resource/template/index.html", "index.html"],
+    ["resource/template/project.js", "project.js"],
+    ["resource/template/tsconfig.json", "tsconfig.json"],
+    ["resource/template/default.scene.json", "default.scene.json"],
+    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
+    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
+    ["resource/template/libs/feng2d.js", "libs/feng2d.js"],
+    ["resource/template/libs/feng2d.d.ts", "libs/feng2d.d.ts"],
+    ["resource/template/libs/cannon.js", "libs/cannon.js"],
+    ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
+    ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
+    ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
+];
 var editor;
 (function (editor) {
     /**
@@ -1952,22 +1968,7 @@ var editor;
          */
         EditorRS.prototype.createproject = function (callback) {
             var _this = this;
-            var urls = [
-                ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
-                ["resource/template/app.js", "app.js"],
-                ["resource/template/index.html", "index.html"],
-                ["resource/template/project.js", "project.js"],
-                ["resource/template/tsconfig.json", "tsconfig.json"],
-                ["resource/template/default.scene.json", "default.scene.json"],
-                ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-                ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["resource/template/libs/feng2d.js", "libs/feng2d.js"],
-                ["resource/template/libs/feng2d.d.ts", "libs/feng2d.d.ts"],
-                ["resource/template/libs/cannon.js", "libs/cannon.js"],
-                ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
-                ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
-                ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
-            ];
+            var urls = templateurls;
             var index = 0;
             var loadUrls = function () {
                 if (index >= urls.length) {
@@ -1991,16 +1992,7 @@ var editor;
         };
         EditorRS.prototype.upgradeProject = function (callback) {
             var _this = this;
-            var urls = [
-                ["../feng3d/out/feng3d.js", "libs/feng3d.js"],
-                ["../feng3d/out/feng3d.d.ts", "libs/feng3d.d.ts"],
-                ["../feng2d/out/feng2d.js", "libs/feng2d.js"],
-                ["../feng2d/out/feng2d.d.ts", "libs/feng2d.d.ts"],
-                ["../cannon/cannon/out/cannon.js", "libs/cannon.js"],
-                ["../cannon/cannon/out/cannon.d.ts", "libs/cannon.d.ts"],
-                ["../cannon/cannon-plugin/out/cannon-plugin.js", "libs/cannon-plugin.js"],
-                ["../cannon/cannon-plugin/out/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
-            ];
+            var urls = templateurls;
             var index = 0;
             var loadUrls = function () {
                 if (index >= urls.length) {

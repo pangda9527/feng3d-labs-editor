@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -11,7 +24,7 @@ var feng2d;
      *
      * Canvas的渲染模式
      */
-    let UIRenderMode;
+    var UIRenderMode;
     (function (UIRenderMode) {
         /**
          * Render at the end of the Scene using a 2D Canvas.
@@ -42,74 +55,116 @@ var feng2d;
      *
      * 通过修改Transform的数值实现
      */
-    let Transform2D = class Transform2D extends feng3d.Component {
+    var Transform2D = /** @class */ (function (_super) {
+        __extends(Transform2D, _super);
         /**
          * 创建一个实体，该类为虚类
          */
-        constructor() {
-            super();
-            this._rect = new feng3d.Vector4(0, 0, 100, 100);
-            this._position = new feng3d.Vector2();
-            this._size = new feng3d.Vector2(1, 1);
-            this._layout = new feng3d.Vector4();
-            this._anchorMin = new feng3d.Vector2(0.5, 0.5);
-            this._anchorMax = new feng3d.Vector2(0.5, 0.5);
-            this._pivot = new feng3d.Vector2(0.5, 0.5);
-            this._rotation = 0;
-            this._scale = new feng3d.Vector2(1, 1);
-            feng3d.watcher.watch(this, "transformLayout", this._onTransformLayoutChanged, this);
+        function Transform2D() {
+            var _this = _super.call(this) || this;
+            _this._rect = new feng3d.Vector4(0, 0, 100, 100);
+            _this._position = new feng3d.Vector2();
+            _this._size = new feng3d.Vector2(1, 1);
+            _this._layout = new feng3d.Vector4();
+            _this._anchorMin = new feng3d.Vector2(0.5, 0.5);
+            _this._anchorMax = new feng3d.Vector2(0.5, 0.5);
+            _this._pivot = new feng3d.Vector2(0.5, 0.5);
+            _this._rotation = 0;
+            _this._scale = new feng3d.Vector2(1, 1);
+            feng3d.watcher.watch(_this, "transformLayout", _this._onTransformLayoutChanged, _this);
+            return _this;
         }
-        get single() { return true; }
-        /**
-         * 描述了2D对象在未经过变换前的位置与尺寸
-         */
-        get rect() {
-            var transformLayout = this.transformLayout;
-            this._rect.init(-transformLayout.pivot.x * transformLayout.size.x, -transformLayout.pivot.y * transformLayout.size.y, transformLayout.size.x, transformLayout.size.y);
-            return this._rect;
-        }
-        /**
-         * 位移
-         */
-        get position() { return this._position; }
-        set position(v) { this._position.copy(v); }
-        /**
-         * 尺寸，宽高。
-         */
-        get size() { return this._size; }
-        set size(v) { this._size.copy(v); }
-        /**
-         * 与最小最大锚点形成的边框的left、right、top、bottom距离。当 anchorMin.x != anchorMax.x 时对 layout.x layout.y 赋值生效，当 anchorMin.y != anchorMax.y 时对 layout.z layout.w 赋值生效，否则赋值无效，自动被覆盖。
-         */
-        get layout() { return this._layout; }
-        set layout(v) { this._layout.copy(v); }
-        /**
-         * 最小锚点，父Transform2D中左上角锚定的规范化位置。
-         */
-        get anchorMin() { return this._anchorMin; }
-        set anchorMin(v) { this._anchorMin.copy(v); }
-        /**
-         * 最大锚点，父Transform2D中左上角锚定的规范化位置。
-         */
-        get anchorMax() { return this._anchorMax; }
-        set anchorMax(v) { this._anchorMax.copy(v); }
-        /**
-         * The normalized position in this RectTransform that it rotates around.
-         */
-        get pivot() { return this._pivot; }
-        set pivot(v) { this._pivot.copy(v); }
-        /**
-         * 旋转
-         */
-        get rotation() { return this._rotation; }
-        set rotation(v) { this._rotation = v; }
-        /**
-         * 缩放
-         */
-        get scale() { return this._scale; }
-        set scale(v) { this._scale.copy(v); }
-        init() {
-            super.init();
+        Object.defineProperty(Transform2D.prototype, "single", {
+            get: function () { return true; },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "rect", {
+            /**
+             * 描述了2D对象在未经过变换前的位置与尺寸
+             */
+            get: function () {
+                var transformLayout = this.transformLayout;
+                this._rect.init(-transformLayout.pivot.x * transformLayout.size.x, -transformLayout.pivot.y * transformLayout.size.y, transformLayout.size.x, transformLayout.size.y);
+                return this._rect;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "position", {
+            /**
+             * 位移
+             */
+            get: function () { return this._position; },
+            set: function (v) { this._position.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "size", {
+            /**
+             * 尺寸，宽高。
+             */
+            get: function () { return this._size; },
+            set: function (v) { this._size.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "layout", {
+            /**
+             * 与最小最大锚点形成的边框的left、right、top、bottom距离。当 anchorMin.x != anchorMax.x 时对 layout.x layout.y 赋值生效，当 anchorMin.y != anchorMax.y 时对 layout.z layout.w 赋值生效，否则赋值无效，自动被覆盖。
+             */
+            get: function () { return this._layout; },
+            set: function (v) { this._layout.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "anchorMin", {
+            /**
+             * 最小锚点，父Transform2D中左上角锚定的规范化位置。
+             */
+            get: function () { return this._anchorMin; },
+            set: function (v) { this._anchorMin.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "anchorMax", {
+            /**
+             * 最大锚点，父Transform2D中左上角锚定的规范化位置。
+             */
+            get: function () { return this._anchorMax; },
+            set: function (v) { this._anchorMax.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "pivot", {
+            /**
+             * The normalized position in this RectTransform that it rotates around.
+             */
+            get: function () { return this._pivot; },
+            set: function (v) { this._pivot.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "rotation", {
+            /**
+             * 旋转
+             */
+            get: function () { return this._rotation; },
+            set: function (v) { this._rotation = v; },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Transform2D.prototype, "scale", {
+            /**
+             * 缩放
+             */
+            get: function () { return this._scale; },
+            set: function (v) { this._scale.copy(v); },
+            enumerable: false,
+            configurable: true
+        });
+        Transform2D.prototype.init = function () {
+            _super.prototype.init.call(this);
             // 处理依赖组件
             var transformLayout = this.getComponent("TransformLayout");
             if (!transformLayout) {
@@ -121,8 +176,8 @@ var feng2d;
             feng3d.watcher.bind(this.transform.scale, "y", this.scale, "y");
             this.on("addComponent", this._onAddComponent, this);
             this.on("removeComponent", this._onRemovedComponent, this);
-        }
-        _onAddComponent(event) {
+        };
+        Transform2D.prototype._onAddComponent = function (event) {
             if (event.data.gameobject != this.gameObject)
                 return;
             var component = event.data.component;
@@ -130,16 +185,16 @@ var feng2d;
                 component.hideFlags = component.hideFlags | feng3d.HideFlags.HideInInspector;
                 this.transformLayout = component;
             }
-        }
-        _onRemovedComponent(event) {
+        };
+        Transform2D.prototype._onRemovedComponent = function (event) {
             if (event.data.gameobject != this.gameObject)
                 return;
             var component = event.data.component;
             if (component instanceof feng3d.TransformLayout) {
                 this.transformLayout = null;
             }
-        }
-        _onTransformLayoutChanged(newValue, oldValue, object, property) {
+        };
+        Transform2D.prototype._onTransformLayoutChanged = function (newValue, oldValue, object, property) {
             var watcher = feng3d.watcher;
             if (oldValue) {
                 watcher.unbind(oldValue.position, "x", this.position, "x");
@@ -178,61 +233,46 @@ var feng2d;
                 watcher.bind(newValue.pivot, "x", this.pivot, "x");
                 watcher.bind(newValue.pivot, "y", this.pivot, "y");
             }
-        }
-        beforeRender(renderAtomic, scene, camera) {
+        };
+        Transform2D.prototype.beforeRender = function (renderAtomic, scene, camera) {
             renderAtomic.uniforms.u_rect = this.rect;
-        }
-        /**
-         * 将 Ray3 从世界空间转换为局部空间。
-         *
-         * @param worldRay 世界空间射线。
-         * @param localRay 局部空间射线。
-         */
-        rayWorldToLocal(worldRay, localRay = new feng3d.Ray3()) {
-            this.transform.rayWorldToLocal(worldRay, localRay);
-            if (this.transform2D) {
-                var size = new feng3d.Vector3(this.transform2D.size.x, this.transform2D.size.y, 1);
-                var pivot = new feng3d.Vector3(this.transform2D.pivot.x, this.transform2D.pivot.y, 0);
-                localRay.origin.divide(size).add(pivot);
-                localRay.direction.divide(size).normalize();
-            }
-            return localRay;
-        }
-    };
-    __decorate([
-        feng3d.oav({ tooltip: "当anchorMin.x == anchorMax.x时对position.x赋值生效，当 anchorMin.y == anchorMax.y 时对position.y赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
-        feng3d.serialize
-    ], Transform2D.prototype, "position", null);
-    __decorate([
-        feng3d.oav({ tooltip: "宽度，不会影响到缩放值。当 anchorMin.x == anchorMax.x 时对 size.x 赋值生效，当anchorMin.y == anchorMax.y时对 size.y 赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
-        feng3d.serialize
-    ], Transform2D.prototype, "size", null);
-    __decorate([
-        feng3d.oav({ tooltip: "与最小最大锚点形成的边框的left、right、top、bottom距离。当 anchorMin.x != anchorMax.x 时对 layout.x layout.y 赋值生效，当 anchorMin.y != anchorMax.y 时对 layout.z layout.w 赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
-        feng3d.serialize
-    ], Transform2D.prototype, "layout", null);
-    __decorate([
-        feng3d.oav({ tooltip: "父Transform2D中左上角锚定的规范化位置。", componentParam: { step: 0.01, stepScale: 0.01, stepDownup: 0.01 } }),
-        feng3d.serialize
-    ], Transform2D.prototype, "anchorMin", null);
-    __decorate([
-        feng3d.oav({ tooltip: "最大锚点，父Transform2D中左上角锚定的规范化位置。", componentParam: { step: 0.01, stepScale: 0.01, stepDownup: 0.01 } }),
-        feng3d.serialize
-    ], Transform2D.prototype, "anchorMax", null);
-    __decorate([
-        feng3d.oav({ tooltip: "中心点" }),
-        feng3d.serialize
-    ], Transform2D.prototype, "pivot", null);
-    __decorate([
-        feng3d.oav({ tooltip: "旋转", componentParam: { step: 0.01, stepScale: 30, stepDownup: 50 } })
-    ], Transform2D.prototype, "rotation", null);
-    __decorate([
-        feng3d.oav({ tooltip: "缩放", componentParam: { step: 0.01, stepScale: 1, stepDownup: 1 } })
-    ], Transform2D.prototype, "scale", null);
-    Transform2D = __decorate([
-        feng3d.AddComponentMenu("Layout/Transform2D"),
-        feng3d.RegisterComponent()
-    ], Transform2D);
+        };
+        __decorate([
+            feng3d.oav({ tooltip: "当anchorMin.x == anchorMax.x时对position.x赋值生效，当 anchorMin.y == anchorMax.y 时对position.y赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
+            feng3d.serialize
+        ], Transform2D.prototype, "position", null);
+        __decorate([
+            feng3d.oav({ tooltip: "宽度，不会影响到缩放值。当 anchorMin.x == anchorMax.x 时对 size.x 赋值生效，当anchorMin.y == anchorMax.y时对 size.y 赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
+            feng3d.serialize
+        ], Transform2D.prototype, "size", null);
+        __decorate([
+            feng3d.oav({ tooltip: "与最小最大锚点形成的边框的left、right、top、bottom距离。当 anchorMin.x != anchorMax.x 时对 layout.x layout.y 赋值生效，当 anchorMin.y != anchorMax.y 时对 layout.z layout.w 赋值生效，否则赋值无效，自动被覆盖。", componentParam: { step: 1, stepScale: 1, stepDownup: 1 } }),
+            feng3d.serialize
+        ], Transform2D.prototype, "layout", null);
+        __decorate([
+            feng3d.oav({ tooltip: "父Transform2D中左上角锚定的规范化位置。", componentParam: { step: 0.01, stepScale: 0.01, stepDownup: 0.01 } }),
+            feng3d.serialize
+        ], Transform2D.prototype, "anchorMin", null);
+        __decorate([
+            feng3d.oav({ tooltip: "最大锚点，父Transform2D中左上角锚定的规范化位置。", componentParam: { step: 0.01, stepScale: 0.01, stepDownup: 0.01 } }),
+            feng3d.serialize
+        ], Transform2D.prototype, "anchorMax", null);
+        __decorate([
+            feng3d.oav({ tooltip: "中心点" }),
+            feng3d.serialize
+        ], Transform2D.prototype, "pivot", null);
+        __decorate([
+            feng3d.oav({ tooltip: "旋转", componentParam: { step: 0.01, stepScale: 30, stepDownup: 50 } })
+        ], Transform2D.prototype, "rotation", null);
+        __decorate([
+            feng3d.oav({ tooltip: "缩放", componentParam: { step: 0.01, stepScale: 1, stepDownup: 1 } })
+        ], Transform2D.prototype, "scale", null);
+        Transform2D = __decorate([
+            feng3d.AddComponentMenu("Layout/Transform2D"),
+            feng3d.RegisterComponent()
+        ], Transform2D);
+        return Transform2D;
+    }(feng3d.Component));
     feng2d.Transform2D = Transform2D;
 })(feng2d || (feng2d = {}));
 var feng3d;
@@ -249,16 +289,19 @@ var feng2d;
     /**
      * UI几何体
      */
-    class UIGeometry extends feng3d.Geometry {
-        constructor() {
-            super();
-            this.positions = [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0];
-            this.uvs = [0, 0, 1, 0, 1, 1, 0, 1];
-            this.indices = [0, 1, 2, 0, 2, 3];
-            this.normals = feng3d.geometryUtils.createVertexNormals(this.indices, this.positions, true);
-            this.tangents = feng3d.geometryUtils.createVertexTangents(this.indices, this.positions, this.uvs, true);
+    var UIGeometry = /** @class */ (function (_super) {
+        __extends(UIGeometry, _super);
+        function UIGeometry() {
+            var _this = _super.call(this) || this;
+            _this.positions = [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0];
+            _this.uvs = [0, 0, 1, 0, 1, 1, 0, 1];
+            _this.indices = [0, 1, 2, 0, 2, 3];
+            _this.normals = feng3d.geometryUtils.createVertexNormals(_this.indices, _this.positions, true);
+            _this.tangents = feng3d.geometryUtils.createVertexTangents(_this.indices, _this.positions, _this.uvs, true);
+            return _this;
         }
-    }
+        return UIGeometry;
+    }(feng3d.Geometry));
     feng2d.UIGeometry = UIGeometry;
     feng3d.Geometry.setDefault("Default-UIGeometry", new UIGeometry());
 })(feng2d || (feng2d = {}));
@@ -267,12 +310,14 @@ var feng2d;
     /**
      * 可在画布上渲染组件，使得拥有该组件的GameObject可以在画布上渲染。
      */
-    let CanvasRenderer = class CanvasRenderer extends feng3d.Renderable {
-        constructor() {
-            super(...arguments);
-            this.renderAtomic = new feng3d.RenderAtomic();
-            this.geometry = feng3d.Geometry.getDefault("Default-UIGeometry");
-            this.material = feng3d.Material.getDefault("Default-UIMaterial");
+    var CanvasRenderer = /** @class */ (function (_super) {
+        __extends(CanvasRenderer, _super);
+        function CanvasRenderer() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.renderAtomic = new feng3d.RenderAtomic();
+            _this.geometry = feng3d.Geometry.getDefault("Default-UIGeometry");
+            _this.material = feng3d.Material.getDefault("Default-UIMaterial");
+            return _this;
         }
         /**
          * 与世界空间射线相交
@@ -281,37 +326,43 @@ var feng2d;
          *
          * @return 相交信息
          */
-        worldRayIntersection(worldRay) {
+        CanvasRenderer.prototype.worldRayIntersection = function (worldRay) {
             var canvas = this.getComponentsInParents("Canvas")[0];
             if (canvas)
                 worldRay = canvas.mouseRay;
-            var localRay = this.transform2D.rayWorldToLocal(worldRay);
+            var localRay = this.transform.rayWorldToLocal(worldRay, localRay);
+            if (this.transform2D) {
+                var size = new feng3d.Vector3(this.transform2D.size.x, this.transform2D.size.y, 1);
+                var pivot = new feng3d.Vector3(this.transform2D.pivot.x, this.transform2D.pivot.y, 0);
+                localRay.origin.divide(size).add(pivot);
+                localRay.direction.divide(size).normalize();
+            }
             var pickingCollisionVO = this.localRayIntersection(localRay);
             if (pickingCollisionVO)
                 pickingCollisionVO.cullFace = feng3d.CullFace.NONE;
             return pickingCollisionVO;
-        }
-        _updateBounds() {
+        };
+        CanvasRenderer.prototype._updateBounds = function () {
             var bounding = this.geometry.bounding.clone();
             var transformLayout = this.getComponent("TransformLayout");
             if (transformLayout != null) {
                 bounding.scale(transformLayout.size);
             }
             this._selfLocalBounds = bounding;
-        }
+        };
         /**
          * 渲染
          */
-        static draw(view) {
+        CanvasRenderer.draw = function (view) {
             var gl = view.gl;
             var scene = view.scene;
-            var canvasList = scene.getComponentsInChildren("Canvas").filter(v => v.isVisibleAndEnabled);
-            canvasList.forEach(canvas => {
+            var canvasList = scene.getComponentsInChildren("Canvas").filter(function (v) { return v.isVisibleAndEnabled; });
+            canvasList.forEach(function (canvas) {
                 canvas.layout(gl.canvas.width, gl.canvas.height);
                 // 更新鼠标射线
                 canvas.calcMouseRay3D(view);
-                var renderables = canvas.getComponentsInChildren("CanvasRenderer").filter(v => v.isVisibleAndEnabled);
-                renderables.forEach(renderable => {
+                var renderables = canvas.getComponentsInChildren("CanvasRenderer").filter(function (v) { return v.isVisibleAndEnabled; });
+                renderables.forEach(function (renderable) {
                     //绘制
                     var renderAtomic = renderable.renderAtomic;
                     renderAtomic.uniforms.u_viewProjection = canvas.projection;
@@ -319,15 +370,16 @@ var feng2d;
                     gl.render(renderAtomic);
                 });
             });
-        }
-    };
-    __decorate([
-        feng3d.oav()
-    ], CanvasRenderer.prototype, "material", void 0);
-    CanvasRenderer = __decorate([
-        feng3d.AddComponentMenu("Rendering/CanvasRenderer"),
-        feng3d.RegisterComponent()
-    ], CanvasRenderer);
+        };
+        __decorate([
+            feng3d.oav()
+        ], CanvasRenderer.prototype, "material", void 0);
+        CanvasRenderer = __decorate([
+            feng3d.AddComponentMenu("Rendering/CanvasRenderer"),
+            feng3d.RegisterComponent()
+        ], CanvasRenderer);
+        return CanvasRenderer;
+    }(feng3d.Renderable));
     feng2d.CanvasRenderer = CanvasRenderer;
 })(feng2d || (feng2d = {}));
 var feng2d;
@@ -337,45 +389,47 @@ var feng2d;
      *
      * 能够被用于屏幕渲染的元素
      */
-    let Canvas = class Canvas extends feng3d.Behaviour {
-        constructor() {
-            super(...arguments);
+    var Canvas = /** @class */ (function (_super) {
+        __extends(Canvas, _super);
+        function Canvas() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * Is the Canvas in World or Overlay mode?
              *
              * 画布是在世界或覆盖模式?
              */
-            this.renderMode = feng2d.UIRenderMode.ScreenSpaceOverlay;
+            _this.renderMode = feng2d.UIRenderMode.ScreenSpaceOverlay;
             /**
              * 获取鼠标射线（与鼠标重叠的摄像机射线）
              */
-            this.mouseRay = new feng3d.Ray3(new feng3d.Vector3(), new feng3d.Vector3(0, 0, 1));
+            _this.mouseRay = new feng3d.Ray3(new feng3d.Vector3(), new feng3d.Vector3(0, 0, 1));
             /**
              * 投影矩阵
              *
              * 渲染前自动更新
              */
-            this.projection = new feng3d.Matrix4x4();
+            _this.projection = new feng3d.Matrix4x4();
             /**
              * 最近距离
              */
-            this.near = -1000;
+            _this.near = -1000;
             /**
              * 最远距离
              */
-            this.far = 10000;
+            _this.far = 10000;
+            return _this;
         }
-        init() {
+        Canvas.prototype.init = function () {
             // this.transform.hideFlags = this.transform.hideFlags | HideFlags.Hide;
             // this.gameObject.hideFlags = this.gameObject.hideFlags | HideFlags.DontTransform;
-        }
+        };
         /**
          * 更新布局
          *
          * @param width 画布宽度
          * @param height 画布高度
          */
-        layout(width, height) {
+        Canvas.prototype.layout = function (width, height) {
             this.transform2D.size.x = width;
             this.transform2D.size.y = height;
             this.transform2D.pivot.init(0, 0);
@@ -391,40 +445,41 @@ var feng2d;
             var near = this.near;
             var far = this.far;
             this.projection.identity().appendTranslation(0, 0, -(far + near) / 2).appendScale(2 / width, -2 / height, 2 / (far - near)).appendTranslation(-1, 1, 0);
-        }
+        };
         /**
          * 计算鼠标射线
          *
          * @param view
          */
-        calcMouseRay3D(view) {
+        Canvas.prototype.calcMouseRay3D = function (view) {
             this.mouseRay.origin.set(view.mousePos.x, view.mousePos.y, 0);
-        }
-    };
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], Canvas.prototype, "near", void 0);
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], Canvas.prototype, "far", void 0);
-    Canvas = __decorate([
-        feng3d.RegisterComponent()
-    ], Canvas);
+        };
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], Canvas.prototype, "near", void 0);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], Canvas.prototype, "far", void 0);
+        Canvas = __decorate([
+            feng3d.RegisterComponent()
+        ], Canvas);
+        return Canvas;
+    }(feng3d.Behaviour));
     feng2d.Canvas = Canvas;
 })(feng2d || (feng2d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.GameObject.registerPrimitive("Canvas", (g) => {
+    feng3d.GameObject.registerPrimitive("Canvas", function (g) {
         g.addComponent("Transform2D");
         g.addComponent("Canvas");
     });
 })(feng3d || (feng3d = {}));
 var feng2d;
 (function (feng2d) {
-    class UIUniforms {
-        constructor() {
+    var UIUniforms = /** @class */ (function () {
+        function UIUniforms() {
             /**
              * UI几何体尺寸，在shader中进行对几何体缩放。
              */
@@ -442,53 +497,20 @@ var feng2d;
              */
             this.u_uvRect = new feng3d.Vector4(0, 0, 1, 1);
         }
-    }
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], UIUniforms.prototype, "u_color", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], UIUniforms.prototype, "s_texture", void 0);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], UIUniforms.prototype, "u_color", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], UIUniforms.prototype, "s_texture", void 0);
+        return UIUniforms;
+    }());
     feng2d.UIUniforms = UIUniforms;
     feng3d.shaderConfig.shaders["ui"] = {
-        vertex: `
-    attribute vec2 a_position;
-    attribute vec2 a_uv;
-    
-    uniform vec4 u_uvRect;
-    uniform vec4 u_rect;
-    uniform mat4 u_modelMatrix;
-    uniform mat4 u_viewProjection;
-    
-    varying vec2 v_uv;
-    varying vec2 v_position;
-
-    void main() 
-    {
-        vec2 position = u_rect.xy + a_position * u_rect.zw;
-        gl_Position = u_viewProjection * u_modelMatrix * vec4(position, 0.0, 1.0);
-        v_uv = u_uvRect.xy + a_uv * u_uvRect.zw;
-        v_position = position.xy;
-    }
-    `,
-        fragment: `
-    precision mediump float;
-
-    uniform sampler2D s_texture;
-    varying vec2 v_uv;
-    varying vec2 v_position;
-    
-    uniform vec4 u_color;
-    
-    void main() 
-    {
-        vec4 color = texture2D(s_texture, v_uv);
-        gl_FragColor = color * u_color;
-    }
-    
-    `,
+        vertex: "\n    attribute vec2 a_position;\n    attribute vec2 a_uv;\n    \n    uniform vec4 u_uvRect;\n    uniform vec4 u_rect;\n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    varying vec2 v_uv;\n    varying vec2 v_position;\n\n    void main() \n    {\n        vec2 position = u_rect.xy + a_position * u_rect.zw;\n        gl_Position = u_viewProjection * u_modelMatrix * vec4(position, 0.0, 1.0);\n        v_uv = u_uvRect.xy + a_uv * u_uvRect.zw;\n        v_position = position.xy;\n    }\n    ",
+        fragment: "\n    precision mediump float;\n\n    uniform sampler2D s_texture;\n    varying vec2 v_uv;\n    varying vec2 v_position;\n    \n    uniform vec4 u_color;\n    \n    void main() \n    {\n        vec4 color = texture2D(s_texture, v_uv);\n        gl_FragColor = color * u_color;\n    }\n    \n    ",
         cls: UIUniforms,
         renderParams: { enableBlend: true, depthtest: false },
     };
@@ -511,32 +533,35 @@ var feng2d;
      *
      * 用于填充UI中背景等颜色。
      */
-    let Rect = class Rect extends feng3d.Component {
-        constructor() {
-            super(...arguments);
+    var Rect = /** @class */ (function (_super) {
+        __extends(Rect, _super);
+        function Rect() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 填充颜色。
              */
-            this.color = new feng3d.Color4();
+            _this.color = new feng3d.Color4();
+            return _this;
         }
-        beforeRender(renderAtomic, scene, camera) {
-            super.beforeRender(renderAtomic, scene, camera);
+        Rect.prototype.beforeRender = function (renderAtomic, scene, camera) {
+            _super.prototype.beforeRender.call(this, renderAtomic, scene, camera);
             renderAtomic.uniforms.u_color = this.color;
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], Rect.prototype, "color", void 0);
-    Rect = __decorate([
-        feng3d.AddComponentMenu("UI/Rect"),
-        feng3d.RegisterComponent()
-    ], Rect);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], Rect.prototype, "color", void 0);
+        Rect = __decorate([
+            feng3d.AddComponentMenu("UI/Rect"),
+            feng3d.RegisterComponent()
+        ], Rect);
+        return Rect;
+    }(feng3d.Component));
     feng2d.Rect = Rect;
 })(feng2d || (feng2d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.GameObject.registerPrimitive("Rect", (g) => {
+    feng3d.GameObject.registerPrimitive("Rect", function (g) {
         var transform2D = g.addComponent("Transform2D");
         g.addComponent("CanvasRenderer");
         transform2D.size.x = 100;
@@ -551,56 +576,59 @@ var feng2d;
      *
      * 用于显示图片
      */
-    let Image = class Image extends feng3d.Component {
-        constructor() {
-            super(...arguments);
+    var Image = /** @class */ (function (_super) {
+        __extends(Image, _super);
+        function Image() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * The source texture of the Image element.
              *
              * 图像元素的源纹理。
              */
-            this.image = feng3d.Texture2D.default;
+            _this.image = feng3d.Texture2D.default;
             /**
              * Tinting color for this Image.
              *
              * 为该图像着色。
              */
-            this.color = new feng3d.Color4();
+            _this.color = new feng3d.Color4();
+            return _this;
         }
         /**
          * 使图片显示实际尺寸
          */
-        setNativeSize() {
+        Image.prototype.setNativeSize = function () {
             var imagesize = this.image.getSize();
             this.transform2D.size.x = imagesize.x;
             this.transform2D.size.y = imagesize.y;
-        }
-        beforeRender(renderAtomic, scene, camera) {
-            super.beforeRender(renderAtomic, scene, camera);
+        };
+        Image.prototype.beforeRender = function (renderAtomic, scene, camera) {
+            _super.prototype.beforeRender.call(this, renderAtomic, scene, camera);
             renderAtomic.uniforms.s_texture = this.image;
             renderAtomic.uniforms.u_color = this.color;
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], Image.prototype, "image", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], Image.prototype, "color", void 0);
-    __decorate([
-        feng3d.oav({ tooltip: "使图片显示实际尺寸", componentParam: { label: "ReSize" } })
-    ], Image.prototype, "setNativeSize", null);
-    Image = __decorate([
-        feng3d.AddComponentMenu("UI/Image"),
-        feng3d.RegisterComponent()
-    ], Image);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], Image.prototype, "image", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], Image.prototype, "color", void 0);
+        __decorate([
+            feng3d.oav({ tooltip: "使图片显示实际尺寸", componentParam: { label: "ReSize" } })
+        ], Image.prototype, "setNativeSize", null);
+        Image = __decorate([
+            feng3d.AddComponentMenu("UI/Image"),
+            feng3d.RegisterComponent()
+        ], Image);
+        return Image;
+    }(feng3d.Component));
     feng2d.Image = Image;
 })(feng2d || (feng2d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.GameObject.registerPrimitive("Image", (g) => {
+    feng3d.GameObject.registerPrimitive("Image", function (g) {
         var transform2D = g.addComponent("Transform2D");
         g.addComponent("CanvasRenderer");
         transform2D.size.x = 100;
@@ -613,7 +641,7 @@ var feng2d;
     /**
      * 按钮状态
      */
-    let ButtonState;
+    var ButtonState;
     (function (ButtonState) {
         /**
          * 弹起状态，默认状态。
@@ -647,87 +675,90 @@ var feng2d;
     /**
      * 按钮
      */
-    let Button = class Button extends feng3d.Behaviour {
-        constructor() {
-            super(...arguments);
+    var Button = /** @class */ (function (_super) {
+        __extends(Button, _super);
+        function Button() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 按钮所处状态。
              */
-            this.state = ButtonState.up;
+            _this.state = ButtonState.up;
             /**
              * 所有状态数据，每一个状态数据中记录了子对象的当前数据。
              */
-            this.allStateData = {};
-            this._stateInvalid = true;
+            _this.allStateData = {};
+            _this._stateInvalid = true;
+            return _this;
         }
         /**
          * 保存当前状态，例如在编辑器中编辑完按钮某一状态后调用该方法进行保存当前状态数据。
          */
-        saveState() {
+        Button.prototype.saveState = function () {
             var stateData = {};
             // 出现相同名称时，只保存第一个数据
             var childMap = {};
-            this.gameObject.children.forEach(child => {
+            this.gameObject.children.forEach(function (child) {
                 if (childMap[child.name])
                     return;
                 childMap[child.name] = child;
             });
-            for (const childname in childMap) {
+            for (var childname in childMap) {
                 var jsonObj = feng3d.serialization.serialize(childMap[childname]);
                 feng3d.serialization.deleteCLASS_KEY(jsonObj);
                 stateData[childname] = jsonObj;
             }
             this.allStateData[this.state] = stateData;
-        }
-        _onStateChanged() {
+        };
+        Button.prototype._onStateChanged = function () {
             this._stateInvalid = true;
-        }
+        };
         /**
          * 每帧执行
          */
-        update(interval) {
+        Button.prototype.update = function (interval) {
             if (this._stateInvalid) {
                 this._updateState();
                 this._stateInvalid = false;
             }
-        }
+        };
         /**
          * 更新状态
          */
-        _updateState() {
+        Button.prototype._updateState = function () {
             var statedata = this.allStateData[this.state];
             if (!statedata)
                 return;
             var childMap = {};
-            this.gameObject.children.forEach(child => {
+            this.gameObject.children.forEach(function (child) {
                 if (childMap[child.name])
                     return;
                 childMap[child.name] = child;
             });
-            for (const childname in childMap) {
+            for (var childname in childMap) {
                 childMap[childname] = feng3d.serialization.setValue(childMap[childname], statedata[childname]);
             }
-        }
-    };
-    __decorate([
-        feng3d.oav({ block: "Layout", tooltip: "按钮所处状态。", component: "OAVEnum", componentParam: { enumClass: ButtonState } }),
-        feng3d.watch("_onStateChanged")
-    ], Button.prototype, "state", void 0);
-    __decorate([
-        feng3d.serialize
-    ], Button.prototype, "allStateData", void 0);
-    __decorate([
-        feng3d.oav()
-    ], Button.prototype, "saveState", null);
-    Button = __decorate([
-        feng3d.AddComponentMenu("UI/Button"),
-        feng3d.RegisterComponent()
-    ], Button);
+        };
+        __decorate([
+            feng3d.oav({ block: "Layout", tooltip: "按钮所处状态。", component: "OAVEnum", componentParam: { enumClass: ButtonState } }),
+            feng3d.watch("_onStateChanged")
+        ], Button.prototype, "state", void 0);
+        __decorate([
+            feng3d.serialize
+        ], Button.prototype, "allStateData", void 0);
+        __decorate([
+            feng3d.oav()
+        ], Button.prototype, "saveState", null);
+        Button = __decorate([
+            feng3d.AddComponentMenu("UI/Button"),
+            feng3d.RegisterComponent()
+        ], Button);
+        return Button;
+    }(feng3d.Behaviour));
     feng2d.Button = Button;
 })(feng2d || (feng2d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.GameObject.registerPrimitive("Button", (g) => {
+    feng3d.GameObject.registerPrimitive("Button", function (g) {
         var transform2D = g.addComponent("Transform2D");
         transform2D.size.x = 160;
         transform2D.size.y = 30;
@@ -744,20 +775,21 @@ var feng2d;
      * @param style 文本样式
      * @param resolution 分辨率
      */
-    function drawText(canvas, _text, style, resolution = 1) {
+    function drawText(canvas, _text, style, resolution) {
+        if (resolution === void 0) { resolution = 1; }
         canvas = canvas || document.createElement("canvas");
         if (style.fontSize < 1)
             style.fontSize = 1;
         var _font = style.toFontString();
-        const context = canvas.getContext('2d');
-        const measured = feng2d.TextMetrics.measureText(_text || ' ', style, style.wordWrap, canvas);
-        const width = measured.width;
-        const height = measured.height;
-        const lines = measured.lines;
-        const lineHeight = measured.lineHeight;
-        const lineWidths = measured.lineWidths;
-        const maxLineWidth = measured.maxLineWidth;
-        const fontProperties = measured.fontProperties;
+        var context = canvas.getContext('2d');
+        var measured = feng2d.TextMetrics.measureText(_text || ' ', style, style.wordWrap, canvas);
+        var width = measured.width;
+        var height = measured.height;
+        var lines = measured.lines;
+        var lineHeight = measured.lineHeight;
+        var lineWidths = measured.lineWidths;
+        var maxLineWidth = measured.maxLineWidth;
+        var fontProperties = measured.fontProperties;
         canvas.width = Math.ceil((Math.max(1, width) + (style.padding * 2)) * resolution);
         canvas.height = Math.ceil((Math.max(1, height) + (style.padding * 2)) * resolution);
         context.scale(resolution, resolution);
@@ -767,14 +799,14 @@ var feng2d;
         context.textBaseline = style.textBaseline;
         context.lineJoin = style.lineJoin;
         context.miterLimit = style.miterLimit;
-        let linePositionX;
-        let linePositionY;
+        var linePositionX;
+        var linePositionY;
         // 需要2个通过如果一个阴影;第一个绘制投影，第二个绘制文本
-        const passesCount = style.dropShadow ? 2 : 1;
-        for (let i = 0; i < passesCount; ++i) {
-            const isShadowPass = style.dropShadow && i === 0;
-            const dsOffsetText = isShadowPass ? height * 2 : 0; // 我们只想要投影，所以把文本放到屏幕外
-            const dsOffsetShadow = dsOffsetText * resolution;
+        var passesCount = style.dropShadow ? 2 : 1;
+        for (var i = 0; i < passesCount; ++i) {
+            var isShadowPass = style.dropShadow && i === 0;
+            var dsOffsetText = isShadowPass ? height * 2 : 0; // 我们只想要投影，所以把文本放到屏幕外
+            var dsOffsetShadow = dsOffsetText * resolution;
             if (isShadowPass) {
                 // 在Safari上，带有渐变和阴影的文本不能正确定位
                 // 如果画布的比例不是1: https://bugs.webkit.org/show_bug.cgi?id=197689
@@ -796,26 +828,26 @@ var feng2d;
                 context.shadowOffsetY = 0;
             }
             // 一行一行绘制
-            for (let i = 0; i < lines.length; i++) {
+            for (var i_1 = 0; i_1 < lines.length; i_1++) {
                 linePositionX = style.strokeThickness / 2;
-                linePositionY = ((style.strokeThickness / 2) + (i * lineHeight)) + fontProperties.ascent;
+                linePositionY = ((style.strokeThickness / 2) + (i_1 * lineHeight)) + fontProperties.ascent;
                 if (style.align === 'right') {
-                    linePositionX += maxLineWidth - lineWidths[i];
+                    linePositionX += maxLineWidth - lineWidths[i_1];
                 }
                 else if (style.align === 'center') {
-                    linePositionX += (maxLineWidth - lineWidths[i]) / 2;
+                    linePositionX += (maxLineWidth - lineWidths[i_1]) / 2;
                 }
                 if (style.stroke && style.strokeThickness) {
-                    drawLetterSpacing(canvas, style, lines[i], linePositionX + style.padding, linePositionY + style.padding - dsOffsetText, true);
+                    drawLetterSpacing(canvas, style, lines[i_1], linePositionX + style.padding, linePositionY + style.padding - dsOffsetText, true);
                 }
                 if (style.fill) {
-                    drawLetterSpacing(canvas, style, lines[i], linePositionX + style.padding, linePositionY + style.padding - dsOffsetText);
+                    drawLetterSpacing(canvas, style, lines[i_1], linePositionX + style.padding, linePositionY + style.padding - dsOffsetText);
                 }
             }
         }
         // 除去透明边缘。
         if (style.trim) {
-            const trimmed = trimCanvas(canvas);
+            var trimmed = trimCanvas(canvas);
             if (trimmed.data) {
                 canvas.width = trimmed.width;
                 canvas.height = trimmed.height;
@@ -832,8 +864,9 @@ var feng2d;
      * @param lines 多行文本。
      * @return 填充样式。
      */
-    function _generateFillStyle(canvas, style, lines, resolution = 1) {
-        const context = canvas.getContext('2d');
+    function _generateFillStyle(canvas, style, lines, resolution) {
+        if (resolution === void 0) { resolution = 1; }
+        var context = canvas.getContext('2d');
         var stylefill = style.fill;
         if (!Array.isArray(stylefill)) {
             return stylefill.toRGBA();
@@ -842,18 +875,18 @@ var feng2d;
             return stylefill[0];
         }
         // 画布颜色渐变。
-        let gradient;
-        let totalIterations;
-        let currentIteration;
-        let stop;
-        const width = Math.ceil(canvas.width / resolution);
-        const height = Math.ceil(canvas.height / resolution);
-        const fill = stylefill.slice();
-        const fillGradientStops = style.fillGradientStops.slice();
+        var gradient;
+        var totalIterations;
+        var currentIteration;
+        var stop;
+        var width = Math.ceil(canvas.width / resolution);
+        var height = Math.ceil(canvas.height / resolution);
+        var fill = stylefill.slice();
+        var fillGradientStops = style.fillGradientStops.slice();
         // 初始化渐变关键帧
         if (!fillGradientStops.length) {
-            const lengthPlus1 = fill.length + 1;
-            for (let i = 1; i < lengthPlus1; ++i) {
+            var lengthPlus1 = fill.length + 1;
+            for (var i = 1; i < lengthPlus1; ++i) {
                 fillGradientStops.push(i / lengthPlus1);
             }
         }
@@ -868,9 +901,9 @@ var feng2d;
             // 我们需要重复渐变，这样每一行文本都有相同的垂直渐变效果
             totalIterations = (fill.length + 1) * lines.length;
             currentIteration = 0;
-            for (let i = 0; i < lines.length; i++) {
+            for (var i = 0; i < lines.length; i++) {
                 currentIteration += 1;
-                for (let j = 0; j < fill.length; j++) {
+                for (var j = 0; j < fill.length; j++) {
                     if (typeof fillGradientStops[j] === 'number') {
                         stop = (fillGradientStops[j] / lines.length) + (i / lines.length);
                     }
@@ -887,7 +920,7 @@ var feng2d;
             gradient = context.createLinearGradient(0, height / 2, width, height / 2);
             totalIterations = fill.length + 1;
             currentIteration = 1;
-            for (let i = 0; i < fill.length; i++) {
+            for (var i = 0; i < fill.length; i++) {
                 if (typeof fillGradientStops[i] === 'number') {
                     stop = fillGradientStops[i];
                 }
@@ -909,9 +942,10 @@ var feng2d;
      * @param y Y轴位置。
      * @param isStroke
      */
-    function drawLetterSpacing(canvas, style, text, x, y, isStroke = false) {
-        const context = canvas.getContext('2d');
-        const letterSpacing = style.letterSpacing;
+    function drawLetterSpacing(canvas, style, text, x, y, isStroke) {
+        if (isStroke === void 0) { isStroke = false; }
+        var context = canvas.getContext('2d');
+        var letterSpacing = style.letterSpacing;
         if (letterSpacing === 0) {
             if (isStroke) {
                 context.strokeText(text, x, y);
@@ -921,15 +955,15 @@ var feng2d;
             }
             return;
         }
-        let currentPosition = x;
+        var currentPosition = x;
         // 使用 Array.from 可以解决表情符号的分割问题。 如  "🌷","🎁","💩","😜" "👍"
         // https://medium.com/@giltayar/iterating-over-emoji-characters-the-es6-way-f06e4589516
         // https://github.com/orling/grapheme-splitter
-        const stringArray = Array.from(text);
-        let previousWidth = context.measureText(text).width;
-        let currentWidth = 0;
-        for (let i = 0; i < stringArray.length; ++i) {
-            const currentChar = stringArray[i];
+        var stringArray = Array.from(text);
+        var previousWidth = context.measureText(text).width;
+        var currentWidth = 0;
+        for (var i = 0; i < stringArray.length; ++i) {
+            var currentChar = stringArray[i];
             if (isStroke) {
                 context.strokeText(currentChar, currentPosition, y);
             }
@@ -949,10 +983,10 @@ var feng2d;
     function trimCanvas(canvas) {
         var width = canvas.width;
         var height = canvas.height;
-        const context = canvas.getContext('2d');
-        const imageData = context.getImageData(0, 0, width, height);
-        const pixels = imageData.data;
-        const len = pixels.length;
+        var context = canvas.getContext('2d');
+        var imageData = context.getImageData(0, 0, width, height);
+        var pixels = imageData.data;
+        var len = pixels.length;
         var top = NaN;
         var left = NaN;
         var right = NaN;
@@ -994,9 +1028,9 @@ var feng2d;
             data = context.getImageData(left, top, width, height);
         }
         return {
-            height,
-            width,
-            data,
+            height: height,
+            width: width,
+            data: data,
         };
     }
 })(feng2d || (feng2d = {}));
@@ -1005,7 +1039,7 @@ var feng2d;
     /**
      * 文本上渐变方向。
      */
-    let TEXT_GRADIENT;
+    var TEXT_GRADIENT;
     (function (TEXT_GRADIENT) {
         /**
          * 纵向梯度。
@@ -1019,7 +1053,7 @@ var feng2d;
     /**
      * 通用字体。
      */
-    let FontFamily;
+    var FontFamily;
     (function (FontFamily) {
         FontFamily["Arial"] = "Arial";
         FontFamily["serif"] = "serif";
@@ -1033,7 +1067,7 @@ var feng2d;
     /**
      * 字体样式。
      */
-    let FontStyle;
+    var FontStyle;
     (function (FontStyle) {
         FontStyle["normal"] = "normal";
         FontStyle["italic"] = "italic";
@@ -1042,12 +1076,12 @@ var feng2d;
     /**
      * 字体变体。
      */
-    let FontVariant;
+    var FontVariant;
     (function (FontVariant) {
         FontVariant["normal"] = "normal";
         FontVariant["small-caps"] = "small-caps";
     })(FontVariant = feng2d.FontVariant || (feng2d.FontVariant = {}));
-    let FontWeight;
+    var FontWeight;
     (function (FontWeight) {
         FontWeight["normal"] = "normal";
         FontWeight["bold"] = "bold";
@@ -1066,7 +1100,7 @@ var feng2d;
     /**
      * 设置创建的角的类型，它可以解决带尖刺的文本问题。
      */
-    let CanvasLineJoin;
+    var CanvasLineJoin;
     (function (CanvasLineJoin) {
         CanvasLineJoin["round"] = "round";
         CanvasLineJoin["bevel"] = "bevel";
@@ -1075,7 +1109,7 @@ var feng2d;
     /**
      * 画布文本基线
      */
-    let CanvasTextBaseline;
+    var CanvasTextBaseline;
     (function (CanvasTextBaseline) {
         CanvasTextBaseline["top"] = "top";
         CanvasTextBaseline["hanging"] = "hanging";
@@ -1087,13 +1121,13 @@ var feng2d;
     /**
      * 文本对齐方式
      */
-    let TextAlign;
+    var TextAlign;
     (function (TextAlign) {
         TextAlign["left"] = "left";
         TextAlign["center"] = "center";
         TextAlign["right"] = "right";
     })(TextAlign = feng2d.TextAlign || (feng2d.TextAlign = {}));
-    let WhiteSpaceHandle;
+    var WhiteSpaceHandle;
     (function (WhiteSpaceHandle) {
         WhiteSpaceHandle["normal"] = "normal";
         WhiteSpaceHandle["pre"] = "pre";
@@ -1106,102 +1140,103 @@ var feng2d;
      *
      * @see https://github.com/pixijs/pixi.js/blob/dev/packages/text/src/TextStyle.js
      */
-    class TextStyle extends feng3d.EventDispatcher {
+    var TextStyle = /** @class */ (function (_super) {
+        __extends(TextStyle, _super);
         /**
          * @param style 样式参数
          */
-        constructor(style) {
-            super();
+        function TextStyle(style) {
+            var _this = _super.call(this) || this;
             /**
              * 字体。
              */
-            this.fontFamily = FontFamily.Arial;
+            _this.fontFamily = FontFamily.Arial;
             /**
              * 字体尺寸。
              */
-            this.fontSize = 26;
+            _this.fontSize = 26;
             /**
              * 字体样式。
              */
-            this.fontStyle = FontStyle.normal;
+            _this.fontStyle = FontStyle.normal;
             /**
              * 字体变体。
              */
-            this.fontVariant = FontVariant.normal;
+            _this.fontVariant = FontVariant.normal;
             /**
              * 字型粗细。
              */
-            this.fontWeight = FontWeight.normal;
+            _this.fontWeight = FontWeight.normal;
             /**
              * 用于填充文本的颜色。
              * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
              */
-            this.fill = new feng3d.Color4(0, 0, 0, 1);
+            _this.fill = new feng3d.Color4(0, 0, 0, 1);
             // fill = new MinMaxGradient();
             /**
              * 如果填充是一个创建渐变的颜色数组，这可以改变渐变的方向。
              */
-            this.fillGradientType = TEXT_GRADIENT.LINEAR_VERTICAL;
+            _this.fillGradientType = TEXT_GRADIENT.LINEAR_VERTICAL;
             /**
              * 如果填充是一个颜色数组来创建渐变，这个数组可以设置停止点
              */
-            this.fillGradientStops = [];
+            _this.fillGradientStops = [];
             /**
              * 将用于文本笔划的画布填充样式。
              */
-            this.stroke = new feng3d.Color4(0, 0, 0, 1);
+            _this.stroke = new feng3d.Color4(0, 0, 0, 1);
             /**
              * 一个表示笔画厚度的数字。
              */
-            this.strokeThickness = 0;
+            _this.strokeThickness = 0;
             /**
              * lineJoin属性设置创建的角的类型，它可以解决带尖刺的文本问题。
              */
-            this.lineJoin = CanvasLineJoin.miter;
+            _this.lineJoin = CanvasLineJoin.miter;
             /**
              * 当使用“miter”lineJoin模式时，miter限制使用。这可以减少或增加呈现文本的尖锐性。
              */
-            this.miterLimit = 10;
+            _this.miterLimit = 10;
             /**
              * 字母之间的间距，默认为0
              */
-            this.letterSpacing = 0;
+            _this.letterSpacing = 0;
             /**
              * 呈现文本的基线。
              */
-            this.textBaseline = CanvasTextBaseline.alphabetic;
+            _this.textBaseline = CanvasTextBaseline.alphabetic;
             /**
              * 是否为文本设置一个投影。
              */
-            this.dropShadow = false;
+            _this.dropShadow = false;
             /**
              * 投影颜色。
              */
-            this.dropShadowColor = new feng3d.Color4(0, 0, 0, 1);
+            _this.dropShadowColor = new feng3d.Color4(0, 0, 0, 1);
             /**
              * 投影角度。
              */
-            this.dropShadowAngle = 30;
+            _this.dropShadowAngle = 30;
             /**
              * 阴影模糊半径。
              */
-            this.dropShadowBlur = 0;
+            _this.dropShadowBlur = 0;
             /**
              * 投影距离。
              */
-            this.dropShadowDistance = 5;
+            _this.dropShadowDistance = 5;
             /**
              * 是否应使用自动换行。
              */
-            this.wordWrap = false;
+            _this.wordWrap = false;
             /**
              * 能否把单词分多行。
              */
-            this.breakWords = false;
+            _this.breakWords = false;
             /**
              * 多行文本对齐方式。
              */
-            this.align = TextAlign.left;
+            _this.align = TextAlign.left;
             /**
              * 如何处理换行与空格。
              * Default is 'pre' (preserve, preserve).
@@ -1212,199 +1247,201 @@ var feng2d;
              * 'pre'        | Preserve      |   Preserve
              * 'pre-line'   | Preserve      |   Collapse
              */
-            this.whiteSpace = WhiteSpaceHandle.pre;
+            _this.whiteSpace = WhiteSpaceHandle.pre;
             /**
              * 文本的换行宽度。
              */
-            this.wordWrapWidth = 100;
+            _this.wordWrapWidth = 100;
             /**
              * 行高。
              */
-            this.lineHeight = 0;
+            _this.lineHeight = 0;
             /**
              * 行距。
              */
-            this.leading = 0;
+            _this.leading = 0;
             /**
              * 内边距，用于文字被裁减问题。
              */
-            this.padding = 0;
+            _this.padding = 0;
             /**
              * 是否修剪透明边界。
              */
-            this.trim = false;
-            feng3d.serialization.setValue(this, style);
+            _this.trim = false;
+            feng3d.serialization.setValue(_this, style);
+            return _this;
         }
         /**
          * 使数据失效
          */
-        invalidate() {
+        TextStyle.prototype.invalidate = function () {
             this.dispatch("changed");
-        }
+        };
         /**
          *
          * 生成用于' TextMetrics.measureFont() '的字体样式字符串。
          */
-        toFontString() {
-            const fontSizeString = `${this.fontSize}px`;
+        TextStyle.prototype.toFontString = function () {
+            var fontSizeString = this.fontSize + "px";
             // 通过引用每个字体名来清除fontFamily属性
             // 这将支持带有空格的字体名称
-            let fontFamilies = this.fontFamily;
+            var fontFamilies = this.fontFamily;
             if (!Array.isArray(this.fontFamily)) {
                 fontFamilies = this.fontFamily.split(',');
             }
-            for (let i = fontFamilies.length - 1; i >= 0; i--) {
+            for (var i = fontFamilies.length - 1; i >= 0; i--) {
                 // 修剪任何多余的空白
-                let fontFamily = fontFamilies[i].trim();
+                var fontFamily = fontFamilies[i].trim();
                 // 检查字体是否已经包含字符串
                 if (!(/([\"\'])[^\'\"]+\1/).test(fontFamily) && FontFamily[fontFamily] == undefined) {
-                    fontFamily = `"${fontFamily}"`;
+                    fontFamily = "\"" + fontFamily + "\"";
                 }
                 fontFamilies[i] = fontFamily;
             }
-            return `${this.fontStyle} ${this.fontVariant} ${this.fontWeight} ${fontSizeString} ${fontFamilies.join(',')}`;
-        }
-    }
-    __decorate([
-        feng3d.oav({ block: "Font", tooltip: "字体。", component: "OAVEnum", componentParam: { enumClass: FontFamily } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fontFamily", void 0);
-    __decorate([
-        feng3d.oav({ block: "Font", tooltip: "字体尺寸。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fontSize", void 0);
-    __decorate([
-        feng3d.oav({ block: "Font", tooltip: "字体样式。", component: "OAVEnum", componentParam: { enumClass: FontStyle } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fontStyle", void 0);
-    __decorate([
-        feng3d.oav({ block: "Font", tooltip: "字体变体。", component: "OAVEnum", componentParam: { enumClass: FontVariant } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fontVariant", void 0);
-    __decorate([
-        feng3d.oav({ block: "Font", tooltip: "字型粗细。", component: "OAVEnum", componentParam: { enumClass: FontWeight } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fontWeight", void 0);
-    __decorate([
-        feng3d.oav({ block: "Fill", tooltip: "用于填充文本的颜色。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fill", void 0);
-    __decorate([
-        feng3d.oav({ block: "Fill", tooltip: "如果填充是一个创建渐变的颜色数组，这可以改变渐变的方向。", component: "OAVEnum", componentParam: { enumClass: TEXT_GRADIENT } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fillGradientType", void 0);
-    __decorate([
-        feng3d.oav({ block: "Fill" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "fillGradientStops", void 0);
-    __decorate([
-        feng3d.oav({ block: "Stroke", tooltip: "将用于文本笔划的画布填充样式。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "stroke", void 0);
-    __decorate([
-        feng3d.oav({ block: "Stroke", tooltip: "一个表示笔画厚度的数字。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "strokeThickness", void 0);
-    __decorate([
-        feng3d.oav({ block: "Stroke", tooltip: "lineJoin属性设置创建的角的类型，它可以解决带尖刺的文本问题。", component: "OAVEnum", componentParam: { enumClass: CanvasLineJoin } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "lineJoin", void 0);
-    __decorate([
-        feng3d.oav({ block: "Stroke", tooltip: "当使用“miter”lineJoin模式时，miter限制使用。这可以减少或增加呈现文本的尖锐性。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "miterLimit", void 0);
-    __decorate([
-        feng3d.oav({ block: "Layout", tooltip: "字母之间的间距，默认为0" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "letterSpacing", void 0);
-    __decorate([
-        feng3d.oav({ block: "Layout", tooltip: "呈现文本的基线。", component: "OAVEnum", componentParam: { enumClass: CanvasTextBaseline } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "textBaseline", void 0);
-    __decorate([
-        feng3d.oav({ block: "Drop Shadow", tooltip: "是否为文本设置一个投影。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "dropShadow", void 0);
-    __decorate([
-        feng3d.oav({ block: "Drop Shadow", tooltip: "投影颜色。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "dropShadowColor", void 0);
-    __decorate([
-        feng3d.oav({ block: "Drop Shadow", tooltip: "投影角度。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "dropShadowAngle", void 0);
-    __decorate([
-        feng3d.oav({ block: "Drop Shadow", tooltip: "阴影模糊半径。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "dropShadowBlur", void 0);
-    __decorate([
-        feng3d.oav({ block: "Drop Shadow", tooltip: "投影距离。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "dropShadowDistance", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "是否应使用自动换行。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "wordWrap", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "breakWords", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "多行文本对齐方式。", component: "OAVEnum", componentParam: { enumClass: TextAlign } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "align", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "如何处理换行与空格。", component: "OAVEnum", componentParam: { enumClass: WhiteSpaceHandle } }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "whiteSpace", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "文本的换行宽度。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "wordWrapWidth", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "行高。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "lineHeight", void 0);
-    __decorate([
-        feng3d.oav({ block: "Multiline", tooltip: "行距。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "leading", void 0);
-    __decorate([
-        feng3d.oav({ block: "Texture", tooltip: "内边距，用于文字被裁减问题。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "padding", void 0);
-    __decorate([
-        feng3d.oav({ block: "Texture", tooltip: "是否修剪透明边界。" }),
-        feng3d.watch("invalidate"),
-        feng3d.serialize
-    ], TextStyle.prototype, "trim", void 0);
+            return this.fontStyle + " " + this.fontVariant + " " + this.fontWeight + " " + fontSizeString + " " + fontFamilies.join(',');
+        };
+        __decorate([
+            feng3d.oav({ block: "Font", tooltip: "字体。", component: "OAVEnum", componentParam: { enumClass: FontFamily } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fontFamily", void 0);
+        __decorate([
+            feng3d.oav({ block: "Font", tooltip: "字体尺寸。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fontSize", void 0);
+        __decorate([
+            feng3d.oav({ block: "Font", tooltip: "字体样式。", component: "OAVEnum", componentParam: { enumClass: FontStyle } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fontStyle", void 0);
+        __decorate([
+            feng3d.oav({ block: "Font", tooltip: "字体变体。", component: "OAVEnum", componentParam: { enumClass: FontVariant } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fontVariant", void 0);
+        __decorate([
+            feng3d.oav({ block: "Font", tooltip: "字型粗细。", component: "OAVEnum", componentParam: { enumClass: FontWeight } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fontWeight", void 0);
+        __decorate([
+            feng3d.oav({ block: "Fill", tooltip: "用于填充文本的颜色。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fill", void 0);
+        __decorate([
+            feng3d.oav({ block: "Fill", tooltip: "如果填充是一个创建渐变的颜色数组，这可以改变渐变的方向。", component: "OAVEnum", componentParam: { enumClass: TEXT_GRADIENT } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fillGradientType", void 0);
+        __decorate([
+            feng3d.oav({ block: "Fill" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "fillGradientStops", void 0);
+        __decorate([
+            feng3d.oav({ block: "Stroke", tooltip: "将用于文本笔划的画布填充样式。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "stroke", void 0);
+        __decorate([
+            feng3d.oav({ block: "Stroke", tooltip: "一个表示笔画厚度的数字。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "strokeThickness", void 0);
+        __decorate([
+            feng3d.oav({ block: "Stroke", tooltip: "lineJoin属性设置创建的角的类型，它可以解决带尖刺的文本问题。", component: "OAVEnum", componentParam: { enumClass: CanvasLineJoin } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "lineJoin", void 0);
+        __decorate([
+            feng3d.oav({ block: "Stroke", tooltip: "当使用“miter”lineJoin模式时，miter限制使用。这可以减少或增加呈现文本的尖锐性。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "miterLimit", void 0);
+        __decorate([
+            feng3d.oav({ block: "Layout", tooltip: "字母之间的间距，默认为0" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "letterSpacing", void 0);
+        __decorate([
+            feng3d.oav({ block: "Layout", tooltip: "呈现文本的基线。", component: "OAVEnum", componentParam: { enumClass: CanvasTextBaseline } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "textBaseline", void 0);
+        __decorate([
+            feng3d.oav({ block: "Drop Shadow", tooltip: "是否为文本设置一个投影。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "dropShadow", void 0);
+        __decorate([
+            feng3d.oav({ block: "Drop Shadow", tooltip: "投影颜色。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "dropShadowColor", void 0);
+        __decorate([
+            feng3d.oav({ block: "Drop Shadow", tooltip: "投影角度。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "dropShadowAngle", void 0);
+        __decorate([
+            feng3d.oav({ block: "Drop Shadow", tooltip: "阴影模糊半径。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "dropShadowBlur", void 0);
+        __decorate([
+            feng3d.oav({ block: "Drop Shadow", tooltip: "投影距离。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "dropShadowDistance", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "是否应使用自动换行。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "wordWrap", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "breakWords", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "多行文本对齐方式。", component: "OAVEnum", componentParam: { enumClass: TextAlign } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "align", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "如何处理换行与空格。", component: "OAVEnum", componentParam: { enumClass: WhiteSpaceHandle } }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "whiteSpace", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "文本的换行宽度。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "wordWrapWidth", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "行高。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "lineHeight", void 0);
+        __decorate([
+            feng3d.oav({ block: "Multiline", tooltip: "行距。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "leading", void 0);
+        __decorate([
+            feng3d.oav({ block: "Texture", tooltip: "内边距，用于文字被裁减问题。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "padding", void 0);
+        __decorate([
+            feng3d.oav({ block: "Texture", tooltip: "是否修剪透明边界。" }),
+            feng3d.watch("invalidate"),
+            feng3d.serialize
+        ], TextStyle.prototype, "trim", void 0);
+        return TextStyle;
+    }(feng3d.EventDispatcher));
     feng2d.TextStyle = TextStyle;
 })(feng2d || (feng2d = {}));
 var feng2d;
@@ -1418,7 +1455,7 @@ var feng2d;
      *
      * @see https://github.com/pixijs/pixi.js/blob/dev/packages/text/src/TextMetrics.js
      */
-    class TextMetrics {
+    var TextMetrics = /** @class */ (function () {
         /**
          * @param text - the text that was measured
          * @param style - the style that was measured
@@ -1430,7 +1467,7 @@ var feng2d;
          * @param maxLineWidth - the maximum line width for all measured lines
          * @param fontProperties - the font properties object from TextMetrics.measureFont
          */
-        constructor(text, style, width, height, lines, lineWidths, lineHeight, maxLineWidth, fontProperties) {
+        function TextMetrics(text, style, width, height, lines, lineWidths, lineHeight, maxLineWidth, fontProperties) {
             this.text = text;
             this.style = style;
             this.width = width;
@@ -1450,42 +1487,43 @@ var feng2d;
          * @param canvas - optional specification of the canvas to use for measuring.
          * @return measured width and height of the text.
          */
-        static measureText(text, style, wordWrap, canvas = TextMetrics._canvas) {
+        TextMetrics.measureText = function (text, style, wordWrap, canvas) {
+            if (canvas === void 0) { canvas = TextMetrics._canvas; }
             wordWrap = (wordWrap === undefined || wordWrap === null) ? style.wordWrap : wordWrap;
-            const font = style.toFontString();
-            const fontProperties = TextMetrics.measureFont(font);
+            var font = style.toFontString();
+            var fontProperties = TextMetrics.measureFont(font);
             // fallback in case UA disallow canvas data extraction
             // (toDataURI, getImageData functions)
             if (fontProperties.fontSize === 0) {
                 fontProperties.fontSize = style.fontSize;
                 fontProperties.ascent = style.fontSize;
             }
-            const context = canvas.getContext('2d');
+            var context = canvas.getContext('2d');
             if (!context) {
-                throw `获取 CanvasRenderingContext2D 失败！`;
+                throw "\u83B7\u53D6 CanvasRenderingContext2D \u5931\u8D25\uFF01";
             }
             context.font = font;
-            const outputText = wordWrap ? TextMetrics.wordWrap(text, style, canvas) : text;
-            const lines = outputText.split(/(?:\r\n|\r|\n)/);
-            const lineWidths = new Array(lines.length);
-            let maxLineWidth = 0;
-            for (let i = 0; i < lines.length; i++) {
-                const lineWidth = context.measureText(lines[i]).width + ((lines[i].length - 1) * style.letterSpacing);
+            var outputText = wordWrap ? TextMetrics.wordWrap(text, style, canvas) : text;
+            var lines = outputText.split(/(?:\r\n|\r|\n)/);
+            var lineWidths = new Array(lines.length);
+            var maxLineWidth = 0;
+            for (var i = 0; i < lines.length; i++) {
+                var lineWidth = context.measureText(lines[i]).width + ((lines[i].length - 1) * style.letterSpacing);
                 lineWidths[i] = lineWidth;
                 maxLineWidth = Math.max(maxLineWidth, lineWidth);
             }
-            let width = maxLineWidth + style.strokeThickness;
+            var width = maxLineWidth + style.strokeThickness;
             if (style.dropShadow) {
                 width += style.dropShadowDistance;
             }
-            const lineHeight = style.lineHeight || fontProperties.fontSize + style.strokeThickness;
-            let height = Math.max(lineHeight, fontProperties.fontSize + style.strokeThickness)
+            var lineHeight = style.lineHeight || fontProperties.fontSize + style.strokeThickness;
+            var height = Math.max(lineHeight, fontProperties.fontSize + style.strokeThickness)
                 + ((lines.length - 1) * (lineHeight + style.leading));
             if (style.dropShadow) {
                 height += style.dropShadowDistance;
             }
             return new TextMetrics(text, style, width, height, lines, lineWidths, lineHeight + style.leading, maxLineWidth, fontProperties);
-        }
+        };
         /**
          * Applies newlines to a string to have it optimally fit into the horizontal
          * bounds set by the Text object's wordWrapWidth property.
@@ -1496,33 +1534,34 @@ var feng2d;
          * @param canvas - optional specification of the canvas to use for measuring.
          * @return New string with new lines applied where required
          */
-        static wordWrap(text, style, canvas = TextMetrics._canvas) {
-            const context = canvas.getContext('2d');
+        TextMetrics.wordWrap = function (text, style, canvas) {
+            if (canvas === void 0) { canvas = TextMetrics._canvas; }
+            var context = canvas.getContext('2d');
             if (!context) {
-                throw `获取 CanvasRenderingContext2D 失败！`;
+                throw "\u83B7\u53D6 CanvasRenderingContext2D \u5931\u8D25\uFF01";
             }
-            let width = 0;
-            let line = '';
-            let lines = '';
-            const cache = {};
-            const { letterSpacing, whiteSpace } = style;
+            var width = 0;
+            var line = '';
+            var lines = '';
+            var cache = {};
+            var letterSpacing = style.letterSpacing, whiteSpace = style.whiteSpace;
             // How to handle whitespaces
-            const collapseSpaces = TextMetrics.collapseSpaces(whiteSpace);
-            const collapseNewlines = TextMetrics.collapseNewlines(whiteSpace);
+            var collapseSpaces = TextMetrics.collapseSpaces(whiteSpace);
+            var collapseNewlines = TextMetrics.collapseNewlines(whiteSpace);
             // whether or not spaces may be added to the beginning of lines
-            let canPrependSpaces = !collapseSpaces;
+            var canPrependSpaces = !collapseSpaces;
             // There is letterSpacing after every char except the last one
             // t_h_i_s_' '_i_s_' '_a_n_' '_e_x_a_m_p_l_e_' '_!
             // so for convenience the above needs to be compared to width + 1 extra letterSpace
             // t_h_i_s_' '_i_s_' '_a_n_' '_e_x_a_m_p_l_e_' '_!_
             // ________________________________________________
             // And then the final space is simply no appended to each line
-            const wordWrapWidth = style.wordWrapWidth + letterSpacing;
+            var wordWrapWidth = style.wordWrapWidth + letterSpacing;
             // break text into words, spaces and newline chars
-            const tokens = TextMetrics.tokenize(text);
-            for (let i = 0; i < tokens.length; i++) {
+            var tokens = TextMetrics.tokenize(text);
+            for (var i = 0; i < tokens.length; i++) {
                 // get the word, space or newlineChar
-                let token = tokens[i];
+                var token = tokens[i];
                 // if word is a new line
                 if (TextMetrics.isNewline(token)) {
                     // keep the new line
@@ -1540,14 +1579,14 @@ var feng2d;
                 // if we should collapse repeated whitespaces
                 if (collapseSpaces) {
                     // check both this and the last tokens for spaces
-                    const currIsBreakingSpace = TextMetrics.isBreakingSpace(token);
-                    const lastIsBreakingSpace = TextMetrics.isBreakingSpace(line[line.length - 1]);
+                    var currIsBreakingSpace = TextMetrics.isBreakingSpace(token);
+                    var lastIsBreakingSpace = TextMetrics.isBreakingSpace(line[line.length - 1]);
                     if (currIsBreakingSpace && lastIsBreakingSpace) {
                         continue;
                     }
                 }
                 // get word width from cache if possible
-                const tokenWidth = TextMetrics.getFromCache(token, letterSpacing, cache, context);
+                var tokenWidth = TextMetrics.getFromCache(token, letterSpacing, cache, context);
                 // word is longer than desired bounds
                 if (tokenWidth > wordWrapWidth) {
                     // if we are not already at the beginning of a line
@@ -1560,15 +1599,15 @@ var feng2d;
                     // break large word over multiple lines
                     if (TextMetrics.canBreakWords(token, style.breakWords)) {
                         // break word into characters
-                        const characters = TextMetrics.wordWrapSplit(token);
+                        var characters = TextMetrics.wordWrapSplit(token);
                         // loop the characters
-                        for (let j = 0; j < characters.length; j++) {
-                            let char = characters[j];
-                            let k = 1;
+                        for (var j = 0; j < characters.length; j++) {
+                            var char = characters[j];
+                            var k = 1;
                             // we are not at the end of the token
                             while (characters[j + k]) {
-                                const nextChar = characters[j + k];
-                                const lastChar = char[char.length - 1];
+                                var nextChar = characters[j + k];
+                                var lastChar = char[char.length - 1];
                                 // should not split chars
                                 if (!TextMetrics.canBreakChars(lastChar, nextChar, token, j, style.breakWords)) {
                                     // combine chars & move forward one
@@ -1580,7 +1619,7 @@ var feng2d;
                                 k++;
                             }
                             j += char.length - 1;
-                            const characterWidth = TextMetrics.getFromCache(char, letterSpacing, cache, context);
+                            var characterWidth = TextMetrics.getFromCache(char, letterSpacing, cache, context);
                             if (characterWidth + width > wordWrapWidth) {
                                 lines += TextMetrics.addLine(line);
                                 canPrependSpaces = false;
@@ -1600,7 +1639,7 @@ var feng2d;
                             line = '';
                             width = 0;
                         }
-                        const isLastToken = i === tokens.length - 1;
+                        var isLastToken = i === tokens.length - 1;
                         // give it its own line if it's not the end
                         lines += TextMetrics.addLine(token, !isLastToken);
                         canPrependSpaces = false;
@@ -1632,7 +1671,7 @@ var feng2d;
             }
             lines += TextMetrics.addLine(line, false);
             return lines;
-        }
+        };
         /**
          * Convienience function for logging each line added during the wordWrap
          * method
@@ -1642,11 +1681,12 @@ var feng2d;
          * @param  newLine     - Add new line character to end
          * @return A formatted line
          */
-        static addLine(line, newLine = true) {
+        TextMetrics.addLine = function (line, newLine) {
+            if (newLine === void 0) { newLine = true; }
             line = TextMetrics.trimRight(line);
-            line = (newLine) ? `${line}\n` : line;
+            line = (newLine) ? line + "\n" : line;
             return line;
-        }
+        };
         /**
          * Gets & sets the widths of calculated characters in a cache object
          *
@@ -1657,15 +1697,15 @@ var feng2d;
          * @param context        The canvas context
          * @return The from cache.
          */
-        static getFromCache(key, letterSpacing, cache, context) {
-            let width = cache[key];
+        TextMetrics.getFromCache = function (key, letterSpacing, cache, context) {
+            var width = cache[key];
             if (width === undefined) {
-                const spacing = ((key.length) * letterSpacing);
+                var spacing = ((key.length) * letterSpacing);
                 width = context.measureText(key).width + spacing;
                 cache[key] = width;
             }
             return width;
-        }
+        };
         /**
          * Determines whether we should collapse breaking spaces
          *
@@ -1673,9 +1713,9 @@ var feng2d;
          * @param whiteSpace  The TextStyle property whiteSpace
          * @return should collapse
          */
-        static collapseSpaces(whiteSpace) {
+        TextMetrics.collapseSpaces = function (whiteSpace) {
             return (whiteSpace === 'normal' || whiteSpace === 'pre-line');
-        }
+        };
         /**
          * Determines whether we should collapse newLine chars
          *
@@ -1683,9 +1723,9 @@ var feng2d;
          * @param whiteSpace  The white space
          * @return should collapse
          */
-        static collapseNewlines(whiteSpace) {
+        TextMetrics.collapseNewlines = function (whiteSpace) {
             return (whiteSpace === 'normal');
-        }
+        };
         /**
          * trims breaking whitespaces from string
          *
@@ -1693,19 +1733,19 @@ var feng2d;
          * @param text  The text
          * @return trimmed string
          */
-        static trimRight(text) {
+        TextMetrics.trimRight = function (text) {
             if (typeof text !== 'string') {
                 return '';
             }
-            for (let i = text.length - 1; i >= 0; i--) {
-                const char = text[i];
+            for (var i = text.length - 1; i >= 0; i--) {
+                var char = text[i];
                 if (!TextMetrics.isBreakingSpace(char)) {
                     break;
                 }
                 text = text.slice(0, -1);
             }
             return text;
-        }
+        };
         /**
          * Determines if char is a newline.
          *
@@ -1713,12 +1753,12 @@ var feng2d;
          * @param char  The character
          * @return True if newline, False otherwise.
          */
-        static isNewline(char) {
+        TextMetrics.isNewline = function (char) {
             if (typeof char !== 'string') {
                 return false;
             }
             return (TextMetrics._newlines.indexOf(char.charCodeAt(0)) >= 0);
-        }
+        };
         /**
          * Determines if char is a breaking whitespace.
          *
@@ -1726,12 +1766,12 @@ var feng2d;
          * @param char  The character
          * @return True if whitespace, False otherwise.
          */
-        static isBreakingSpace(char) {
+        TextMetrics.isBreakingSpace = function (char) {
             if (typeof char !== 'string') {
                 return false;
             }
             return (TextMetrics._breakingSpaces.indexOf(char.charCodeAt(0)) >= 0);
-        }
+        };
         /**
          * Splits a string into words, breaking-spaces and newLine characters
          *
@@ -1739,14 +1779,14 @@ var feng2d;
          * @param text       The text
          * @return A tokenized array
          */
-        static tokenize(text) {
-            const tokens = [];
-            let token = '';
+        TextMetrics.tokenize = function (text) {
+            var tokens = [];
+            var token = '';
             if (typeof text !== 'string') {
                 return tokens;
             }
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
+            for (var i = 0; i < text.length; i++) {
+                var char = text[i];
                 if (TextMetrics.isBreakingSpace(char) || TextMetrics.isNewline(char)) {
                     if (token !== '') {
                         tokens.push(token);
@@ -1761,7 +1801,7 @@ var feng2d;
                 tokens.push(token);
             }
             return tokens;
-        }
+        };
         /**
          * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
          *
@@ -1773,9 +1813,9 @@ var feng2d;
          * @param breakWords  The style attr break words
          * @return whether to break word or not
          */
-        static canBreakWords(token, breakWords) {
+        TextMetrics.canBreakWords = function (token, breakWords) {
             return breakWords;
-        }
+        };
         /**
          * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
          *
@@ -1791,9 +1831,9 @@ var feng2d;
          * @param breakWords  The style attr break words
          * @return whether to break word or not
          */
-        static canBreakChars(char, nextChar, token, index, breakWords) {
+        TextMetrics.canBreakChars = function (char, nextChar, token, index, breakWords) {
             return true;
-        }
+        };
         /**
          * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
          *
@@ -1808,9 +1848,9 @@ var feng2d;
          * @param token The token to split
          * @return The characters of the token
          */
-        static wordWrapSplit(token) {
+        TextMetrics.wordWrapSplit = function (token) {
             return token.split('');
-        }
+        };
         /**
          * Calculates the ascent, descent and fontSize of a given font-style
          *
@@ -1819,19 +1859,19 @@ var feng2d;
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
          */
-        static measureFont(font) {
+        TextMetrics.measureFont = function (font) {
             // as this method is used for preparing assets, don't recalculate things if we don't need to
             if (TextMetrics._fonts[font]) {
                 return TextMetrics._fonts[font];
             }
-            const properties = {};
-            const canvas = TextMetrics._canvas;
-            const context = TextMetrics._context;
+            var properties = {};
+            var canvas = TextMetrics._canvas;
+            var context = TextMetrics._context;
             context.font = font;
-            const metricsString = TextMetrics.METRICS_STRING + TextMetrics.BASELINE_SYMBOL;
-            const width = Math.ceil(context.measureText(metricsString).width);
-            let baseline = Math.ceil(context.measureText(TextMetrics.BASELINE_SYMBOL).width);
-            const height = 3 * baseline;
+            var metricsString = TextMetrics.METRICS_STRING + TextMetrics.BASELINE_SYMBOL;
+            var width = Math.ceil(context.measureText(metricsString).width);
+            var baseline = Math.ceil(context.measureText(TextMetrics.BASELINE_SYMBOL).width);
+            var height = 3 * baseline;
             baseline = baseline * TextMetrics.BASELINE_MULTIPLIER | 0;
             canvas.width = width;
             canvas.height = height;
@@ -1841,15 +1881,15 @@ var feng2d;
             context.textBaseline = 'alphabetic';
             context.fillStyle = '#000';
             context.fillText(metricsString, 0, baseline);
-            const imagedata = context.getImageData(0, 0, width, height).data;
-            const pixels = imagedata.length;
-            const line = width * 4;
-            let i = 0;
-            let idx = 0;
-            let stop = false;
+            var imagedata = context.getImageData(0, 0, width, height).data;
+            var pixels = imagedata.length;
+            var line = width * 4;
+            var i = 0;
+            var idx = 0;
+            var stop = false;
             // ascent. scan from top to bottom until we find a non red pixel
             for (i = 0; i < baseline; ++i) {
-                for (let j = 0; j < line; j += 4) {
+                for (var j = 0; j < line; j += 4) {
                     if (imagedata[idx + j] !== 255) {
                         stop = true;
                         break;
@@ -1867,7 +1907,7 @@ var feng2d;
             stop = false;
             // descent. scan from bottom to top until we find a non red pixel
             for (i = height; i > baseline; --i) {
-                for (let j = 0; j < line; j += 4) {
+                for (var j = 0; j < line; j += 4) {
                     if (imagedata[idx + j] !== 255) {
                         stop = true;
                         break;
@@ -1884,76 +1924,78 @@ var feng2d;
             properties.fontSize = properties.ascent + properties.descent;
             TextMetrics._fonts[font] = properties;
             return properties;
-        }
+        };
         /**
          * Clear font metrics in metrics cache.
          *
          * @param font - font name. If font name not set then clear cache for all fonts.
          */
-        static clearMetrics(font = '') {
+        TextMetrics.clearMetrics = function (font) {
+            if (font === void 0) { font = ''; }
             if (font) {
                 delete TextMetrics._fonts[font];
             }
             else {
                 TextMetrics._fonts = {};
             }
-        }
-    }
-    /**
-     * Cached canvas element for measuring text
-     */
-    TextMetrics._canvas = (() => {
-        var c = document.createElement('canvas');
-        c.width = c.height = 10;
-        return c;
-    })();
-    /**
-     * Cache for context to use.
-     */
-    TextMetrics._context = TextMetrics._canvas.getContext('2d');
-    /**
-     * Cache of {@see PIXI.TextMetrics.FontMetrics} objects.
-     */
-    TextMetrics._fonts = {};
-    /**
-     * String used for calculate font metrics.
-     * These characters are all tall to help calculate the height required for text.
-     */
-    TextMetrics.METRICS_STRING = '|ÉqÅ';
-    /**
-     * Baseline symbol for calculate font metrics.
-     */
-    TextMetrics.BASELINE_SYMBOL = 'M';
-    /**
-     * Baseline multiplier for calculate font metrics.
-     */
-    TextMetrics.BASELINE_MULTIPLIER = 2;
-    /**
-     * Cache of new line chars.
-     */
-    TextMetrics._newlines = [
-        0x000A,
-        0x000D,
-    ];
-    /**
-     * Cache of breaking spaces.
-     */
-    TextMetrics._breakingSpaces = [
-        0x0009,
-        0x0020,
-        0x2000,
-        0x2001,
-        0x2002,
-        0x2003,
-        0x2004,
-        0x2005,
-        0x2006,
-        0x2008,
-        0x2009,
-        0x200A,
-        0x205F,
-        0x3000,
-    ];
+        };
+        /**
+         * Cached canvas element for measuring text
+         */
+        TextMetrics._canvas = (function () {
+            var c = document.createElement('canvas');
+            c.width = c.height = 10;
+            return c;
+        })();
+        /**
+         * Cache for context to use.
+         */
+        TextMetrics._context = TextMetrics._canvas.getContext('2d');
+        /**
+         * Cache of {@see PIXI.TextMetrics.FontMetrics} objects.
+         */
+        TextMetrics._fonts = {};
+        /**
+         * String used for calculate font metrics.
+         * These characters are all tall to help calculate the height required for text.
+         */
+        TextMetrics.METRICS_STRING = '|ÉqÅ';
+        /**
+         * Baseline symbol for calculate font metrics.
+         */
+        TextMetrics.BASELINE_SYMBOL = 'M';
+        /**
+         * Baseline multiplier for calculate font metrics.
+         */
+        TextMetrics.BASELINE_MULTIPLIER = 2;
+        /**
+         * Cache of new line chars.
+         */
+        TextMetrics._newlines = [
+            0x000A,
+            0x000D,
+        ];
+        /**
+         * Cache of breaking spaces.
+         */
+        TextMetrics._breakingSpaces = [
+            0x0009,
+            0x0020,
+            0x2000,
+            0x2001,
+            0x2002,
+            0x2003,
+            0x2004,
+            0x2005,
+            0x2006,
+            0x2008,
+            0x2009,
+            0x200A,
+            0x205F,
+            0x3000,
+        ];
+        return TextMetrics;
+    }());
     feng2d.TextMetrics = TextMetrics;
 })(feng2d || (feng2d = {}));
 var feng2d;
@@ -1963,27 +2005,29 @@ var feng2d;
      *
      * 用于显示文字。
      */
-    let Text = class Text extends feng3d.Component {
-        constructor() {
-            super(...arguments);
+    var Text = /** @class */ (function (_super) {
+        __extends(Text, _super);
+        function Text() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 文本内容。
              */
-            this.text = "Hello 🌷 world\nHello 🌷 world";
+            _this.text = "Hello 🌷 world\nHello 🌷 world";
             /**
              * 是否根据文本自动调整宽高。
              */
-            this.autoSize = true;
-            this.style = new feng2d.TextStyle();
+            _this.autoSize = true;
+            _this.style = new feng2d.TextStyle();
             /**
              * 显示图片的区域，(0, 0, 1, 1)表示完整显示图片。
              */
-            this._uvRect = new feng3d.Vector4(0, 0, 1, 1);
-            this._image = new feng3d.Texture2D();
-            this._invalid = true;
+            _this._uvRect = new feng3d.Vector4(0, 0, 1, 1);
+            _this._image = new feng3d.Texture2D();
+            _this._invalid = true;
+            return _this;
         }
-        beforeRender(renderAtomic, scene, camera) {
-            super.beforeRender(renderAtomic, scene, camera);
+        Text.prototype.beforeRender = function (renderAtomic, scene, camera) {
+            _super.prototype.beforeRender.call(this, renderAtomic, scene, camera);
             var canvas = this._canvas;
             if (!this._canvas || this._invalid) {
                 canvas = this._canvas = feng2d.drawText(this._canvas, this.text, this.style);
@@ -2002,40 +2046,41 @@ var feng2d;
             //
             renderAtomic.uniforms.s_texture = this._image;
             renderAtomic.uniforms.u_uvRect = this._uvRect;
-        }
-        invalidate() {
+        };
+        Text.prototype.invalidate = function () {
             this._invalid = true;
-        }
-        _styleChanged(property, oldValue, newValue) {
+        };
+        Text.prototype._styleChanged = function (property, oldValue, newValue) {
             if (oldValue)
                 oldValue.off("changed", this.invalidate, this);
             if (newValue)
                 newValue.on("changed", this.invalidate, this);
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize,
-        feng3d.watch("invalidate")
-    ], Text.prototype, "text", void 0);
-    __decorate([
-        feng3d.oav({ tooltip: "是否根据文本自动调整宽高。" }),
-        feng3d.serialize
-    ], Text.prototype, "autoSize", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize,
-        feng3d.watch("_styleChanged")
-    ], Text.prototype, "style", void 0);
-    Text = __decorate([
-        feng3d.AddComponentMenu("UI/Text"),
-        feng3d.RegisterComponent()
-    ], Text);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize,
+            feng3d.watch("invalidate")
+        ], Text.prototype, "text", void 0);
+        __decorate([
+            feng3d.oav({ tooltip: "是否根据文本自动调整宽高。" }),
+            feng3d.serialize
+        ], Text.prototype, "autoSize", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize,
+            feng3d.watch("_styleChanged")
+        ], Text.prototype, "style", void 0);
+        Text = __decorate([
+            feng3d.AddComponentMenu("UI/Text"),
+            feng3d.RegisterComponent()
+        ], Text);
+        return Text;
+    }(feng3d.Component));
     feng2d.Text = Text;
 })(feng2d || (feng2d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.GameObject.registerPrimitive("Text", (g) => {
+    feng3d.GameObject.registerPrimitive("Text", function (g) {
         var transform2D = g.addComponent("Transform2D");
         g.addComponent("CanvasRenderer");
         transform2D.size.x = 160;

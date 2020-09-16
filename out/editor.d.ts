@@ -782,6 +782,7 @@ declare namespace editor {
         initproject(projectname: string, callback: (err?: Error) => void): void;
     }
 }
+declare var templateurls: string[][];
 declare namespace editor {
     /**
      * 编辑器资源系统

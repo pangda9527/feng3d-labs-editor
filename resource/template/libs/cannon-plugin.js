@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -13,44 +26,52 @@ var CANNON;
     /**
      * 刚体
      */
-    let Rigidbody = class Rigidbody extends feng3d.Behaviour {
-        constructor() {
-            super(...arguments);
-            this.body = new CANNON.Body();
-            this.runEnvironment = feng3d.RunEnvironment.feng3d;
+    var Rigidbody = /** @class */ (function (_super) {
+        __extends(Rigidbody, _super);
+        function Rigidbody() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.body = new CANNON.Body();
+            _this.runEnvironment = feng3d.RunEnvironment.feng3d;
+            return _this;
         }
-        get mass() {
-            return this.body.mass;
-        }
-        set mass(v) {
-            this.body.mass = v;
-        }
-        init() {
+        Object.defineProperty(Rigidbody.prototype, "mass", {
+            get: function () {
+                return this.body.mass;
+            },
+            set: function (v) {
+                this.body.mass = v;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Rigidbody.prototype.init = function () {
+            var _this = this;
             this.body = new CANNON.Body({ mass: this.mass });
             this.body.position = new CANNON.Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
             var colliders = this.gameObject.getComponents("Collider");
-            colliders.forEach(element => {
-                this.body.addShape(element.shape);
+            colliders.forEach(function (element) {
+                _this.body.addShape(element.shape);
             });
-        }
+        };
         /**
          * 每帧执行
          */
-        update(interval) {
+        Rigidbody.prototype.update = function (interval) {
             var scene = this.getComponentsInParents("Scene")[0];
             if (scene) {
                 this.transform.position = new feng3d.Vector3(this.body.position.x, this.body.position.y, this.body.position.z);
             }
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], Rigidbody.prototype, "mass", null);
-    Rigidbody = __decorate([
-        feng3d.AddComponentMenu("Physics/Rigidbody"),
-        feng3d.RegisterComponent()
-    ], Rigidbody);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], Rigidbody.prototype, "mass", null);
+        Rigidbody = __decorate([
+            feng3d.AddComponentMenu("Physics/Rigidbody"),
+            feng3d.RegisterComponent()
+        ], Rigidbody);
+        return Rigidbody;
+    }(feng3d.Behaviour));
     CANNON.Rigidbody = Rigidbody;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -58,14 +79,23 @@ var CANNON;
     /**
      * 碰撞体
      */
-    let Collider = class Collider extends feng3d.Component {
-        get shape() {
-            return this._shape;
+    var Collider = /** @class */ (function (_super) {
+        __extends(Collider, _super);
+        function Collider() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-    };
-    Collider = __decorate([
-        feng3d.RegisterComponent()
-    ], Collider);
+        Object.defineProperty(Collider.prototype, "shape", {
+            get: function () {
+                return this._shape;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Collider = __decorate([
+            feng3d.RegisterComponent()
+        ], Collider);
+        return Collider;
+    }(feng3d.Component));
     CANNON.Collider = Collider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -73,43 +103,46 @@ var CANNON;
     /**
      * 长方体碰撞体
      */
-    let BoxCollider = class BoxCollider extends CANNON.Collider {
-        constructor() {
-            super(...arguments);
+    var BoxCollider = /** @class */ (function (_super) {
+        __extends(BoxCollider, _super);
+        function BoxCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 宽度
              */
-            this.width = 1;
+            _this.width = 1;
             /**
              * 高度
              */
-            this.height = 1;
+            _this.height = 1;
             /**
              * 深度
              */
-            this.depth = 1;
+            _this.depth = 1;
+            return _this;
         }
-        init() {
+        BoxCollider.prototype.init = function () {
             var halfExtents = new CANNON.Vector3(this.width / 2, this.height / 2, this.depth / 2);
             this._shape = new CANNON.Box(halfExtents);
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], BoxCollider.prototype, "width", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], BoxCollider.prototype, "height", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], BoxCollider.prototype, "depth", void 0);
-    BoxCollider = __decorate([
-        feng3d.AddComponentMenu("Physics/Box Collider"),
-        feng3d.RegisterComponent()
-    ], BoxCollider);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "width", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], BoxCollider.prototype, "depth", void 0);
+        BoxCollider = __decorate([
+            feng3d.AddComponentMenu("Physics/Box Collider"),
+            feng3d.RegisterComponent()
+        ], BoxCollider);
+        return BoxCollider;
+    }(CANNON.Collider));
     CANNON.BoxCollider = BoxCollider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -117,34 +150,41 @@ var CANNON;
     /**
      * 球形碰撞体
      */
-    let SphereCollider = class SphereCollider extends CANNON.Collider {
-        constructor() {
-            super(...arguments);
-            this._radius = 0.5;
+    var SphereCollider = /** @class */ (function (_super) {
+        __extends(SphereCollider, _super);
+        function SphereCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._radius = 0.5;
+            return _this;
         }
-        /**
-         * 半径
-         */
-        get radius() {
-            return this._radius;
-        }
-        set radius(v) {
-            this._radius = v;
-            if (this._shape)
-                this._shape.radius = v;
-        }
-        init() {
+        Object.defineProperty(SphereCollider.prototype, "radius", {
+            /**
+             * 半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                this._radius = v;
+                if (this._shape)
+                    this._shape.radius = v;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        SphereCollider.prototype.init = function () {
             this._shape = new CANNON.Sphere(this._radius);
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], SphereCollider.prototype, "radius", null);
-    SphereCollider = __decorate([
-        feng3d.AddComponentMenu("Physics/Sphere Collider"),
-        feng3d.RegisterComponent()
-    ], SphereCollider);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], SphereCollider.prototype, "radius", null);
+        SphereCollider = __decorate([
+            feng3d.AddComponentMenu("Physics/Sphere Collider"),
+            feng3d.RegisterComponent()
+        ], SphereCollider);
+        return SphereCollider;
+    }(CANNON.Collider));
     CANNON.SphereCollider = SphereCollider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -152,50 +192,53 @@ var CANNON;
     /**
      * 圆柱体碰撞体
      */
-    let CylinderCollider = class CylinderCollider extends CANNON.Collider {
-        constructor() {
-            super(...arguments);
+    var CylinderCollider = /** @class */ (function (_super) {
+        __extends(CylinderCollider, _super);
+        function CylinderCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             /**
              * 顶部半径
              */
-            this.topRadius = 0.5;
+            _this.topRadius = 0.5;
             /**
              * 底部半径
              */
-            this.bottomRadius = 0.5;
+            _this.bottomRadius = 0.5;
             /**
              * 高度
              */
-            this.height = 2;
+            _this.height = 2;
             /**
              * 横向分割数
              */
-            this.segmentsW = 16;
+            _this.segmentsW = 16;
+            return _this;
         }
-        init() {
+        CylinderCollider.prototype.init = function () {
             this._shape = new CANNON.Cylinder(this.topRadius, this.bottomRadius, this.height, this.segmentsW);
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], CylinderCollider.prototype, "topRadius", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], CylinderCollider.prototype, "bottomRadius", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], CylinderCollider.prototype, "height", void 0);
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], CylinderCollider.prototype, "segmentsW", void 0);
-    CylinderCollider = __decorate([
-        feng3d.AddComponentMenu("Physics/Cylinder Collider"),
-        feng3d.RegisterComponent()
-    ], CylinderCollider);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "topRadius", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "bottomRadius", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "height", void 0);
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], CylinderCollider.prototype, "segmentsW", void 0);
+        CylinderCollider = __decorate([
+            feng3d.AddComponentMenu("Physics/Cylinder Collider"),
+            feng3d.RegisterComponent()
+        ], CylinderCollider);
+        return CylinderCollider;
+    }(CANNON.Collider));
     CANNON.CylinderCollider = CylinderCollider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -203,79 +246,101 @@ var CANNON;
     /**
      * 胶囊体碰撞体
      */
-    let CapsuleCollider = class CapsuleCollider extends CANNON.Collider {
-        constructor() {
-            super(...arguments);
-            this._radius = 0.5;
-            this._height = 1;
-            this._segmentsW = 16;
-            this._segmentsH = 15;
-            this._yUp = true;
+    var CapsuleCollider = /** @class */ (function (_super) {
+        __extends(CapsuleCollider, _super);
+        function CapsuleCollider() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._radius = 0.5;
+            _this._height = 1;
+            _this._segmentsW = 16;
+            _this._segmentsH = 15;
+            _this._yUp = true;
+            return _this;
         }
-        /**
-         * 胶囊体半径
-         */
-        get radius() {
-            return this._radius;
-        }
-        set radius(v) {
-            if (this._radius == v)
-                return;
-            this._radius = v;
+        Object.defineProperty(CapsuleCollider.prototype, "radius", {
+            /**
+             * 胶囊体半径
+             */
+            get: function () {
+                return this._radius;
+            },
+            set: function (v) {
+                if (this._radius == v)
+                    return;
+                this._radius = v;
+                this.invalidateGeometry();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "height", {
+            /**
+             * 胶囊体高度
+             */
+            get: function () {
+                return this._height;
+            },
+            set: function (v) {
+                if (this._height == v)
+                    return;
+                this._height = v;
+                this.invalidateGeometry();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "segmentsW", {
+            /**
+             * 横向分割数
+             */
+            get: function () {
+                return this._segmentsW;
+            },
+            set: function (v) {
+                if (this._segmentsW == v)
+                    return;
+                this._segmentsW = v;
+                this.invalidateGeometry();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "segmentsH", {
+            /**
+             * 纵向分割数
+             */
+            get: function () {
+                return this._segmentsH;
+            },
+            set: function (v) {
+                if (this._segmentsH == v)
+                    return;
+                this._segmentsH = v;
+                this.invalidateGeometry();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CapsuleCollider.prototype, "yUp", {
+            /**
+             * 正面朝向 true:Y+ false:Z+
+             */
+            get: function () {
+                return this._yUp;
+            },
+            set: function (v) {
+                if (this._yUp == v)
+                    return;
+                this._yUp = v;
+                this.invalidateGeometry();
+            },
+            enumerable: false,
+            configurable: true
+        });
+        CapsuleCollider.prototype.init = function () {
             this.invalidateGeometry();
-        }
-        /**
-         * 胶囊体高度
-         */
-        get height() {
-            return this._height;
-        }
-        set height(v) {
-            if (this._height == v)
-                return;
-            this._height = v;
-            this.invalidateGeometry();
-        }
-        /**
-         * 横向分割数
-         */
-        get segmentsW() {
-            return this._segmentsW;
-        }
-        set segmentsW(v) {
-            if (this._segmentsW == v)
-                return;
-            this._segmentsW = v;
-            this.invalidateGeometry();
-        }
-        /**
-         * 纵向分割数
-         */
-        get segmentsH() {
-            return this._segmentsH;
-        }
-        set segmentsH(v) {
-            if (this._segmentsH == v)
-                return;
-            this._segmentsH = v;
-            this.invalidateGeometry();
-        }
-        /**
-         * 正面朝向 true:Y+ false:Z+
-         */
-        get yUp() {
-            return this._yUp;
-        }
-        set yUp(v) {
-            if (this._yUp == v)
-                return;
-            this._yUp = v;
-            this.invalidateGeometry();
-        }
-        init() {
-            this.invalidateGeometry();
-        }
-        invalidateGeometry() {
+        };
+        CapsuleCollider.prototype.invalidateGeometry = function () {
             var g = new feng3d.CapsuleGeometry();
             g.radius = this._radius;
             g.height = this._height;
@@ -284,31 +349,32 @@ var CANNON;
             g.yUp = this._yUp;
             g.updateGrometry();
             this._shape = new CANNON.Trimesh(g.positions, g.indices);
-        }
-    };
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], CapsuleCollider.prototype, "radius", null);
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], CapsuleCollider.prototype, "height", null);
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], CapsuleCollider.prototype, "segmentsW", null);
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], CapsuleCollider.prototype, "segmentsH", null);
-    __decorate([
-        feng3d.serialize,
-        feng3d.oav()
-    ], CapsuleCollider.prototype, "yUp", null);
-    CapsuleCollider = __decorate([
-        feng3d.RegisterComponent()
-    ], CapsuleCollider);
+        };
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "radius", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "height", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "segmentsW", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "segmentsH", null);
+        __decorate([
+            feng3d.serialize,
+            feng3d.oav()
+        ], CapsuleCollider.prototype, "yUp", null);
+        CapsuleCollider = __decorate([
+            feng3d.RegisterComponent()
+        ], CapsuleCollider);
+        return CapsuleCollider;
+    }(CANNON.Collider));
     CANNON.CapsuleCollider = CapsuleCollider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -316,15 +382,20 @@ var CANNON;
     /**
      * 平面碰撞体
      */
-    let PlaneCollider = class PlaneCollider extends CANNON.Collider {
-        init() {
-            this._shape = new CANNON.Plane();
+    var PlaneCollider = /** @class */ (function (_super) {
+        __extends(PlaneCollider, _super);
+        function PlaneCollider() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-    };
-    PlaneCollider = __decorate([
-        feng3d.AddComponentMenu("Physics/Plane Collider"),
-        feng3d.RegisterComponent()
-    ], PlaneCollider);
+        PlaneCollider.prototype.init = function () {
+            this._shape = new CANNON.Plane();
+        };
+        PlaneCollider = __decorate([
+            feng3d.AddComponentMenu("Physics/Plane Collider"),
+            feng3d.RegisterComponent()
+        ], PlaneCollider);
+        return PlaneCollider;
+    }(CANNON.Collider));
     CANNON.PlaneCollider = PlaneCollider;
 })(CANNON || (CANNON = {}));
 var CANNON;
@@ -332,84 +403,90 @@ var CANNON;
     /**
      * 物理世界组件
      */
-    let PhysicsWorld = class PhysicsWorld extends feng3d.Behaviour {
-        constructor() {
-            super(...arguments);
-            this.runEnvironment = feng3d.RunEnvironment.feng3d;
+    var PhysicsWorld = /** @class */ (function (_super) {
+        __extends(PhysicsWorld, _super);
+        function PhysicsWorld() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.runEnvironment = feng3d.RunEnvironment.feng3d;
             /**
              * 物理世界
              */
-            this.world = new CANNON.World();
+            _this.world = new CANNON.World();
             /**
              * 重力加速度
              */
-            this.gravity = new feng3d.Vector3(0, -9.82, 0);
-            this._isInit = false;
+            _this.gravity = new feng3d.Vector3(0, -9.82, 0);
+            _this._isInit = false;
+            return _this;
         }
-        init() {
-            super.init();
-        }
-        initWorld() {
+        PhysicsWorld.prototype.init = function () {
+            _super.prototype.init.call(this);
+        };
+        PhysicsWorld.prototype.initWorld = function () {
+            var _this = this;
             if (this._isInit)
                 return true;
             this._isInit = true;
-            var bodys = this.getComponentsInChildren("Rigidbody").map(c => c.body);
-            bodys.forEach(v => {
-                this.world.addBody(v);
+            var bodys = this.getComponentsInChildren("Rigidbody").map(function (c) { return c.body; });
+            bodys.forEach(function (v) {
+                _this.world.addBody(v);
             });
             //
             this.on("addChild", this.onAddChild, this);
             this.on("removeChild", this.onRemoveChild, this);
             this.on("addComponent", this.onAddComponent, this);
             this.on("removeComponent", this.onRemovedComponent, this);
-        }
-        onAddComponent(e) {
+        };
+        PhysicsWorld.prototype.onAddComponent = function (e) {
             if (e.data.component instanceof CANNON.Rigidbody) {
                 this.world.addBody(e.data.component.body);
             }
-        }
-        onRemovedComponent(e) {
+        };
+        PhysicsWorld.prototype.onRemovedComponent = function (e) {
             if (e.data.component instanceof CANNON.Rigidbody) {
                 this.world.removeBody(e.data.component.body);
             }
-        }
-        onAddChild(e) {
+        };
+        PhysicsWorld.prototype.onAddChild = function (e) {
             var bodyComponent = e.data.child.getComponent("Rigidbody");
             if (bodyComponent) {
                 this.world.addBody(bodyComponent.body);
             }
-        }
-        onRemoveChild(e) {
+        };
+        PhysicsWorld.prototype.onRemoveChild = function (e) {
             var bodyComponent = e.data.child.getComponent("Rigidbody");
             if (bodyComponent) {
                 this.world.removeBody(bodyComponent.body);
             }
-        }
-        update(interval) {
+        };
+        PhysicsWorld.prototype.update = function (interval) {
             this.initWorld();
             this.world.gravity = new CANNON.Vector3(this.gravity.x, this.gravity.y, this.gravity.z);
             this.world.step(1.0 / 60.0, interval / 1000, 3);
-        }
-    };
-    __decorate([
-        feng3d.oav(),
-        feng3d.serialize
-    ], PhysicsWorld.prototype, "gravity", void 0);
-    PhysicsWorld = __decorate([
-        feng3d.AddComponentMenu("Physics/PhysicsWorld"),
-        feng3d.RegisterComponent()
-    ], PhysicsWorld);
+        };
+        __decorate([
+            feng3d.oav(),
+            feng3d.serialize
+        ], PhysicsWorld.prototype, "gravity", void 0);
+        PhysicsWorld = __decorate([
+            feng3d.AddComponentMenu("Physics/PhysicsWorld"),
+            feng3d.RegisterComponent()
+        ], PhysicsWorld);
+        return PhysicsWorld;
+    }(feng3d.Behaviour));
     CANNON.PhysicsWorld = PhysicsWorld;
 })(CANNON || (CANNON = {}));
 var CANNON;
 (function (CANNON) {
-    let Cloth = class Cloth extends feng3d.Renderable {
-        constructor() {
-            super(...arguments);
-            this.runEnvironment = feng3d.RunEnvironment.feng3d;
+    var Cloth = /** @class */ (function (_super) {
+        __extends(Cloth, _super);
+        function Cloth() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.runEnvironment = feng3d.RunEnvironment.feng3d;
+            return _this;
         }
-        init() {
-            super.init();
+        Cloth.prototype.init = function () {
+            _super.prototype.init.call(this);
             var clothMass = 1; // 1 kg in total
             var clothSize = 1; // 1 meter
             var Nx = 12;
@@ -457,24 +534,25 @@ var CANNON;
             }
             this.particles = particles;
             this.constraints = constraints;
-        }
-        update() {
-            super.update();
+        };
+        Cloth.prototype.update = function () {
+            _super.prototype.update.call(this);
             var physicsWorld = this.getComponentsInParents("PhysicsWorld")[0];
             var world = physicsWorld.world;
-            this.particles.forEach(p => {
-                p.forEach(v => {
+            this.particles.forEach(function (p) {
+                p.forEach(function (v) {
                     world.addBody(v);
                 });
             });
-            this.constraints.forEach(v => {
+            this.constraints.forEach(function (v) {
                 world.addConstraint(v);
             });
-        }
-    };
-    Cloth = __decorate([
-        feng3d.RegisterComponent()
-    ], Cloth);
+        };
+        Cloth = __decorate([
+            feng3d.RegisterComponent()
+        ], Cloth);
+        return Cloth;
+    }(feng3d.Renderable));
     CANNON.Cloth = Cloth;
 })(CANNON || (CANNON = {}));
 var feng3d;
@@ -483,7 +561,7 @@ var feng3d;
 })(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
-    feng3d.functionwrap.extendFunction(feng3d.GameObject, "createPrimitive", (g, type) => {
+    feng3d.functionwrap.extendFunction(feng3d.GameObject, "createPrimitive", function (g, type) {
         if (type == "Cube") {
             g.addComponent("BoxCollider");
             g.addComponent("Rigidbody");
