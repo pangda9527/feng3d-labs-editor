@@ -72,7 +72,6 @@
         //
         "src/ui/SceneView.ts",
         "src/ui/CameraPreview.ts",
-        "src/ui/ParticleEffectController.ts",
         "src/ui/components/RenameTextInput.ts",
         "src/ui/components/SplitGroup.ts",
         "src/ui/components/SplitUIComponent.ts",
@@ -86,7 +85,6 @@
         "src/ui/components/TreeItemRenderer.ts",
         "src/ui/components/TreeNode.ts",
         "src/ui/components/ComponentView.ts",
-        "src/ui/components/ParticleComponentView.ts",
         "src/ui/components/Menu.ts",
         "src/ui/components/Message.ts",
         "src/ui/components/ToolTip.ts",
@@ -140,7 +138,6 @@
         "src/objectview/oav/OAVGameObjectName.ts",
         "src/objectview/oav/OAVPick.ts",
         "src/objectview/oav/OAVTexture2D.ts",
-        "src/objectview/oav/OAVParticleComponentList.ts",
         "src/objectview/oav/OAVFeng3dPreView.ts",
         "src/objectview/oav/OAVMinMaxCurve.ts",
         "src/objectview/oav/OAVMinMaxCurveVector3.ts",
