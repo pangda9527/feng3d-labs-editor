@@ -74,7 +74,7 @@ namespace editor
                 canvas.style.top = rect.top + "px";
                 canvas.style.left = (rect.left + rect.width - canvas.width) + "px";
 
-                var rotation = this.view.camera.transform.localToWorldMatrix.clone().invert().decompose()[1];
+                var rotation = this.view.camera.transform.localToWorldMatrix.clone().invert().toTRS()[1];
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
@@ -82,7 +82,7 @@ namespace editor
                 //隐藏正面箭头
                 arrowsArr.forEach(element =>
                 {
-                    if (Math.abs(element.transform.localToWorldMatrix.up.dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
+                    if (Math.abs(element.transform.localToWorldMatrix.getAxisY().dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
                         element.visible = true;
                     else
                         element.visible = false;
@@ -209,7 +209,7 @@ namespace editor
             {
                 var cameraTargetMatrix = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
                 cameraTargetMatrix.invert();
-                var result = cameraTargetMatrix.decompose()[1];
+                var result = cameraTargetMatrix.toTRS()[1];
 
                 feng3d.globalDispatcher.dispatch("editorCameraRotate", result);
 
@@ -220,7 +220,7 @@ namespace editor
         private onEditorCameraRotate(resultRotation: feng3d.Vector3)
         {
             var camera = this.view.camera;
-            var forward = camera.transform.forwardVector;
+            var forward = camera.transform.matrix.getAxisZ();
             var lookDistance: number;
             if (editorData.selectedGameObjects.length > 0)
             {
@@ -248,9 +248,8 @@ namespace editor
                     var cameraQuat = sourceQuat.slerpTo(targetQuat, rate.rate);
                     camera.transform.orientation = cameraQuat;
                     //
-                    var translation = camera.transform.forwardVector;
-                    translation.negate();
-                    translation.scaleNumber(lookDistance);
+                    var translation = camera.transform.matrix.getAxisZ();
+                    translation.normalize(-lookDistance);
                     camera.transform.position = rotateCenter.addTo(translation);
                 },
             }).to({ rate: 1 }, 300, egret.Ease.sineIn);

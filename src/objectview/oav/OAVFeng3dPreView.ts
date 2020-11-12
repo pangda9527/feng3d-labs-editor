@@ -49,8 +49,8 @@ namespace editor
         {
             var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 
-            var X_AXIS = feng3dScreenShot.camera.transform.rightVector;
-            var Y_AXIS = feng3dScreenShot.camera.transform.upVector;
+            var X_AXIS = feng3dScreenShot.camera.transform.matrix.getAxisX();
+            var Y_AXIS = feng3dScreenShot.camera.transform.matrix.getAxisY();
             feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
             feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
             this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();

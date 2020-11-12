@@ -304,7 +304,7 @@ namespace editor
 				this.rotateSceneCenter = transformBox.getCenter();
 			} else
 			{
-				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix.forward;
+				this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix.getAxisZ();
 				this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
 				this.rotateSceneCenter = this.rotateSceneCenter.addTo(this.rotateSceneCameraGlobalMatrix.getPosition());
 			}
@@ -320,7 +320,7 @@ namespace editor
 			var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
 			var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
 			globalMatrix.appendRotation(feng3d.Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
-			var rotateAxisX = globalMatrix.right;
+			var rotateAxisX = globalMatrix.getAxisX();
 			globalMatrix.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
 			this.editorCamera.transform.localToWorldMatrix = globalMatrix;
 		}
@@ -345,13 +345,13 @@ namespace editor
 			var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
 			sceneControlConfig.lookDistance -= moveDistance;
 
-			var forward = this.editorCamera.transform.localToWorldMatrix.forward;
+			var forward = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
 			var camerascenePosition = this.editorCamera.transform.worldPosition;
 			var newCamerascenePosition = new feng3d.Vector3(
 				forward.x * moveDistance + camerascenePosition.x,
 				forward.y * moveDistance + camerascenePosition.y,
 				forward.z * moveDistance + camerascenePosition.z);
-			var newCameraPosition = this.editorCamera.transform.inverseTransformPoint(newCamerascenePosition);
+			var newCameraPosition = this.editorCamera.transform.worldToLocalPoint(newCamerascenePosition);
 			this.editorCamera.transform.position = newCameraPosition;
 
 			this.preMousePoint = currentMousePoint;
@@ -377,10 +377,10 @@ namespace editor
 			var mousePoint = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
 			var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
 			var scale = this.view.getScaleByDepth(sceneControlConfig.lookDistance);
-			var up = this.dragSceneCameraGlobalMatrix.up;
-			var right = this.dragSceneCameraGlobalMatrix.right;
-			up.scaleNumber(addPoint.y * scale);
-			right.scaleNumber(-addPoint.x * scale);
+			var up = this.dragSceneCameraGlobalMatrix.getAxisY();
+			var right = this.dragSceneCameraGlobalMatrix.getAxisX();
+			up.normalize(addPoint.y * scale);
+			right.normalize(-addPoint.x * scale);
 			var globalMatrix = this.dragSceneCameraGlobalMatrix.clone();
 			globalMatrix.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
 			this.editorCamera.transform.localToWorldMatrix = globalMatrix;
@@ -432,13 +432,13 @@ namespace editor
 				}
 				//
 				sceneControlConfig.lookDistance = lookDistance;
-				var lookPos = this.editorCamera.transform.localToWorldMatrix.forward;
+				var lookPos = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
 				lookPos.scaleNumber(-lookDistance);
 				lookPos.add(scenePosition);
 				var localLookPos = lookPos.clone();
 				if (this.editorCamera.transform.parent)
 				{
-					localLookPos = this.editorCamera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
+					localLookPos = this.editorCamera.transform.parent.worldToLocalMatrix.transformPoint3(lookPos);
 				}
 				egret.Tween.get(this.editorCamera.transform).to({ x: localLookPos.x, y: localLookPos.y, z: localLookPos.z }, 300, egret.Ease.sineIn);
 			}

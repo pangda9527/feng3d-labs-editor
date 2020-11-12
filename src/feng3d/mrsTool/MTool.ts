@@ -60,17 +60,17 @@ namespace editor
             //全局矩阵
             var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
-            var po = globalMatrix.transformVector(new feng3d.Vector3(0, 0, 0));
-            var px = globalMatrix.transformVector(new feng3d.Vector3(1, 0, 0));
-            var py = globalMatrix.transformVector(new feng3d.Vector3(0, 1, 0));
-            var pz = globalMatrix.transformVector(new feng3d.Vector3(0, 0, 1));
+            var po = globalMatrix.transformPoint3(new feng3d.Vector3(0, 0, 0));
+            var px = globalMatrix.transformPoint3(new feng3d.Vector3(1, 0, 0));
+            var py = globalMatrix.transformPoint3(new feng3d.Vector3(0, 1, 0));
+            var pz = globalMatrix.transformPoint3(new feng3d.Vector3(0, 0, 1));
             //
             var ox = px.subTo(po);
             var oy = py.subTo(po);
             var oz = pz.subTo(po);
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-            var cameraDir = cameraSceneTransform.forward;
+            var cameraDir = cameraSceneTransform.getAxisZ();
             this.movePlane3D = new feng3d.Plane();
             //
             switch (event.currentTarget)
@@ -151,7 +151,7 @@ namespace editor
             if (!this.editorCamera) return;
 
             var cameraPos = this.editorCamera.transform.worldPosition;
-            var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformVector(cameraPos);
+            var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformPoint3(cameraPos);
 
             this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
             this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;

@@ -143,7 +143,7 @@ namespace editor
             {
                 var matrix = gameobject.transform.localToWorldMatrix;
                 var positions = Array.apply(null, geometry.positions);
-                matrix.transformVectors(positions, positions);
+                matrix.transformPoints(positions, positions);
                 var indices = Array.apply(null, geometry.indices);
                 //
                 geometrys.push({ positions: positions, indices: indices });

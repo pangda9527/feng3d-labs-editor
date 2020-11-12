@@ -48,12 +48,12 @@ namespace editor
             var globalMatrix = this.transform.localToWorldMatrix;
             //中心与X,Y,Z轴上点坐标
             var pos = globalMatrix.getPosition();
-            var xDir = globalMatrix.right;
-            var yDir = globalMatrix.up;
-            var zDir = globalMatrix.forward;
+            var xDir = globalMatrix.getAxisX();
+            var yDir = globalMatrix.getAxisY();
+            var zDir = globalMatrix.getAxisZ();
             //摄像机前方方向
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-            var cameraDir = cameraSceneTransform.forward;
+            var cameraDir = cameraSceneTransform.getAxisZ();
             var cameraPos = cameraSceneTransform.getPosition();
             this.movePlane3D = new feng3d.Plane();
             switch (event.currentTarget)
@@ -128,8 +128,8 @@ namespace editor
                     var endPoint = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
                     var offset = endPoint.subTo(this.startMousePos);
                     var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-                    var right = cameraSceneTransform.right;
-                    var up = cameraSceneTransform.up;
+                    var right = cameraSceneTransform.getAxisX();
+                    var up = cameraSceneTransform.getAxisY();
                     this.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                     //
                     this.startMousePos = endPoint;
@@ -159,7 +159,7 @@ namespace editor
             if (!this.editorCamera) return;
 
             var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix.clone();
-            var cameraDir = cameraSceneTransform.forward;
+            var cameraDir = cameraSceneTransform.getAxisZ();
             cameraDir.negate();
             //
             var xyzAxis = [this.toolModel.xAxis, this.toolModel.yAxis, this.toolModel.zAxis];
@@ -171,7 +171,7 @@ namespace editor
             //朝向摄像机
             var temp = cameraSceneTransform.clone();
             temp.append(this.toolModel.transform.worldToLocalMatrix);
-            var rotation = temp.decompose()[1];
+            var rotation = temp.toTRS()[1];
             this.toolModel.freeAxis.transform.rotation = rotation;
             this.toolModel.cameraAxis.transform.rotation = rotation;
         }

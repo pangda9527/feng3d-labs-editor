@@ -22,7 +22,7 @@ namespace editor
 
             var position = mouseRay3D.origin.clone();
             var direction = mouseRay3D.direction.clone();
-            position = gameobject.transform.inverseTransformPoint(position);
+            position = gameobject.transform.worldToLocalPoint(position);
             direction = gameobject.transform.inverseTransformDirection(direction);
             gameobject.transform.position = position;
 

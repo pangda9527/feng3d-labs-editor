@@ -136,7 +136,7 @@ namespace editor
                 var transform = this._startTransformDic.get(gameobject);
                 var localMove = addPos.clone();
                 if (gameobject.parent)
-                    localMove = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localMove);
+                    localMove = gameobject.parent.worldToLocalMatrix.transformVector3(localMove);
                 gameobject.position = transform.position.addTo(localMove);
             }
         }
@@ -172,7 +172,7 @@ namespace editor
             if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
             {
                 if (gameobject.parent)
-                    localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal);
+                    localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(normal);
             }
             for (var i = 0; i < objects.length; i++)
             {
@@ -185,7 +185,7 @@ namespace editor
                 {
                     localnormal = normal.clone();
                     if (gameobject.parent)
-                        localnormal = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal);
+                        localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal);
                     if (editorData.isBaryCenter)
                     {
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
@@ -193,7 +193,7 @@ namespace editor
                     {
                         var localPivotPoint = this._position;
                         if (gameobject.parent)
-                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
                         gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
                         gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                     }
@@ -217,8 +217,8 @@ namespace editor
             {
                 if (gameobject.parent)
                 {
-                    normal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal1);
-                    normal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(normal2);
+                    normal1 = gameobject.parent.worldToLocalMatrix.transformVector3(normal1);
+                    normal2 = gameobject.parent.worldToLocalMatrix.transformVector3(normal2);
                 }
             }
             for (var i = 0; i < objects.length; i++)
@@ -237,8 +237,8 @@ namespace editor
                     var localnormal2 = normal2.clone();
                     if (gameobject.parent)
                     {
-                        localnormal1 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal1);
-                        localnormal2 = gameobject.parent.worldToLocalMatrix.deltaTransformVector(localnormal2);
+                        localnormal1 = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal1);
+                        localnormal2 = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal2);
                     }
                     if (editorData.isBaryCenter)
                     {
@@ -248,7 +248,7 @@ namespace editor
                     {
                         var localPivotPoint = this._position;
                         if (gameobject.parent)
-                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformVector(localPivotPoint);
+                            localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
                         //
                         tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
                         gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
@@ -300,7 +300,7 @@ namespace editor
             var rotationmatrix = new feng3d.Matrix4x4();
             rotationmatrix.fromRotation(rotation.x, rotation.y, rotation.z);
             rotationmatrix.appendRotation(axis, angle);
-            var newrotation = rotationmatrix.decompose()[1];
+            var newrotation = rotationmatrix.toTRS()[1];
             var v = Math.round((newrotation.x - rotation.x) / 180);
             if (v % 2 != 0)
             {

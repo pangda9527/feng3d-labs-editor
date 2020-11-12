@@ -129,7 +129,7 @@ namespace editor
             //把交点从世界转换为模型空间
             var inverseGlobalMatrix = this.startSceneTransform.clone();
             inverseGlobalMatrix.invert();
-            crossPos = inverseGlobalMatrix.transformVector(crossPos);
+            crossPos = inverseGlobalMatrix.transformPoint3(crossPos);
             return crossPos;
         }
 

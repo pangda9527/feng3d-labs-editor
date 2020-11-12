@@ -200,13 +200,13 @@ namespace editor
                 lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
             }
             //
-            var lookPos = this.camera.transform.localToWorldMatrix.forward;
+            var lookPos = this.camera.transform.localToWorldMatrix.getAxisZ();
             lookPos.scaleNumber(-lookDistance);
             lookPos.add(scenePosition);
             var localLookPos = lookPos.clone();
             if (this.camera.transform.parent)
             {
-                localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformVector(lookPos);
+                localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformPoint3(lookPos);
             }
             this.camera.transform.position = localLookPos;
         }

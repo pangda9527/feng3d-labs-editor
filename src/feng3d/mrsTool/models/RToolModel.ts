@@ -125,7 +125,7 @@ namespace editor
             var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
             if (this.filterNormal)
             {
-                var localNormal = inverseGlobalMatrix.deltaTransformVector(this.filterNormal);
+                var localNormal = inverseGlobalMatrix.transformVector3(this.filterNormal);
             }
 
             this.segmentGeometry.segments = [];
@@ -155,8 +155,8 @@ namespace editor
         showSector(startPos: feng3d.Vector3, endPos: feng3d.Vector3)
         {
             var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
-            var localStartPos = inverseGlobalMatrix.transformVector(startPos);
-            var localEndPos = inverseGlobalMatrix.transformVector(endPos);
+            var localStartPos = inverseGlobalMatrix.transformPoint3(startPos);
+            var localEndPos = inverseGlobalMatrix.transformPoint3(endPos);
             var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * Math.RAD2DEG;
             var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * Math.RAD2DEG;
 
