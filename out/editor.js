@@ -2719,6 +2719,7 @@ var editor;
             feng3d.shortcut.on("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
             feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+            feng3d.globalDispatcher.on("editor.addSceneToolView", this._onAddSceneToolView, this);
             editor.drag.register(this, null, ["file_gameobject", "file_script"], function (dragdata) {
                 dragdata.getDragData("file_gameobject").forEach(function (v) {
                     editor.hierarchy.addGameoObjectFromAsset(v, editor.hierarchy.rootnode.gameobject);
@@ -2757,6 +2758,7 @@ var editor;
             feng3d.shortcut.off("fpsViewStart", this.onFpsViewStart, this);
             feng3d.shortcut.off("fpsViewStop", this.onFpsViewStop, this);
             feng3d.shortcut.off("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+            feng3d.globalDispatcher.off("editor.addSceneToolView", this._onAddSceneToolView, this);
             editor.drag.unregister(this);
             if (this._canvas) {
                 this._canvas.style.display = "none";
@@ -2979,6 +2981,9 @@ var editor;
             var distance = -feng3d.windowEventProxy.deltaY * editor.sceneControlConfig.mouseWheelMoveStep * editor.sceneControlConfig.lookDistance / 10;
             this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
             editor.sceneControlConfig.lookDistance -= distance;
+        };
+        SceneView.prototype._onAddSceneToolView = function (event) {
+            this.group.addChild(event.data);
         };
         SceneView.moduleName = "Scene";
         return SceneView;
@@ -16536,6 +16541,10 @@ var editor;
 var editor;
 (function (editor) {
     /**
+     * 创建对象菜单
+     */
+    editor.createObjectMenu = [];
+    /**
      * 菜单配置
      */
     var MenuConfig = /** @class */ (function () {
@@ -16803,8 +16812,8 @@ var editor;
          * 层级界面创建3D对象列表数据
          */
         MenuConfig.prototype.getCreateObjectMenu = function () {
-            if (!editor.createObjectMenu) {
-                editor.createObjectMenu = [
+            if (editor.createObjectMenu.length < 2) {
+                editor.createObjectMenu = editor.createObjectMenu.concat([
                     //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
                     {
                         label: "游戏对象",
@@ -16942,7 +16951,7 @@ var editor;
                             editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
                         }
                     },
-                ];
+                ]);
             }
             return editor.createObjectMenu;
         };

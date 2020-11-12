@@ -114,6 +114,10 @@ declare namespace feng3d {
          * 打开脚本
          */
         "openScript": feng3d.StringAsset;
+        /**
+         * 在场景窗口添加工具界面
+         */
+        "editor.addSceneToolView": eui.Component;
     }
 }
 declare namespace egret {
@@ -1012,6 +1016,7 @@ declare namespace editor {
      */
     class SceneView extends eui.Component implements ModuleView {
         backRect: eui.Rect;
+        group: eui.Group;
         private _canvas;
         private _areaSelectStartPosition;
         private _areaSelectRect;
@@ -1057,6 +1062,7 @@ declare namespace editor {
         private updateFpsView;
         private onLookToSelectedGameObject;
         private onMouseWheelMoveSceneCamera;
+        private _onAddSceneToolView;
     }
 }
 declare namespace editor {

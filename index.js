@@ -14,6 +14,9 @@ var modules = [
     "../cannon/cannon/tsconfig.json",
     "../cannon/cannon-plugin/tsconfig.json",
     "tsconfig.json",
+    //
+    "../packages/particlesystem/editor/tsconfig.json",
+    "../packages/particlesystem/runtime/tsconfig.json",
 ];
 
 loadModule(modules, () =>

@@ -76,5 +76,10 @@ namespace feng3d
          * 打开脚本
          */
         "openScript": feng3d.StringAsset;
+
+        /**
+         * 在场景窗口添加工具界面
+         */
+        "editor.addSceneToolView": eui.Component;
     }
 }

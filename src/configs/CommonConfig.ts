@@ -8,7 +8,7 @@ namespace editor
     /**
      * 创建对象菜单
      */
-    export var createObjectMenu: MenuItem[];
+    export var createObjectMenu: MenuItem[] = [];
 
     /**
      * 菜单配置
@@ -315,9 +315,9 @@ namespace editor
          */
         getCreateObjectMenu()
         {
-            if (!createObjectMenu)
+            if (createObjectMenu.length < 2)
             {
-                createObjectMenu = [
+                createObjectMenu = createObjectMenu.concat([
                     //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
                     {
                         label: "游戏对象", click: () =>
@@ -455,7 +455,7 @@ namespace editor
                             hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
                         }
                     },
-                ];
+                ]);
             }
             return createObjectMenu;
         }

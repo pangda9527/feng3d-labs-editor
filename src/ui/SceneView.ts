@@ -6,6 +6,7 @@ namespace editor
 	export class SceneView extends eui.Component implements ModuleView
 	{
 		public backRect: eui.Rect;
+		public group: eui.Group;
 
 		private _canvas: HTMLCanvasElement;
 		private _areaSelectStartPosition: feng3d.Vector2;
@@ -119,6 +120,8 @@ namespace editor
 			feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
 			feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
 
+			feng3d.globalDispatcher.on("editor.addSceneToolView", this._onAddSceneToolView, this);
+
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
 				dragdata.getDragData("file_gameobject").forEach(v =>
@@ -165,6 +168,8 @@ namespace editor
 			feng3d.shortcut.off("fpsViewStart", this.onFpsViewStart, this);
 			feng3d.shortcut.off("fpsViewStop", this.onFpsViewStop, this);
 			feng3d.shortcut.off("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+
+			feng3d.globalDispatcher.off("editor.addSceneToolView", this._onAddSceneToolView, this);
 
 			drag.unregister(this);
 
@@ -451,6 +456,11 @@ namespace editor
 			var distance = -feng3d.windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
 			this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
 			sceneControlConfig.lookDistance -= distance;
+		}
+
+		private _onAddSceneToolView(event: feng3d.Event<eui.Component>)
+		{
+			this.group.addChild(event.data);
 		}
 	}
 
