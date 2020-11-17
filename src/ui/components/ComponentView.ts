@@ -1,5 +1,19 @@
 namespace editor
 {
+	export const componentIconMap = new Map<any, string>();
+
+	componentIconMap.set(feng3d.Transform, "Transform_png");
+	componentIconMap.set(feng3d.Water, "Water_png");
+	componentIconMap.set(feng3d.Renderable, "Model_png");
+	componentIconMap.set(feng3d.ScriptComponent, "ScriptComponent_png");
+	componentIconMap.set(feng3d.Camera, "Camera_png");
+	componentIconMap.set(feng3d.AudioSource, "AudioSource_png");
+	componentIconMap.set(feng3d.AudioListener, "AudioListener_png");
+	componentIconMap.set(feng3d.SpotLight, "SpotLight_png");
+	componentIconMap.set(feng3d.PointLight, "PointLight_png");
+	componentIconMap.set(feng3d.DirectionalLight, "DirectionalLight_png");
+	componentIconMap.set(feng3d.FPSController, "FPSController_png");
+
 	export class ComponentView extends eui.Component
 	{
 		component: feng3d.Components;
@@ -51,42 +65,10 @@ namespace editor
 			this.helpBtn = this.accordion["helpBtn"];
 			this.operationBtn = this.accordion["operationBtn"];
 
-			if (this.component instanceof feng3d.Transform)
+			var icon = componentIconMap.get(<any>this.component.constructor);
+			if (icon)
 			{
-				this.componentIcon.source = "Transform_png";
-			} else if (this.component instanceof feng3d.Water)
-			{
-				this.componentIcon.source = "Water_png";
-			} else if (this.component instanceof feng3d.Terrain)
-			{
-				this.componentIcon.source = "Terrain_png";
-			} else if (this.component instanceof feng3d.Renderable)
-			{
-				this.componentIcon.source = "Model_png";
-			} else if (this.component instanceof feng3d.ScriptComponent)
-			{
-				this.componentIcon.source = "ScriptComponent_png";
-			} else if (this.component instanceof feng3d.Camera)
-			{
-				this.componentIcon.source = "Camera_png";
-			} else if (this.component instanceof feng3d.AudioSource)
-			{
-				this.componentIcon.source = "AudioSource_png";
-			} else if (this.component instanceof feng3d.SpotLight)
-			{
-				this.componentIcon.source = "SpotLight_png";
-			} else if (this.component instanceof feng3d.PointLight)
-			{
-				this.componentIcon.source = "PointLight_png";
-			} else if (this.component instanceof feng3d.DirectionalLight)
-			{
-				this.componentIcon.source = "DirectionalLight_png";
-			} else if (this.component instanceof feng3d.FPSController)
-			{
-				this.componentIcon.source = "FPSController_png";
-			} else if (this.component instanceof feng3d.AudioListener)
-			{
-				this.componentIcon.source = "AudioListener_png";
+				this.componentIcon.source = icon;
 			}
 
 			this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);

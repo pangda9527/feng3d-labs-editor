@@ -4404,6 +4404,18 @@ var editor;
 })(editor || (editor = {}));
 var editor;
 (function (editor) {
+    editor.componentIconMap = new Map();
+    editor.componentIconMap.set(feng3d.Transform, "Transform_png");
+    editor.componentIconMap.set(feng3d.Water, "Water_png");
+    editor.componentIconMap.set(feng3d.Renderable, "Model_png");
+    editor.componentIconMap.set(feng3d.ScriptComponent, "ScriptComponent_png");
+    editor.componentIconMap.set(feng3d.Camera, "Camera_png");
+    editor.componentIconMap.set(feng3d.AudioSource, "AudioSource_png");
+    editor.componentIconMap.set(feng3d.AudioListener, "AudioListener_png");
+    editor.componentIconMap.set(feng3d.SpotLight, "SpotLight_png");
+    editor.componentIconMap.set(feng3d.PointLight, "PointLight_png");
+    editor.componentIconMap.set(feng3d.DirectionalLight, "DirectionalLight_png");
+    editor.componentIconMap.set(feng3d.FPSController, "FPSController_png");
     var ComponentView = /** @class */ (function (_super) {
         __extends(ComponentView, _super);
         /**
@@ -4434,41 +4446,9 @@ var editor;
             this.componentIcon = this.accordion["componentIcon"];
             this.helpBtn = this.accordion["helpBtn"];
             this.operationBtn = this.accordion["operationBtn"];
-            if (this.component instanceof feng3d.Transform) {
-                this.componentIcon.source = "Transform_png";
-            }
-            else if (this.component instanceof feng3d.Water) {
-                this.componentIcon.source = "Water_png";
-            }
-            else if (this.component instanceof feng3d.Terrain) {
-                this.componentIcon.source = "Terrain_png";
-            }
-            else if (this.component instanceof feng3d.Renderable) {
-                this.componentIcon.source = "Model_png";
-            }
-            else if (this.component instanceof feng3d.ScriptComponent) {
-                this.componentIcon.source = "ScriptComponent_png";
-            }
-            else if (this.component instanceof feng3d.Camera) {
-                this.componentIcon.source = "Camera_png";
-            }
-            else if (this.component instanceof feng3d.AudioSource) {
-                this.componentIcon.source = "AudioSource_png";
-            }
-            else if (this.component instanceof feng3d.SpotLight) {
-                this.componentIcon.source = "SpotLight_png";
-            }
-            else if (this.component instanceof feng3d.PointLight) {
-                this.componentIcon.source = "PointLight_png";
-            }
-            else if (this.component instanceof feng3d.DirectionalLight) {
-                this.componentIcon.source = "DirectionalLight_png";
-            }
-            else if (this.component instanceof feng3d.FPSController) {
-                this.componentIcon.source = "FPSController_png";
-            }
-            else if (this.component instanceof feng3d.AudioListener) {
-                this.componentIcon.source = "AudioListener_png";
+            var icon = editor.componentIconMap.get(this.component.constructor);
+            if (icon) {
+                this.componentIcon.source = icon;
             }
             this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
             this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
@@ -9501,12 +9481,6 @@ var editor;
                                     label: "线段",
                                     click: function () {
                                         _this.createAsset(folderPath, feng3d.GeometryAsset, "New SegmentGeometry", { data: new feng3d.SegmentGeometry() });
-                                    }
-                                },
-                                {
-                                    label: "地形",
-                                    click: function () {
-                                        _this.createAsset(folderPath, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
                                     }
                                 },
                             ],
@@ -16877,12 +16851,6 @@ var editor;
                                 label: "线段",
                                 click: function () {
                                     editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Segment"));
-                                }
-                            },
-                            {
-                                label: "地形",
-                                click: function () {
-                                    editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
                                 }
                             },
                             {

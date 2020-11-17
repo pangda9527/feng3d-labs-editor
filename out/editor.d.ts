@@ -1435,6 +1435,7 @@ declare namespace editor {
     }
 }
 declare namespace editor {
+    const componentIconMap: Map<any, string>;
     class ComponentView extends eui.Component {
         component: feng3d.Components;
         componentView: feng3d.IObjectView;

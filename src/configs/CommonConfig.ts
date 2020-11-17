@@ -384,12 +384,6 @@ namespace editor
                                 }
                             },
                             {
-                                label: "地形", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
-                                }
-                            },
-                            {
                                 label: "水", click: () =>
                                 {
                                     hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Water"));

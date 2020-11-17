@@ -309,12 +309,12 @@ namespace editor
                                             this.createAsset(folderPath, feng3d.GeometryAsset, "New SegmentGeometry", { data: new feng3d.SegmentGeometry() });
                                         }
                                     },
-                                    {
-                                        label: "地形", click: () =>
-                                        {
-                                            this.createAsset(folderPath, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
-                                        }
-                                    },
+                                    // {
+                                    //     label: "地形", click: () =>
+                                    //     {
+                                    //         this.createAsset(folderPath, feng3d.GeometryAsset, "New TerrainGeometry", { data: new feng3d.TerrainGeometry() });
+                                    //     }
+                                    // },
                                 ],
                             },
                         ]
