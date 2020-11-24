@@ -9380,14 +9380,14 @@ var editor;
                         {
                             label: "Folder",
                             click: function () {
-                                _this.createAsset(folderPath, feng3d.FolderAsset, "NewFolder");
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("folder"), "NewFolder");
                             }
                         },
                         {
                             label: "TS Script",
                             click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewScript");
-                                _this.createAsset(folderPath, feng3d.ScriptAsset, fileName, { textContent: editor.assetFileTemplates.getNewScript(fileName) }, function () {
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("script"), fileName, { textContent: editor.assetFileTemplates.getNewScript(fileName) }, function () {
                                     feng3d.globalDispatcher.dispatch("script.compile");
                                 });
                             }
@@ -9396,7 +9396,7 @@ var editor;
                             label: "Shader",
                             click: function () {
                                 var fileName = editor.editorRS.getValidChildName(folder, "NewShader");
-                                _this.createAsset(folderPath, feng3d.ShaderAsset, fileName, { textContent: editor.assetFileTemplates.getNewShader(fileName) }, function () {
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("shader"), fileName, { textContent: editor.assetFileTemplates.getNewShader(fileName) }, function () {
                                     feng3d.globalDispatcher.dispatch("script.compile");
                                 });
                             }
@@ -9404,19 +9404,19 @@ var editor;
                         {
                             label: "js",
                             click: function () {
-                                _this.createAsset(folderPath, feng3d.JSAsset, "NewJs");
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("js"), "NewJs");
                             }
                         },
                         {
                             label: "Json",
                             click: function () {
-                                _this.createAsset(folderPath, feng3d.JsonAsset, "New Json");
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("json"), "New Json");
                             }
                         },
                         {
                             label: "Txt",
                             click: function () {
-                                _this.createAsset(folderPath, feng3d.TextAsset, "New Text");
+                                _this.createAsset(folderPath, feng3d.getAssetTypeClass("txt"), "New Text");
                             }
                         },
                         { type: "separator" },
