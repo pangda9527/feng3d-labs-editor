@@ -9507,7 +9507,7 @@ var editor;
                 {
                     label: "Open",
                     click: function () {
-                        if (assetNode.asset instanceof feng3d.StringAsset) {
+                        if (assetNode.asset instanceof feng3d.TextAsset) {
                             feng3d.globalDispatcher.dispatch("openScript", assetNode.asset);
                         }
                     },

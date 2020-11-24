@@ -337,9 +337,9 @@ namespace editor
                     {
                         label: "Open", click: () =>
                         {
-                            if (assetNode.asset instanceof feng3d.StringAsset)
+                            if (assetNode.asset instanceof feng3d.TextAsset)
                             {
-                                feng3d.globalDispatcher.dispatch("openScript", <feng3d.StringAsset>assetNode.asset);
+                                feng3d.globalDispatcher.dispatch("openScript", <feng3d.TextAsset>assetNode.asset);
                             }
                         },
                     },

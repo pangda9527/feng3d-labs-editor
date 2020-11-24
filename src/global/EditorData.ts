@@ -255,7 +255,7 @@ namespace editor
         /**
          * 编辑器打开的脚本
          */
-        openScript: feng3d.StringAsset;
+        openScript: feng3d.TextAsset;
 
         /**
          * 历史记录undo列表

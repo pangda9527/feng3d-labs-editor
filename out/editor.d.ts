@@ -78,7 +78,7 @@ declare namespace feng3d {
         /**
          * 使用编辑器打开脚本
          */
-        "codeeditor.openScript": feng3d.StringAsset;
+        "codeeditor.openScript": feng3d.TextAsset;
         /**
          * 脚本编译
          */
@@ -113,7 +113,7 @@ declare namespace feng3d {
         /**
          * 打开脚本
          */
-        "openScript": feng3d.StringAsset;
+        "openScript": feng3d.TextAsset;
         /**
          * 在场景窗口添加工具界面
          */
@@ -3333,7 +3333,7 @@ declare namespace editor {
         /**
          * 编辑器打开的脚本
          */
-        openScript: feng3d.StringAsset;
+        openScript: feng3d.TextAsset;
         /**
          * 历史记录undo列表
          */
