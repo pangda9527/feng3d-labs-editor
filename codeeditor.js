@@ -119,14 +119,14 @@ function getModel(file)
         return "typescript";
     if (file instanceof feng3d.ShaderAsset)
         return "typescript";
-    if (file instanceof feng3d.StringAsset)
+    if (file instanceof feng3d.TextAsset)
         return "text";
     return "text";
 }
 
 function codeEditor(tslibs, file)
 {
-    if (!(file instanceof feng3d.StringAsset)) return;
+    if (!(file instanceof feng3d.TextAsset)) return;
 
     var model = getModel(file);
     var oldModel = monacoEditor.getModel();
