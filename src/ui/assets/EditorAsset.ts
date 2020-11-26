@@ -406,7 +406,7 @@ namespace editor
          * @param object 对象
          * @param callback 
          */
-        saveObject(object: feng3d.AssetData, callback?: (file: AssetNode) => void)
+        saveObject(object: any, callback?: (file: AssetNode) => void)
         {
             this.createAsset(this.showFloder.asset.assetPath, feng3d.GameObjectAsset, object.name, { data: object }, (err, assetNode) =>
             {

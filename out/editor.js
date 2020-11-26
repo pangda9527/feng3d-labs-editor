@@ -12739,7 +12739,7 @@ var editor;
     function setAwaysVisible(component) {
         var models = component.getComponentsInChildren("Renderable");
         models.forEach(function (element) {
-            if (element.material && !element.material.assetId) {
+            if (element.material) {
                 element.material.renderParams.depthtest = false;
             }
         });

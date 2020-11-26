@@ -11,7 +11,7 @@ namespace editor
         var models = component.getComponentsInChildren("Renderable");
         models.forEach(element =>
         {
-            if (element.material && !element.material.assetId)
+            if (element.material)
             {
                 element.material.renderParams.depthtest = false;
             }
