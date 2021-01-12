@@ -9,6 +9,9 @@ var modules = [
     "../feng2d/tsconfig.json",
     "../cannon/cannon/tsconfig.json",
     "../cannon/cannon-plugin/tsconfig.json",
+    //
+    "../packages/assets/runtime/tsconfig.json",
+    "../packages/parsers/runtime/tsconfig.json",
 ];
 
 loadModule(modules, () =>
