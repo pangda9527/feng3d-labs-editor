@@ -11292,7 +11292,7 @@ var editor;
                     if (length > 0) {
                         this._transformBox = null;
                         this.selectedGameObjects.forEach(function (cv) {
-                            var box = cv.worldBounds;
+                            var box = cv.boundingBox.worldBounds;
                             if (editor.editorData.isBaryCenter || _this._transformBox == null) {
                                 _this._transformBox = box.clone();
                             }
@@ -13726,7 +13726,7 @@ var editor;
         };
         Feng3dScreenShot.prototype.updateCameraPosition = function (gameObject) {
             //
-            var bounds = gameObject.worldBounds;
+            var bounds = gameObject.boundingBox.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);

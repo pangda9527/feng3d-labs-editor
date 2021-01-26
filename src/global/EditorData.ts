@@ -212,7 +212,7 @@ namespace editor
                     this._transformBox = null;
                     this.selectedGameObjects.forEach(cv =>
                     {
-                        var box = cv.worldBounds;
+                        var box = cv.boundingBox.worldBounds;
                         if (editorData.isBaryCenter || this._transformBox == null)
                         {
                             this._transformBox = box.clone();

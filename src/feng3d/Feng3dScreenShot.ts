@@ -189,7 +189,7 @@ namespace editor
         updateCameraPosition(gameObject: feng3d.GameObject)
         {
             //
-            var bounds = gameObject.worldBounds;
+            var bounds = gameObject.boundingBox.worldBounds;
             var scenePosition = bounds.getCenter();
             var size = bounds.getSize().length;
             size = Math.max(size, 1);
