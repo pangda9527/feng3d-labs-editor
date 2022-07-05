@@ -21,16 +21,16 @@
             "path": "../feng2d"
         },
         {
-            "path": "../packages/parsers/runtime"
+            "path": "../parsers/runtime"
         },
         {
-            "path": "../packages/assets/runtime"
+            "path": "../assets/runtime"
         },
         {
-            "path": "../cannon/cannon",
+            "path": "../cannon",
         },
         {
-            "path": "../cannon/cannon-plugin"
+            "path": "../cannon-plugin"
         },
     ],
     "files": [

@@ -10,11 +10,11 @@ var copyFiles = [
     ['../feng2d/out/feng2d.js', 'resource/template/libs/feng2d.js'],
     ['../feng2d/out/feng2d.d.ts', 'resource/template/libs/feng2d.d.ts'],
 
-    ['../cannon/cannon/out/cannon.js', 'resource/template/libs/cannon.js'],
-    ['../cannon/cannon/out/cannon.d.ts', 'resource/template/libs/cannon.d.ts'],
+    ['../cannon/out/cannon.js', 'resource/template/libs/cannon.js'],
+    ['../cannon/out/cannon.d.ts', 'resource/template/libs/cannon.d.ts'],
 
-    ['../cannon/cannon-plugin/out/cannon-plugin.js', 'resource/template/libs/cannon-plugin.js'],
-    ['../cannon/cannon-plugin/out/cannon-plugin.d.ts', 'resource/template/libs/cannon-plugin.d.ts'],
+    ['../cannon-plugin/out/cannon-plugin.js', 'resource/template/libs/cannon-plugin.js'],
+    ['../cannon-plugin/out/cannon-plugin.d.ts', 'resource/template/libs/cannon-plugin.d.ts'],
 ];
 
 try
