@@ -11,16 +11,16 @@ var result = [
 var modules = [
     "../feng3d/tsconfig.json",
     "../feng2d/tsconfig.json",
-    "../cannon/cannon/tsconfig.json",
-    "../cannon/cannon-plugin/tsconfig.json",
+    "../cannon/tsconfig.json",
+    "../cannon-plugin/tsconfig.json",
     //
-    "../packages/assets/runtime/tsconfig.json",
-    "../packages/parsers/runtime/tsconfig.json",
+    "../assets/runtime/tsconfig.json",
+    "../parsers/runtime/tsconfig.json",
     //
     "tsconfig.json",
     //
-    "../packages/particlesystem/editor/tsconfig.json",
-    "../packages/particlesystem/runtime/tsconfig.json",
+    "../particlesystem/editor/tsconfig.json",
+    "../particlesystem/runtime/tsconfig.json",
 ];
 
 loadModule(modules, () =>
