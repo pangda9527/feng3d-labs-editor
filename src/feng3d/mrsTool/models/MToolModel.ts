@@ -108,7 +108,7 @@ namespace editor
             var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hitCoordinateAxis" });
             model = mouseHit.addComponent("Renderable");
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
-            //model.material = materialFactory.create("color");
+            model.material = feng3d.Material.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
             mouseHit.visible = false;
             mouseHit.mouseEnabled = true;
@@ -143,14 +143,14 @@ namespace editor
         init()
         {
             super.init();
-            
+
             feng3d.watcher.watch(<CoordinateCube>this, "selected", this.update, this);
-            
+
             //
             this.oCube = new feng3d.GameObject();
             var model = this.oCube.addComponent("Renderable")
             model.geometry = feng3d.serialization.setValue(new feng3d.CubeGeometry(), { width: 8, height: 8, depth: 8 });
-            this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
+            this.colorMaterial = model.material = feng3d.Material.create("color");
             this.colorMaterial.renderParams.enableBlend = true;
             this.oCube.mouseEnabled = true;
             this.gameObject.addChild(this.oCube);
@@ -194,7 +194,7 @@ namespace editor
             var model = plane.addComponent("Renderable");
             plane.transform.x = plane.transform.z = this._width / 2;
             model.geometry = feng3d.serialization.setValue(new feng3d.PlaneGeometry(), { width: this._width, height: this._width });
-            this.colorMaterial = model.material = feng3d.serialization.setValue(new feng3d.Material(), { shaderName: "color" });
+            this.colorMaterial = model.material = feng3d.Material.create("color");
             this.colorMaterial.renderParams.cullFace = feng3d.CullFace.NONE;
             this.colorMaterial.renderParams.enableBlend = true;
             plane.mouseEnabled = true;
