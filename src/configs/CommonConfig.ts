@@ -392,6 +392,12 @@ namespace editor
                         ],
                     },
                     {
+                        label: "地形", click: () =>
+                        {
+                            hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
+                        }
+                    },
+                    {
                         label: "光源",
                         submenu: [
                             {

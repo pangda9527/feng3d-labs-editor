@@ -4416,6 +4416,7 @@ var editor;
     editor.componentIconMap.set(feng3d.PointLight, "PointLight_png");
     editor.componentIconMap.set(feng3d.DirectionalLight, "DirectionalLight_png");
     editor.componentIconMap.set(feng3d.FPSController, "FPSController_png");
+    editor.componentIconMap.set(feng3d.Terrain, "Terrain_png");
     var ComponentView = /** @class */ (function (_super) {
         __extends(ComponentView, _super);
         /**
@@ -16861,6 +16862,12 @@ var editor;
                                 }
                             },
                         ],
+                    },
+                    {
+                        label: "地形",
+                        click: function () {
+                            editor.hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
+                        }
                     },
                     {
                         label: "光源",

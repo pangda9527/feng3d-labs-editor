@@ -13,6 +13,7 @@ namespace editor
 	componentIconMap.set(feng3d.PointLight, "PointLight_png");
 	componentIconMap.set(feng3d.DirectionalLight, "DirectionalLight_png");
 	componentIconMap.set(feng3d.FPSController, "FPSController_png");
+    componentIconMap.set(feng3d.Terrain, "Terrain_png");
 
 	export class ComponentView extends eui.Component
 	{
