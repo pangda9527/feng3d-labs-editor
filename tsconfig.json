@@ -21,9 +21,6 @@
             "path": "../feng2d"
         },
         {
-            "path": "../parsers/runtime"
-        },
-        {
             "path": "../assets/runtime"
         },
         {

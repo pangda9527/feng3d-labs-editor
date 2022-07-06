@@ -11,7 +11,6 @@ var modules = [
     "../cannon-plugin/tsconfig.json",
     //
     "../assets/runtime/tsconfig.json",
-    "../parsers/runtime/tsconfig.json",
 ];
 
 loadModule(modules, () =>

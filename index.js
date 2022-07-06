@@ -15,7 +15,6 @@ var modules = [
     "../cannon-plugin/tsconfig.json",
     //
     "../assets/runtime/tsconfig.json",
-    "../parsers/runtime/tsconfig.json",
     //
     "tsconfig.json",
 ];
