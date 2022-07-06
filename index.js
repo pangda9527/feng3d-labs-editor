@@ -18,9 +18,6 @@ var modules = [
     "../parsers/runtime/tsconfig.json",
     //
     "tsconfig.json",
-    //
-    "../particlesystem/editor/tsconfig.json",
-    "../particlesystem/runtime/tsconfig.json",
 ];
 
 loadModule(modules, () =>

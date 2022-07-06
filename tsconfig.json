@@ -219,6 +219,11 @@
         //
         "src/polyfill/typescript/typescriptSorting.ts",
         "src/ScriptCompiler.ts",
+        // 粒子系统
+        "src/ui/ParticleEffectController.ts",
+        "src/ui/components/ParticleComponentView.ts",
+        "src/objectview/oav/OAVParticleComponentList.ts",
+        //
         "src/Editor.ts"
     ]
 }

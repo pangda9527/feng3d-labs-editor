@@ -392,6 +392,12 @@ namespace editor
                         ],
                     },
                     {
+                        label: "粒子系统", click: () =>
+                        {
+                            hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
+                        }
+                    },
+                    {
                         label: "地形", click: () =>
                         {
                             hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
