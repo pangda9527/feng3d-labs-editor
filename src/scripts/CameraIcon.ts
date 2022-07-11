@@ -24,57 +24,64 @@ namespace editor
             if (!this.editorCamera) return;
             if (this._lightIcon) return;
 
-            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "CameraIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
-                    {
-                        __class__: "feng3d.MeshRenderer", material: {
-                            __class__: "feng3d.Material",
-                            shaderName: "texture",
-                            uniforms: {
-                                s_texture: {
-                                    __class__: "feng3d.Texture2D",
-                                    source: { url: editorData.getEditorAssetPath("assets/3d/icons/camera.png") },
-                                    format: feng3d.TextureFormat.RGBA,
-                                    // premulAlpha: true,
-                                }
-                            },
-                            renderParams: { enableBlend: true, depthMask: false },
-                        },
-                        geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
-                    },
-                ]
-            });
-            this.gameObject.addChild(lightIcon);
+            {
+                const lightIcon = this._lightIcon = new feng3d.GameObject();
+                lightIcon.name = "CameraIcon";
+                const billboardComponent = lightIcon.addComponent("BillboardComponent");
+                billboardComponent.camera = this.editorCamera;
+                const meshRenderer = lightIcon.addComponent("MeshRenderer");
+                const material = meshRenderer.material = new feng3d.Material();
+                material.shaderName = "texture";
+                const uniforms = material.uniforms as feng3d.TextureUniforms;
+                uniforms.s_texture = new feng3d.Texture2D();
+                uniforms.s_texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/camera.png") };
+                uniforms.s_texture.format = feng3d.TextureFormat.RGBA;
+                material.renderParams.enableBlend = true;
+                material.renderParams.depthMask = false;
+                const geometry = meshRenderer.geometry = new feng3d.PlaneGeometry();
+                geometry.width = 1;
+                geometry.height = 1;
+                geometry.segmentsW = 1;
+                geometry.segmentsH = 1;
+                geometry.yUp = false;
+                this.gameObject.addChild(lightIcon);
+            }
 
             //
-            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{
-                    __class__: "feng3d.MeshRenderer", material: {
-                        __class__: "feng3d.Material",
-                        shaderName: "segment",
-                        uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 } },
-                        renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.LINES },
-                    },
-                    geometry: { __class__: "feng3d.SegmentGeometry" },
-                },
-                ],
-            });
-            this._segmentGeometry = <any>lightLines.getComponent("Renderable").geometry;
-            this.gameObject.addChild(lightLines);
+            {
+                const lightLines = this._lightLines = new feng3d.GameObject();
+                lightLines.name = "Lines";
+                lightLines.mouseEnabled = false;
+                lightLines.hideFlags = feng3d.HideFlags.Hide;
+                const meshRenderer = lightLines.addComponent("MeshRenderer");
+                const material = meshRenderer.material = new feng3d.Material();
+                material.shaderName = "segment";
+                const uniforms = material.uniforms as feng3d.SegmentUniforms;
+                uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
+                material.renderParams.enableBlend = true;
+                material.renderParams.renderMode = feng3d.RenderMode.LINES;
+                meshRenderer.geometry = new feng3d.SegmentGeometry();
+                this._segmentGeometry = meshRenderer.geometry;
+                this.gameObject.addChild(lightLines);
+            }
+
             //
-            var lightpoints = this._lightpoints = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "points", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide, components: [
-                    {
-                        __class__: "feng3d.MeshRenderer",
-                        material: { __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: feng3d.RenderMode.POINTS } },
-                        geometry: { __class__: "feng3d.PointGeometry", },
-                    },
-                ]
-            });
-            this._pointGeometry = <any>lightpoints.getComponent("Renderable").geometry;
-            this.gameObject.addChild(lightpoints);
+            {
+                const lightpoints = this._lightpoints = new feng3d.GameObject();
+                lightpoints.name = "points";
+                lightpoints.mouseEnabled = false;
+                lightpoints.hideFlags = feng3d.HideFlags.Hide;
+                const meshRenderer = lightpoints.addComponent("MeshRenderer");
+                const material = meshRenderer.material = new feng3d.Material();
+                material.shaderName = "point";
+                const uniforms = material.uniforms as feng3d.PointUniforms;
+                uniforms.u_PointSize = 5;
+                material.renderParams.enableBlend = true;
+                material.renderParams.renderMode = feng3d.RenderMode.POINTS;
+                meshRenderer.geometry = new feng3d.PointGeometry();
+                this._pointGeometry = meshRenderer.geometry;
+                this.gameObject.addChild(lightpoints);
+            }
 
             this.enabled = true;
         }
