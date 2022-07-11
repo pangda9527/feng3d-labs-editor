@@ -4,9 +4,9 @@
   "description": "feng3d引擎编辑器\r 编辑器UI基于[egret](https://www.egret.com/)开发。",
   "main": "main.js",
   "scripts": {
-    "build": "tsc -b",
-    "refreshTemplate": "node scripts/refreshTemplate.js",
-    "run": "electron ."
+    "build": "tsc",
+    "watch": "tsc -w",
+    "refreshTemplate": "node scripts/refreshTemplate.js"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,6 @@
   "author": "feng",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^7.1.10",
-    "fs-extra": "^7.0.1"
+    "typescript": "^4.7.4"
   }
 }
