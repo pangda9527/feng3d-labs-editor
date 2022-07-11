@@ -249,13 +249,13 @@ namespace editor
                             {
                                 label: "立方体贴图", click: () =>
                                 {
-                                    this.createAsset(folderPath, feng3d.TextureCubeAsset, "new TextureCube", { data: new feng3d.TextureCube() });
+                                    this.createAsset(folderPath, feng3d.TextureCubeAsset, "new TextureCube", { data: <any>new feng3d.TextureCube() });
                                 }
                             },
                             {
                                 label: "Material", click: () =>
                                 {
-                                    this.createAsset(folderPath, feng3d.MaterialAsset, "New Material", { data: new feng3d.Material() });
+                                    this.createAsset(folderPath, feng3d.MaterialAsset, "New Material", { data: <any>new feng3d.Material() });
                                 }
                             },
                             {
@@ -454,7 +454,7 @@ namespace editor
                     {
                         var texture2D = new feng3d.Texture2D();
                         texture2D["_pixels"] = img;
-                        this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: texture2D }, createAssetCallback);
+                        this.createAsset(showFloder, feng3d.TextureAsset, fileName, { data: <any>texture2D }, createAssetCallback);
                     });
                 } else if (feng3d.regExps.audio.test(file.name))
                 {

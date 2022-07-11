@@ -2,14 +2,18 @@ namespace feng3d { export interface ComponentMap { MTool: editor.MTool } }
 
 namespace editor
 {
+    export interface MTool
+    {
+        get toolModel(): MToolModel;
+        set toolModel(v: MToolModel);
+    }
+
     /**
      * 位移工具
      */
     @feng3d.RegisterComponent()
     export class MTool extends MRSToolBase
     {
-        protected toolModel: MToolModel;
-
         /**
          * 用于判断是否改变了XYZ
          */

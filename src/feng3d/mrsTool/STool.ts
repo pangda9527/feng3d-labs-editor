@@ -2,10 +2,15 @@ namespace feng3d { export interface ComponentMap { STool: editor.STool } }
 
 namespace editor
 {
+    export interface STool
+    {
+        get toolModel(): SToolModel;
+        set toolModel(v: SToolModel);
+    }
+
     @feng3d.RegisterComponent()
     export class STool extends MRSToolBase
     {
-        protected toolModel: SToolModel;
         private startMousePos: feng3d.Vector2;
         /**
          * 用于判断是否改变了XYZ

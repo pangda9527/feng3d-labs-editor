@@ -1,14 +1,16 @@
 namespace editor
 {
+    export interface OAVGameObjectName
+    {
+        get space(): feng3d.GameObject;
+    }
+
     @feng3d.OAVComponent()
     export class OAVGameObjectName extends OAVBase
     {
         public nameInput: eui.TextInput;
         public visibleCB: eui.CheckBox;
         public mouseEnabledCB: eui.CheckBox;
-
-        //
-        space: feng3d.GameObject;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {

@@ -1,5 +1,10 @@
 namespace editor
 {
+    export interface OAVMaterialName
+    {
+        get space(): feng3d.Material;
+    }
+
     @feng3d.OAVComponent()
     export class OAVMaterialName extends OAVBase
     {
@@ -9,9 +14,7 @@ namespace editor
         public helpBtn: eui.Button;
         public shaderComboBox: ComboBox;
         public group: eui.Group;
-
         //
-        space: feng3d.Material;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {
