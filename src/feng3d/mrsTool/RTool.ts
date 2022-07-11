@@ -2,10 +2,15 @@ namespace feng3d { export interface ComponentMap { RTool: editor.RTool } }
 
 namespace editor
 {
+    export interface RTool
+    {
+        get toolModel(): RToolModel;
+        set toolModel(v);
+    }
+
     @feng3d.RegisterComponent()
     export class RTool extends MRSToolBase
     {
-        protected toolModel: RToolModel;
         private startPlanePos: feng3d.Vector3;
         private stepPlaneCross: feng3d.Vector3;
         private startMousePos: feng3d.Vector2;

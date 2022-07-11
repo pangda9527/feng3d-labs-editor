@@ -105,22 +105,38 @@ namespace editor
         {
             if (component instanceof feng3d.DirectionalLight)
             {
-                var directionLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "DirectionLightIcon", }).addComponent("DirectionLightIcon"), { light: component, editorCamera: this.editorCamera });
+                const gameobject = new feng3d.GameObject();
+                gameobject.name = "DirectionLightIcon";
+                const directionLightIcon = gameobject.addComponent("DirectionLightIcon");
+                directionLightIcon.light = component;
+                directionLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(directionLightIcon.gameObject);
                 this.directionLightIconMap.set(component, directionLightIcon);
             } else if (component instanceof feng3d.PointLight)
             {
-                var pointLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "PointLightIcon" }).addComponent("PointLightIcon"), { light: component, editorCamera: this.editorCamera });
+                const gameobject = new feng3d.GameObject();
+                gameobject.name = "PointLightIcon";
+                const pointLightIcon = gameobject.addComponent("PointLightIcon");
+                pointLightIcon.light = component;
+                pointLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(pointLightIcon.gameObject);
                 this.pointLightIconMap.set(component, pointLightIcon);
             } else if (component instanceof feng3d.SpotLight)
             {
-                var spotLightIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "SpotLightIcon" }).addComponent("SpotLightIcon"), { light: component, editorCamera: this.editorCamera });
+                const gameobject = new feng3d.GameObject();
+                gameobject.name = "SpotLightIcon";
+                const spotLightIcon = gameobject.addComponent("SpotLightIcon");
+                spotLightIcon.light = component;
+                spotLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(spotLightIcon.gameObject);
                 this.spotLightIconMap.set(component, spotLightIcon);
             } else if (component instanceof feng3d.Camera)
             {
-                var cameraIcon = feng3d.serialization.setValue(feng3d.serialization.setValue(new feng3d.GameObject(), { name: "CameraIcon" }).addComponent("CameraIcon"), { camera: component, editorCamera: this.editorCamera });
+                const gameobject = new feng3d.GameObject();
+                gameobject.name = "CameraIcon";
+                const cameraIcon = gameobject.addComponent("CameraIcon");
+                cameraIcon.camera = component;
+                cameraIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(cameraIcon.gameObject);
                 this.cameraIconMap.set(component, cameraIcon);
             }

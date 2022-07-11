@@ -1,13 +1,17 @@
 namespace editor
 {
+    export interface OAVColorPicker
+    {
+        get attributeValue(): feng3d.Color3 | feng3d.Color4;
+        set attributeValue(v);
+    }
+
     @feng3d.OAVComponent()
     export class OAVColorPicker extends OAVBase
     {
         public labelLab: eui.Label;
         public colorPicker: editor.ColorPicker;
         public input: eui.TextInput;
-
-        attributeValue: feng3d.Color3 | feng3d.Color4;
 
         constructor(attributeViewInfo: feng3d.AttributeViewInfo)
         {

@@ -155,7 +155,7 @@ namespace editor
 
             nodeMap.clear();
 
-            var node = new HierarchyNode({ gameobject: gameobject });
+            var node = new HierarchyNode({ gameobject: <any>gameobject });
             nodeMap.set(gameobject, node);
             node.isOpen = true;
 
@@ -180,7 +180,7 @@ namespace editor
             {
                 if (!node)
                 {
-                    node = new HierarchyNode({ gameobject: gameobject });
+                    node = new HierarchyNode({ gameobject: <any>gameobject });
                     nodeMap.set(gameobject, node);
                 }
                 parentnode.addChild(node);

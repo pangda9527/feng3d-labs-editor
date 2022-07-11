@@ -30,29 +30,42 @@ namespace editor
 
             var linesize = 20;
 
-            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "DirectionLightIcon", components: [{ __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
-                {
-                    __class__: "feng3d.MeshRenderer", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsH: 1, segmentsW: 1, yUp: false },
-                    material: {
-                        __class__: "feng3d.Material",
-                        shaderName: "texture",
-                        uniforms: { s_texture: { __class__: "feng3d.Texture2D", source: { url: editorData.getEditorAssetPath("assets/3d/icons/sun.png") }, format: feng3d.TextureFormat.RGBA, premulAlpha: true, }, }, renderParams: { enableBlend: true }
-                    },
-                },],
-            });
-            this._textureMaterial = <any>lightIcon.addComponent("Renderable").material;
-            this.gameObject.addChild(lightIcon);
+            {
+                const lightIcon = this._lightIcon = new feng3d.GameObject();
+                lightIcon.name = "DirectionLightIcon";
+                const billboardComponent = lightIcon.addComponent("BillboardComponent");
+                billboardComponent.camera = this.editorCamera;
+                const meshRenderer = lightIcon.addComponent("MeshRenderer");
+                const geometry = meshRenderer.geometry = new feng3d.PlaneGeometry();
+                geometry.width = 1;
+                geometry.height = 1;
+                geometry.segmentsH = 1;
+                geometry.segmentsW = 1;
+                geometry.yUp = false;
+                const material = meshRenderer.material = new feng3d.Material();
+                material.shaderName = "texture";
+                const uniforms = material.uniforms as feng3d.TextureUniforms;
+                const texture = uniforms.s_texture = new feng3d.Texture2D();
+                texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/sun.png") };
+                texture.format = feng3d.TextureFormat.RGBA;
+                texture.premulAlpha = true;
+                material.renderParams.enableBlend = true;
+                this._textureMaterial = material;
+                this.gameObject.addChild(lightIcon);
+            }
 
             //
             var num = 10;
-            var segments: Partial<feng3d.Segment>[] = [];
+            var segments: feng3d.Segment[] = [];
             for (var i = 0; i < num; i++)
             {
                 var angle = i * Math.PI * 2 / num;
                 var x = Math.sin(angle) * linesize;
                 var y = Math.cos(angle) * linesize;
-                segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x, y, linesize * 5) });
+                const segment = new feng3d.Segment();
+                segment.start = new feng3d.Vector3(x, y, 0);
+                segment.end = new feng3d.Vector3(x, y, linesize * 5);
+                segments.push(segment);
             }
             num = 36;
             for (var i = 0; i < num; i++)
@@ -63,18 +76,29 @@ namespace editor
                 var angle1 = (i + 1) * Math.PI * 2 / num;
                 var x1 = Math.sin(angle1) * linesize;
                 var y1 = Math.cos(angle1) * linesize;
-                segments.push({ start: new feng3d.Vector3(x, y, 0), end: new feng3d.Vector3(x1, y1, 0) });
+                const segment = new feng3d.Segment();
+                segment.start = new feng3d.Vector3(x, y, 0);
+                segment.end = new feng3d.Vector3(x1, y1, 0);
+                segments.push(segment);
             }
-            var lightLines = this._lightLines = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "Lines", mouseEnabled: false, hideFlags: feng3d.HideFlags.Hide,
-                components: [{ __class__: "feng3d.HoldSizeComponent", camera: this.editorCamera, holdSize: 0.005 },
-                {
-                    __class__: "feng3d.MeshRenderer",
-                    material: { __class__: "feng3d.Material", shaderName: "segment", uniforms: { u_segmentColor: { __class__: "feng3d.Color4", r: 163 / 255, g: 162 / 255, b: 107 / 255 } }, renderParams: { renderMode: feng3d.RenderMode.LINES } },
-                    geometry: { __class__: "feng3d.SegmentGeometry", segments: segments },
-                },],
-            });
-            this.gameObject.addChild(lightLines);
+            {
+                const lightLines = this._lightLines = new feng3d.GameObject();
+                lightLines.name = "Lines";
+                lightLines.mouseEnabled = false;
+                lightLines.hideFlags = feng3d.HideFlags.Hide;
+                const holdSizeComponent = lightLines.addComponent("HoldSizeComponent");
+                holdSizeComponent.camera = this.editorCamera;
+                holdSizeComponent.holdSize = 0.005;
+                const meshRenderer = lightLines.addComponent("MeshRenderer");
+                const material = meshRenderer.material = new feng3d.Material();
+                material.shaderName = "segment";
+                const uniforms = material.uniforms as feng3d.SegmentUniforms;
+                uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
+                material.renderParams.renderMode = feng3d.RenderMode.LINES;
+                const geometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+                geometry.segments = segments;
+                this.gameObject.addChild(lightLines);
+            }
 
             this.enabled = true;
         }

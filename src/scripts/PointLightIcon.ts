@@ -23,28 +23,26 @@ namespace editor
         {
             if (!this._editorCamera) return;
 
-            var lightIcon = this._lightIcon = feng3d.serialization.setValue(new feng3d.GameObject(), {
-                name: "PointLightIcon", components: [
-                    { __class__: "feng3d.BillboardComponent", camera: this.editorCamera },
-                    {
-                        __class__: "feng3d.MeshRenderer", geometry: { __class__: "feng3d.PlaneGeometry", width: 1, height: 1, segmentsW: 1, segmentsH: 1, yUp: false },
-                        material: {
-                            __class__: "feng3d.Material",
-                            shaderName: "texture",
-                            uniforms: {
-                                s_texture: {
-                                    __class__: "feng3d.Texture2D",
-                                    source: { url: editorData.getEditorAssetPath("assets/3d/icons/light.png") },
-                                    format: feng3d.TextureFormat.RGBA,
-                                    premulAlpha: true,
-                                },
-                            },
-                            renderParams: { enableBlend: true },
-                        },
-                    },
-                ],
-            });
-            this._textureMaterial = <any>lightIcon.getComponent("Renderable").material;
+            const lightIcon = this._lightIcon = new feng3d.GameObject();
+            lightIcon.name = "PointLightIcon";
+            const billboardComponent = lightIcon.addComponent("BillboardComponent");
+            billboardComponent.camera = this.editorCamera;
+            const meshRenderer = lightIcon.addComponent("MeshRenderer");
+            const geometry = meshRenderer.geometry = new feng3d.PlaneGeometry();
+            geometry.width = 1;
+            geometry.height = 1;
+            geometry.segmentsW = 1;
+            geometry.segmentsH = 1;
+            geometry.yUp = false;
+            const material = meshRenderer.material = new feng3d.Material();
+            material.shaderName = "texture";
+            const uniforms = material.uniforms as feng3d.TextureUniforms;
+            const texture = uniforms.s_texture = new feng3d.Texture2D()
+            texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/light.png") };
+            texture.format = feng3d.TextureFormat.RGBA;
+            texture.premulAlpha = true;
+            material.renderParams.enableBlend = true;
+            this._textureMaterial = material;
             this.gameObject.addChild(lightIcon);
 
             //
