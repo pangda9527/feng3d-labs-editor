@@ -10,8 +10,10 @@ namespace editor
          * 显示标签
          */
         label?: string,
-        accelerator?: string,
-        role?: string,
+        /**
+         * 优先级，数字越大，显示越靠前，默认为0
+         */
+        priority?: number;
         type?: 'separator',
         /**
          * 点击事件

@@ -315,154 +315,73 @@ namespace editor
          */
         getCreateObjectMenu()
         {
-            if (createObjectMenu.length < 2)
+            var createObjectMenu: MenuItem[] = [];
+            //
+            feng3d.createNodeMenu.forEach((item) =>
             {
-                createObjectMenu = createObjectMenu.concat([
-                    //label:显示在创建列表中的名称 className:3d对象的类全路径，将通过classUtils.getDefinitionByName获取定义
+                let submenu = createObjectMenu;
+                const paths = item.path.split("/");
+                let targetItem: MenuItem;
+                for (let i = 0; i < paths.length; i++)
+                {
+                    targetItem = submenu.filter((item0) =>
                     {
-                        label: "游戏对象", click: () =>
-                        {
-                            hierarchy.addGameObject(new feng3d.GameObject());
-                        }
-                    },
-                    { type: "separator" },
+                        return item0.label === paths[i];
+                    })[0];
+                    if (!targetItem)
                     {
-                        label: "3D对象",
-                        submenu: [
-                            {
-                                label: "平面", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Plane"));
-                                }
-                            },
-                            {
-                                label: "四边形", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Quad"));
-                                }
-                            },
-                            {
-                                label: "立方体", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cube"));
-                                }
-                            },
-                            {
-                                label: "球体", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Sphere"));
-                                }
-                            },
-                            {
-                                label: "胶囊体", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Capsule"));
-                                }
-                            },
-                            {
-                                label: "圆柱体", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cylinder"));
-                                }
-                            },
-                            {
-                                label: "圆锥体", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Cone"));
-                                }
-                            },
-                            {
-                                label: "圆环", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Torus"));
-                                }
-                            },
-                            {
-                                label: "线段", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Segment"));
-                                }
-                            },
-                            {
-                                label: "水", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Water"));
-                                }
-                            },
-                        ],
-                    },
+                        targetItem = { label: paths[i] };
+                        submenu.push(targetItem);
+                    }
+                    if (!targetItem.submenu)
                     {
-                        label: "粒子系统", click: () =>
-                        {
-                            hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Particle System"));
-                        }
-                    },
+                        targetItem.submenu = [];
+                    }
+                    submenu = targetItem.submenu;
+                }
+                if (item.priority !== undefined)
+                {
+                    targetItem.priority = item.priority;
+                }
+                if (item.click !== undefined)
+                {
+                    targetItem.click = () =>
                     {
-                        label: "地形", click: () =>
-                        {
-                            hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Terrain"));
-                        }
-                    },
+                        const gameObject = item.click();
+                        hierarchy.addGameObject(gameObject);
+                    };
+                }
+            });
+
+            // 排序
+            const sortSubMenu = (submenu: MenuItem[]) =>
+            {
+                if (!submenu)
+                {
+                    return;
+                }
+                submenu.sort((a, b) =>
+                {
+                    if (a.priority === undefined) a.priority = 0;
+                    if (b.priority === undefined) b.priority = 0;
+                    return b.priority - a.priority;
+                });
+                for (let i = 0; i < submenu.length; i++)
+                {
+                    sortSubMenu(submenu[i].submenu);
+                }
+                for (let i = submenu.length - 2; i >= 0; i--)
+                {
+                    // 优先级跨度 10000 时，中间增加 横格线。
+                    if (~~(submenu[i].priority / 10000) > ~~(submenu[i + 1].priority / 10000))
                     {
-                        label: "光源",
-                        submenu: [
-                            {
-                                label: "点光源", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Point light"));
-                                }
-                            },
-                            {
-                                label: "方向光源", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Directional light"));
-                                }
-                            },
-                            {
-                                label: "聚光灯", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Spot light"));
-                                }
-                            },
-                        ],
-                    },
-                    {
-                        label: "UI",
-                        submenu: [
-                            {
-                                label: "矩形", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Rect"));
-                                }
-                            },
-                            {
-                                label: "图片", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Image"));
-                                }
-                            },
-                            {
-                                label: "文本", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Text"));
-                                }
-                            },
-                            {
-                                label: "按钮", click: () =>
-                                {
-                                    hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Button"));
-                                }
-                            },
-                        ],
-                    },
-                    {
-                        label: "摄像机", click: () =>
-                        {
-                            hierarchy.addGameObject(feng3d.GameObject.createPrimitive("Camera"));
-                        }
-                    },
-                ]);
-            }
+                        submenu.splice(i + 1, 0, { type: "separator" });
+                    }
+                }
+            };
+
+            sortSubMenu(createObjectMenu);
+
             return createObjectMenu;
         }
 
