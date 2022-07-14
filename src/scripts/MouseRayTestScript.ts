@@ -14,7 +14,7 @@ namespace editor
             var mouseRay3D = this.gameObject.scene.mouseRay3D;
 
             var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
-            var model = gameobject.addComponent("Renderable");
+            var model = gameobject.addComponent(feng3d.Renderable);
             model.material = new feng3d.Material();
             model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
             gameobject.mouseEnabled = false;

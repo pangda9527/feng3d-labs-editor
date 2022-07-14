@@ -60,7 +60,7 @@ namespace editor
             {
                 const pointsObject = new feng3d.GameObject();
                 pointsObject.name = "allowedVoxels";
-                const meshRenderer = pointsObject.addComponent("MeshRenderer");
+                const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "point";
                 const uniforms = material.uniforms as feng3d.PointUniforms;
@@ -73,7 +73,7 @@ namespace editor
             {
                 const pointsObject = new feng3d.GameObject();
                 pointsObject.name = "rejectivedVoxels";
-                const meshRenderer = pointsObject.addComponent("MeshRenderer");
+                const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "point";
                 const uniforms = material.uniforms as feng3d.PointUniforms;
@@ -86,7 +86,7 @@ namespace editor
             {
                 const pointsObject = new feng3d.GameObject();
                 pointsObject.name = "debugVoxels";
-                const meshRenderer = pointsObject.addComponent("MeshRenderer");
+                const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "point";
                 const uniforms = material.uniforms as feng3d.PointUniforms;
@@ -149,7 +149,7 @@ namespace editor
 
             if (!gameobject.visible)
                 return geometrys;
-            var model = gameobject.getComponent("Renderable");
+            var model = gameobject.getComponent(feng3d.Renderable);
             var geometry = model && model.geometry;
             if (geometry)
             {

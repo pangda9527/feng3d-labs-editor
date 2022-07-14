@@ -15,26 +15,26 @@ namespace editor
 
             if (this._scene)
             {
-                this.scene.off("addComponent", this.onAddComponent, this);
-                this.scene.off("removeComponent", this.onRemoveComponent, this);
+                this.scene.off("addComponent", this._onAddComponent, this);
+                this.scene.off("removeComponent", this._onRemoveComponent, this);
 
-                this.scene.getComponentsInChildren("Component").forEach(element =>
+                this.scene.getComponentsInChildren(feng3d.Component).forEach(element =>
                 {
-                    this.removeComponent(element);
+                    this._removeComponent(element);
                 });
             }
             this._scene = v;
             if (this._scene)
             {
-                this.scene.getComponentsInChildren("Component").forEach(element =>
+                this.scene.getComponentsInChildren(feng3d.Component).forEach(element =>
                 {
-                    this.addComponent(element);
+                    this._addComponent(element);
                 });
 
-                this.scene.on("addComponent", this.onAddComponent, this);
-                this.scene.on("removeComponent", this.onRemoveComponent, this);
-                this.scene.on("addChild", this.onAddChild, this);
-                this.scene.on("removeChild", this.onRemoveChild, this);
+                this.scene.on("addComponent", this._onAddComponent, this);
+                this.scene.on("removeComponent", this._onRemoveComponent, this);
+                this.scene.on("addChild", this._onAddChild, this);
+                this.scene.on("removeChild", this._onRemoveChild, this);
             }
         }
 
@@ -53,32 +53,32 @@ namespace editor
             super.dispose();
         }
 
-        private onAddChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+        private _onAddChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
             var components = event.data.child.getComponentsInChildren();
             components.forEach(v =>
             {
-                this.addComponent(v);
+                this._addComponent(v);
             });
         }
 
-        private onRemoveChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+        private _onRemoveChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
             var components = event.data.child.getComponentsInChildren();
             components.forEach(v =>
             {
-                this.removeComponent(v);
+                this._removeComponent(v);
             });
         }
 
-        private onAddComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+        private _onAddComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
         {
-            this.addComponent(event.data.component);
+            this._addComponent(event.data.component);
         }
 
-        private onRemoveComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+        private _onRemoveComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
         {
-            this.removeComponent(event.data.component);
+            this._removeComponent(event.data.component);
         }
 
         private update()
@@ -101,13 +101,13 @@ namespace editor
             });
         }
 
-        private addComponent(component: feng3d.Component)
+        private _addComponent(component: feng3d.Component)
         {
             if (component instanceof feng3d.DirectionalLight)
             {
                 const gameobject = new feng3d.GameObject();
                 gameobject.name = "DirectionLightIcon";
-                const directionLightIcon = gameobject.addComponent("DirectionLightIcon");
+                const directionLightIcon = gameobject.addComponent(DirectionLightIcon);
                 directionLightIcon.light = component;
                 directionLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(directionLightIcon.gameObject);
@@ -116,7 +116,7 @@ namespace editor
             {
                 const gameobject = new feng3d.GameObject();
                 gameobject.name = "PointLightIcon";
-                const pointLightIcon = gameobject.addComponent("PointLightIcon");
+                const pointLightIcon = gameobject.addComponent(PointLightIcon);
                 pointLightIcon.light = component;
                 pointLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(pointLightIcon.gameObject);
@@ -125,7 +125,7 @@ namespace editor
             {
                 const gameobject = new feng3d.GameObject();
                 gameobject.name = "SpotLightIcon";
-                const spotLightIcon = gameobject.addComponent("SpotLightIcon");
+                const spotLightIcon = gameobject.addComponent(SpotLightIcon);
                 spotLightIcon.light = component;
                 spotLightIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(spotLightIcon.gameObject);
@@ -134,7 +134,7 @@ namespace editor
             {
                 const gameobject = new feng3d.GameObject();
                 gameobject.name = "CameraIcon";
-                const cameraIcon = gameobject.addComponent("CameraIcon");
+                const cameraIcon = gameobject.addComponent(CameraIcon);
                 cameraIcon.camera = component;
                 cameraIcon.editorCamera = this.editorCamera;
                 this.gameObject.addChild(cameraIcon.gameObject);
@@ -142,7 +142,7 @@ namespace editor
             }
         }
 
-        private removeComponent(component: feng3d.Component)
+        private _removeComponent(component: feng3d.Component)
         {
             if (component instanceof feng3d.DirectionalLight)
             {

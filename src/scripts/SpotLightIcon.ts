@@ -25,9 +25,9 @@ namespace editor
             {
                 const lightIcon = this._lightIcon = new feng3d.GameObject();
                 lightIcon.name = "SpotLightIcon";
-                const billboardComponent = lightIcon.addComponent("BillboardComponent");
+                const billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
                 billboardComponent.camera = this.editorCamera;
-                const meshRenderer = lightIcon.addComponent("MeshRenderer");
+                const meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "texture";
                 const uniforms = material.uniforms as feng3d.TextureUniforms;
@@ -52,7 +52,7 @@ namespace editor
                 lightLines.name = "Lines";
                 lightLines.mouseEnabled = false;
                 lightLines.hideFlags = feng3d.HideFlags.Hide;
-                const meshRenderer = lightLines.addComponent("MeshRenderer");
+                const meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "segment";
                 const uniforms = material.uniforms as feng3d.SegmentUniforms;
@@ -73,7 +73,7 @@ namespace editor
                     },
                 ]
             });
-            this._pointGeometry = <any>lightpoints.getComponent("Renderable").geometry;
+            this._pointGeometry = <any>lightpoints.getComponent(feng3d.Renderable).geometry;
             this.gameObject.addChild(lightpoints);
 
             this.enabled = true;

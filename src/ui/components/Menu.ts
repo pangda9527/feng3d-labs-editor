@@ -47,9 +47,9 @@ namespace editor
 [{
     label: "Rendering",
     submenu: [
-        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
-        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
-        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
     ]
 }]
 ```
@@ -58,9 +58,9 @@ namespace editor
 [{
     label: "Rendering",
     submenu: [
-        { label: "DirectionalLight", click: () => { gameobject.addComponent("DirectionalLight"); } },
-        { label: "Camera", click: () => { gameobject.addComponent("Camera"); } },
-        { label: "PointLight", click: () => { gameobject.addComponent("PointLight"); } },
+        { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+        { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
+        { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
     ]
 }]
 ```

@@ -414,7 +414,11 @@ namespace editor
                         currentmenu.push(currentMenuItem);
                     };
                 });
-                currentMenuItem.click = () => { gameobject.addComponent(item.type); }
+                currentMenuItem.click = () =>
+                {
+                    const componentClass = feng3d.getComponentType(item.type);
+                    gameobject.addComponent(componentClass);
+                }
             });
 
             return menu;

@@ -27,9 +27,9 @@ namespace editor
             {
                 const lightIcon = this._lightIcon = new feng3d.GameObject();
                 lightIcon.name = "CameraIcon";
-                const billboardComponent = lightIcon.addComponent("BillboardComponent");
+                const billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
                 billboardComponent.camera = this.editorCamera;
-                const meshRenderer = lightIcon.addComponent("MeshRenderer");
+                const meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "texture";
                 const uniforms = material.uniforms as feng3d.TextureUniforms;
@@ -53,7 +53,7 @@ namespace editor
                 lightLines.name = "Lines";
                 lightLines.mouseEnabled = false;
                 lightLines.hideFlags = feng3d.HideFlags.Hide;
-                const meshRenderer = lightLines.addComponent("MeshRenderer");
+                const meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "segment";
                 const uniforms = material.uniforms as feng3d.SegmentUniforms;
@@ -71,7 +71,7 @@ namespace editor
                 lightpoints.name = "points";
                 lightpoints.mouseEnabled = false;
                 lightpoints.hideFlags = feng3d.HideFlags.Hide;
-                const meshRenderer = lightpoints.addComponent("MeshRenderer");
+                const meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
                 const material = meshRenderer.material = new feng3d.Material();
                 material.shaderName = "point";
                 const uniforms = material.uniforms as feng3d.PointUniforms;

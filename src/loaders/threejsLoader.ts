@@ -78,10 +78,10 @@ namespace editor
             switch (object3d.type)
             {
                 case "PerspectiveCamera":
-                    gameobject.addComponent("Camera").lens = parsePerspectiveCamera(object3d);
+                    gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
                     break;
                 case "SkinnedMesh":
-                    var skinnedModel = gameobject.addComponent("SkinnedMeshRenderer");
+                    var skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
                     skinnedModel.geometry = parseGeometry(object3d.geometry);
                     skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     console.assert(object3d.bindMode == "attached");
@@ -90,14 +90,14 @@ namespace editor
                         skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone();
                     break;
                 case "Mesh":
-                    var model = gameobject.addComponent("Renderable");
+                    var model = gameobject.addComponent(feng3d.Renderable);
                     model.geometry = parseGeometry(object3d.geometry);
                     model.material.renderParams.cullFace = feng3d.CullFace.NONE;
                     break;
                 case "Group":
                     if (object3d.skeleton)
                     {
-                        skeletonComponent = gameobject.addComponent("SkeletonComponent");
+                        skeletonComponent = gameobject.addComponent(feng3d.SkeletonComponent);
                         skeletonComponent.joints = parseSkeleton(object3d.skeleton);
                     }
                     break;
@@ -111,7 +111,7 @@ namespace editor
 
             if (object3d.animations && object3d.animations.length > 0)
             {
-                var animation = gameobject.addComponent("Animation");
+                var animation = gameobject.addComponent(feng3d.Animation);
                 for (var i = 0; i < object3d.animations.length; i++)
                 {
                     var animationClip = parseAnimations(object3d.animations[i]);

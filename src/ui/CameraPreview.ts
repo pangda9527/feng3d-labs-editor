@@ -91,7 +91,7 @@ namespace editor
             {
                 for (let i = 0; i < selectedGameObjects.length; i++)
                 {
-                    var camera = selectedGameObjects[i].getComponent("Camera");
+                    var camera = selectedGameObjects[i].getComponent(feng3d.Camera);
                     if (camera)
                     {
                         this.camera = camera;
