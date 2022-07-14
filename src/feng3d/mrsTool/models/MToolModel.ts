@@ -110,7 +110,7 @@ namespace editor
             model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
             model.material = feng3d.Material.create("color");
             mouseHit.transform.y = 20 + (this.length - 20) / 2;
-            mouseHit.visible = false;
+            mouseHit.activeSelf = false;
             mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 

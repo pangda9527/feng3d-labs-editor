@@ -147,7 +147,7 @@ namespace editor
         {
             geometrys = geometrys || [];
 
-            if (!gameobject.visible)
+            if (!gameobject.activeSelf)
                 return geometrys;
             var model = gameobject.getComponent(feng3d.Renderable);
             var geometry = model && model.geometry;

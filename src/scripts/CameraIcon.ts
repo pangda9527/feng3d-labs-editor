@@ -154,12 +154,12 @@ namespace editor
                     this._lensChanged = false;
                 }
                 //
-                this._lightLines.visible = true;
-                this._lightpoints.visible = true;
+                this._lightLines.activeSelf = true;
+                this._lightpoints.activeSelf = true;
             } else
             {
-                this._lightLines.visible = false;
-                this._lightpoints.visible = false;
+                this._lightLines.activeSelf = false;
+                this._lightpoints.activeSelf = false;
             }
         }
 

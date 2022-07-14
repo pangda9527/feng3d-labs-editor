@@ -179,12 +179,12 @@ namespace editor
                     alpha = 1.0;
                 this._pointGeometry.points.push({ position: point, color: new feng3d.Color4(0, 0, 1, alpha) });
                 //
-                this._lightLines.visible = true;
-                this._lightpoints.visible = true;
+                this._lightLines.activeSelf = true;
+                this._lightpoints.activeSelf = true;
             } else
             {
-                this._lightLines.visible = false;
-                this._lightpoints.visible = false;
+                this._lightLines.activeSelf = false;
+                this._lightpoints.activeSelf = false;
             }
         }
 

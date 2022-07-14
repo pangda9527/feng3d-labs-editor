@@ -40,14 +40,14 @@ namespace editor
 
         updateView()
         {
-            this.visibleCB.selected = this.space.visible;
+            this.visibleCB.selected = this.space.activeSelf;
             this.mouseEnabledCB.selected = this.space.mouseEnabled;
             this.nameInput.text = this.space.name;
         }
 
         private onVisibleCBClick()
         {
-            this.space.visible = !this.space.visible;
+            this.space.activeSelf = !this.space.activeSelf;
         }
 
         private onMouseEnabledCBClick()

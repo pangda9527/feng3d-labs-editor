@@ -108,7 +108,7 @@ namespace editor
             if (!this.light) return;
 
             (<feng3d.TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
-            this._lightLines.visible = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
+            this._lightLines.activeSelf = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
         }
 
         dispose()

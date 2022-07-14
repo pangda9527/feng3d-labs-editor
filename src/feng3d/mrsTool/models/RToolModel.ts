@@ -106,7 +106,7 @@ namespace editor
             this.torusGeometry = model.geometry = feng3d.serialization.setValue(new feng3d.TorusGeometry(), { radius: this.radius, tubeRadius: 2 });
             model.material = new feng3d.Material();
             mouseHit.transform.rx = 90;
-            mouseHit.visible = false;
+            mouseHit.activeSelf = false;
             mouseHit.mouseEnabled = true;
             this.gameObject.addChild(mouseHit);
 
@@ -298,7 +298,7 @@ namespace editor
 
             this.sector = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "sector" }).addComponent(SectorGameObject);
             this.sector.update(0, 360);
-            this.sector.gameObject.visible = false;
+            this.sector.gameObject.activeSelf = false;
             this.sector.gameObject.mouseEnabled = true;
             this.gameObject.addChild(this.sector.gameObject);
 

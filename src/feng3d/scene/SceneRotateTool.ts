@@ -83,9 +83,9 @@ namespace editor
                 arrowsArr.forEach(element =>
                 {
                     if (Math.abs(element.transform.localToWorldMatrix.getAxisY().dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
-                        element.visible = true;
+                        element.activeSelf = true;
                     else
-                        element.visible = false;
+                        element.activeSelf = false;
                 });
 
                 //
