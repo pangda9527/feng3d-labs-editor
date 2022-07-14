@@ -165,7 +165,7 @@ namespace editor
             var toolView = new feng3d.View(canvas);
             toolView.scene.background.a = 0.0;
             toolView.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-            toolView.root.addChild(feng3d.GameObject.createPrimitive("Point light"));
+            toolView.root.addChild(feng3d.GameObject.createPrimitive("Point Light"));
             return { toolView: toolView, canvas };
         }
 
