@@ -132,7 +132,7 @@ namespace editor
             var points: feng3d.Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
-                points[i] = new feng3d.Vector3(Math.sin(i * Math.DEG2RAD), Math.cos(i * Math.DEG2RAD), 0);
+                points[i] = new feng3d.Vector3(Math.sin(i * feng3d.mathUtil.DEG2RAD), Math.cos(i * feng3d.mathUtil.DEG2RAD), 0);
                 points[i].scaleNumber(this.radius);
                 if (i > 0)
                 {
@@ -157,8 +157,8 @@ namespace editor
             var inverseGlobalMatrix = this.transform.worldToLocalMatrix;
             var localStartPos = inverseGlobalMatrix.transformPoint3(startPos);
             var localEndPos = inverseGlobalMatrix.transformPoint3(endPos);
-            var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * Math.RAD2DEG;
-            var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * Math.RAD2DEG;
+            var startAngle = Math.atan2(localStartPos.y, localStartPos.x) * feng3d.mathUtil.RAD2DEG;
+            var endAngle = Math.atan2(localEndPos.y, localEndPos.x) * feng3d.mathUtil.RAD2DEG;
 
             //
             var min = Math.min(startAngle, endAngle);
@@ -238,8 +238,8 @@ namespace editor
             vertexPositionData[2] = 0;
             for (var i = 0; i < length; i++)
             {
-                vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * Math.DEG2RAD);
-                vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * Math.DEG2RAD);
+                vertexPositionData[i * 3 + 3] = this.radius * Math.cos((i + this._start) * feng3d.mathUtil.DEG2RAD);
+                vertexPositionData[i * 3 + 4] = this.radius * Math.sin((i + this._start) * feng3d.mathUtil.DEG2RAD);
                 vertexPositionData[i * 3 + 5] = 0;
                 if (i > 0)
                 {
@@ -252,8 +252,8 @@ namespace editor
             this.geometry.positions = vertexPositionData;
             this.geometry.indices = indices;
             //绘制边界
-            var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * Math.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * Math.DEG2RAD), 0);
-            var endPoint = new feng3d.Vector3(this.radius * Math.cos((this._end + 0.1) * Math.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * Math.DEG2RAD), 0);
+            var startPoint = new feng3d.Vector3(this.radius * Math.cos((this._start - 0.1) * feng3d.mathUtil.DEG2RAD), this.radius * Math.sin((this._start - 0.1) * feng3d.mathUtil.DEG2RAD), 0);
+            var endPoint = new feng3d.Vector3(this.radius * Math.cos((this._end + 0.1) * feng3d.mathUtil.DEG2RAD), this.radius * Math.sin((this._end + 0.1) * feng3d.mathUtil.DEG2RAD), 0);
             //
             this.segmentGeometry.segments = [
                 { start: new feng3d.Vector3(), end: startPoint, startColor: this.borderColor, endColor: this.borderColor },
@@ -319,7 +319,7 @@ namespace editor
             var points: feng3d.Vector3[] = [];
             for (var i = 0; i <= 360; i++)
             {
-                points[i] = new feng3d.Vector3(Math.sin(i * Math.DEG2RAD), Math.cos(i * Math.DEG2RAD), 0);
+                points[i] = new feng3d.Vector3(Math.sin(i * feng3d.mathUtil.DEG2RAD), Math.cos(i * feng3d.mathUtil.DEG2RAD), 0);
                 points[i].scaleNumber(this.radius);
                 if (i > 0)
                 {

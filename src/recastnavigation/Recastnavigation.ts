@@ -156,7 +156,7 @@ namespace editor
          */
         private _applyAgentMaxSlope()
         {
-            var mincos = Math.cos(this._agent.maxSlope * Math.DEG2RAD);
+            var mincos = Math.cos(this._agent.maxSlope * feng3d.mathUtil.DEG2RAD);
 
             this.getVoxels().forEach(v =>
             {

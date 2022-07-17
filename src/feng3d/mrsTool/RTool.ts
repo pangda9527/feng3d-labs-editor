@@ -113,8 +113,8 @@ namespace editor
                     endDir.normalize();
                     //计算夹角
                     var cosValue = startDir.dot(endDir);
-                    cosValue = Math.clamp(cosValue, -1, 1);
-                    var angle = Math.acos(cosValue) * Math.RAD2DEG;
+                    cosValue = feng3d.mathUtil.clamp(cosValue, -1, 1);
+                    var angle = Math.acos(cosValue) * feng3d.mathUtil.RAD2DEG;
                     //计算是否顺时针
                     var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                     sign = sign > 0 ? 1 : -1;

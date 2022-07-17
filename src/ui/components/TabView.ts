@@ -341,7 +341,7 @@ namespace editor
 		{
 			var moduleNames = this._moduleViews.map(v => v.moduleName);
 			// 设置默认显示模块名称
-			this._showModuleIndex = Math.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
+			this._showModuleIndex = feng3d.mathUtil.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
 
 			this._tabButtons.forEach(v =>
 			{
