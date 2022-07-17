@@ -1,6 +1,6 @@
 namespace feng3d
 {
-    export interface GlobalEvents
+    export interface MixinsGlobalEvents
     {
         "editor.selectedObjectsChanged"
         "editor.isBaryCenterChanged"

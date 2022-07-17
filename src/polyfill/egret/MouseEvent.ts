@@ -77,8 +77,9 @@ namespace egret
 
         webTouchHandler.canvas.addEventListener("mousemove", onMouseMove);
 
-        feng3d.windowEventProxy.on("mousedown", (e) =>
+        feng3d.windowEventProxy.on("mousedown", (event) =>
         {
+            const e = event.data;
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
             var y = location.y;
@@ -87,7 +88,6 @@ namespace egret
 
             // mousedownButton = e.button;
             mousedownObject = target;
-
             if (e.button == 0)
             {
                 egret.TouchEvent.dispatchTouchEvent(target, MouseEvent.MOUSE_DOWN, true, true, x, y);
@@ -100,8 +100,9 @@ namespace egret
             }
         });
 
-        feng3d.windowEventProxy.on("mouseup", (e) =>
+        feng3d.windowEventProxy.on("mouseup", (event) =>
         {
+            const e = event.data;
             //右键按下
             var location = webTouchHandler.getLocation(e);
             var x = location.x;
@@ -144,8 +145,9 @@ namespace egret
         });
 
         // 调试，查看鼠标下的对象
-        feng3d.windowEventProxy.on("keyup", (e) =>
+        feng3d.windowEventProxy.on("keyup", (event) =>
         {
+            const e = event.data;
             if (e.key == "p")
             {
                 var location = webTouchHandler.getLocation(e);
@@ -161,7 +163,7 @@ namespace egret
             }
         });
 
-        function onMouseMove(event)
+        function onMouseMove(event: globalThis.MouseEvent)
         {
             var location = webTouchHandler.getLocation(event);
             var x = location.x;

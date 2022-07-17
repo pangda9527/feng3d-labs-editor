@@ -7,16 +7,7 @@ namespace editor
 		openChanged: TreeNode;
 	}
 
-	export interface TreeNode
-	{
-		once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.IEvent<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
-		emit<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.IEvent<TreeNodeMap[K]>;
-		has<K extends keyof TreeNodeMap>(type: K): boolean;
-		on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.IEvent<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-		off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.IEvent<TreeNodeMap[K]>) => any, thisObject?: any): void;
-	}
-
-	export class TreeNode extends feng3d.EventEmitter
+	export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventEmitter<T>
 	{
 		/**
 		 * 标签

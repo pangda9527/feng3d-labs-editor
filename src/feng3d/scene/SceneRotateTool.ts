@@ -100,8 +100,9 @@ namespace editor
                 }
             });
 
-            feng3d.windowEventProxy.on("mouseup", (e) =>
+            feng3d.windowEventProxy.on("mouseup", (event) =>
             {
+                const e = event.data;
                 var canvasRect = canvas.getBoundingClientRect();
                 var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
                 if (!bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
@@ -171,7 +172,7 @@ namespace editor
 
         private onclick(e: feng3d.IEvent<any>)
         {
-            this.clickItem(e.currentTarget);
+            this.clickItem(e.currentTarget as any);
         }
 
         private clickItem(item: feng3d.GameObject)

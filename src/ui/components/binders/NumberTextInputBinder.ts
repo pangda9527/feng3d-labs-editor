@@ -3,18 +3,18 @@ namespace editor
     export class NumberTextInputBinder extends TextInputBinder
     {
         /**
-		 * 步长，精度
-		 */
+         * 步长，精度
+         */
         step = 0.001;
 
-		/**
-		 * 按下上下方向键时增加的步长数量
-		 */
+        /**
+         * 按下上下方向键时增加的步长数量
+         */
         stepDownup = 10;
 
-		/**
-		 * 移动一个像素时增加的步长数量
-		 */
+        /**
+         * 移动一个像素时增加的步长数量
+         */
         stepScale = 1;
 
         /**
@@ -121,13 +121,13 @@ namespace editor
             feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
         }
 
-        private onWindowKeyDown(event: KeyboardEvent)
+        private onWindowKeyDown(event: feng3d.IEvent<KeyboardEvent>)
         {
-            if (event.key == "ArrowUp")
+            if (event.data.key == "ArrowUp")
             {
                 this.space[this.attribute] += this.step * this.stepDownup;
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);
-            } else if (event.key == "ArrowDown")
+            } else if (event.data.key == "ArrowDown")
             {
                 this.space[this.attribute] -= this.step * this.stepDownup;
                 this.textInput.text = this.toText.call(this, this.space[this.attribute]);

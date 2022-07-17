@@ -39,16 +39,7 @@ namespace editor
         valueChanged
     }
 
-    export interface TextInputBinder
-    {
-        once<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.IEvent<TextInputBinderEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        emit<K extends keyof TextInputBinderEventMap>(type: K, data?: TextInputBinderEventMap[K], bubbles?: boolean): feng3d.IEvent<TextInputBinderEventMap[K]>;
-        has<K extends keyof TextInputBinderEventMap>(type: K): boolean;
-        on<K extends keyof TextInputBinderEventMap>(type: K, listener: (event: feng3d.IEvent<TextInputBinderEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof TextInputBinderEventMap>(type?: K, listener?: (event: feng3d.IEvent<TextInputBinderEventMap[K]>) => any, thisObject?: any): void;
-    }
-
-    export class TextInputBinder extends feng3d.EventEmitter implements UIBinder
+    export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinderEventMap> extends feng3d.EventEmitter<T> implements UIBinder
     {
         space: any;
 
