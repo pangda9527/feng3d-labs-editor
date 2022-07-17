@@ -211,7 +211,7 @@ namespace editor
                 cameraTargetMatrix.invert();
                 var result = cameraTargetMatrix.toTRS()[1];
 
-                feng3d.globalDispatcher.dispatch("editorCameraRotate", result);
+                feng3d.globalEmitter.emit("editorCameraRotate", result);
 
                 this.onEditorCameraRotate(result);
             }

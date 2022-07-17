@@ -22,8 +22,8 @@ namespace editor
 
         constructor()
         {
-            feng3d.globalDispatcher.on("message", this._onMessage, this);
-            feng3d.globalDispatcher.on("message.error", this._onErrorMessage, this);
+            feng3d.globalEmitter.on("message", this._onMessage, this);
+            feng3d.globalEmitter.on("message.error", this._onErrorMessage, this);
         }
 
         private _onMessage(event: feng3d.Event<string>)

@@ -111,7 +111,7 @@ namespace editor
 			this.dispatchEvent(objectViewEvent);
 
 			//
-			feng3d.objectevent.dispatch(this._space, "propertyValueChanged");
+			feng3d.objectevent.emit(this._space, "propertyValueChanged");
 		}
 
 		dispose()

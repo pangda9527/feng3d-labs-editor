@@ -10,7 +10,7 @@ namespace editor
 
         constructor()
         {
-            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
+            feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
             feng3d.watcher.watch(<Hierarchy>this, "rootGameObject", this.rootGameObjectChanged, this);
         }
 

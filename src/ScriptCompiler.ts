@@ -9,13 +9,13 @@ namespace editor
 
         constructor()
         {
-            feng3d.globalDispatcher.on("script.compile", this.onScriptCompile, this);
-            feng3d.globalDispatcher.on("script.gettslibs", this.onGettsLibs, this);
+            feng3d.globalEmitter.on("script.compile", this.onScriptCompile, this);
+            feng3d.globalEmitter.on("script.gettslibs", this.onGettsLibs, this);
 
-            feng3d.globalDispatcher.on("openScript", this.onOpenScript, this);
+            feng3d.globalEmitter.on("openScript", this.onOpenScript, this);
 
-            feng3d.globalDispatcher.on("fs.delete", this.onFileChanged, this);
-            feng3d.globalDispatcher.on("fs.write", this.onFileChanged, this);
+            feng3d.globalEmitter.on("fs.delete", this.onFileChanged, this);
+            feng3d.globalEmitter.on("fs.write", this.onFileChanged, this);
         }
 
         private onOpenScript(e)
@@ -41,7 +41,7 @@ namespace editor
                 codeeditoWin = window.open(`codeeditor.html`);
                 codeeditoWin.onload = () =>
                 {
-                    feng3d.globalDispatcher.dispatch("codeeditor.openScript", editorData.openScript);
+                    feng3d.globalEmitter.emit("codeeditor.openScript", editorData.openScript);
                 };
             }
         }
@@ -124,7 +124,7 @@ namespace editor
 
                 editorAsset.runProjectScript(() =>
                 {
-                    feng3d.globalDispatcher.dispatch("asset.scriptChanged");
+                    feng3d.globalEmitter.emit("asset.scriptChanged");
                 });
             }
             catch (e)
@@ -133,7 +133,7 @@ namespace editor
             }
             callback && callback(null);
 
-            feng3d.globalDispatcher.dispatch("message", `编译完成！`)
+            feng3d.globalEmitter.emit("message", `编译完成！`)
         }
 
         private transpileModule(tslibs: { path: string; code: string; }[])

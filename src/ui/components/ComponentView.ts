@@ -96,7 +96,7 @@ namespace editor
 
 			this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-			feng3d.globalDispatcher.on("asset.scriptChanged", this.onScriptChanged, this);
+			feng3d.globalEmitter.on("asset.scriptChanged", this.onScriptChanged, this);
 		}
 
 		private onRemovedFromStage()
@@ -107,7 +107,7 @@ namespace editor
 
 			this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 			this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-			feng3d.globalDispatcher.off("asset.scriptChanged", this.onScriptChanged, this);
+			feng3d.globalEmitter.off("asset.scriptChanged", this.onScriptChanged, this);
 		}
 
 		private onRefreshView()
