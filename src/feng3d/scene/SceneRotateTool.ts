@@ -238,10 +238,10 @@ namespace editor
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
             resultRotation.scaleNumber(feng3d.mathUtil.DEG2RAD);
-            targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
+            targetQuat.fromEuler(resultRotation.x, resultRotation.y, resultRotation.z);
             //
             var sourceQuat = new feng3d.Quaternion();
-            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.mathUtil.DEG2RAD, camera.transform.ry * feng3d.mathUtil.DEG2RAD, camera.transform.rz * feng3d.mathUtil.DEG2RAD)
+            sourceQuat.fromEuler(camera.transform.rx * feng3d.mathUtil.DEG2RAD, camera.transform.ry * feng3d.mathUtil.DEG2RAD, camera.transform.rz * feng3d.mathUtil.DEG2RAD)
             var rate = { rate: 0.0 };
             egret.Tween.get(rate, {
                 onChange: () =>
