@@ -59,7 +59,7 @@ namespace editor
 			this.views.length = 0;
 		}
 
-		private onRefreshView(event: feng3d.Event<any>)
+		private onRefreshView(event: feng3d.IEvent<any>)
 		{
 			this.dispose();
 			this.initView();

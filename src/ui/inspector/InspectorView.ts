@@ -60,7 +60,7 @@ namespace editor
 			this.updateView();
 		}
 
-		private onSaveShowData(event: feng3d.Event<() => void>)
+		private onSaveShowData(event: feng3d.IEvent<() => void>)
 		{
 			this.saveShowData(event.data);
 		}

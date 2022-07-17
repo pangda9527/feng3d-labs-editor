@@ -62,7 +62,7 @@ namespace editor
             editorcache.viewLayout = data;
         }
 
-        private _resetLayout(event: feng3d.Event<Object>)
+        private _resetLayout(event: feng3d.IEvent<Object>)
         {
             editorcache.viewLayout = event.data || viewLayoutConfig.Default;
 

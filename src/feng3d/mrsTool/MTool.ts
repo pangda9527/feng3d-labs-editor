@@ -52,7 +52,7 @@ namespace editor
             this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
         }
 
-        protected onItemMouseDown(event: feng3d.Event<any>)
+        protected onItemMouseDown(event: feng3d.IEvent<any>)
         {
             if (!feng3d.shortcut.getState("mouseInView3D")) return;
 

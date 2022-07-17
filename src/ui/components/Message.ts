@@ -26,13 +26,13 @@ namespace editor
             feng3d.globalEmitter.on("message.error", this._onErrorMessage, this);
         }
 
-        private _onMessage(event: feng3d.Event<string>)
+        private _onMessage(event: feng3d.IEvent<string>)
         {
             this._messages.push([MessageType.Normal, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);
         }
 
-        private _onErrorMessage(event: feng3d.Event<string>)
+        private _onErrorMessage(event: feng3d.IEvent<string>)
         {
             this._messages.push([MessageType.Error, event.data]);
             feng3d.ticker.on(this._interval, this._showMessage, this);

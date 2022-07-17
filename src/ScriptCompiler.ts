@@ -46,7 +46,7 @@ namespace editor
             }
         }
 
-        private onGettsLibs(e: feng3d.Event<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
+        private onGettsLibs(e: feng3d.IEvent<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
         {
             this.loadtslibs(e.data.callback);
         }
@@ -84,7 +84,7 @@ namespace editor
             });
         }
 
-        private onFileChanged(e: feng3d.Event<string>)
+        private onFileChanged(e: feng3d.IEvent<string>)
         {
             if (!e.data) return;
             if (e.data.substr(-3) == ".ts")
@@ -93,7 +93,7 @@ namespace editor
             }
         }
 
-        private onScriptCompile(e?: feng3d.Event<{ onComplete?: () => void; }>)
+        private onScriptCompile(e?: feng3d.IEvent<{ onComplete?: () => void; }>)
         {
             this.loadtslibs((tslibs) =>
             {

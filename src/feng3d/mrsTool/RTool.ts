@@ -42,7 +42,7 @@ namespace editor
             this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
         }
 
-        protected onItemMouseDown(event: feng3d.Event<any>)
+        protected onItemMouseDown(event: feng3d.IEvent<any>)
         {
             if (!feng3d.shortcut.getState("mouseInView3D")) return;
             if (feng3d.shortcut.keyState.getKeyState("alt")) return;

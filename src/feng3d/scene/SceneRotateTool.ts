@@ -169,7 +169,7 @@ namespace editor
             return { toolView: toolView, canvas };
         }
 
-        private onclick(e: feng3d.Event<any>)
+        private onclick(e: feng3d.IEvent<any>)
         {
             this.clickItem(e.currentTarget);
         }

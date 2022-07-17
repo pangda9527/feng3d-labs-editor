@@ -458,7 +458,7 @@ namespace editor
 			sceneControlConfig.lookDistance -= distance;
 		}
 
-		private _onAddSceneToolView(event: feng3d.Event<eui.Component>)
+		private _onAddSceneToolView(event: feng3d.IEvent<eui.Component>)
 		{
 			this.group.addChild(event.data);
 		}

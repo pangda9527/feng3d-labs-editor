@@ -526,7 +526,7 @@ namespace editor
             feng3d.globalEmitter.emit("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
 
-        private onParsed(e: feng3d.Event<any>)
+        private onParsed(e: feng3d.IEvent<any>)
         {
             var data = e.data;
             if (data instanceof feng3d.FileAsset)
