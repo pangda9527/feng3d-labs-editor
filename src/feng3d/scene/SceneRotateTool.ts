@@ -78,7 +78,7 @@ namespace editor
                 rotationToolModel.transform.rotation = rotation;
 
                 //隐藏角度
-                var visibleAngle = Math.cos(15 * Math.DEG2RAD);
+                var visibleAngle = Math.cos(15 * feng3d.mathUtil.DEG2RAD);
                 //隐藏正面箭头
                 arrowsArr.forEach(element =>
                 {
@@ -237,11 +237,11 @@ namespace editor
             var rotateCenter = camera.transform.worldPosition.addTo(forward.scaleNumber(lookDistance));
             //计算目标四元素旋转
             var targetQuat = new feng3d.Quaternion();
-            resultRotation.scaleNumber(Math.DEG2RAD);
+            resultRotation.scaleNumber(feng3d.mathUtil.DEG2RAD);
             targetQuat.fromEulerAngles(resultRotation.x, resultRotation.y, resultRotation.z);
             //
             var sourceQuat = new feng3d.Quaternion();
-            sourceQuat.fromEulerAngles(camera.transform.rx * Math.DEG2RAD, camera.transform.ry * Math.DEG2RAD, camera.transform.rz * Math.DEG2RAD)
+            sourceQuat.fromEulerAngles(camera.transform.rx * feng3d.mathUtil.DEG2RAD, camera.transform.ry * feng3d.mathUtil.DEG2RAD, camera.transform.rz * feng3d.mathUtil.DEG2RAD)
             var rate = { rate: 0.0 };
             egret.Tween.get(rate, {
                 onChange: () =>

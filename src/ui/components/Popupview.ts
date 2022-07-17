@@ -76,8 +76,8 @@ namespace editor
                 y0 = param.y;
             }
 
-            x0 = Math.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
-            y0 = Math.clamp(y0, 0, editorui.popupLayer.stage.stageHeight - view.height);
+            x0 = feng3d.mathUtil.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
+            y0 = feng3d.mathUtil.clamp(y0, 0, editorui.popupLayer.stage.stageHeight - view.height);
 
             view.x = x0;
             view.y = y0;

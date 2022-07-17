@@ -13,7 +13,7 @@ namespace navigation
         checkMaxSlope(maxSlope: number)
         {
             var up = new feng3d.Vector3(0, 1, 0);
-            var mincos = Math.cos(maxSlope * Math.DEG2RAD);
+            var mincos = Math.cos(maxSlope * feng3d.mathUtil.DEG2RAD);
 
             var keys = feng3d.MapUtils.getKeys(this.data.trianglemap);
             keys.forEach(element =>
