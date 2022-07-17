@@ -46,7 +46,7 @@ namespace editor
 
         private onDoubleClick()
         {
-            feng3d.shortcut.dispatch("lookToSelectedGameObject");
+            feng3d.shortcut.emit("lookToSelectedGameObject");
         }
 
         private onrightclick()

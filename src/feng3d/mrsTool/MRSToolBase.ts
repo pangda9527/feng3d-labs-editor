@@ -59,7 +59,7 @@ namespace editor
             holdSizeComponent.camera = this._editorCamera;
         }
 
-        protected onItemMouseDown(event: feng3d.Event<any>)
+        protected onItemMouseDown(event: feng3d.IEvent<any>)
         {
             feng3d.shortcut.activityState("inTransforming");
         }

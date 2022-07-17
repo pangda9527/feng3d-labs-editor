@@ -23,7 +23,7 @@ namespace editor
 
         constructor()
         {
-            feng3d.globalDispatcher.on("asset.parsed", this.onParsed, this);
+            feng3d.globalEmitter.on("asset.parsed", this.onParsed, this);
         }
 
         /**
@@ -129,7 +129,7 @@ namespace editor
                 delete this._assetIDMap[assetNode.asset.assetId];
                 delete this._assetPathMap[assetNode.asset.assetPath];
 
-                feng3d.globalDispatcher.dispatch("asset.deletefile", { id: assetNode.asset.assetId });
+                feng3d.globalEmitter.emit("asset.deletefile", { id: assetNode.asset.assetId });
 
                 callback && callback(err);
             });
@@ -213,7 +213,7 @@ namespace editor
                                     var fileName = editorRS.getValidChildName(folder, "NewScript");
                                     this.createAsset(folderPath, feng3d.ScriptAsset, fileName, { textContent: assetFileTemplates.getNewScript(fileName) }, () =>
                                     {
-                                        feng3d.globalDispatcher.dispatch("script.compile");
+                                        feng3d.globalEmitter.emit("script.compile");
                                     });
                                 }
                             },
@@ -223,7 +223,7 @@ namespace editor
                                     var fileName = editorRS.getValidChildName(folder, "NewShader");
                                     this.createAsset(folderPath, feng3d.ShaderAsset, fileName, { textContent: assetFileTemplates.getNewShader(fileName) }, () =>
                                     {
-                                        feng3d.globalDispatcher.dispatch("script.compile");
+                                        feng3d.globalEmitter.emit("script.compile");
                                     });
                                 }
                             },
@@ -339,7 +339,7 @@ namespace editor
                         {
                             if (assetNode.asset instanceof feng3d.TextAsset)
                             {
-                                feng3d.globalDispatcher.dispatch("openScript", <feng3d.TextAsset>assetNode.asset);
+                                feng3d.globalEmitter.emit("openScript", <feng3d.TextAsset>assetNode.asset);
                             }
                         },
                     },
@@ -480,7 +480,7 @@ namespace editor
                         // 运行project.js
                         windowEval(content);
                         // 刷新属性界面（界面中可能有脚本）
-                        feng3d.globalDispatcher.dispatch("inspector.update");
+                        feng3d.globalEmitter.emit("inspector.update");
 
                     } catch (error)
                     {
@@ -523,10 +523,10 @@ namespace editor
         private showFloderChanged(property, oldValue, newValue)
         {
             this.showFloder.openParents();
-            feng3d.globalDispatcher.dispatch("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+            feng3d.globalEmitter.emit("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
         }
 
-        private onParsed(e: feng3d.Event<any>)
+        private onParsed(e: feng3d.IEvent<any>)
         {
             var data = e.data;
             if (data instanceof feng3d.FileAsset)

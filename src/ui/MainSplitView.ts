@@ -30,16 +30,16 @@ namespace editor
 
         private onAddedToStage()
         {
-            feng3d.globalDispatcher.on("viewLayout.changed", this._saveViewLayout, this);
-            feng3d.globalDispatcher.on("viewLayout.reset", this._resetLayout, this);
+            feng3d.globalEmitter.on("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.globalEmitter.on("viewLayout.reset", this._resetLayout, this);
 
             this._initViewLayout();
         }
 
         private onRemovedFromStage()
         {
-            feng3d.globalDispatcher.off("viewLayout.changed", this._saveViewLayout, this);
-            feng3d.globalDispatcher.off("viewLayout.reset", this._resetLayout, this);
+            feng3d.globalEmitter.off("viewLayout.changed", this._saveViewLayout, this);
+            feng3d.globalEmitter.off("viewLayout.reset", this._resetLayout, this);
         }
 
         private _initViewLayout()
@@ -62,7 +62,7 @@ namespace editor
             editorcache.viewLayout = data;
         }
 
-        private _resetLayout(event: feng3d.Event<Object>)
+        private _resetLayout(event: feng3d.IEvent<Object>)
         {
             editorcache.viewLayout = event.data || viewLayoutConfig.Default;
 

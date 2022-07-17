@@ -53,7 +53,7 @@ namespace editor
             super.dispose();
         }
 
-        private _onAddChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+        private _onAddChild(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
             var components = event.data.child.getComponentsInChildren();
             components.forEach(v =>
@@ -62,7 +62,7 @@ namespace editor
             });
         }
 
-        private _onRemoveChild(event: feng3d.Event<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+        private _onRemoveChild(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
         {
             var components = event.data.child.getComponentsInChildren();
             components.forEach(v =>
@@ -71,12 +71,12 @@ namespace editor
             });
         }
 
-        private _onAddComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+        private _onAddComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
         {
             this._addComponent(event.data.component);
         }
 
-        private _onRemoveComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+        private _onRemoveComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
         {
             this._removeComponent(event.data.component);
         }

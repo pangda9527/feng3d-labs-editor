@@ -120,7 +120,7 @@ namespace editor
 			feng3d.shortcut.on("fpsViewStop", this.onFpsViewStop, this);
 			feng3d.shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
 
-			feng3d.globalDispatcher.on("editor.addSceneToolView", this._onAddSceneToolView, this);
+			feng3d.globalEmitter.on("editor.addSceneToolView", this._onAddSceneToolView, this);
 
 			drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
 			{
@@ -169,7 +169,7 @@ namespace editor
 			feng3d.shortcut.off("fpsViewStop", this.onFpsViewStop, this);
 			feng3d.shortcut.off("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
 
-			feng3d.globalDispatcher.off("editor.addSceneToolView", this._onAddSceneToolView, this);
+			feng3d.globalEmitter.off("editor.addSceneToolView", this._onAddSceneToolView, this);
 
 			drag.unregister(this);
 
@@ -458,7 +458,7 @@ namespace editor
 			sceneControlConfig.lookDistance -= distance;
 		}
 
-		private _onAddSceneToolView(event: feng3d.Event<eui.Component>)
+		private _onAddSceneToolView(event: feng3d.IEvent<eui.Component>)
 		{
 			this.group.addChild(event.data);
 		}

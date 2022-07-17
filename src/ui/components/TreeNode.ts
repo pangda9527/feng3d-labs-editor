@@ -7,16 +7,7 @@ namespace editor
 		openChanged: TreeNode;
 	}
 
-	export interface TreeNode
-	{
-		once<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => void, thisObject?: any, priority?: number): void;
-		dispatch<K extends keyof TreeNodeMap>(type: K, data?: TreeNodeMap[K], bubbles?: boolean): feng3d.Event<TreeNodeMap[K]>;
-		has<K extends keyof TreeNodeMap>(type: K): boolean;
-		on<K extends keyof TreeNodeMap>(type: K, listener: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-		off<K extends keyof TreeNodeMap>(type?: K, listener?: (event: feng3d.Event<TreeNodeMap[K]>) => any, thisObject?: any): void;
-	}
-
-	export class TreeNode extends feng3d.EventDispatcher
+	export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventEmitter<T>
 	{
 		/**
 		 * 标签
@@ -105,7 +96,7 @@ namespace editor
 			if (this.children.indexOf(node) == -1) this.children.push(node);
 			node.parent = this;
 
-			this.dispatch("added", node, true);
+			this.emit("added", node, true);
 		}
 
 		remove()
@@ -114,7 +105,7 @@ namespace editor
 			{
 				var index = this.parent.children.indexOf(this);
 				if (index != -1) this.parent.children.splice(index, 1);
-				this.dispatch("removed", this, true);
+				this.emit("removed", this, true);
 				this.parent = null;
 			}
 		}
@@ -144,7 +135,7 @@ namespace editor
 
 		private openChanged()
 		{
-			this.dispatch("openChanged", null, true);
+			this.emit("openChanged", null, true);
 		}
 
 		private selectedChanged()

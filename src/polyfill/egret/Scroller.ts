@@ -23,12 +23,12 @@ namespace egret
         oldonTouchMove.call(this, event);
     }
 
-    function onMouseWheel(event: WheelEvent)
+    function onMouseWheel(event: feng3d.IEvent<WheelEvent>)
     {
         var scroller: eui.Scroller = this;
         if (scroller.hitTestPoint(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
         {
-            scroller.viewport.scrollV = Math.clamp(scroller.viewport.scrollV + event.deltaY * 0.3, 0, Math.max(0, scroller.viewport.contentHeight - scroller.height));
+            scroller.viewport.scrollV = Math.clamp(scroller.viewport.scrollV + event.data.deltaY * 0.3, 0, Math.max(0, scroller.viewport.contentHeight - scroller.height));
         }
     }
 

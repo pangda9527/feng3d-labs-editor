@@ -8,19 +8,10 @@ namespace editor
         loaded
     }
 
-    export interface AssetNode
-    {
-        once<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof AssetNodeEventMap>(type: K, data?: AssetNodeEventMap[K], bubbles?: boolean): feng3d.Event<AssetNodeEventMap[K]>;
-        has<K extends keyof AssetNodeEventMap>(type: K): boolean;
-        on<K extends keyof AssetNodeEventMap>(type: K, listener: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof AssetNodeEventMap>(type?: K, listener?: (event: feng3d.Event<AssetNodeEventMap[K]>) => any, thisObject?: any): void;
-    }
-
     /**
      * 资源树结点
      */
-    export class AssetNode extends TreeNode
+    export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends TreeNode<T>
     {
         /**
          * 是否文件夹
@@ -118,7 +109,7 @@ namespace editor
 
                 callback && callback();
 
-                this.dispatch("loaded", this);
+                this.emit("loaded", this);
             });
         }
 
@@ -292,7 +283,7 @@ namespace editor
                         this.addChild(v);
                     } else
                     {
-                        feng3d.globalDispatcher.dispatch("message.error", err.message);
+                        feng3d.globalEmitter.emit("message.error", err.message);
                     }
                 });
             });

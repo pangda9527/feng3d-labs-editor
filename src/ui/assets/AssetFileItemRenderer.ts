@@ -21,7 +21,7 @@ namespace editor
             this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
             this.selectedfilechanged();
         }
 
@@ -32,7 +32,7 @@ namespace editor
             this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
             this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+            feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         }
 
         dataChanged()

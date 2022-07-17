@@ -125,13 +125,13 @@ namespace editor
 			}
 		}
 
-		private onAddCompont(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+		private onAddCompont(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
 		{
 			if (event.data.component.gameObject == this.space)
 				this.addComponentView(event.data.component);
 		}
 
-		private onRemoveComponent(event: feng3d.Event<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+		private onRemoveComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
 		{
 			if (event.data.component.gameObject == this.space)
 				this.removedComponentView(event.data.component);

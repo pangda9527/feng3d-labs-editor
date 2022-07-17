@@ -77,7 +77,7 @@ namespace editor
         {
             if (this.saveParent) return;
             this.saveParent = this.parent;
-            feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onDataChange, this);
+            feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
             this.onDataChange();
         }
 
@@ -111,8 +111,8 @@ namespace editor
         }
     }
 
-    feng3d.globalDispatcher.once("editor.selectedObjectsChanged", () =>
+    feng3d.globalEmitter.once("editor.selectedObjectsChanged", () =>
     {
-        feng3d.globalDispatcher.dispatch("editor.addSceneToolView", new ParticleEffectController());
+        feng3d.globalEmitter.emit("editor.addSceneToolView", new ParticleEffectController());
     });
 }

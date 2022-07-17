@@ -147,7 +147,7 @@ namespace editor
 						let moduleView = v.tabView.removeModule(v.moduleName);
 						this.addModule(moduleView);
 					}
-					feng3d.globalDispatcher.dispatch("viewLayout.changed");
+					feng3d.globalEmitter.emit("viewLayout.changed");
 				});
 
 			});
@@ -172,7 +172,7 @@ namespace editor
 					{
 						this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
 					}
-					feng3d.globalDispatcher.dispatch("viewLayout.changed");
+					feng3d.globalEmitter.emit("viewLayout.changed");
 				});
 
 			});

@@ -60,7 +60,7 @@ namespace editor
 			this.updateView();
 		}
 
-		private onSaveShowData(event: feng3d.Event<() => void>)
+		private onSaveShowData(event: feng3d.IEvent<() => void>)
 		{
 			this.saveShowData(event.data);
 		}
@@ -157,10 +157,10 @@ namespace editor
 			this.backButton.visible = this._historySelectedObject.length > 1;
 
 			this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.globalDispatcher.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+			feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 			//
-			feng3d.globalDispatcher.on("inspector.update", this.updateView, this);
-			feng3d.globalDispatcher.on("inspector.saveShowData", this.onSaveShowData, this);
+			feng3d.globalEmitter.on("inspector.update", this.updateView, this);
+			feng3d.globalEmitter.on("inspector.saveShowData", this.onSaveShowData, this);
 
 			//
 			this.updateView();
@@ -169,10 +169,10 @@ namespace editor
 		private onRemovedFromStage()
 		{
 			this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-			feng3d.globalDispatcher.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+			feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 			//
-			feng3d.globalDispatcher.off("inspector.update", this.updateView, this);
-			feng3d.globalDispatcher.off("inspector.saveShowData", this.onSaveShowData, this);
+			feng3d.globalEmitter.off("inspector.update", this.updateView, this);
+			feng3d.globalEmitter.off("inspector.saveShowData", this.onSaveShowData, this);
 		}
 
 		private onSelectedObjectsChanged()

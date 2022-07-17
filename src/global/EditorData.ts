@@ -58,7 +58,7 @@ namespace editor
             this._transformGameObjectInvalid = true;
             this._transformBoxInvalid = true;
 
-            feng3d.globalDispatcher.dispatch("editor.selectedObjectsChanged");
+            feng3d.globalEmitter.emit("editor.selectedObjectsChanged");
         }
         private _selectedObjects = [];
 
@@ -127,7 +127,7 @@ namespace editor
         {
             if (this._toolType == v) return;
             this._toolType = v;
-            feng3d.globalDispatcher.dispatch("editor.toolTypeChanged");
+            feng3d.globalEmitter.emit("editor.toolTypeChanged");
         }
 
         private _toolType = MRSToolType.MOVE;
@@ -164,7 +164,7 @@ namespace editor
             if (this._isBaryCenter == v) return;
             this._isBaryCenter = v;
             this._transformBoxInvalid = true;
-            feng3d.globalDispatcher.dispatch("editor.isBaryCenterChanged");
+            feng3d.globalEmitter.emit("editor.isBaryCenterChanged");
         }
         private _isBaryCenter = true;
 
@@ -179,7 +179,7 @@ namespace editor
         {
             if (this._isWoldCoordinate == v) return;
             this._isWoldCoordinate = v;
-            feng3d.globalDispatcher.dispatch("editor.isWoldCoordinateChanged");
+            feng3d.globalEmitter.emit("editor.isWoldCoordinateChanged");
         }
         private _isWoldCoordinate = false;
 
