@@ -458,10 +458,10 @@ namespace editor
                     });
                 } else if (feng3d.regExps.audio.test(file.name))
                 {
-                    this.createAsset(showFloder, feng3d.AudioAsset, fileName, { arraybuffer: result }, createAssetCallback);
+                    this.createAsset(showFloder, feng3d.AudioAsset, fileName, { arraybuffer: <any>result }, createAssetCallback);
                 } else
                 {
-                    this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: result }, createAssetCallback);
+                    this.createAsset(showFloder, feng3d.ArrayBufferAsset, fileName, { arraybuffer: <any>result }, createAssetCallback);
                 }
             }, false);
             reader.readAsArrayBuffer(file);

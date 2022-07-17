@@ -15,7 +15,7 @@ namespace navigation
             var up = new feng3d.Vector3(0, 1, 0);
             var mincos = Math.cos(maxSlope * Math.DEG2RAD);
 
-            var keys = Map.getKeys(this.data.trianglemap);
+            var keys = feng3d.MapUtils.getKeys(this.data.trianglemap);
             keys.forEach(element =>
             {
                 var normal = this.data.trianglemap.get(element).getNormal();
@@ -243,8 +243,8 @@ namespace navigation
             var linemap = this.data.linemap;
             var trianglemap = this.data.trianglemap;
             //
-            var triangle0s = Map.getValues(trianglemap).map(createTriangle);
-            Map.getValues(pointmap).forEach(handlePoint);
+            var triangle0s = feng3d.MapUtils.getValues(trianglemap).map(createTriangle);
+            feng3d.MapUtils.getValues(pointmap).forEach(handlePoint);
 
             //
             function createTriangle(triangle: Triangle)
