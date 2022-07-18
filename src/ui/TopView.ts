@@ -121,7 +121,7 @@ namespace editor
 							if (editorRS.fs.type == feng3d.FSType.indexedDB)
 							{
 								if (runwin) runwin.close();
-								runwin = window.open(`run.html?fstype=${feng3d.fs.type}&project=${editorcache.projectname}`);
+								runwin = window.open(`run.html?fstype=${feng3d.FS.fs.type}&project=${editorcache.projectname}`);
 								return;
 							}
 							var path = editorRS.fs.getAbsolutePath("index.html");
