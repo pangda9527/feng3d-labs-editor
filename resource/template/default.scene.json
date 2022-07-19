@@ -46,10 +46,10 @@
 					"__class__": "feng3d.MeshRenderer"
 				},
 				{
-					"__class__": "CANNON.PlaneCollider"
+					"__class__": "feng3d.PlaneCollider"
 				},
 				{
-					"__class__": "CANNON.Rigidbody"
+					"__class__": "feng3d.Rigidbody"
 				}],
 			"__class__": "feng3d.GameObject"
 		},
@@ -69,11 +69,11 @@
 					"__class__": "feng3d.MeshRenderer"
 				},
 				{
-					"__class__": "CANNON.SphereCollider"
+					"__class__": "feng3d.SphereCollider"
 				},
 				{
 					"mass": 1,
-					"__class__": "CANNON.Rigidbody"
+					"__class__": "feng3d.Rigidbody"
 				}],
 			"__class__": "feng3d.GameObject"
 		}],
@@ -95,7 +95,7 @@
 			"__class__": "feng3d.Scene"
 		},
 		{
-			"__class__": "CANNON.PhysicsWorld"
+			"__class__": "feng3d.PhysicsWorld"
 		}],
 	"__class__": "feng3d.GameObject"
 }
