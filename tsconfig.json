@@ -11,6 +11,9 @@
             "ES2015",
             "dom"
         ],
+        "types": [
+            "feng3d"
+        ],
         "outFile": "dist/index.js"
         // "outDir": "debug"
     },
@@ -23,8 +26,6 @@
         },
     ],
     "files": [
-        //
-        "../feng3d/dist/index.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",

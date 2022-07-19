@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/feng3d/editor.git"
+    "url": "https://gitlab.com/feng3d/editor.git"
   },
   "keywords": [
     "editor",
@@ -32,6 +32,9 @@
   ],
   "author": "feng",
   "license": "ISC",
+  "dependencies": {
+    "feng3d": "0.1.3"
+  },
   "devDependencies": {
     "typescript": "^4.7.4"
   }
