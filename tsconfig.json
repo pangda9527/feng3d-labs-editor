@@ -11,13 +11,10 @@
             "ES2015",
             "dom"
         ],
-        "outFile": "out/editor.js"
+        "outFile": "dist/index.js"
         // "outDir": "debug"
     },
     "references": [
-        {
-            "path": "../feng3d"
-        },
         {
             "path": "../cannon",
         },
@@ -26,6 +23,8 @@
         },
     ],
     "files": [
+        //
+        "../feng3d/dist/index.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",

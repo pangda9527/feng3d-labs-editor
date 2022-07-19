@@ -49,7 +49,7 @@ namespace editor
          */
         addGameObject(gameobject: feng3d.GameObject)
         {
-            if (gameobject.getComponent(feng2d.Transform2D))
+            if (gameobject.getComponent(feng3d.Transform2D))
             {
                 this.addUI(gameobject);
                 return;
@@ -71,16 +71,16 @@ namespace editor
         addUI(gameobject: feng3d.GameObject)
         {
             var selectedNode = this.getSelectedNode();
-            if (selectedNode && selectedNode.gameobject.getComponent(feng2d.Transform2D))
+            if (selectedNode && selectedNode.gameobject.getComponent(feng3d.Transform2D))
             {
                 selectedNode.gameobject.addChild(gameobject);
             }
             else
             {
-                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng2d.Canvas)[0];
+                var canvas = this.rootnode.gameobject.getComponentsInChildren(feng3d.Canvas)[0];
                 if (!canvas)
                 {
-                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng2d.Canvas);
+                    canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng3d.Canvas);
                     this.rootnode.gameobject.addChild(canvas.gameObject);
                 }
                 canvas.gameObject.addChild(gameobject);
