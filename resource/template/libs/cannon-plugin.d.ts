@@ -1,21 +1,20 @@
-declare namespace CANNON {
+declare namespace feng3d {
 }
 declare namespace feng3d {
     interface ComponentMap {
-        Rigidbody: CANNON.Rigidbody;
+        Rigidbody: Rigidbody;
     }
-}
-declare namespace CANNON {
     /**
      * 刚体
      */
     class Rigidbody extends feng3d.Behaviour {
         __class__: "physics.Rigidbody";
-        body: Body;
-        runEnvironment: feng3d.RunEnvironment;
+        body: CANNON.Body<CANNON.BodyEventMap>;
+        runEnvironment: RunEnvironment;
         get mass(): number;
         set mass(v: number);
         init(): void;
+        private _onTransformChanged;
         /**
          * 每帧执行
          */
@@ -24,24 +23,23 @@ declare namespace CANNON {
 }
 declare namespace feng3d {
     interface ComponentMap {
-        Collider: CANNON.Collider;
+        Collider: Collider;
     }
-}
-declare namespace CANNON {
     /**
      * 碰撞体
      */
     class Collider extends feng3d.Component {
-        get shape(): Shape;
-        protected _shape: Shape;
+        get shape(): CANNON.Shape;
+        protected _shape: CANNON.Shape;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        BoxCollider: CANNON.BoxCollider;
+        BoxCollider: BoxCollider;
     }
-}
-declare namespace CANNON {
+    interface BoxCollider {
+        get shape(): CANNON.Box;
+    }
     /**
      * 长方体碰撞体
      */
@@ -58,17 +56,17 @@ declare namespace CANNON {
          * 深度
          */
         depth: number;
-        readonly shape: Box;
-        protected _shape: Box;
+        protected _shape: CANNON.Box;
         init(): void;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        SphereCollider: CANNON.SphereCollider;
+        SphereCollider: SphereCollider;
     }
-}
-declare namespace CANNON {
+    interface SphereCollider {
+        get shape(): CANNON.Sphere;
+    }
     /**
      * 球形碰撞体
      */
@@ -79,17 +77,16 @@ declare namespace CANNON {
         get radius(): number;
         set radius(v: number);
         private _radius;
-        readonly shape: Sphere;
-        protected _shape: Sphere;
         init(): void;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        CylinderCollider: CANNON.CylinderCollider;
+        CylinderCollider: CylinderCollider;
     }
-}
-declare namespace CANNON {
+    interface CylinderCollider {
+        get shape(): CANNON.Cylinder;
+    }
     /**
      * 圆柱体碰撞体
      */
@@ -110,17 +107,16 @@ declare namespace CANNON {
          * 横向分割数
          */
         segmentsW: number;
-        readonly shape: Cylinder;
-        protected _shape: Cylinder;
         init(): void;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        CapsuleCollider: CANNON.CapsuleCollider;
+        CapsuleCollider: CapsuleCollider;
     }
-}
-declare namespace CANNON {
+    interface CapsuleCollider {
+        get shape(): CANNON.Trimesh;
+    }
     /**
      * 胶囊体碰撞体
      */
@@ -155,46 +151,41 @@ declare namespace CANNON {
         get yUp(): boolean;
         set yUp(v: boolean);
         private _yUp;
-        readonly shape: Trimesh;
-        protected _shape: Trimesh;
         init(): void;
         private invalidateGeometry;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        PlaneCollider: CANNON.PlaneCollider;
+        PlaneCollider: PlaneCollider;
     }
-}
-declare namespace CANNON {
+    interface PlaneCollider {
+        get shape(): CANNON.Plane;
+    }
     /**
      * 平面碰撞体
      */
     class PlaneCollider extends Collider {
-        readonly shape: Plane;
-        protected _shape: Plane;
         init(): void;
     }
 }
 declare namespace feng3d {
     interface ComponentMap {
-        PhysicsWorld: CANNON.PhysicsWorld;
+        PhysicsWorld: PhysicsWorld;
     }
-}
-declare namespace CANNON {
     /**
      * 物理世界组件
      */
     class PhysicsWorld extends feng3d.Behaviour {
-        runEnvironment: feng3d.RunEnvironment;
+        runEnvironment: RunEnvironment;
         /**
          * 物理世界
          */
-        world: World;
+        world: CANNON.World<CANNON.WorldEventMap>;
         /**
          * 重力加速度
          */
-        gravity: feng3d.Vector3;
+        gravity: Vector3;
         init(): void;
         private _isInit;
         private initWorld;
@@ -207,14 +198,12 @@ declare namespace CANNON {
 }
 declare namespace feng3d {
     interface ComponentMap {
-        Cloth: CANNON.Cloth;
+        Cloth: Cloth;
     }
-}
-declare namespace CANNON {
     class Cloth extends feng3d.Renderable {
-        runEnvironment: feng3d.RunEnvironment;
-        particles: Body[][];
-        constraints: DistanceConstraint[];
+        runEnvironment: RunEnvironment;
+        particles: CANNON.Body[][];
+        constraints: CANNON.DistanceConstraint[];
         init(): void;
         update(): void;
     }
@@ -228,4 +217,4 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
 }
-//# sourceMappingURL=cannon-plugin.d.ts.map
+//# sourceMappingURL=index.d.ts.map

@@ -2,10 +2,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -17,12 +19,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var CANNON;
-(function (CANNON) {
-    CANNON.World.worldNormal = new CANNON.Vector3(0, 1, 0);
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+var feng3d;
+(function (feng3d) {
+    CANNON.World.worldNormal = new feng3d.Vector3(0, 1, 0);
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 刚体
      */
@@ -47,17 +49,21 @@ var CANNON;
         Rigidbody.prototype.init = function () {
             var _this = this;
             this.body = new CANNON.Body({ mass: this.mass });
-            this.body.position = new CANNON.Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
-            var colliders = this.gameObject.getComponents("Collider");
+            this.body.position = new feng3d.Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
+            var colliders = this.gameObject.getComponents(feng3d.Collider);
             colliders.forEach(function (element) {
                 _this.body.addShape(element.shape);
             });
+            this.on("transformChanged", this._onTransformChanged, this);
+        };
+        Rigidbody.prototype._onTransformChanged = function () {
+            this.body.position = new feng3d.Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z);
         };
         /**
          * 每帧执行
          */
         Rigidbody.prototype.update = function (interval) {
-            var scene = this.getComponentsInParents("Scene")[0];
+            var scene = this.getComponentsInParent(feng3d.Scene)[0];
             if (scene) {
                 this.transform.position = new feng3d.Vector3(this.body.position.x, this.body.position.y, this.body.position.z);
             }
@@ -72,10 +78,10 @@ var CANNON;
         ], Rigidbody);
         return Rigidbody;
     }(feng3d.Behaviour));
-    CANNON.Rigidbody = Rigidbody;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    feng3d.Rigidbody = Rigidbody;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 碰撞体
      */
@@ -96,10 +102,10 @@ var CANNON;
         ], Collider);
         return Collider;
     }(feng3d.Component));
-    CANNON.Collider = Collider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    feng3d.Collider = Collider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 长方体碰撞体
      */
@@ -122,7 +128,7 @@ var CANNON;
             return _this;
         }
         BoxCollider.prototype.init = function () {
-            var halfExtents = new CANNON.Vector3(this.width / 2, this.height / 2, this.depth / 2);
+            var halfExtents = new feng3d.Vector3(this.width / 2, this.height / 2, this.depth / 2);
             this._shape = new CANNON.Box(halfExtents);
         };
         __decorate([
@@ -142,11 +148,11 @@ var CANNON;
             feng3d.RegisterComponent()
         ], BoxCollider);
         return BoxCollider;
-    }(CANNON.Collider));
-    CANNON.BoxCollider = BoxCollider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    }(feng3d.Collider));
+    feng3d.BoxCollider = BoxCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 球形碰撞体
      */
@@ -184,11 +190,11 @@ var CANNON;
             feng3d.RegisterComponent()
         ], SphereCollider);
         return SphereCollider;
-    }(CANNON.Collider));
-    CANNON.SphereCollider = SphereCollider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    }(feng3d.Collider));
+    feng3d.SphereCollider = SphereCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 圆柱体碰撞体
      */
@@ -238,11 +244,11 @@ var CANNON;
             feng3d.RegisterComponent()
         ], CylinderCollider);
         return CylinderCollider;
-    }(CANNON.Collider));
-    CANNON.CylinderCollider = CylinderCollider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    }(feng3d.Collider));
+    feng3d.CylinderCollider = CylinderCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 胶囊体碰撞体
      */
@@ -374,11 +380,11 @@ var CANNON;
             feng3d.RegisterComponent()
         ], CapsuleCollider);
         return CapsuleCollider;
-    }(CANNON.Collider));
-    CANNON.CapsuleCollider = CapsuleCollider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    }(feng3d.Collider));
+    feng3d.CapsuleCollider = CapsuleCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 平面碰撞体
      */
@@ -395,11 +401,11 @@ var CANNON;
             feng3d.RegisterComponent()
         ], PlaneCollider);
         return PlaneCollider;
-    }(CANNON.Collider));
-    CANNON.PlaneCollider = PlaneCollider;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    }(feng3d.Collider));
+    feng3d.PlaneCollider = PlaneCollider;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     /**
      * 物理世界组件
      */
@@ -427,7 +433,7 @@ var CANNON;
             if (this._isInit)
                 return true;
             this._isInit = true;
-            var bodys = this.getComponentsInChildren("Rigidbody").map(function (c) { return c.body; });
+            var bodys = this.getComponentsInChildren(feng3d.Rigidbody).map(function (c) { return c.body; });
             bodys.forEach(function (v) {
                 _this.world.addBody(v);
             });
@@ -438,30 +444,30 @@ var CANNON;
             this.on("removeComponent", this.onRemovedComponent, this);
         };
         PhysicsWorld.prototype.onAddComponent = function (e) {
-            if (e.data.component instanceof CANNON.Rigidbody) {
+            if (e.data.component instanceof feng3d.Rigidbody) {
                 this.world.addBody(e.data.component.body);
             }
         };
         PhysicsWorld.prototype.onRemovedComponent = function (e) {
-            if (e.data.component instanceof CANNON.Rigidbody) {
+            if (e.data.component instanceof feng3d.Rigidbody) {
                 this.world.removeBody(e.data.component.body);
             }
         };
         PhysicsWorld.prototype.onAddChild = function (e) {
-            var bodyComponent = e.data.child.getComponent("Rigidbody");
+            var bodyComponent = e.data.child.getComponent(feng3d.Rigidbody);
             if (bodyComponent) {
                 this.world.addBody(bodyComponent.body);
             }
         };
         PhysicsWorld.prototype.onRemoveChild = function (e) {
-            var bodyComponent = e.data.child.getComponent("Rigidbody");
+            var bodyComponent = e.data.child.getComponent(feng3d.Rigidbody);
             if (bodyComponent) {
                 this.world.removeBody(bodyComponent.body);
             }
         };
         PhysicsWorld.prototype.update = function (interval) {
             this.initWorld();
-            this.world.gravity = new CANNON.Vector3(this.gravity.x, this.gravity.y, this.gravity.z);
+            this.world.gravity = new feng3d.Vector3(this.gravity.x, this.gravity.y, this.gravity.z);
             this.world.step(1.0 / 60.0, interval / 1000, 3);
         };
         __decorate([
@@ -474,10 +480,10 @@ var CANNON;
         ], PhysicsWorld);
         return PhysicsWorld;
     }(feng3d.Behaviour));
-    CANNON.PhysicsWorld = PhysicsWorld;
-})(CANNON || (CANNON = {}));
-var CANNON;
-(function (CANNON) {
+    feng3d.PhysicsWorld = PhysicsWorld;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
     var Cloth = /** @class */ (function (_super) {
         __extends(Cloth, _super);
         function Cloth() {
@@ -537,7 +543,7 @@ var CANNON;
         };
         Cloth.prototype.update = function () {
             _super.prototype.update.call(this);
-            var physicsWorld = this.getComponentsInParents("PhysicsWorld")[0];
+            var physicsWorld = this.getComponentsInParent(feng3d.PhysicsWorld)[0];
             var world = physicsWorld.world;
             this.particles.forEach(function (p) {
                 p.forEach(function (v) {
@@ -553,8 +559,8 @@ var CANNON;
         ], Cloth);
         return Cloth;
     }(feng3d.Renderable));
-    CANNON.Cloth = Cloth;
-})(CANNON || (CANNON = {}));
+    feng3d.Cloth = Cloth;
+})(feng3d || (feng3d = {}));
 var feng3d;
 (function (feng3d) {
     feng3d.classUtils.addClassNameSpace("CANNON");
@@ -563,27 +569,27 @@ var feng3d;
 (function (feng3d) {
     feng3d.functionwrap.extendFunction(feng3d.GameObject, "createPrimitive", function (g, type) {
         if (type == "Cube") {
-            g.addComponent("BoxCollider");
-            g.addComponent("Rigidbody");
+            g.addComponent(feng3d.BoxCollider);
+            g.addComponent(feng3d.Rigidbody);
         }
         else if (type == "Plane") {
-            g.addComponent("PlaneCollider");
-            g.addComponent("Rigidbody");
+            g.addComponent(feng3d.PlaneCollider);
+            g.addComponent(feng3d.Rigidbody);
         }
         else if (type == "Cylinder") {
-            g.addComponent("CylinderCollider");
-            g.addComponent("Rigidbody");
+            g.addComponent(feng3d.CylinderCollider);
+            g.addComponent(feng3d.Rigidbody);
         }
         else if (type == "Sphere") {
-            g.addComponent("SphereCollider");
-            g.addComponent("Rigidbody");
+            g.addComponent(feng3d.SphereCollider);
+            g.addComponent(feng3d.Rigidbody);
         }
         else if (type == "Capsule") {
-            g.addComponent("CapsuleCollider");
-            g.addComponent("Rigidbody");
+            g.addComponent(feng3d.CapsuleCollider);
+            g.addComponent(feng3d.Rigidbody);
         }
         else if (type == "Cloth") {
-            g.addComponent("Cloth");
+            g.addComponent(feng3d.Cloth);
         }
         return g;
     });
@@ -592,8 +598,8 @@ var feng3d;
 (function (feng3d) {
     // 默认在 Scene.init 添加物理世界模块
     feng3d.functionwrap.extendFunction(feng3d.View, "createNewScene", function (r) {
-        r.gameObject.addComponent("PhysicsWorld");
+        r.gameObject.addComponent(feng3d.PhysicsWorld);
         return r;
     });
 })(feng3d || (feng3d = {}));
-//# sourceMappingURL=cannon-plugin.js.map
+//# sourceMappingURL=index.js.map

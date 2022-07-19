@@ -1242,7 +1242,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array to store resulting bodies in.
          */
-        aabbQuery(world: World, aabb: Box3, result: Body[]): Body[];
+        aabbQuery(world: World, aabb: Box3, result: Body[]): Body<BodyEventMap>[];
     }
 }
 declare namespace CANNON {
@@ -1268,9 +1268,9 @@ declare namespace CANNON {
          * @param world
          */
         setWorld(world: World): void;
-        static insertionSortX(a: Body[]): Body[];
-        static insertionSortY(a: Body[]): Body[];
-        static insertionSortZ(a: Body[]): Body[];
+        static insertionSortX(a: Body[]): Body<BodyEventMap>[];
+        static insertionSortY(a: Body[]): Body<BodyEventMap>[];
+        static insertionSortZ(a: Body[]): Body<BodyEventMap>[];
         /**
          * Collect all collision pairs
          * @param world
@@ -1297,7 +1297,7 @@ declare namespace CANNON {
          * @param aabb
          * @param result An array to store resulting bodies in.
          */
-        aabbQuery(world: World, aabb: Box3, result: Body[]): Body[];
+        aabbQuery(world: World, aabb: Box3, result: Body[]): Body<BodyEventMap>[];
     }
 }
 declare namespace CANNON {
@@ -1505,14 +1505,7 @@ declare namespace CANNON {
             contact: ContactEquation;
         };
     }
-    interface Body {
-        once<K extends keyof BodyEventMap>(type: K, listener: (event: feng3d.Event<BodyEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof BodyEventMap>(type: K, data?: BodyEventMap[K], bubbles?: boolean): feng3d.Event<BodyEventMap[K]>;
-        has<K extends keyof BodyEventMap>(type: K): boolean;
-        on<K extends keyof BodyEventMap>(type: K, listener: (event: feng3d.Event<BodyEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof BodyEventMap>(type?: K, listener?: (event: feng3d.Event<BodyEventMap[K]>) => any, thisObject?: any): void;
-    }
-    class Body extends feng3d.EventDispatcher {
+    class Body<T extends BodyEventMap = BodyEventMap> extends feng3d.EventEmitter<T> {
         id: number;
         /**
          * Reference to the world the body is living in
@@ -2510,14 +2503,7 @@ declare namespace CANNON {
             shapeB: Shape;
         };
     }
-    interface World {
-        once<K extends keyof WorldEventMap>(type: K, listener: (event: feng3d.Event<WorldEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof WorldEventMap>(type: K, data?: WorldEventMap[K], bubbles?: boolean): feng3d.Event<WorldEventMap[K]>;
-        has<K extends keyof WorldEventMap>(type: K): boolean;
-        on<K extends keyof WorldEventMap>(type: K, listener: (event: feng3d.Event<WorldEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof WorldEventMap>(type?: K, listener?: (event: feng3d.Event<WorldEventMap[K]>) => any, thisObject?: any): void;
-    }
-    class World extends feng3d.EventDispatcher {
+    class World<T extends WorldEventMap = WorldEventMap> extends feng3d.EventEmitter<T> {
         static worldNormal: feng3d.Vector3;
         /**
          * Currently / last used timestep. Is set to -1 if not available. This value is updated before each internal step, which means that it is "fresh" inside event callbacks.
@@ -2705,13 +2691,13 @@ declare namespace CANNON {
             to?: Vector3;
             callback?: Function;
             result?: RaycastResult;
-        }, result: RaycastResult): boolean;
+        }, result: RaycastResult): any;
         /**
          * Remove a rigid body from the simulation.
          * @param body
          */
         removeBody(body: Body): void;
-        getBodyById(id: number): Body;
+        getBodyById(id: number): Body<BodyEventMap>;
         getShapeById(id: number): Shape;
         /**
          * Adds a material to the World.
@@ -2836,4 +2822,4 @@ declare namespace CANNON {
         sphereHeightfield(sphereShape: Sphere, hfShape: Heightfield, spherePos: Vector3, hfPos: Vector3, sphereQuat: Quaternion, hfQuat: Quaternion, sphereBody: Body, hfBody: Body, rsi?: Shape, rsj?: Shape, justTest?: boolean): boolean;
     }
 }
-//# sourceMappingURL=cannon.d.ts.map
+//# sourceMappingURL=index.d.ts.map

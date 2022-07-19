@@ -2,10 +2,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1414,7 +1416,7 @@ var CANNON;
                 [5, 4, 0, 1],
                 [2, 3, 7, 6],
                 [0, 4, 7, 3],
-                [1, 2, 6, 5],
+                [1, 2, 6, 5], // +x
             ];
             var axes = [
                 new V(0, 0, 1),
@@ -1574,7 +1576,6 @@ var CANNON;
          * @author schteppe / https://github.com/schteppe
          */
         function Cylinder(radiusTop, radiusBottom, height, numSegments) {
-            var _this = this;
             var N = numSegments, verts = [], axes = [], faces = [], bottomface = [], topface = [], cos = Math.cos, sin = Math.sin;
             // First bottom point
             verts.push(new CANNON.Vector3(radiusBottom * cos(0), radiusBottom * sin(0), -height * 0.5));
@@ -1611,8 +1612,7 @@ var CANNON;
                 temp.push(bottomface[bottomface.length - i - 1]);
             }
             faces.push(temp);
-            _this = _super.call(this, verts, faces, axes) || this;
-            return _this;
+            return _super.call(this, verts, faces, axes) || this;
         }
         return Cylinder;
     }(CANNON.ConvexPolyhedron));
@@ -4370,7 +4370,7 @@ var CANNON;
             this.sleepState = 0;
             this._wakeUpAfterNarrowphase = false;
             if (s === Body.SLEEPING) {
-                this.dispatch("wakeup");
+                this.emit("wakeup");
             }
         };
         /**
@@ -4393,14 +4393,14 @@ var CANNON;
                 if (sleepState === Body.AWAKE && speedSquared < speedLimitSquared) {
                     this.sleepState = Body.SLEEPY; // Sleepy
                     this.timeLastSleepy = time;
-                    this.dispatch("sleepy");
+                    this.emit("sleepy");
                 }
                 else if (sleepState === Body.SLEEPY && speedSquared > speedLimitSquared) {
                     this.wakeUp(); // Wake up
                 }
                 else if (sleepState === Body.SLEEPY && (time - this.timeLastSleepy) > this.sleepTimeLimit) {
                     this.sleep(); // Sleeping
-                    this.dispatch("sleep");
+                    this.emit("sleep");
                 }
             }
         };
@@ -4722,7 +4722,7 @@ var CANNON;
         Body.SLEEPING = 2;
         Body.idCounter = 0;
         return Body;
-    }(feng3d.EventDispatcher));
+    }(feng3d.EventEmitter));
     CANNON.Body = Body;
     var tmpVec = new CANNON.Vector3();
     var tmpQuat = new CANNON.Quaternion();
@@ -6479,7 +6479,7 @@ var CANNON;
                     }
                     if (hasBeginContact) {
                         for (var i = 0, l = additions.length; i < l; i += 2) {
-                            _this.dispatch("beginContact", {
+                            _this.emit("beginContact", {
                                 bodyA: _this.getBodyById(additions[i]),
                                 bodyB: _this.getBodyById(additions[i + 1])
                             });
@@ -6487,7 +6487,7 @@ var CANNON;
                     }
                     if (hasEndContact) {
                         for (var i = 0, l = removals.length; i < l; i += 2) {
-                            _this.dispatch("endContact", {
+                            _this.emit("endContact", {
                                 bodyA: _this.getBodyById(removals[i]),
                                 bodyB: _this.getBodyById(removals[i + 1])
                             });
@@ -6503,14 +6503,14 @@ var CANNON;
                         for (var i = 0, l = additions.length; i < l; i += 2) {
                             var shapeA = _this.getShapeById(additions[i]);
                             var shapeB = _this.getShapeById(additions[i + 1]);
-                            _this.dispatch("beginShapeContact", { shapeA: shapeA, shapeB: shapeB, bodyA: shapeA.body, bodyB: shapeB.body });
+                            _this.emit("beginShapeContact", { shapeA: shapeA, shapeB: shapeB, bodyA: shapeA.body, bodyB: shapeB.body });
                         }
                     }
                     if (hasEndShapeContact) {
                         for (var i = 0, l = removals.length; i < l; i += 2) {
                             var shapeA = _this.getShapeById(removals[i]);
                             var shapeB = _this.getShapeById(removals[i + 1]);
-                            _this.dispatch("endShapeContact", { shapeA: shapeA, shapeB: shapeB, bodyA: shapeA.body, bodyB: shapeB.body });
+                            _this.emit("endShapeContact", { shapeA: shapeA, shapeB: shapeB, bodyA: shapeA.body, bodyB: shapeB.body });
                         }
                     }
                 };
@@ -6605,7 +6605,7 @@ var CANNON;
                 body.initQuaternion.copy(body.quaternion);
             }
             this.idToBodyMap[body.id] = body;
-            this.dispatch("addBody", body);
+            this.emit("addBody", body);
         };
         /**
          * Add a constraint to the simulation.
@@ -6688,7 +6688,7 @@ var CANNON;
                     bodies[i].index = i;
                 }
                 delete this.idToBodyMap[body.id];
-                this.dispatch("removeBody", body);
+                this.emit("removeBody", body);
             }
         };
         World.prototype.getBodyById = function (id) {
@@ -6931,8 +6931,8 @@ var CANNON;
                 if (!this.collisionMatrixPrevious[bi_2.index + "_" + bj.index]) {
                     // First contact!
                     // We reuse the collideEvent object, otherwise we will end up creating new objects for each new contact, even if there's no event listener attached.
-                    bi_2.dispatch("collide", { body: bj, contact: c_1 });
-                    bj.dispatch("collide", { body: bi_2, contact: c_1 });
+                    bi_2.emit("collide", { body: bj, contact: c_1 });
+                    bj.emit("collide", { body: bi_2, contact: c_1 });
                 }
                 this.bodyOverlapKeeper.set(bi_2.id, bj.id);
                 this.shapeOverlapKeeper.set(si.id, sj.id);
@@ -6982,7 +6982,7 @@ var CANNON;
                     }
                 }
             }
-            this.dispatch("preStep");
+            this.emit("preStep");
             // Leap frog
             // vnew = v + h*f/m
             // xnew = x + h*vnew
@@ -7003,7 +7003,7 @@ var CANNON;
             // Update world time
             this.time += dt;
             this.stepnumber += 1;
-            this.dispatch("postStep");
+            this.emit("postStep");
             // Sleeping update
             if (this.allowSleep) {
                 for (i = 0; i !== N; i++) {
@@ -7026,7 +7026,7 @@ var CANNON;
         };
         World.worldNormal = new CANNON.Vector3(0, 0, 1);
         return World;
-    }(feng3d.EventDispatcher));
+    }(feng3d.EventEmitter));
     CANNON.World = World;
     // Temp stuff
     var tmpAABB1 = new CANNON.Box3();
@@ -8407,4 +8407,4 @@ var CANNON;
     Narrowphase.prototype[CANNON.Shape.types.SPHERE | CANNON.Shape.types.HEIGHTFIELD] = Narrowphase.prototype.sphereHeightfield;
     Narrowphase.prototype[CANNON.Shape.types.CONVEXPOLYHEDRON | CANNON.Shape.types.HEIGHTFIELD] = Narrowphase.prototype.convexHeightfield;
 })(CANNON || (CANNON = {}));
-//# sourceMappingURL=cannon.js.map
+//# sourceMappingURL=index.js.map

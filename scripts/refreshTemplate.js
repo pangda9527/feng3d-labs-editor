@@ -4,17 +4,14 @@ const fs = require('fs-extra')
 
 var copyFiles = [
     // feng3d
-    ['../feng3d/out/feng3d.js', 'resource/template/libs/feng3d.js'],
-    ['../feng3d/out/feng3d.d.ts', 'resource/template/libs/feng3d.d.ts'],
+    ['../feng3d/dist/index.js', 'resource/template/libs/feng3d.js'],
+    ['../feng3d/dist/index.d.ts', 'resource/template/libs/feng3d.d.ts'],
 
-    ['../feng2d/out/feng2d.js', 'resource/template/libs/feng2d.js'],
-    ['../feng2d/out/feng2d.d.ts', 'resource/template/libs/feng2d.d.ts'],
+    ['../cannon/dist/index.js', 'resource/template/libs/cannon.js'],
+    ['../cannon/dist/index.d.ts', 'resource/template/libs/cannon.d.ts'],
 
-    ['../cannon/out/cannon.js', 'resource/template/libs/cannon.js'],
-    ['../cannon/out/cannon.d.ts', 'resource/template/libs/cannon.d.ts'],
-
-    ['../cannon-plugin/out/cannon-plugin.js', 'resource/template/libs/cannon-plugin.js'],
-    ['../cannon-plugin/out/cannon-plugin.d.ts', 'resource/template/libs/cannon-plugin.d.ts'],
+    ['../cannon-plugin/dist/index.js', 'resource/template/libs/cannon-plugin.js'],
+    ['../cannon-plugin/dist/index.d.ts', 'resource/template/libs/cannon-plugin.d.ts'],
 ];
 
 try

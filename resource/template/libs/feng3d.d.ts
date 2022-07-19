@@ -1,24 +1,21 @@
 declare namespace feng3d {
     /**
-     * 事件
+     * 任意事件发射器。
+     *
+     * 可以为任何对象甚至基础类型发射事件。
+     *
+     * 可针对（除undefined、null、Symbol外）的任意对象（0, 1, true, false, "1", {}）发射事件
      */
-    export var event: FEvent;
-    /**
-     * 用于适配不同对象对于的事件
-     */
-    export interface ObjectEventDispatcher<O, T> {
-        once<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(target: O, type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(target: O, type: K): boolean;
-        on<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(target: O, type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
-    /**
-     * 事件
-     */
-    export class FEvent {
-        private feventMap;
-        private getBubbleTargets;
+    class AnyEmitter<O = any, T = any> {
+        /**
+         * Return an array listing the events for which the emitter has registered
+         * listeners.
+         */
+        eventNames(obj: O): string[];
+        /**
+         * Return the number of listeners listening to a given event.
+         */
+        listenerCount<K extends keyof T & string>(obj: O, type: K): number;
         /**
          * 监听一次事件后将会被移除
          * @param type						事件的类型。
@@ -26,23 +23,26 @@ declare namespace feng3d {
          * @param thisObject                listener函数作用域
          * @param priority					事件监听器的优先级。数字越大，优先级越高。默认为0。
          */
-        once(obj: Object, type: string, listener: (event: Event<any>) => void, thisObject?: any, priority?: number): void;
+        once<K extends keyof T & string>(obj: O, type: K, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number): this;
         /**
-         * 派发事件
+         * 发射事件
          *
          * 当事件重复流向一个对象时将不会被处理。
          *
-         * @param e                 事件对象。
+         * @param event                 事件对象。
          * @returns                 返回事件是否被该对象处理。
          */
-        dispatchEvent(obj: Object, e: Event<any>): boolean;
+        emitEvent<K extends keyof T & string>(obj: O, event: IEvent<T[K]>): IEvent<T[K]>;
         /**
-         * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
-         * @param type                      事件的类型。类型区分大小写。
-         * @param data                      事件携带的自定义数据。
-         * @param bubbles                   表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
+         * 将事件调度到事件流中. 事件目标是对其调用 emitEvent() 方法的 IEvent 对象。
+         *
+         * @param type 事件的类型。类型区分大小写。
+         * @param data 事件携带的自定义数据。
+         * @param bubbles 是否向上级报告事件。默认为`false`。
+         * @param broadcast 是否向下级广播事件。默认为`false`。
+         * @param share 是否向平级分享事件。默认为`true`。
          */
-        dispatch(obj: Object, type: string, data?: any, bubbles?: boolean): Event<any>;
+        emit<K extends keyof T & string>(obj: O, type: K, data?: T[K], bubbles?: boolean, broadcast?: boolean, share?: boolean): IEvent<T[K]>;
         /**
          * 检查 被监听对象 是否为特定事件类型注册了任何监听器.
          *
@@ -50,7 +50,7 @@ declare namespace feng3d {
          * @param type		                事件的类型。
          * @return 			                如果指定类型的监听器已注册，则值为 true；否则，值为 false。
          */
-        has(obj: Object, type: string): boolean;
+        has<K extends keyof T & string>(obj: O, type: K): boolean;
         /**
          * 为监听对象新增指定类型的事件监听。
          *
@@ -61,7 +61,7 @@ declare namespace feng3d {
          * @param priority					事件监听器的优先级。数字越大，优先级越高。默认为0。
          * @param once                      值为true时在监听一次事件后该监听器将被移除。默认为false。
          */
-        on(obj: Object, type: string, listener: (event: Event<any>) => any, thisObject?: any, priority?: number, once?: boolean): void;
+        on<K extends keyof T & string>(obj: O, type: K, listener: (event: IEvent<T[K]>) => any, thisObject?: any, priority?: number, once?: boolean): this;
         /**
          * 移除监听
          *
@@ -70,7 +70,11 @@ declare namespace feng3d {
          * @param listener					要删除的监听器对象。可选。该值为空时所有指定类型的监听均将被移除。
          * @param thisObject                监听器的上下文。可选。
          */
-        off(obj: Object, type?: string, listener?: (event: Event<any>) => any, thisObject?: any): void;
+        off<K extends keyof T & string>(obj: O, type?: K, listener?: (event: IEvent<T[K]>) => any, thisObject?: any): this;
+        /**
+         * Remove all listeners, or those of the specified event.
+         */
+        offAll<K extends keyof T & string>(obj: O, type?: K): this;
         /**
          * 监听对象的任意事件，该对象的任意事件都将触发该监听器的调用。
          *
@@ -78,8 +82,9 @@ declare namespace feng3d {
          * @param listener                  处理事件的监听器函数。
          * @param thisObject                监听器的上下文。可选。
          * @param priority                  事件监听器的优先级。数字越大，优先级越高。默认为0。
+         * @param once                      值为true时在监听一次事件后该监听器将被移除。默认为false。
          */
-        onAny(obj: Object, listener: (event: Event<any>) => void, thisObject?: any, priority?: number): void;
+        onAny<K extends keyof T & string>(obj: O, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): this;
         /**
          * 移除监听对象的任意事件。
          *
@@ -87,30 +92,187 @@ declare namespace feng3d {
          * @param listener                  处理事件的监听器函数。
          * @param thisObject                监听器的上下文。可选。
          */
-        offAny(obj: Object, listener?: (event: any) => void, thisObject?: any): void;
-        /**
-         * 初始化事件对象
-         *
-         * @param type                      事件的类型。类型区分大小写。
-         * @param data                      事件携带的自定义数据。
-         * @param bubbles                   表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
-         */
-        makeEvent<T>(type: string, data: T, bubbles?: boolean): Event<T>;
-        /**
-         * 处理事件
-         * @param e 事件
-         */
-        protected handleEvent(obj: Object, e: Event<any>): void;
-        /**
-         * 处理事件冒泡
-         * @param e 事件
-         */
-        protected handelEventBubbles(obj: Object, e: Event<any>): void;
+        offAny<K extends keyof T & string>(obj: O, listener?: (event: IEvent<T[K]>) => void, thisObject?: any): this;
     }
     /**
      * 事件
      */
-    export interface Event<T> {
+    const anyEmitter: AnyEmitter<any, any>;
+}
+declare namespace feng3d {
+    /**
+     * 事件发射器
+     */
+    class EventEmitter<T = any> {
+        /**
+         * 目标与发射器映射。
+         */
+        private static targetEmitterMap;
+        /**
+         * 发射器与目标映射。
+         */
+        private static emitterTargetMap;
+        /**
+         * 发射器与监听器映射。
+         */
+        private static emitterListenerMap;
+        /**
+         * 获取事件发射器
+         * @param target
+         */
+        static getEventEmitter(target: any): EventEmitter<any>;
+        /**
+         * 获取事件发射器，当没有找到对应发射器时，返回新建的事件发射器。
+         * @param target
+         */
+        static getOrCreateEventEmitter(target: any): EventEmitter<any>;
+        constructor(target?: any);
+        /**
+         * 返回监听的事件类型列表。
+         */
+        eventNames<K extends keyof T & string>(): K[];
+        /**
+         * 返回指定事件类型的监听数量。
+         *
+         * @param type 事件的类型。
+         */
+        listenerCount<K extends keyof T & string>(type: K): number;
+        /**
+         * 监听一次事件后将会被移除
+         *
+         * @param type						事件的类型。
+         * @param listener					处理事件的侦听器函数。
+         * @param thisObject                listener函数作用域
+         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         */
+        once<K extends keyof T & string>(type: K, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number): this;
+        /**
+         * 发射事件。
+         *
+         * 当事件重复流向一个对象时将不会被处理。
+         *
+         * @param event   事件对象
+         * @returns 返回事件是否被处理
+         */
+        emitEvent<K extends keyof T & string>(event: IEvent<T[K]>): IEvent<T[K]>;
+        /**
+         * 发射事件。
+         *
+         * @param type 事件的类型。类型区分大小写。
+         * @param data 事件携带的自定义数据。
+         * @param bubbles 是否向上级报告事件。默认为`false`。
+         * @param broadcast 是否向下级广播事件。默认为`false`。
+         * @param share 是否向平级分享事件。默认为`true`。
+         *
+         * @returns 返回发射后的事件。
+         */
+        emit<K extends keyof T & string>(type: K, data?: T[K], bubbles?: boolean, broadcast?: boolean, share?: boolean): IEvent<T[K]>;
+        /**
+         * 将事件广播到下级对象中。
+         *
+         * @param type                      事件的类型。类型区分大小写。
+         * @param data                      事件携带的自定义数据。
+         *
+         * @returns 返回广播后的事件。
+         */
+        broadcast<K extends keyof T & string>(type: K, data?: T[K]): IEvent<T[K]>;
+        /**
+         * 将事件冒泡到上级对象中。
+         *
+         * @param type                      事件的类型。类型区分大小写。
+         * @param data                      事件携带的自定义数据。
+         *
+         * @returns 返回冒泡后的事件。
+         */
+        bubbles<K extends keyof T & string>(type: K, data?: T[K]): IEvent<T[K]>;
+        /**
+         * 检查 Event 对象是否为特定事件类型注册了任何侦听器.
+         *
+         * @param type		事件的类型。
+         * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
+         */
+        has<K extends keyof T & string>(type: K): boolean;
+        /**
+         * 为监听对象新增指定类型的事件监听。
+         *
+         * @param type						事件的类型。
+         * @param listener					处理事件的监听器函数。
+         * @param thisObject                监听器的上下文。可选。
+         * @param priority					事件监听器的优先级。数字越大，优先级越高。默认为0。
+         * @param once                      值为true时在监听一次事件后该监听器将被移除。默认为false。
+         */
+        on<K extends keyof T & string>(type: K, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): this;
+        /**
+         * 移除监听
+         *
+         * @param type						事件的类型。可选。该值为空时所有被监听对象上的监听均将被移除。
+         * @param listener					要删除的监听器对象。可选。该值为空时所有指定类型的监听均将被移除。
+         * @param thisObject                监听器的上下文。可选。
+         */
+        off<K extends keyof T & string>(type?: K, listener?: (event: IEvent<T[K]>) => void, thisObject?: any): this;
+        /**
+         * 移除所有监听
+         *
+         * @param type						事件的类型。可选。该值为空时所有被监听对象上的监听均将被移除。
+         */
+        offAll<K extends keyof T & string>(type?: K): this;
+        /**
+         * 监听对象的任意事件，该对象的任意事件都将触发该监听器的调用。
+         *
+         * @param listener                  处理事件的监听器函数。
+         * @param thisObject                监听器的上下文。可选。
+         * @param priority                  事件监听器的优先级。数字越大，优先级越高。默认为0。
+         * @param once                      值为true时在监听一次事件后该监听器将被移除。默认为false。
+         */
+        onAny<K extends keyof T & string>(listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): this;
+        /**
+         * 移除监听对象的任意事件。
+         *
+         * @param listener                  处理事件的监听器函数。
+         * @param thisObject                监听器的上下文。可选。
+         */
+        offAny<K extends keyof T & string>(listener?: (event: IEvent<T[K]>) => void, thisObject?: any): this;
+        /**
+         * 处理事件
+         * @param e 事件
+         */
+        protected handleEvent<K extends keyof T & string>(e: IEvent<T[K]>): void;
+        /**
+         * 向平级分享事件
+         *
+         * @param event 事件
+         */
+        protected handelEventShare<K extends keyof T & string>(event: IEvent<T[K]>): void;
+        /**
+         * 向上级报告事件
+         *
+         * @param event 事件
+         */
+        protected handelEventBubbles<K extends keyof T & string>(event: IEvent<T[K]>): void;
+        /**
+         * 向下级广播事件
+         *
+         * @param event 事件
+         */
+        protected handelEventBroadcast<K extends keyof T & string>(event: IEvent<T[K]>): void;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 全局事件发射器。
+     */
+    const globalEmitter: EventEmitter<MixinsGlobalEvents>;
+    /**
+     * 事件列表
+     */
+    interface MixinsGlobalEvents {
+    }
+}
+declare namespace feng3d {
+    /**
+     * 事件
+     */
+    interface IEvent<T = any> {
         /**
          * 事件的类型。类型区分大小写。
          */
@@ -120,42 +282,74 @@ declare namespace feng3d {
          */
         data: T;
         /**
-         * 表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
+         * 事件目标。
+         */
+        target: IEventTarget;
+        /**
+         * 当前正在处理事件监听的事件对象。
+         */
+        currentTarget: IEventTarget;
+        /**
+         * 是否向平级分享事件。
+         *
+         * 如果值为`true`，则向平级分享事件，分享对象将由`IEventTarget.getShareTargets?()`获取。
+         */
+        share: boolean;
+        /**
+         * 是否停止向平级分享事件。
+         */
+        isStopShare: boolean;
+        /**
+         * 是否向上级报告事件。
+         *
+         * 如果值为`true`，则向上级报告事件，报告对象将由`IEventTarget.getBubbleTargets?()`获取。
          */
         bubbles: boolean;
         /**
-         * 事件目标。
-         */
-        target: any;
-        /**
-         * 当前正在使用某个事件监听器处理 Event 对象的对象。
-         */
-        currentTarget: any;
-        /**
-         * 是否停止处理事件监听器
-         */
-        isStop: boolean;
-        /**
-         * 是否停止冒泡
+         * 是否停止向上级报告事件。
          */
         isStopBubbles: boolean;
+        /**
+         * 是否向下级广播事件。
+         *
+         * 如果值为`true`，则向下级广播事件，广播对象将由`IEventTarget.getBroadcastTargets?()`获取。
+         */
+        broadcast: boolean;
+        /**
+         * 是否停止向下级广播事件。
+         */
+        isStopBroadcast: boolean;
+        /**
+         * 是否停止传播事件。
+         *
+         * 如果值为`true`，则停止事件传递（向平级分享、向上级报告、向下级广播）。
+         */
+        isStopTransmit: boolean;
+        /**
+         * 是否停止事件。
+         *
+         * 如果值为`true`，则停止事件传递（向平级分享、向上级报告、向下级广播），并且停止后续的事件监听器的执行。
+         */
+        isStop: boolean;
         /**
          * 事件流过的对象列表，事件路径
          */
         targets: any[];
         /**
-         * 处理列表
+         * 已处理的监听器列表。
          */
-        handles: ListenerVO[];
+        handles: IEventListener[];
     }
+}
+declare namespace feng3d {
     /**
-     * 监听数据
+     * 事件监听器。
      */
-    interface ListenerVO {
+    interface IEventListener {
         /**
          * 监听函数
          */
-        listener: (event: Event<any>) => void;
+        listener: (event: IEvent<any>) => void;
         /**
          * 监听函数作用域
          */
@@ -169,97 +363,31 @@ declare namespace feng3d {
          */
         once: boolean;
     }
-    export {};
 }
 declare namespace feng3d {
-    interface IEventDispatcher<T> {
-        once<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(type: K): boolean;
-        on<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
     /**
-     * 事件适配器
+     * 派发事件的对象。
      */
-    class EventDispatcher {
+    interface IEventTarget {
         /**
-         * 监听一次事件后将会被移除
-         * @param type						事件的类型。
-         * @param listener					处理事件的侦听器函数。
-         * @param thisObject                listener函数作用域
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         * 获取分享的平级目标列表。
          */
-        once(type: string, listener: (event: Event<any>) => void, thisObject?: any, priority?: number): void;
+        getShareTargets?(): IEventTarget[];
         /**
-         * 派发事件
-         *
-         * 当事件重复流向一个对象时将不会被处理。
-         *
-         * @param e   事件对象
-         * @returns 返回事件是否被该对象处理
+         * 获取报告的上级目标列表。默认返回 `[this.parent]` 。
          */
-        dispatchEvent(e: Event<any>): boolean;
+        getBubbleTargets?(): IEventTarget[];
         /**
-         * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
-         * @param type                      事件的类型。类型区分大小写。
-         * @param data                      事件携带的自定义数据。
-         * @param bubbles                   表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
+         * 获取广播的下级目标列表。默认返回 `this.children` 。
          */
-        dispatch(type: string, data?: any, bubbles?: boolean): Event<any>;
-        /**
-         * 检查 Event 对象是否为特定事件类型注册了任何侦听器.
-         *
-         * @param type		事件的类型。
-         * @return 			如果指定类型的侦听器已注册，则值为 true；否则，值为 false。
-         */
-        has(type: string): boolean;
-        /**
-         * 添加监听
-         * @param type						事件的类型。
-         * @param listener					处理事件的侦听器函数。
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
-         */
-        on(type: string, listener: (event: Event<any>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        /**
-         * 移除监听
-         * @param dispatcher 派发器
-         * @param type						事件的类型。
-         * @param listener					要删除的侦听器对象。
-         */
-        off(type?: string, listener?: (event: Event<any>) => void, thisObject?: any): void;
-        /**
-         * 监听对象的任意事件，该对象的任意事件都将触发该监听器的调用。
-         *
-         * @param listener                  处理事件的监听器函数。
-         * @param thisObject                监听器的上下文。可选。
-         * @param priority                  事件监听器的优先级。数字越大，优先级越高。默认为0。
-         */
-        onAny(listener: (event: Event<any>) => void, thisObject?: any, priority?: number): void;
-        /**
-         * 移除监听对象的任意事件。
-         *
-         * @param listener                  处理事件的监听器函数。
-         * @param thisObject                监听器的上下文。可选。
-         */
-        offAny(listener?: (event: Event<any>) => void, thisObject?: any): void;
-        /**
-         * 处理事件
-         * @param e 事件
-         */
-        protected handleEvent(e: Event<any>): void;
-        /**
-         * 处理事件冒泡
-         * @param e 事件
-         */
-        protected handelEventBubbles(e: Event<any>): void;
+        getBroadcastTargets?(): IEventTarget[];
     }
 }
 declare namespace feng3d {
     /**
      * 只针对Object的事件
      */
-    var objectevent: ObjectEventDispatcher<Object, ObjectEventType>;
+    const objectEmitter: AnyEmitter<any, ObjectEventType>;
     /**
      * Object 事件类型
      */
@@ -276,99 +404,880 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 观察装饰器，观察被装饰属性的变化
+     * 方程求解
      *
-     * @param onChange 属性变化回调  例如参数为“onChange”时，回调将会调用this.onChange(property, oldValue, newValue)
+     * 求解方程 f(x) == 0 在[a, b]上的解
      *
-     * 使用@watch后会自动生成一个带"_"的属性，例如 属性"a"会生成"_a"
+     * 参考：高等数学 第七版上册 第三章第八节 方程的近似解
+     * 当f(x)在区间 [a, b] 上连续，且f(a) * f(b) <= 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == 0
      *
-     * 通过使用 eval 函数 生成出 与自己手动写的set get 一样的函数，性能已经接近 手动写的get set函数。
+     * 当f(x)在区间 [a, b] 上连续，且 (f(a) - y) * (f(b) - y) < 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == y
      *
-     * 性能比Watcher.watch更加高效，但还是建议使用 Watcher.watch 替代 @watch ，由于 @watch 没有对onChange更好的约束 使用 时容易出现运行时报错。
+     * @author feng / http://feng3d.com 05/06/2018
      */
-    function watch(onChange: string): (target: any, property: string) => void;
-    var watcher: Watcher;
-    class Watcher {
+    class EquationSolving {
         /**
-         * 监听对象属性的变化
-         *
-         * 注意：使用watch后获取该属性值的性能将会是原来的1/60，避免在运算密集处使用该函数。
-         *
-         * @param object 被监听对象
-         * @param property 被监听属性
-         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
-         * @param thisObject 变化回调函数 this值
+         * 获取数字的(正负)符号
+         * @param n 数字
          */
-        watch<T, K extends PropertyNames<T>, V extends T[K]>(object: T, property: K, handler: (newValue: V, oldValue: V, object: T, property: string) => void, thisObject?: any): void;
+        private getSign;
         /**
-         * 取消监听对象属性的变化
-         *
-         * @param object 被监听对象
-         * @param property 被监听属性
-         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
-         * @param thisObject 变化回调函数 this值
+         * 比较 a 与 b 是否相等
+         * @param a 值a
+         * @param b 值b
+         * @param precision 比较精度
          */
-        unwatch<T, K extends PropertyNames<T>, V extends T[K]>(object: T, property: K, handler?: (newValue: V, oldValue: V, object: T, property: string) => void, thisObject?: any): void;
-        private _binds;
+        private equalNumber;
         /**
-         * 绑定两个对象的指定属性，保存两个属性值同步。
+         * 获取近似导函数 f'(x)
          *
-         * @param object0 第一个对象。
-         * @param property0 第一个对象的属性名称。
-         * @param object1 第二个对象。
-         * @param property1 第二个对象的属性名称。
+         * 导函数定义
+         * f'(x) = (f(x + Δx) - f(x)) / Δx , Δx → 0
+         *
+         * 注：通过测试Δx不能太小，由于方程内存在x的n次方问题（比如0.000000000000001的10次方为0），过小会导致计算机计算进度不够反而导致求导不准确！
+         *
+         * 另外一种办法是还原一元多次函数，然后求出导函数。
+         *
+         * @param f 函数
+         * @param delta Δx，进过测试该值太小或者过大都会导致求导准确率降低（个人猜测是计算机计算精度问题导致）
          */
-        bind<T0, T1, K0 extends PropertyNames<T0>, K1 extends PropertyNames<T1>>(object0: T0, property0: K0, object1: T1, property1: K1): void;
+        getDerivative(f: (x: any) => number, delta?: number): (x: any) => number;
         /**
-         * 解除两个对象的指定属性的绑定。
-         *
-         * @param object0 第一个对象。
-         * @param property0 第一个对象的属性名称。
-         * @param object1 第二个对象。
-         * @param property1 第二个对象的属性名称。
+         * 函数是否连续
+         * @param f 函数
          */
-        unbind<T0, T1, K0 extends PropertyNames<T0>, K1 extends PropertyNames<T1>>(object0: T0, property0: K0, object1: T1, property1: K1): void;
+        isContinuous(_f: (x: number) => number): boolean;
         /**
-         * 监听对象属性链值变化
+         * 方程 f(x) == 0 在 [a, b] 区间内是否有解
          *
-         * @param object 被监听对象
-         * @param property 被监听属性 例如："a.b"
-         * @param handler 变化回调函数 (newValue: any, oldValue: any, object: any, property: string) => void
-         * @param thisObject 变化回调函数 this值
+         * 当f(x)在区间 [a, b] 上连续，且f(a) * f(b) <= 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == 0
+         *
+         * @param f 函数f(x)
+         * @param a 区间起点
+         * @param b 区间终点
+         * @param errorcallback  错误回调函数
+         *
+         * @returns 是否有解
          */
-        watchchain(object: any, property: string, handler: (newValue: any, oldValue: any, object: any, property: string) => void, thisObject?: any): void;
+        hasSolution(f: (x: any) => number, a: number, b: number, errorcallback?: (err: Error) => void): boolean;
         /**
-         * 取消监听对象属性链值变化
+         * 二分法 求解 f(x) == 0
          *
-         * @param object 被监听对象
-         * @param property 被监听属性 例如："a.b"
-         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
-         * @param thisObject 变化回调函数 this值
+         * 通过区间中点作为边界来逐步缩小求解区间，最终获得解
+         *
+         * @param f 函数f(x)
+         * @param a 区间起点
+         * @param b 区间终点
+         * @param precision 求解精度
+         * @param errorcallback  错误回调函数
+         *
+         * @returns 不存在解时返回 undefined ，存在时返回 解
          */
-        unwatchchain(object: any, property: string, handler?: (newValue: any, oldValue: any, object: any, property: string) => void, thisObject?: any): void;
+        binary(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
         /**
-         * 监听对象属性链值变化
+         * 连线法 求解 f(x) == 0
          *
-         * @param object 被监听对象
-         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property == object时表示监听对象中所有叶子属性变化。
-         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
-         * @param thisObject 变化回调函数 this值
+         * 连线法是我自己想的方法，自己取的名字，目前没有找到相应的资料（这方法大家都能够想得到。）
+         *
+         * 用曲线弧两端的连线来代替曲线弧与X轴交点作为边界来逐步缩小求解区间，最终获得解
+         *
+         * 通过 A，B两点连线与x轴交点来缩小求解区间最终获得解
+         *
+         * A，B两点直线方程 f(x) = f(a) + (f(b) - f(a)) / (b - a) * (x-a) ,求 f(x) == 0 解得 x = a - fa * (b - a)/ (fb - fa)
+         *
+         * @param f 函数f(x)
+         * @param a 区间起点
+         * @param b 区间终点
+         * @param precision 求解精度
+         * @param errorcallback  错误回调函数
+         *
+         * @returns 不存在解时返回 undefined ，存在时返回 解
          */
-        watchobject<T>(object: T, property: gPartial<T>, handler: (object: any, property: string, oldValue: any) => void, thisObject?: any): void;
+        line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
         /**
-         * 取消监听对象属性链值变化
+         * 切线法 求解 f(x) == 0
          *
-         * @param object 被监听对象
-         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property == object时表示监听对象中所有叶子属性变化。
-         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
-         * @param thisObject 变化回调函数 this值
+         * 用曲线弧一端的切线来代替曲线弧，从而求出方程实根的近似解。
+         *
+         * 迭代公式： Xn+1 = Xn - f(Xn) / f'(Xn)
+         *
+         * #### 额外需求
+         * 1. f(x)在[a, b]上具有一阶导数 f'(x)
+         * 1. f'(x)在[a, b]上保持定号；意味着f(x)在[a, b]上单调
+         * 1. f''(x)在[a, b]上保持定号；意味着f'(x)在[a, b]上单调
+         *
+         * 切记，当无法满足这些额外要求时，该函数将找不到[a, b]上的解！！！！！！！！！！！
+         *
+         * @param f 函数f(x)
+         * @param f1 一阶导函数 f'(x)
+         * @param f2 二阶导函数 f''(x)
+         * @param a 区间起点
+         * @param b 区间终点
+         * @param precision 求解精度
+         * @param errorcallback  错误回调函数
+         *
+         * @returns 不存在解与无法使用该函数求解时返回 undefined ，否则返回 解
          */
-        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldValue: any) => void, thisObject?: any): void;
+        tangent(f: (x: any) => number, f1: (x: any) => number, f2: (x: any) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
+        /**
+         * 割线法（弦截法） 求解 f(x) == 0
+         *
+         * 使用 (f(Xn) - f(Xn-1)) / (Xn - Xn-1) 代替切线法迭代公式 Xn+1 = Xn - f(Xn) / f'(Xn) 中的 f'(x)
+         *
+         * 迭代公式：Xn+1 = Xn - f(Xn) * (Xn - Xn-1) / (f(Xn) - f(Xn-1));
+         *
+         * 用过点(Xn-1,f(Xn-1))和点(Xn,f(Xn))的割线来近似代替(Xn,f(Xn))处的切线，将这条割线与X轴交点的横坐标作为新的近似解。
+         *
+         * #### 额外需求
+         * 1. f(x)在[a, b]上具有一阶导数 f'(x)
+         * 1. f'(x)在[a, b]上保持定号；意味着f(x)在[a, b]上单调
+         * 1. f''(x)在[a, b]上保持定号；意味着f'(x)在[a, b]上单调
+         *
+         * 切记，当无法满足这些额外要求时，该函数将找不到[a, b]上的解！！！！！！！！！！！
+         *
+         * @param f 函数f(x)
+         * @param a 区间起点
+         * @param b 区间终点
+         * @param precision 求解精度
+         * @param errorcallback  错误回调函数
+         *
+         * @returns 不存在解与无法使用该函数求解时返回 undefined ，否则返回 解
+         */
+        secant(f: (x: any) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
     }
-    const __watchs__ = "__watchs__";
-    const __watchchains__ = "__watchchains__";
+    /**
+     * 方程求解
+     */
+    const equationSolving: EquationSolving;
 }
 declare namespace feng3d {
+    /**
+     * 高次函数
+     *
+     * 处理N次函数定义，求值，方程求解问题
+     *
+     * n次函数定义
+     * f(x) = a0 * pow(x, n) + a1 * pow(x, n - 1) +.....+ an_1 * pow(x, 1) + an
+     *
+     * 0次 f(x) = a0;
+     * 1次 f(x) = a0 * x + a1;
+     * 2次 f(x) = a0 * x * x + a1 * x + a2;
+     * ......
+     *
+     * @author feng / http://feng3d.com 05/06/2018
+     */
+    class HighFunction {
+        private as;
+        /**
+         * 构建函数
+         * @param as 函数系数 a0-an 数组
+         */
+        constructor(as: number[]);
+        /**
+         * 获取函数 f(x) 的值
+         * @param x x坐标
+         */
+        getValue(x: number): number;
+    }
+}
+declare namespace feng3d {
+    /**
+     * Bézier曲线
+     * @see https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+     *
+     * @author feng / http://feng3d.com 03/06/2018
+     */
+    class Bezier {
+        /**
+         * 线性Bézier曲线
+         * 给定不同的点P0和P1，线性Bézier曲线就是这两个点之间的直线。曲线由下式给出
+         * ```
+         * B(t) = p0 + t * (p1 - p0) = (1 - t) * p0 + t * p1 , 0 <= t && t <= 1
+         * ```
+         * 相当于线性插值
+         *
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         */
+        linear(t: number, p0: number, p1: number): number;
+        /**
+         * 线性Bézier曲线关于t的导数
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         */
+        linearDerivative(t: number, p0: number, p1: number): number;
+        /**
+         * 线性Bézier曲线关于t的二阶导数
+         * @param _t 插值度
+         * @param _p0 点0
+         * @param _p1 点1
+         */
+        linearSecondDerivative(_t: number, _p0: number, _p1: number): number;
+        /**
+         * 二次Bézier曲线
+         *
+         * 二次Bézier曲线是由函数B（t）跟踪的路径，给定点P0，P1和P2，
+         * ```
+         * B(t) = (1 - t) * ((1 - t) * p0 + t * p1) + t * ((1 - t) * p1 + t * p2) , 0 <= t && t <= 1
+         * ```
+         * 这可以解释为分别从P0到P1和从P1到P2的线性Bézier曲线上相应点的线性插值。重新排列前面的等式得出：
+         * ```
+         * B(t) = (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2 , 0 <= t && t <= 1
+         * ```
+         * Bézier曲线关于t的导数是
+         * ```
+         * B'(t) = 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1)
+         * ```
+         * 从中可以得出结论：在P0和P2处曲线的切线在P 1处相交。随着t从0增加到1，曲线沿P1的方向从P0偏离，然后从P1的方向弯曲到P2。
+         *
+         * Bézier曲线关于t的二阶导数是
+         * ```
+         * B''(t) = 2 * (p2 - 2 * p1 + p0)
+         * ```
+         *
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         */
+        quadratic(t: number, p0: number, p1: number, p2: number): number;
+        /**
+         * 二次Bézier曲线关于t的导数
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         */
+        quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
+        /**
+         * 二次Bézier曲线关于t的二阶导数
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         */
+        quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
+        /**
+         * 立方Bézier曲线
+         *
+         * 平面中或高维空间中（其实一维也是成立的，这里就是使用一维计算）的四个点P0，P1，P2和P3定义了三次Bézier曲线。
+         * 曲线开始于P0朝向P1并且从P2的方向到达P3。通常不会通过P1或P2; 这些点只是为了提供方向信息。
+         * P1和P2之间的距离在转向P2之前确定曲线向P1移动的“多远”和“多快” 。
+         *
+         * 对于由点Pi，Pj和Pk定义的二次Bézier曲线，可以将Bpipjpk(t)写成三次Bézier曲线，它可以定义为两条二次Bézier曲线的仿射组合：
+         * ```
+         * B(t) = (1 - t) * Bp0p1p2(t) + t * Bp1p2p3(t) , 0 <= t && t <= 1
+         * ```
+         * 曲线的显式形式是：
+         * ```
+         * B(t) = (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3 , 0 <= t && t <= 1
+         * ```
+         * 对于P1和P2的一些选择，曲线可以相交，或者包含尖点。
+         *
+         * 三次Bézier曲线相对于t的导数是
+         * ```
+         * B'(t) = 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
+         * ```
+         * 三次Bézier曲线关于t的二阶导数是
+         * ```
+         * 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
+         * ```
+         *
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         * @param p3 点3
+         */
+        cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        /**
+         * 三次Bézier曲线关于t的导数
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         * @param p3 点3
+         */
+        cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        /**
+         * 三次Bézier曲线关于t的二阶导数
+         * @param t 插值度
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
+         */
+        cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        /**
+         * n次Bézier曲线
+         *
+         * 一般定义
+         *
+         * Bézier曲线可以定义为任意度n。
+         *
+         * @param t 插值度
+         * @param ps 点列表 ps.length == n+1
+         * @param processs 收集中间过程数据，可用作Bézier曲线动画数据
+         */
+        bn(t: number, ps: number[], processs?: number[][]): number;
+        /**
+         * n次Bézier曲线关于t的导数
+         *
+         * 一般定义
+         *
+         * Bézier曲线可以定义为任意度n。
+         *
+         * @param t 插值度
+         * @param ps 点列表 ps.length == n+1
+         */
+        bnDerivative(t: number, ps: number[]): number;
+        /**
+         * n次Bézier曲线关于t的二阶导数
+         *
+         * 一般定义
+         *
+         * Bézier曲线可以定义为任意度n。
+         *
+         * @param t 插值度
+         * @param ps 点列表 ps.length == n+1
+         */
+        bnSecondDerivative(t: number, ps: number[]): number;
+        /**
+         * n次Bézier曲线关于t的dn阶导数
+         *
+         * Bézier曲线可以定义为任意度n。
+         *
+         * @param t 插值度
+         * @param dn 求导次数
+         * @param ps 点列表     ps.length == n+1
+         */
+        bnND(t: number, dn: number, ps: number[]): number;
+        /**
+         * 获取曲线在指定插值度上的值
+         * @param t 插值度
+         * @param ps 点列表
+         */
+        getValue(t: number, ps: number[]): number;
+        /**
+         * 获取曲线在指定插值度上的导数(斜率)
+         * @param t 插值度
+         * @param ps 点列表
+         */
+        getDerivative(t: number, ps: number[]): number;
+        /**
+         * 获取曲线在指定插值度上的二阶导数
+         * @param t 插值度
+         * @param ps 点列表
+         */
+        getSecondDerivative(t: number, ps: number[]): number;
+        /**
+         * 查找区间内极值列表
+         *
+         * @param ps 点列表
+         * @param numSamples 采样次数，用于分段查找极值
+         * @param precision  查找精度
+         *
+         * @returns 极值列表 {} {ts: 极值插值度列表,vs: 极值值列表}
+         */
+        getExtremums(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        /**
+         * 获取单调区间列表
+         * @returns {} {ts: 区间节点插值度列表,vs: 区间节点值列表}
+         */
+        getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        /**
+         * 获取目标值所在的插值度T
+         *
+         * @param targetV 目标值
+         * @param ps 点列表
+         * @param numSamples 分段数量，用于分段查找，用于解决寻找多个解、是否无解等问题；过少的分段可能会造成找不到存在的解决，过多的分段将会造成性能很差。
+         * @param precision  查找精度
+         *
+         * @returns 返回解数组
+         */
+        getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
+        /**
+         * 分割曲线
+         *
+         * 在曲线插值度t位置分割为两条连接起来与原曲线完全重合的曲线
+         *
+         * @param t 分割位置（插值度）
+         * @param ps 被分割曲线点列表
+         * @returns 返回两条曲线组成的数组
+         */
+        split(t: number, ps: number[]): number[][];
+        /**
+         * 合并曲线
+         *
+         * 合并两条连接的曲线为一条曲线并且可以还原为分割前的曲线
+         *
+         * @param fps 第一条曲线点列表
+         * @param sps 第二条曲线点列表
+         * @param mergeType 合并方式。mergeType = 0时进行还原合并，还原拆分之前的曲线；mergeType = 1时进行拟合合并，合并后的曲线会经过两条曲线的连接点；
+         */
+        merge(fps: number[], sps: number[], mergeType?: number): number[];
+        /**
+         * 获取曲线样本数据
+         *
+         * 这些点可用于连线来拟合曲线。
+         *
+         * @param ps 点列表
+         * @param num 采样次数 ，采样点分别为[0,1/num,2/num,....,(num-1)/num,1]
+         */
+        getSamples(ps: number[], num?: number): number[];
+    }
+    /**
+     * Bézier曲线
+     */
+    const bezier: Bezier;
+}
+interface MixinsOAVComponentParamMap {
+}
+declare namespace feng3d {
+    /**
+     * 构造函数
+     */
+    type Constructor<T> = (new (...args: any[]) => T);
+    /**
+     * 标记objectview对象界面类
+     */
+    export function OVComponent(component?: string): (constructor: Constructor<any>) => void;
+    /**
+     * 标记objectview块界面类
+     */
+    export function OBVComponent(component?: string): (constructor: Constructor<any>) => void;
+    /**
+     * 标记objectview属性界面类
+     */
+    export function OAVComponent(component?: string): (constructor: Constructor<any>) => void;
+    /**
+     * objectview类装饰器
+     */
+    export function ov<K extends keyof OVComponentParamMap>(param: {
+        component?: K;
+        componentParam?: OVComponentParamMap[K];
+    }): (constructor: Constructor<any>) => void;
+    export type OAVComponentParams = Partial<OAVComponentParamMap[keyof OAVComponentParamMap]> & {
+        /**
+         * 是否可编辑
+         */
+        editable?: boolean;
+        /**
+         * 所属块名称
+         */
+        block?: string;
+        /**
+         * 提示信息
+         */
+        tooltip?: string;
+        /**
+         * 优先级，数字越小，显示越靠前，默认为0
+         */
+        priority?: number;
+        /**
+         * 是否排除
+         */
+        exclude?: boolean;
+    };
+    /**
+     * objectview属性装饰器
+     * @param param 参数
+     */
+    export function oav(param?: OAVComponentParams): (target: any, propertyKey: string) => void;
+    /**
+     * 对象界面
+     */
+    export class ObjectView {
+        /**
+         * 默认基础类型对象界面类定义
+         */
+        defaultBaseObjectViewClass: string;
+        /**
+         * 默认对象界面类定义
+         */
+        defaultObjectViewClass: string;
+        /**
+         * 默认对象属性界面类定义
+         */
+        defaultObjectAttributeViewClass: string;
+        /**
+         * 属性块默认界面
+         */
+        defaultObjectAttributeBlockView: string;
+        /**
+         * 指定属性类型界面类定义字典（key:属性类名称,value:属性界面类定义）
+         */
+        defaultTypeAttributeView: {};
+        OAVComponent: {};
+        OBVComponent: {};
+        OVComponent: {};
+        setDefaultTypeAttributeView(type: string, component: AttributeTypeDefinition): void;
+        /**
+         * 获取对象界面
+         * @param object 用于生成界面的对象
+         * @param param 参数
+         */
+        getObjectView(object: any, param?: GetObjectViewParam): IObjectView;
+        /**
+         * 获取属性界面
+         *
+         * @static
+         * @param attributeViewInfo 属性界面信息
+         * @returns                        属性界面
+         *
+         * @memberOf ObjectView
+         */
+        getAttributeView(attributeViewInfo: AttributeViewInfo): IObjectAttributeView;
+        /**
+         * 获取块界面
+         *
+         * @static
+         * @param blockViewInfo 块界面信息
+         * @returns                块界面
+         *
+         * @memberOf ObjectView
+         */
+        getBlockView(blockViewInfo: BlockViewInfo): IObjectBlockView;
+        addOAV(target: any, propertyKey: string, param?: OAVComponentParams): void;
+        /**
+         * 获取对象信息
+         * @param object 对象
+         * @param autocreate 当对象没有注册属性时是否自动创建属性信息
+         * @param excludeAttrs 排除属性列表
+         * @return
+         */
+        getObjectInfo(object: any, autocreate?: boolean, excludeAttrs?: string[]): ObjectViewInfo;
+    }
+    /**
+     * 对象界面
+     */
+    export const objectview: ObjectView;
+    /**
+     * OAV 组件参数映射
+     * {key: OAV组件名称,value：组件参数类定义}
+     */
+    export interface OAVComponentParamMap extends MixinsOAVComponentParamMap {
+        OAVEnum: OAVEnumParam;
+    }
+    /**
+     * OAVEnum 组件参数
+     */
+    export interface OAVEnumParam {
+        component: 'OAVEnum';
+        componentParam: {
+            /**
+             * 枚举类型
+             */
+            enumClass: any;
+        };
+    }
+    export interface OBVComponentParamMap {
+        块组件名称: '块组件参数';
+        [component: string]: any;
+    }
+    export interface OVComponentParamMap {
+        类组件名称: '类组件参数';
+        [component: string]: any;
+    }
+    /**
+     * 定义属性
+     */
+    export interface AttributeDefinition {
+        /**
+         * 属性名称
+         */
+        name: string;
+        /**
+         * 是否可编辑
+         */
+        editable?: boolean;
+        /**
+         * 所属块名称
+         */
+        block?: string;
+        /**
+         * 提示信息
+         */
+        tooltip?: string;
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+        /**
+         * 优先级，数字越小，显示越靠前，默认为0
+         */
+        priority?: number;
+        /**
+         * 是否排除
+         */
+        exclude?: boolean;
+    }
+    /**
+     * 定义特定属性类型默认界面
+     */
+    export interface AttributeTypeDefinition {
+        /**
+         * 界面类
+         */
+        component: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+    }
+    /**
+     * 块定义
+     */
+    export interface BlockDefinition {
+        /**
+         * 块名称
+         */
+        name: string;
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+    }
+    /**
+     * ObjectView类配置
+     */
+    export interface ClassDefinition {
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+        /**
+         * 自定义对象属性定义字典（key:属性名,value:属性定义）
+         */
+        attributeDefinitionVec: AttributeDefinition[];
+        /**
+         * 自定义对象属性块界面类定义字典（key:属性块名称,value:自定义对象属性块界面类定义）
+         */
+        blockDefinitionVec: BlockDefinition[];
+    }
+    /**
+     * 对象属性界面接口
+     */
+    export interface IObjectAttributeView {
+        /**
+         * 界面所属对象（空间）
+         */
+        space: any;
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        /**
+         * 属性名称
+         */
+        attributeName: string;
+        /**
+         * 属性值
+         */
+        attributeValue: any;
+        /**
+         * 对象属性界面
+         */
+        objectView: IObjectView;
+        /**
+         * 对象属性块界面
+         */
+        objectBlockView: IObjectBlockView;
+    }
+    /**
+     * 对象属性块界面接口
+     */
+    export interface IObjectBlockView {
+        /**
+         * 界面所属对象（空间）
+         */
+        space: any;
+        /**
+         * 块名称
+         */
+        blockName: string;
+        /**
+         * 对象属性界面
+         */
+        objectView: IObjectView;
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        /**
+         * 获取属性界面
+         * @param attributeName 属性名称
+         */
+        getAttributeView(attributeName: string): IObjectAttributeView;
+    }
+    /**
+     * 对象界面接口
+     */
+    export interface IObjectView {
+        /**
+         * 界面所属对象（空间）
+         */
+        space: any;
+        /**
+         * 更新界面
+         */
+        updateView(): void;
+        /**
+         * 获取块界面
+         * @param blockName 块名称
+         */
+        getblockView(blockName: string): IObjectBlockView;
+        /**
+         * 获取属性界面
+         * @param attributeName 属性名称
+         */
+        getAttributeView(attributeName: string): IObjectAttributeView;
+    }
+    /**
+     * 对象属性信息
+     */
+    export interface AttributeViewInfo {
+        /**
+         * 属性名称
+         */
+        name: string;
+        /**
+         * 属性类型
+         */
+        type: string;
+        /**
+         * 是否可写
+         */
+        editable: boolean;
+        /**
+         * 所属块名称
+         */
+        block?: string;
+        /**
+         * 提示信息
+         */
+        tooltip?: string;
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+        /**
+         * 属性所属对象
+         */
+        owner: any;
+        /**
+         * 优先级，数字越小，显示越靠前，默认为0
+         */
+        priority?: number;
+        /**
+         * 是否排除
+         */
+        exclude?: boolean;
+    }
+    /**
+     * 对象属性块
+     */
+    export interface BlockViewInfo {
+        /**
+         * 块名称
+         */
+        name: string;
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+        /**
+         * 属性信息列表
+         */
+        itemList: AttributeViewInfo[];
+        /**
+         * 属性拥有者
+         */
+        owner: any;
+    }
+    /**
+     * 对象信息
+     */
+    export interface ObjectViewInfo {
+        /**
+         * 组件
+         */
+        component?: string;
+        /**
+         * 组件参数
+         */
+        componentParam?: any;
+        /**
+         * 对象属性列表
+         */
+        objectAttributeInfos: AttributeViewInfo[];
+        /**
+         * 对象块信息列表
+         */
+        objectBlockInfos: BlockViewInfo[];
+        /**
+         * 保存类的一个实例，为了能够获取动态属性信息
+         */
+        owner: any;
+        /**
+         * 是否可编辑
+         */
+        editable?: boolean;
+    }
+    export type GetObjectViewParam = {
+        /**
+         * 当对象没有注册属性时是否自动创建属性信息
+         */
+        autocreate?: boolean;
+        /**
+         * 排除属性列表
+         */
+        excludeAttrs?: string[];
+        /**
+         * 是否可编辑
+         */
+        editable?: boolean;
+    };
+    export {};
+}
+interface ArrayBuffer {
+    image: HTMLImageElement;
+}
+interface HTMLImageElement {
+    arraybuffer: ArrayBuffer;
+}
+declare namespace feng3d {
+    /**
+     * 构造函数
+     */
+    type Constructor<T> = (new (...args: any[]) => T);
     /**
      * 让T中以及所有键值中的所有键都是可选的
      */
@@ -461,8 +1370,8 @@ declare namespace feng3d {
     type LazyObject<T> = {
         [P in keyof T]: Lazy<T[P]>;
     };
-    var lazy: {
-        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    const lazy: {
+        getvalue<T>(lazyItem: Lazy<T>): T;
     };
     /**
      * 可销毁对象
@@ -478,115 +1387,207 @@ declare namespace feng3d {
         dispose(): void;
     }
 }
-/**
- * Object.assignDeep 中 转换结果的函数定义
- */
-interface AssignDeepHandler {
+interface Array<T> {
     /**
-     *
-     * @param target 目标对象
-     * @param source 源数据
-     * @param key 属性名称
-     * @param replacers 转换函数
-     * @param deep 当前深度
+     * Determines whether an array includes a certain element, returning true or false as appropriate.
+     * @param searchElement The element to search for.
+     * @param fromIndex The position in this array at which to begin searching for searchElement.
      */
-    (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;
-}
-interface ObjectConstructor {
-    /**
-     * 从对象自身或者对象的原型中获取属性描述
-     *
-     * @param object 对象
-     * @param property 属性名称
-     */
-    getPropertyDescriptor(object: Object, property: string): PropertyDescriptor | undefined;
-    /**
-     * 属性是否可写
-     * @param obj 对象
-     * @param property 属性名称
-     */
-    propertyIsWritable(obj: Object, property: string): boolean;
-    /**
-     * 判断是否为基础类型 undefined,null,boolean,string,number
-     */
-    isBaseType(object: any): boolean;
-    /**
-     * 判断是否为Object对象，构造函数是否为Object， 检测 object.constructor == Object
-     *
-     * @param object 用于判断的对象
-     */
-    isObject(object: any): boolean;
-    /**
-     * 获取对象对应属性上的值
-     *
-     * @param object 对象
-     * @param property 属性名称，可以是 "a" 或者 "a.b" 或者 ["a","b"]
-     */
-    getPropertyValue(object: Object, property: string | string[]): any;
-    /**
-     * 获取对象上属性链列表
-     *
-     * 例如 object值为{ a: { b: { c: 1 }, d: 2 } }时则返回 ["a.b.c","a.d"]
-     *
-     * @param object 对象
-     */
-    getPropertyChains(object: Object): string[];
-    /**
-     * 浅赋值
-     * 从源数据取所有可枚举属性值赋值给目标对象
-     *
-     * @param target 目标对象
-     * @param source 源数据
-     */
-    assignShallow<T>(target: T, source: Partial<T>): T;
-    /**
-     * 深度赋值
-     * 从源数据取所有子代可枚举属性值赋值给目标对象
-     *
-     * @param target 被赋值对象
-     * @param source 源数据
-     * @param handlers 处理函数列表，先于 Object.assignDeepDefaultHandlers 执行。函数返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。执行在 Object.DefaultAssignDeepReplacers 前。
-     * @param deep 赋值深度，deep<1时直接返回。
-     */
-    assignDeep<T>(target: T, source: feng3d.gPartial<T>, handlers?: AssignDeepHandler[], deep?: number): T;
-    /**
-     * 深度比较两个对象子代可枚举属性值
-     *
-     * @param arr 用于比较的数组
-     */
-    equalDeep<T>(a: T, b: T): boolean;
-    /**
-     * 执行方法
-     *
-     * 用例：
-     * 1. 给一个新建的对象进行初始化
-     *
-     *  ``` startLifetime = Object.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
-     *
-     * @param obj 对象
-     * @param func 被执行的方法
-     */
-    runFunc<T>(obj: T, func: (obj: T) => void): T;
-    /**
-     * Object.assignDeep 中 默认转换结果的函数列表
-     */
-    assignDeepDefaultHandlers: AssignDeepHandler[];
+    includes(searchElement: T, fromIndex?: number): boolean;
 }
 declare namespace feng3d {
-    var CLASS_KEY: string;
     /**
-     * 类工具
+     * ObjectUtils.assignDeep 中 转换结果的函数定义
      */
-    var classUtils: ClassUtils;
+    interface AssignDeepHandler {
+        /**
+         *
+         * @param target 目标对象
+         * @param source 源数据
+         * @param key 属性名称
+         * @param replacers 转换函数
+         * @param deep 当前深度
+         */
+        (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;
+    }
+    export class ObjectUtils {
+        /**
+         * 判断是否为基础类型 undefined,null,boolean,string,number
+         */
+        static isBaseType(object: any): boolean;
+        /**
+         * 执行方法
+         *
+         * 用例：
+         * 1. 给一个新建的对象进行初始化
+         *
+         *  ``` startLifetime = ObjectUtils.runFunc(new MinMaxCurve(), (obj) => { obj.mode = MinMaxCurveMode.Constant; (<MinMaxCurveConstant>obj.minMaxCurve).value = 5; }); ```
+         *
+         * @param obj 对象
+         * @param func 被执行的方法
+         */
+        static runFunc<T>(obj: T, func: (obj: T) => void): T;
+        /**
+         * 判断是否为Object对象，构造函数是否为Object， 检测 ObjectUtils.constructor === Object
+         *
+         * @param object 用于判断的对象
+         */
+        static isObject(object: any): boolean;
+        /**
+         * 获取对象对应属性上的值
+         *
+         * @param object 对象
+         * @param property 属性名称，可以是 "a" 或者 "a.b" 或者 ["a","b"]
+         */
+        static getPropertyValue(object: any, property: string | string[]): any;
+        /**
+         * 获取对象上属性链列表
+         *
+         * 例如 object值为{ a: { b: { c: 1 }, d: 2 } }时则返回 ["a.b.c","a.d"]
+         *
+         * @param object 对象
+         */
+        static getPropertyChains(object: any): string[];
+        /**
+         * 浅赋值
+         * 从源数据取所有可枚举属性值赋值给目标对象
+         *
+         * @param target 目标对象
+         * @param source 源数据
+         */
+        static assignShallow<T>(target: T, source: Partial<T>): T;
+        /**
+         * 深度赋值
+         * 从源数据取所有子代可枚举属性值赋值给目标对象
+         *
+         * @param target 被赋值对象
+         * @param source 源数据
+         * @param handlers 处理函数列表，先于 ObjectUtils.assignDeepDefaultHandlers 执行。函数返回值为true表示该属性赋值已完成跳过默认属性赋值操作，否则执行默认属性赋值操作。执行在 ObjectUtils.DefaultAssignDeepReplacers 前。
+         * @param deep 赋值深度，deep<1时直接返回。
+         */
+        static assignDeep<T>(target: T, source: gPartial<T>, handlers?: AssignDeepHandler[], deep?: number): T;
+        /**
+         * 深度比较两个对象子代可枚举属性值
+         *
+         * @param a 第一个对象
+         * @param b 第二个对象
+         */
+        static equalDeep<T>(a: T, b: T): boolean;
+        /**
+         * 判断对象是否为null或者undefine
+         *
+         * @param obj
+         * @returns
+         */
+        static objectIsEmpty(obj: any): boolean;
+        /**
+         * 从对象自身或者对象的原型中获取属性描述
+         *
+         * @param object 对象
+         * @param property 属性名称
+         */
+        static getPropertyDescriptor(object: any, property: string): PropertyDescriptor | undefined;
+        /**
+         * 属性是否可写
+         * @param obj 对象
+         * @param property 属性名称
+         */
+        static propertyIsWritable(obj: any, property: string): boolean;
+        /**
+         * ObjectUtils.assignDeep 中 默认转换结果的函数列表
+         */
+        static assignDeepDefaultHandlers: AssignDeepHandler[];
+    }
+    export {};
+}
+declare namespace feng3d {
+    class ArrayUtils {
+        /**
+          * 比较两个数组中元素是否相同
+          *
+          * @param array 被操作数组
+          * @param arr 用于比较的数组
+          */
+        static equal<T>(array: T[], arr: ArrayLike<T>): boolean;
+        /**
+         * 连接一个或多个数组到自身
+         *
+         * @param array 被操作数组
+         * @param items 要添加到数组末尾的其他项。
+         * @returns 返回自身
+         */
+        static concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
+        /**
+         * 使数组变得唯一，不存在两个相等的元素
+         *
+         * @param array 被操作数组
+         * @param compare 比较函数
+         */
+        static unique<T>(array: T[], compare?: (a: T, b: T) => boolean): T[];
+        /**
+         * 使用b元素替换数组中第一个a元素。
+         *
+         * @param array 被操作数组
+         * @param a 被替换的元素
+         * @param b 用于替换的元素
+         * @param isAdd 当数组中没有找到a元素时，是否需要把b元素添加到数组尾部。默认值为true。
+         */
+        static replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
+        /**
+         * 创建数组
+         * @param length 长度
+         * @param itemFunc 创建元素方法
+         */
+        static create<T>(length: number, itemFunc: (index: number) => T): T[];
+        /**
+         * 二分查找,如果有多个则返回第一个
+         * @param array 数组
+         * @param target 寻找的目标
+         * @param compare 比较函数
+         * @param start 起始位置
+         * @param end 结束位置
+         * @returns          查找到目标时返回所在位置，否则返回-1
+         */
+        static binarySearch<T>(array: T[], target: T, compare: (a: T, b: T) => number, start?: number, end?: number): number;
+        /**
+         * 二分查找插入位置,如果有多个则返回第一个
+         * @param array 数组
+         * @param target 寻找的目标
+         * @param compare 比较函数
+         * @param start 起始位置
+         * @param end 结束位置
+         * @returns          目标所在位置（如果该位置上不是目标对象，则该索引为该目标可插入的位置）
+         */
+        static binarySearchInsert<T>(array: T[], target: T, compare: (a: T, b: T) => number, start?: number, end?: number): number;
+        /**
+         * 判断数组是否唯一
+         *
+         * @param array 被检查数组
+         * @param compare 比较函数
+         */
+        static isUnique<T>(array: T[], compare?: (a: T, b: T) => boolean): boolean;
+        /**
+         * 删除元素
+         *
+         * @param array 被操作数组
+         * @param item 被删除元素
+         * @returns 被删除元素在数组中的位置
+         */
+        static deleteItem<T>(array: T[], item: T): number;
+    }
+}
+declare namespace feng3d {
+    const __class__ = "__class__";
     /**
      * 类工具
      */
     class ClassUtils {
+        classUtilsHandlers: Function[];
         /**
-         * 返回对象的完全限定类名。
-         * @param value 需要完全限定类名称的对象，可以将任何 JavaScript 值传递给此方法，包括所有可用的 JavaScript 类型、对象实例、原始类型
+         * 返回对象的类名。
+         * @param value 需要类名称的对象，可以将任何 JavaScript 值传递给此方法，包括所有可用的 JavaScript 类型、对象实例、原始类型
          * （如number)和类对象
-         * @returns 包含完全限定类名称的字符串。
+         * @returns 包含类名称的字符串。
          */
         getQualifiedClassName(value: any): string;
         /**
@@ -606,275 +1607,496 @@ declare namespace feng3d {
          *
          * @param name 类名称
          */
-        getInstanceByName(name: string): any;
+        getInstanceByName(name: string): unknown;
+        getInstanceByDefinition<T>(cls: Constructor<T>): T;
         /**
          * 新增反射对象所在的命名空间，使得getQualifiedClassName能够得到正确的结果
          */
         addClassNameSpace(namespace: string): void;
     }
+    /**
+     * 类工具
+     */
+    const classUtils: ClassUtils;
+    /**
+     * 为一个类定义注册类名
+     * @param constructor 类定义
+     * @param className 类名
+     */
+    function registerClass(constructor: Constructor<any>, className?: string): void;
+    /**
+     * 标记objectview对象界面类
+     */
+    function decoratorRegisterClass(className?: string): (constructor: Constructor<any>) => void;
 }
-interface MapConstructor {
-    getKeys<K, V>(map: Map<K, V>): K[];
-    getValues<K, V>(map: Map<K, V>): V[];
+/**
+ * The unescape() function computes a new string in which hexadecimal escape sequences are replaced with the character that it represents. The escape sequences might be introduced by a function like escape. Usually, decodeURI or decodeURIComponent are preferred over unescape.
+ * @param str A string to be decoded.
+ * @returns A new string in which certain characters have been unescaped.
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/unescape
+ */
+declare function unescape(str: string): string;
+/**
+ * The escape() function computes a new string in which certain characters have been replaced by a hexadecimal escape sequence.
+ * @param str A string to be encoded.
+ * @returns A new string in which certain characters have been escaped.
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/escape
+ */
+declare function escape(str: string): string;
+declare namespace feng3d {
+    /**
+     * 数据类型转换
+     * TypeArray、ArrayBuffer、Blob、File、DataURL、canvas的相互转换
+     * @see http://blog.csdn.net/yinwhm12/article/details/73482904
+     */
+    class DataTransform {
+        /**
+         * Blob to ArrayBuffer
+         */
+        blobToArrayBuffer(blob: Blob, callback: (arrayBuffer: ArrayBuffer) => void): void;
+        /**
+         * ArrayBuffer to Blob
+         */
+        arrayBufferToBlob(arrayBuffer: ArrayBuffer): Blob;
+        /**
+         * ArrayBuffer to Uint8
+         * Uint8数组可以直观的看到ArrayBuffer中每个字节（1字节 === 8位）的值。一般我们要将ArrayBuffer转成Uint类型数组后才能对其中的字节进行存取操作。
+         */
+        arrayBufferToUint8(arrayBuffer: ArrayBuffer): Uint8Array;
+        /**
+         * Uint8 to ArrayBuffer
+         * 我们Uint8数组可以直观的看到ArrayBuffer中每个字节（1字节 === 8位）的值。一般我们要将ArrayBuffer转成Uint类型数组后才能对其中的字节进行存取操作。
+         */
+        uint8ToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer;
+        /**
+         * Array to ArrayBuffer
+         * @param array 例如：[0x15, 0xFF, 0x01, 0x00, 0x34, 0xAB, 0x11];
+         */
+        arrayToArrayBuffer(array: number[]): ArrayBuffer;
+        /**
+         * TypeArray to Array
+         */
+        uint8ArrayToArray(u8a: Uint8Array): number[];
+        /**
+         * canvas转换为dataURL
+         */
+        canvasToDataURL(canvas: HTMLCanvasElement, type?: 'png' | 'jpeg', quality?: number): string;
+        /**
+         * canvas转换为图片
+         */
+        canvasToImage(canvas: HTMLCanvasElement, type: 'png' | 'jpeg', quality: number, callback: (img: HTMLImageElement) => void): void;
+        /**
+         * File、Blob对象转换为dataURL
+         * File对象也是一个Blob对象，二者的处理相同。
+         */
+        blobToDataURL(blob: Blob, callback: (dataurl: string) => void): void;
+        /**
+         * dataURL转换为Blob对象
+         */
+        dataURLtoBlob(dataurl: string): Blob;
+        /**
+         * dataURL图片数据转换为HTMLImageElement
+         * dataURL图片数据绘制到canvas
+         * 先构造Image对象，src为dataURL，图片onload之后绘制到canvas
+         */
+        dataURLDrawCanvas(dataurl: string, canvas: HTMLCanvasElement, callback: (img: HTMLImageElement) => void): void;
+        dataURLToArrayBuffer(dataurl: string, callback: (arraybuffer: ArrayBuffer) => void): void;
+        arrayBufferToDataURL(arrayBuffer: ArrayBuffer, callback: (dataurl: string) => void): void;
+        dataURLToImage(dataurl: string, callback: (img: HTMLImageElement) => void): void;
+        imageToDataURL(img: HTMLImageElement, quality?: number): string;
+        imageToCanvas(img: HTMLImageElement): HTMLCanvasElement;
+        imageToArrayBuffer(img: HTMLImageElement, callback: (arraybuffer: ArrayBuffer) => void): void;
+        imageDataToDataURL(imageData: ImageData, quality?: number): string;
+        imageDataToCanvas(imageData: ImageData): HTMLCanvasElement;
+        imagedataToImage(imageData: ImageData, quality: number, callback: (img: HTMLImageElement) => void): void;
+        arrayBufferToImage(arrayBuffer: ArrayBuffer, callback: (img: HTMLImageElement) => void): void;
+        blobToText(blob: Blob, callback: (content: string) => void): void;
+        stringToArrayBuffer(str: string): ArrayBuffer;
+        arrayBufferToString(arrayBuffer: ArrayBuffer, callback: (content: string) => void): void;
+        /**
+         * ArrayBuffer 转换为 对象
+         *
+         * @param arrayBuffer
+         * @param callback
+         */
+        arrayBufferToObject(arrayBuffer: ArrayBuffer, callback: (object: any) => void): void;
+        stringToUint8Array(str: string): Uint8Array;
+        uint8ArrayToString(arr: Uint8Array, callback: (str: string) => void): void;
+    }
+    /**
+     * 数据类型转换
+     * TypeArray、ArrayBuffer、Blob、File、DataURL、canvas的相互转换
+     * @see http://blog.csdn.net/yinwhm12/article/details/73482904
+     */
+    const dataTransform: DataTransform;
 }
-interface ArrayConstructor {
-    /**
-     * 使数组变得唯一，不存在两个相等的元素
-     *
-     * @param array 被操作数组
-     * @param compare 比较函数
-     */
-    unique<T>(array: T[], compare?: (a: T, b: T) => boolean): T[];
-    /**
-     * 判断数组是否唯一
-     *
-     * @param array 被检查数组
-     * @param compare 比较函数
-     */
-    isUnique<T>(array: T[], compare?: (a: T, b: T) => boolean): boolean;
-    /**
-     * 删除元素
-     *
-     * @param array 被操作数组
-     * @param item 被删除元素
-     * @returns 被删除元素在数组中的位置
-     */
-    delete<T>(array: T[], item: T): number;
-    /**
-     * 连接一个或多个数组到自身
-     *
-     * @param array 被操作数组
-     * @param items 要添加到数组末尾的其他项。
-     * @returns 返回自身
-     */
-    concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
-    /**
-     * 比较两个数组中元素是否相同
-     *
-     * @param array 被操作数组
-     * @param arr 用于比较的数组
-     */
-    equal<T>(array: T[], arr: ArrayLike<T>): boolean;
-    /**
-     * 使用b元素替换数组中第一个a元素。
-     *
-     * @param array 被操作数组
-     * @param a 被替换的元素
-     * @param b 用于替换的元素
-     * @param isAdd 当数组中没有找到a元素时，是否需要把b元素添加到数组尾部。默认值为true。
-     */
-    replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
-    /**
-     * 创建数组
-     * @param length 长度
-     * @param itemFunc 创建元素方法
-     */
-    create<T>(length: number, itemFunc: (index: number) => T): T[];
-    /**
-     * 二分查找,如果有多个则返回第一个
-     * @param   array   数组
-     * @param	target	寻找的目标
-     * @param	compare	比较函数
-     * @param   start   起始位置
-     * @param   end     结束位置
-     * @return          查找到目标时返回所在位置，否则返回-1
-     */
-    binarySearch<T>(array: T[], target: T, compare: (a: T, b: T) => number, start?: number, end?: number): number;
-    /**
-     * 二分查找插入位置,如果有多个则返回第一个
-     * @param   array   数组
-     * @param	target	寻找的目标
-     * @param	compare	比较函数
-     * @param   start   起始位置
-     * @param   end     结束位置
-     * @return          目标所在位置（如果该位置上不是目标对象，则该索引为该目标可插入的位置）
-     */
-    binarySearchInsert<T>(array: T[], target: T, compare: (a: T, b: T) => number, start?: number, end?: number): number;
+declare namespace feng3d {
+    class MapUtils {
+        static getKeys<K, V>(map: Map<K, V>): K[];
+        static getValues<K, V>(map: Map<K, V>): V[];
+    }
 }
-interface Array<T> {
-    /**
-     * Determines whether an array includes a certain element, returning true or false as appropriate.
-     * @param searchElement The element to search for.
-     * @param fromIndex The position in this array at which to begin searching for searchElement.
-     */
-    includes(searchElement: T, fromIndex?: number): boolean;
+interface MixinsMathUtil {
 }
-interface Math {
-    /**
-     * 角度转弧度因子
-     */
-    DEG2RAD: number;
-    /**
-     * 弧度转角度因子
-     */
-    RAD2DEG: number;
-    /**
-     * 默认精度
-     */
-    PRECISION: number;
-    /**
-     * 获取唯一标识符
-     * @see http://www.broofa.com/Tools/Math.uuid.htm
-     */
-    uuid: () => string;
-    /**
-     * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
-     *
-     * @param value 指定值
-     * @param lowerlimit 区间下界
-     * @param upperlimit 区间上界
-     */
-    clamp(value: number, lowerlimit: number, upperlimit: number): number;
-    /**
-     * 计算欧几里得模（整数模） ((n % m) + m) % m
-     *
-     * @param n 被除数
-     * @param m 除数
-     * @see https://en.wikipedia.org/wiki/Modulo_operation
-     */
-    euclideanModulo(n: number, m: number): number;
-    /**
-     * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
-     *
-     * @param x 第一个区间中值
-     * @param a1 第一个区间起始值
-     * @param a2 第一个区间终止值
-     * @param b1 第二个区间起始值
-     * @param b2 第二个区间起始值
-     */
-    mapLinear: (x: number, a1: number, a2: number, b1: number, b2: number) => number;
-    /**
-     * 线性插值
-     *
-     * @param start 起始值
-     * @param end 终止值
-     * @param t 插值系数 [0 ,1]
-     *
-     * @see https://en.wikipedia.org/wiki/Linear_interpolation
-     */
-    lerp(start: number, end: number, t: number): number;
-    /**
-     * 计算平滑值 3x^2 - 2x^3
-     *
-     * @param x
-     * @param min 最小值
-     * @param max 最大值
-     *
-     * @see http://en.wikipedia.org/wiki/Smoothstep
-     */
-    smoothstep(x: number, min: number, max: number): number;
-    /**
-     * 计算平滑值 6x^5 - 15x^4 + 10x^3
-     *
-     * @param x
-     * @param min 最小值
-     * @param max 最大值
-     */
-    smootherstep(x: number, min: number, max: number): number;
-    /**
-     * 从<low, high>获取随机整数
-     *
-     * @param low 区间起始值
-     * @param high 区间终止值
-     */
-    randInt(low: number, high: number): number;
-    /**
-     * 从<low, high>获取随机浮点数
-     *
-     * @param low 区间起始值
-     * @param high 区间终止值
-     */
-    randFloat(low: number, high: number): number;
-    /**
-     * 从<-range/2, range/2>获取随机浮点数
-     *
-     * @param range 范围
-     */
-    randFloatSpread(range: number): number;
-    /**
-     * 角度转换为弧度
-     *
-     * @param degrees 角度
-     */
-    degToRad(degrees: number): number;
-    /**
-     * 弧度转换为角度
-     *
-     * @param radians 弧度
-     */
-    radToDeg(radians: number): number;
-    /**
-     * 判断指定整数是否为2的幂
-     *
-     * @param value 整数
-     */
-    isPowerOfTwo(value: number): boolean;
-    /**
-     * 获取离指定整数最近的2的幂
-     *
-     * @param value 整数
-     */
-    nearestPowerOfTwo(value: number): number;
-    /**
-     * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
-     *
-     * @param value 整数
-     */
-    nextPowerOfTwo(value: number): number;
-    /**
-     * 获取目标最近的值
-     *
-     * source增加或者减少整数倍precision后得到离target最近的值
-     *
-     * ```
-     * Math.toRound(71,0,5);//运算结果为1
-     * ```
-     *
-     * @param source 初始值
-     * @param target 目标值
-     * @param precision 精度
-     */
-    toRound(source: number, target: number, precision?: number): number;
-    /**
-     * 比较两个Number是否相等
-     *
-     * @param a 数字a
-     * @param b 数字b
-     * @param precision 进度
-     */
-    equals(a: number, b: number, precision?: number): boolean;
-    /**
-     * 计算最大公约数
-     *
-     * @param a 整数a
-     * @param b 整数b
-     *
-     * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
-     */
-    gcd(a: number, b: number): number;
-    /**
-     * 计算最小公倍数
-     * Least common multiple
-     *
-     * @param a 整数a
-     * @param b 整数b
-     *
-     * @see https://en.wikipedia.org/wiki/Least_common_multiple
-     */
-    lcm(a: number, b: number): number;
+declare namespace feng3d {
+    interface MathUtil extends MixinsMathUtil {
+    }
+    class MathUtil implements MixinsMathUtil {
+        /**
+         * 角度转弧度因子
+         */
+        DEG2RAD: number;
+        /**
+         * 弧度转角度因子
+         */
+        RAD2DEG: number;
+        /**
+         * 默认精度
+         */
+        PRECISION: number;
+        /**
+         * 获取唯一标识符
+         * @see http://www.broofa.com/Tools/Math.uuid.htm
+         */
+        uuid: () => string;
+        /**
+         * （夹紧）计算指定值到区间[edge0 ,edge1]最近的值
+         *
+         * @param value 指定值
+         * @param lowerlimit 区间下界
+         * @param upperlimit 区间上界
+         */
+        clamp(value: number, lowerlimit: number, upperlimit: number): number;
+        /**
+         * 计算欧几里得模（整数模） ((n % m) + m) % m
+         *
+         * @param n 被除数
+         * @param m 除数
+         * @see https://en.wikipedia.org/wiki/Modulo_operation
+         */
+        uclideanModulo(n: number, m: number): number;
+        /**
+         * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
+         *
+         * @param x 第一个区间中值
+         * @param a1 第一个区间起始值
+         * @param a2 第一个区间终止值
+         * @param b1 第二个区间起始值
+         * @param b2 第二个区间起始值
+         */
+        mapLinear(x: number, a1: number, a2: number, b1: number, b2: number): number;
+        /**
+         * 线性插值
+         *
+         * @param start 起始值
+         * @param end 终止值
+         * @param t 插值系数 [0 ,1]
+         *
+         * @see https://en.wikipedia.org/wiki/Linear_interpolation
+         */
+        lerp(start: number, end: number, t: number): number;
+        /**
+         * 计算平滑值 3x^2 - 2x^3
+         *
+         * @param x
+         * @param min 最小值
+         * @param max 最大值
+         *
+         * @see http://en.wikipedia.org/wiki/Smoothstep
+         */
+        smoothstep(x: number, min: number, max: number): number;
+        /**
+         * 计算平滑值 6x^5 - 15x^4 + 10x^3
+         *
+         * @param x
+         * @param min 最小值
+         * @param max 最大值
+         */
+        smootherstep(x: number, min: number, max: number): number;
+        /**
+         * 从<low, high>获取随机整数
+         *
+         * @param low 区间起始值
+         * @param high 区间终止值
+         */
+        randInt(low: number, high: number): number;
+        /**
+         * 从<low, high>获取随机浮点数
+         *
+         * @param low 区间起始值
+         * @param high 区间终止值
+         */
+        randFloat(low: number, high: number): number;
+        /**
+         * 从<-range/2, range/2>获取随机浮点数
+         *
+         * @param range 范围
+         */
+        randFloatSpread(range: number): number;
+        /**
+         * 角度转换为弧度
+         *
+         * @param degrees 角度
+         */
+        degToRad(degrees: number): number;
+        /**
+         * 弧度转换为角度
+         *
+         * @param radians 弧度
+         */
+        radToDeg(radians: number): number;
+        /**
+         * 判断指定整数是否为2的幂
+         *
+         * @param value 整数
+         */
+        isPowerOfTwo(value: number): boolean;
+        /**
+         * 获取离指定整数最近的2的幂
+         *
+         * @param value 整数
+         */
+        nearestPowerOfTwo(value: number): number;
+        /**
+         * 获取指定大于等于整数最小2的幂，3->4,5->8,17->32,33->64
+         *
+         * @param value 整数
+         */
+        nextPowerOfTwo(value: number): number;
+        /**
+         * 获取目标最近的值
+         *
+         * source增加或者减少整数倍precision后得到离target最近的值
+         *
+         * ```
+         * mathUtil.toRound(71,0,5);//运算结果为1
+         * ```
+         *
+         * @param source 初始值
+         * @param target 目标值
+         * @param precision 精度
+         */
+        toRound(source: number, target: number, precision?: number): number;
+        /**
+         * 比较两个Number是否相等
+         *
+         * @param a 数字a
+         * @param b 数字b
+         * @param precision 进度
+         */
+        equals(a: number, b: number, precision?: number): boolean;
+        /**
+         * 计算最大公约数
+         *
+         * @param a 整数a
+         * @param b 整数b
+         *
+         * @see https://en.wikipedia.org/wiki/Greatest_common_divisor
+         */
+        gcd(a: number, b: number): number;
+        /**
+         * 计算最小公倍数
+         * Least common multiple
+         *
+         * @param a 整数a
+         * @param b 整数b
+         *
+         * @see https://en.wikipedia.org/wiki/Least_common_multiple
+         */
+        lcm(a: number, b: number): number;
+    }
+    const mathUtil: MathUtil;
 }
 declare namespace feng3d {
     /**
-     * 默认序列化工具
+     * 任务函数
      */
-    export var serialization: Serialization;
+    export interface TaskFunction {
+        /**
+         * 函数自身名称
+         */
+        readonly name?: string;
+        /**
+         * 函数自身
+         */
+        (callback: () => void): void;
+    }
+    /**
+     * 任务
+     *
+     * 处理 异步任务(函数)串联并联执行功能
+     */
+    class Task {
+        /**
+         * 并联多个异步函数为一个函数
+         *
+         * 这些异步函数同时执行
+         *
+         * @param fns 一组异步函数
+         */
+        parallel(fns: TaskFunction[]): TaskFunction;
+        /**
+         * 串联多个异步函数为一个函数
+         *
+         * 这些异步函数按顺序依次执行，等待前一个异步函数执行完调用回调后才执行下一个异步函数。
+         *
+         * @param fns 一组异步函数
+         */
+        series(fns: TaskFunction[]): TaskFunction;
+        /**
+         * 创建一组并行同类任务，例如同时加载一组资源，并在回调中返回结果数组
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        parallelResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
+        /**
+         * 创建一组串联同类任务，例如排序加载一组资源
+         *
+         * @param ps 一组参数
+         * @param fn 单一任务函数
+         * @param done 完成回调
+         */
+        seriesResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
+    }
+    /**
+     * 任务，用于处理任务之间依赖
+     */
+    export const task: Task;
+    export {};
+}
+declare namespace feng3d {
+    /**
+     * 观察装饰器，观察被装饰属性的变化
+     *
+     * @param onChange 属性变化回调  例如参数为“onChange”时，回调将会调用this.onChange(property, oldValue, newValue)
+     *
+     * 使用@watch后会自动生成一个带"_"的属性，例如 属性"a"会生成"_a"
+     *
+     * 通过使用 eval 函数 生成出 与自己手动写的set get 一样的函数，性能已经接近 手动写的get set函数。
+     *
+     * 性能比Watcher.watch更加高效，但还是建议使用 Watcher.watch 替代 @watch ，由于 @watch 没有对onChange更好的约束 使用 时容易出现运行时报错。
+     */
+    export function watch(onChange: string): (target: any, property: string) => void;
+    export class Watcher {
+        /**
+         * 监听对象属性的变化
+         *
+         * 注意：使用watch后获取该属性值的性能将会是原来的1/60，避免在运算密集处使用该函数。
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性
+         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        watch<T, K extends PropertyNames<T>, V extends T[K]>(object: T, property: K, handler: (newValue: V, oldValue: V, object: T, property: string) => void, thisObject?: any): void;
+        /**
+         * 取消监听对象属性的变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性
+         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        unwatch<T, K extends PropertyNames<T>, V extends T[K]>(object: T, property: K, handler?: (newValue: V, oldValue: V, object: T, property: string) => void, thisObject?: any): void;
+        private _binds;
+        /**
+         * 绑定两个对象的指定属性，保存两个属性值同步。
+         *
+         * @param object0 第一个对象。
+         * @param property0 第一个对象的属性名称。
+         * @param object1 第二个对象。
+         * @param property1 第二个对象的属性名称。
+         */
+        bind<T0, T1, K0 extends PropertyNames<T0>, K1 extends PropertyNames<T1>>(object0: T0, property0: K0, object1: T1, property1: K1): void;
+        /**
+         * 解除两个对象的指定属性的绑定。
+         *
+         * @param object0 第一个对象。
+         * @param property0 第一个对象的属性名称。
+         * @param object1 第二个对象。
+         * @param property1 第二个对象的属性名称。
+         */
+        unbind<T0, T1, K0 extends PropertyNames<T0>, K1 extends PropertyNames<T1>>(object0: T0, property0: K0, object1: T1, property1: K1): void;
+        /**
+         * 监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如："a.b"
+         * @param handler 变化回调函数 (newValue: any, oldValue: any, object: any, property: string) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        watchchain(object: any, property: string, handler: (newValue: any, oldValue: any, object: any, property: string) => void, thisObject?: any): void;
+        /**
+         * 取消监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如："a.b"
+         * @param handler 变化回调函数 (object: T, property: string, oldValue: V) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        unwatchchain(object: any, property: string, handler?: (newValue: any, oldValue: any, object: any, property: string) => void, thisObject?: any): void;
+        /**
+         * 监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property===object时表示监听对象中所有叶子属性变化。
+         * @param handler 变化回调函数 (newValue: any, oldValue: any, host: any, property: string) => void
+         * @param thisObject 变化回调函数 this值
+         */
+        watchobject<T>(object: T, property: gPartial<T>, handler: (newValue: any, oldValue: any, host: any, property: string) => void, thisObject?: any): void;
+        /**
+         * 取消监听对象属性链值变化
+         *
+         * @param object 被监听对象
+         * @param property 被监听属性 例如：{a:{b:null,d:null}} 表示监听 object.a.b 与 object.a.d 值得变化，如果property===object时表示监听对象中所有叶子属性变化。
+         * @param handler 变化回调函数 newValue: any, oldValue: any, host: any, property: string => void
+         * @param thisObject 变化回调函数 this值
+         */
+        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (newValue: any, oldValue: any, host: any, property: string) => void, thisObject?: any): void;
+    }
+    export const watcher: Watcher;
+    export const __watchs__ = "__watchs__";
+    export const __watchchains__ = "__watchchains__";
+    /**
+     * 让T中以及所有键值中的所有键都是可选的
+     */
+    type gPartial<T> = {
+        [P in keyof T]?: gPartial<T[P]>;
+    };
+    /**
+     * 选取T类型中值为非函数类型的所有键
+     */
+    type PropertyNames<T> = NonTypePropertyNames<T, Function>;
+    /**
+     * 获取T类型中除值为KT类型以外的所有键
+     *
+     * ```
+     * class A
+     * {
+     *      a = 1;
+     *      f(){}
+     * }
+     *
+     * var a: NonTypePropertyNames<A, number>; //var a:"f"
+     * var a1: NonTypePropertyNames<A, Function>; //var a:"a"
+     *
+     * ```
+     */
+    type NonTypePropertyNames<T, KT> = {
+        [K in keyof T]: T[K] extends KT ? never : K;
+    }[keyof T];
+    export {};
+}
+declare namespace feng3d {
     /**
      * 序列化装饰器
      *
      * 在属性定义前使用 @serialize 进行标记需要序列化
      *
-     * @param {*} target                序列化原型
-     * @param {string} propertyKey      序列化属性
+     * @param target 序列化原型
+     * @param propertyKey 序列化属性
      */
     export function serialize(target: any, propertyKey: string): void;
     /**
@@ -905,21 +2127,21 @@ declare namespace feng3d {
          *
          * 用于处理序列化循环引用以及多次引用的对象
          */
-        serializedMap: Map<Object, {
+        serializedMap: Map<any, {
             target: any;
             property: string;
         }>;
         handlers: PropertyHandler<SerializeHandlerParam>[];
-        root: object;
+        root: any;
         autoRefID: number;
     }
     interface DeserializeHandlerParam extends HandlerParam {
         refs: {
             [refid: string]: {
-                target: Object;
+                target: any;
                 property: string;
                 refs: {
-                    target: Object;
+                    target: any;
                     property: string;
                 }[];
             };
@@ -930,7 +2152,7 @@ declare namespace feng3d {
         /**
          * 当前对象的不同数据
          */
-        different: Object;
+        different: any;
     }
     /**
      * 序列化
@@ -983,7 +2205,7 @@ declare namespace feng3d {
          *
          * @param obj
          */
-        deleteCLASS_KEY(obj: Object): void;
+        deleteClassKey(obj: any): void;
         /**
          * 反序列化对象为基础对象数据（由Object与Array组合）
          *
@@ -995,7 +2217,7 @@ declare namespace feng3d {
          * 比较两个对象的不同，提取出不同的数据(可能会经过反序列化处理)
          *
          * @param target 用于检测不同的数据
-         * @param source   模板（默认）数据
+         * @param source 模板（默认）数据
          * @param different 比较得出的不同（简单结构）数据
          *
          * @returns 比较得出的不同数据（由Object与Array组合可 JSON.stringify 的简单结构）
@@ -1018,1982 +2240,11 @@ declare namespace feng3d {
         loadingNum?: number;
         onLoaded?: () => void;
     }
+    /**
+     * 默认序列化工具
+     */
+    export const serialization: Serialization;
     export {};
-}
-declare namespace feng3d {
-    /**
-     * 标记objectview对象界面类
-     */
-    function OVComponent(component?: string): (constructor: Function) => void;
-    /**
-     * 标记objectview块界面类
-     */
-    function OBVComponent(component?: string): (constructor: Function) => void;
-    /**
-     * 标记objectview属性界面类
-     */
-    function OAVComponent(component?: string): (constructor: Function) => void;
-    /**
-     * objectview类装饰器
-     */
-    function ov<K extends keyof OVComponentParamMap>(param: {
-        component?: K;
-        componentParam?: OVComponentParamMap[K];
-    }): (constructor: Function) => void;
-    type OAVComponentParams = Partial<OAVComponentParamMap[keyof OAVComponentParamMap]> & {
-        /**
-         * 是否可编辑
-         */
-        editable?: boolean;
-        /**
-         * 所属块名称
-         */
-        block?: string;
-        /**
-         * 提示信息
-         */
-        tooltip?: string;
-        /**
-         * 优先级，数字越小，显示越靠前，默认为0
-         */
-        priority?: number;
-        /**
-         * 是否排除
-         */
-        exclude?: boolean;
-    };
-    /**
-     * objectview属性装饰器
-     * @param param 参数
-     */
-    function oav(param?: OAVComponentParams): (target: any, propertyKey: string) => void;
-    /**
-     * 对象界面
-     */
-    var objectview: ObjectView;
-    /**
-     * 对象界面
-     */
-    class ObjectView {
-        /**
-         * 默认基础类型对象界面类定义
-         */
-        defaultBaseObjectViewClass: string;
-        /**
-         * 默认对象界面类定义
-         */
-        defaultObjectViewClass: string;
-        /**
-         * 默认对象属性界面类定义
-         */
-        defaultObjectAttributeViewClass: string;
-        /**
-         * 属性块默认界面
-         */
-        defaultObjectAttributeBlockView: string;
-        /**
-         * 指定属性类型界面类定义字典（key:属性类名称,value:属性界面类定义）
-         */
-        defaultTypeAttributeView: {};
-        OAVComponent: {};
-        OBVComponent: {};
-        OVComponent: {};
-        setDefaultTypeAttributeView(type: string, component: AttributeTypeDefinition): void;
-        /**
-         * 获取对象界面
-         * @param object 用于生成界面的对象
-         * @param param 参数
-         */
-        getObjectView(object: Object, param?: GetObjectViewParam): IObjectView;
-        /**
-         * 获取属性界面
-         *
-         * @static
-         * @param {AttributeViewInfo} attributeViewInfo			属性界面信息
-         * @returns {egret.DisplayObject}						属性界面
-         *
-         * @memberOf ObjectView
-         */
-        getAttributeView(attributeViewInfo: AttributeViewInfo): IObjectAttributeView;
-        /**
-         * 获取块界面
-         *
-         * @static
-         * @param {BlockViewInfo} blockViewInfo			块界面信息
-         * @returns {egret.DisplayObject}				块界面
-         *
-         * @memberOf ObjectView
-         */
-        getBlockView(blockViewInfo: BlockViewInfo): IObjectBlockView;
-        addOAV(target: any, propertyKey: string, param?: OAVComponentParams): void;
-        /**
-         * 获取对象信息
-         * @param object				对象
-         * @param autocreate			当对象没有注册属性时是否自动创建属性信息
-         * @param excludeAttrs			排除属性列表
-         * @return
-         */
-        getObjectInfo(object: Object, autocreate?: boolean, excludeAttrs?: string[]): ObjectViewInfo;
-    }
-    /**
-     * OAV 组件参数映射
-     * {key: OAV组件名称,value：组件参数类定义}
-     */
-    interface OAVComponentParamMap {
-        OAVEnum: OAVEnumParam;
-    }
-    /**
-     * OAVEnum 组件参数
-     */
-    interface OAVEnumParam {
-        component: "OAVEnum";
-        componentParam: {
-            /**
-             * 枚举类型
-             */
-            enumClass: any;
-        };
-    }
-    interface OBVComponentParamMap {
-        块组件名称: "块组件参数";
-        [component: string]: any;
-    }
-    interface OVComponentParamMap {
-        类组件名称: "类组件参数";
-        [component: string]: any;
-    }
-    /**
-     * 定义属性
-     */
-    interface AttributeDefinition {
-        /**
-         * 属性名称
-         */
-        name: string;
-        /**
-         * 是否可编辑
-         */
-        editable?: boolean;
-        /**
-         * 所属块名称
-         */
-        block?: string;
-        /**
-         * 提示信息
-         */
-        tooltip?: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 优先级，数字越小，显示越靠前，默认为0
-         */
-        priority?: number;
-        /**
-         * 是否排除
-         */
-        exclude?: boolean;
-    }
-    /**
-     * 定义特定属性类型默认界面
-     */
-    interface AttributeTypeDefinition {
-        /**
-         * 界面类
-         */
-        component: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-    }
-    /**
-     * 块定义
-     */
-    interface BlockDefinition {
-        /**
-         * 块名称
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-    }
-    /**
-     * ObjectView类配置
-     */
-    interface ClassDefinition {
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 自定义对象属性定义字典（key:属性名,value:属性定义）
-         */
-        attributeDefinitionVec: AttributeDefinition[];
-        /**
-         * 自定义对象属性块界面类定义字典（key:属性块名称,value:自定义对象属性块界面类定义）
-         */
-        blockDefinitionVec: BlockDefinition[];
-    }
-    /**
-     * 对象属性界面接口
-     */
-    interface IObjectAttributeView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 属性名称
-         */
-        attributeName: string;
-        /**
-         * 属性值
-         */
-        attributeValue: Object;
-        /**
-         * 对象属性界面
-         */
-        objectView: IObjectView;
-        /**
-         * 对象属性块界面
-         */
-        objectBlockView: IObjectBlockView;
-    }
-    /**
-     * 对象属性块界面接口
-     */
-    interface IObjectBlockView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 块名称
-         */
-        blockName: string;
-        /**
-         * 对象属性界面
-         */
-        objectView: IObjectView;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 获取属性界面
-         * @param attributeName		属性名称
-         */
-        getAttributeView(attributeName: string): IObjectAttributeView;
-    }
-    /**
-     * 对象界面接口
-     */
-    interface IObjectView {
-        /**
-         * 界面所属对象（空间）
-         */
-        space: Object;
-        /**
-         * 更新界面
-         */
-        updateView(): void;
-        /**
-         * 获取块界面
-         * @param blockName		块名称
-         */
-        getblockView(blockName: string): IObjectBlockView;
-        /**
-         * 获取属性界面
-         * @param attributeName		属性名称
-         */
-        getAttributeView(attributeName: string): IObjectAttributeView;
-    }
-    /**
-     * 对象属性信息
-     */
-    interface AttributeViewInfo {
-        /**
-         * 属性名称
-         */
-        name: string;
-        /**
-         * 属性类型
-         */
-        type: string;
-        /**
-         * 是否可写
-         */
-        editable: boolean;
-        /**
-         * 所属块名称
-         */
-        block?: string;
-        /**
-         * 提示信息
-         */
-        tooltip?: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 属性所属对象
-         */
-        owner: Object;
-        /**
-         * 优先级，数字越小，显示越靠前，默认为0
-         */
-        priority?: number;
-        /**
-         * 是否排除
-         */
-        exclude?: boolean;
-    }
-    /**
-     * 对象属性块
-     */
-    interface BlockViewInfo {
-        /**
-         * 块名称
-         */
-        name: string;
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 属性信息列表
-         */
-        itemList: AttributeViewInfo[];
-        /**
-         * 属性拥有者
-         */
-        owner: Object;
-    }
-    /**
-     * 对象信息
-     */
-    interface ObjectViewInfo {
-        /**
-         * 组件
-         */
-        component?: string;
-        /**
-         * 组件参数
-         */
-        componentParam?: Object;
-        /**
-         * 对象属性列表
-         */
-        objectAttributeInfos: AttributeViewInfo[];
-        /**
-         * 对象块信息列表
-         */
-        objectBlockInfos: BlockViewInfo[];
-        /**
-         * 保存类的一个实例，为了能够获取动态属性信息
-         */
-        owner: Object;
-        /**
-         * 是否可编辑
-         */
-        editable?: boolean;
-    }
-    type GetObjectViewParam = {
-        /**
-         * 当对象没有注册属性时是否自动创建属性信息
-         */
-        autocreate?: boolean;
-        /**
-         * 排除属性列表
-         */
-        excludeAttrs?: string[];
-        /**
-         * 是否可编辑
-         */
-        editable?: boolean;
-    };
-}
-declare namespace feng3d {
-    type CompareFunction<T> = (a: T, b: T) => number;
-    /**
-     * 比较器
-     */
-    class Comparator<T> {
-        /**
-         * 默认比较函数。只能处理 a和b 同为string或number的比较。
-         *
-         * @param a 比较值a
-         * @param b 比较值b
-         */
-        static defaultCompareFunction(a: string | number, b: string | number): 1 | 0 | -1;
-        private compare;
-        /**
-         * 构建比较器
-         * @param compareFunction 比较函数
-         */
-        constructor(compareFunction?: CompareFunction<T>);
-        /**
-         * 检查 a 是否等于 b 。
-         *
-         * @param a 值a
-         * @param b 值b
-         */
-        equal(a: T, b: T): boolean;
-        /**
-         * 检查 a 是否小于 b 。
-         *
-         * @param a 值a
-         * @param b 值b
-         */
-        lessThan(a: T, b: T): boolean;
-        /**
-         * 检查 a 是否大于 b 。
-         *
-         * @param a 值a
-         * @param b 值b
-         */
-        greaterThan(a: T, b: T): boolean;
-        /**
-         * 检查 a 是否小于等于 b 。
-         *
-         * @param a 值a
-         * @param b 值b
-         */
-        lessThanOrEqual(a: T, b: T): boolean;
-        /**
-         * 检查 a 是否大于等于 b 。
-         *
-         * @param a 值a
-         * @param b 值b
-         */
-        greaterThanOrEqual(a: T, b: T): boolean;
-        /**
-         * 反转比较函数。
-         */
-        reverse(): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 链表
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/linked-list/LinkedList.js
-     */
-    class LinkedList<T> {
-        /**
-         * 表头
-         */
-        private head;
-        /**
-         * 表尾
-         */
-        private tail;
-        /**
-         * 比较器
-         */
-        private compare;
-        /**
-         * 构建双向链表
-         *
-         * @param comparatorFunction 比较函数
-         */
-        constructor(comparatorFunction?: CompareFunction<T>);
-        /**
-         * 是否为空
-         */
-        isEmpty(): boolean;
-        /**
-         * 清空
-         */
-        empty(): void;
-        /**
-         * 获取表头值
-         */
-        getHeadValue(): T;
-        /**
-         * 添加新结点到表头
-         *
-         * @param value 结点数据
-         */
-        addHead(value: T): this;
-        /**
-         * 添加新结点到表尾
-         *
-         * @param value 结点数据
-         */
-        addTail(value: T): this;
-        /**
-         * 删除链表中第一个与指定值相等的结点
-         *
-         * @param value 结点值
-         */
-        delete(value: T): LinkedListNode<T>;
-        /**
-         * 删除链表中所有与指定值相等的结点
-         *
-         * @param value 结点值
-         */
-        deleteAll(value: T): LinkedListNode<T>;
-        /**
-         * 查找与结点值相等的结点
-         *
-         * @param value 结点值
-         */
-        find(value: T): LinkedListNode<T>;
-        /**
-         * 查找与结点值相等的结点
-         *
-         * @param callback 判断是否为查找的元素
-         */
-        findByFunc(callback: (value: T) => Boolean): LinkedListNode<T>;
-        /**
-         * 删除表头
-         *
-         * 删除链表前面的元素(链表的头)并返回元素值。如果队列为空，则返回null。
-         */
-        deleteHead(): T;
-        /**
-         * 删除表尾
-         */
-        deleteTail(): T;
-        /**
-         * 从数组中初始化链表
-         *
-         * @param values 结点值列表
-         */
-        fromArray(values: T[]): this;
-        /**
-         * 转换为数组
-         */
-        toArray(): T[];
-        /**
-         * 转换为字符串
-         *
-         * @param valueToString 值输出为字符串函数
-         */
-        toString(valueToString?: (value: T) => string): string;
-        /**
-         * 反转链表
-         */
-        reverse(): this;
-        /**
-         * 核查结构是否正确
-         */
-        checkStructure(): boolean;
-    }
-    /**
-     * 链表结点
-     */
-    interface LinkedListNode<T> {
-        /**
-         * 值
-         */
-        value: T;
-        /**
-         * 下一个结点
-         */
-        next: LinkedListNode<T>;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 双向链表
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/doubly-linked-list/DoublyLinkedList.js
-     */
-    class DoublyLinkedList<T> {
-        /**
-         * 表头
-         */
-        private head;
-        /**
-         * 表尾
-         */
-        private tail;
-        /**
-         * 比较器
-         */
-        private compare;
-        /**
-         * 构建双向链表
-         *
-         * @param comparatorFunction 比较函数
-         */
-        constructor(comparatorFunction?: CompareFunction<T>);
-        /**
-         * 是否为空
-         */
-        isEmpty(): boolean;
-        /**
-         * 清空
-         */
-        empty(): void;
-        /**
-         * 添加新结点到表头
-         *
-         * @param value 结点数据
-         */
-        addHead(value: T): this;
-        /**
-         * 添加新结点到表尾
-         *
-         * @param value 结点数据
-         */
-        addTail(value: T): this;
-        /**
-         * 删除链表中第一个与指定值相等的结点
-         *
-         * @param value 结点值
-         */
-        delete(value: T): DoublyLinkedListNode<T>;
-        /**
-         * 删除链表中所有与指定值相等的结点
-         *
-         * @param value 结点值
-         */
-        deleteAll(value: T): DoublyLinkedListNode<T>;
-        /**
-         * 查找与结点值相等的结点
-         *
-         * @param value 结点值
-         */
-        find(value: T): DoublyLinkedListNode<T>;
-        /**
-         * 查找与结点值相等的结点
-         *
-         * @param callback 判断是否为查找的元素
-         */
-        findByFunc(callback: (value: T) => Boolean): DoublyLinkedListNode<T>;
-        /**
-         * 删除表头
-         */
-        deleteHead(): T;
-        /**
-         * 删除表尾
-         */
-        deleteTail(): T;
-        /**
-         * 从数组中初始化链表
-         *
-         * @param values 结点值列表
-         */
-        fromArray(values: T[]): this;
-        /**
-         * 转换为数组
-         */
-        toArray(): T[];
-        /**
-         * 转换为字符串
-         * @param valueToString 值输出为字符串函数
-         */
-        toString(valueToString?: (value: T) => string): string;
-        /**
-         * 反转链表
-         */
-        reverse(): this;
-        /**
-         * 核查结构是否正确
-         */
-        checkStructure(): boolean;
-    }
-    /**
-     * 双向链接结点
-     */
-    interface DoublyLinkedListNode<T> {
-        /**
-         * 值
-         */
-        value: T;
-        /**
-         * 上一个结点
-         */
-        previous: DoublyLinkedListNode<T>;
-        /**
-         * 下一个结点
-         */
-        next: DoublyLinkedListNode<T>;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 队列，只能从后面进，前面出
-     * 使用单向链表实现
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/queue/Queue.js
-     */
-    class Queue<T> {
-        private linkedList;
-        /**
-         * 构建队列
-         *
-         * @param comparatorFunction 比较函数
-         */
-        constructor();
-        /**
-         * 是否为空
-         */
-        isEmpty(): boolean;
-        /**
-         * 清空
-         */
-        empty(): void;
-        /**
-         * 读取队列前面的元素，但不删除它。
-         */
-        peek(): T;
-        /**
-         * 入队
-         *
-         * 在队列的末尾(链表的尾部)添加一个新元素。
-         * 这个元素将在它前面的所有元素之后被处理。
-         *
-         * @param value 元素值
-         */
-        enqueue(value: T): this;
-        /**
-         * 出队
-         *
-         * 删除队列前面的元素(链表的头)。如果队列为空，则返回null。
-         */
-        dequeue(): T;
-        /**
-         * 转换为字符串
-         *
-         * @param valueToString 值输出为字符串函数
-         */
-        toString(valueToString?: (value: T) => string): string;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 栈
-     *
-     * 后进先出
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/stack/Stack.js
-     */
-    class Stack<T> {
-        private linkedList;
-        /**
-         * 是否为空
-         */
-        isEmpty(): boolean;
-        /**
-         * 查看第一个元素值
-         */
-        peek(): T;
-        /**
-         * 入栈
-         *
-         * @param value 元素值
-         */
-        push(value: T): this;
-        /**
-         * 出栈
-         */
-        pop(): T;
-        /**
-         * 转换为数组
-         */
-        toArray(): T[];
-        /**
-         * 转换为字符串
-         *
-         * @param valueToString 值输出为字符串函数
-         */
-        toString(valueToString?: (value: T) => string): string;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 堆
-     *
-     * 最小和最大堆的父类。
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/heap/Heap.js
-     */
-    abstract class Heap<T> {
-        /**
-         * 堆的数组表示。
-         */
-        private heapContainer;
-        /**
-         * 比较器
-         */
-        protected compare: Comparator<T>;
-        /**
-         * 构建链表
-         *
-         * @param comparatorFunction 比较函数
-         */
-        constructor(comparatorFunction?: CompareFunction<T>);
-        /**
-         * 获取左边子结点索引
-         *
-         * @param parentIndex 父结点索引
-         */
-        getLeftChildIndex(parentIndex: number): number;
-        /**
-         * 获取右边子结点索引
-         *
-         * @param parentIndex 父结点索引
-         */
-        getRightChildIndex(parentIndex: number): number;
-        /**
-         * 获取父结点索引
-         *
-         * @param childIndex 子结点索引
-         */
-        getParentIndex(childIndex: number): number;
-        /**
-         * 是否有父结点
-         *
-         * @param childIndex 子结点索引
-         */
-        hasParent(childIndex: number): boolean;
-        /**
-         * 是否有左结点
-         *
-         * @param parentIndex 父结点索引
-         */
-        hasLeftChild(parentIndex: number): boolean;
-        /**
-         * 是否有右结点
-         *
-         * @param parentIndex 父结点索引
-         */
-        hasRightChild(parentIndex: number): boolean;
-        /**
-         * 获取左结点
-         *
-         * @param parentIndex 父结点索引
-         */
-        leftChild(parentIndex: number): T;
-        /**
-         * 获取右结点
-         *
-         * @param parentIndex 父结点索引
-         */
-        rightChild(parentIndex: number): T;
-        /**
-         * 获取父结点
-         *
-         * @param childIndex 子结点索引
-         */
-        parent(childIndex: number): T;
-        /**
-         * 交换两个结点数据
-         *
-         * @param index1 索引1
-         * @param index2 索引2
-         */
-        swap(index1: number, index2: number): void;
-        /**
-         * 查看堆顶数据
-         */
-        peek(): T;
-        /**
-         * 出堆
-         *
-         * 取出堆顶元素
-         */
-        poll(): T;
-        /**
-         * 新增元素
-         *
-         * @param item 元素
-         */
-        add(item: T): this;
-        /**
-         * 移除所有指定元素
-         *
-         * @param item 元素
-         * @param comparator 比较器
-         */
-        remove(item: T, comparator?: Comparator<T>): this;
-        /**
-         * 查找元素所在所有索引
-         *
-         * @param item 查找的元素
-         * @param comparator 比较器
-         */
-        find(item: T, comparator?: Comparator<T>): number[];
-        /**
-         * 是否为空
-         */
-        isEmpty(): boolean;
-        /**
-         * 转换为字符串
-         */
-        toString(): string;
-        /**
-         * 堆冒泡
-         *
-         * @param startIndex 堆冒泡起始索引
-         */
-        heapifyUp(startIndex?: number): void;
-        /**
-         * 堆下沉
-         *
-         * @param startIndex 堆下沉起始索引
-         */
-        heapifyDown(startIndex?: number): void;
-        /**
-         * 检查堆元素对的顺序是否正确。
-         * 对于MinHeap，第一个元素必须总是小于等于。
-         * 对于MaxHeap，第一个元素必须总是大于或等于。
-         *
-         * @param firstElement 第一个元素
-         * @param secondElement 第二个元素
-         */
-        abstract pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 最大堆
-     *
-     * 所有父结点都大于子结点
-     */
-    class MaxHeap<T> extends Heap<T> {
-        /**
-         * 检查堆元素对的顺序是否正确。
-         * 对于MinHeap，第一个元素必须总是小于等于。
-         * 对于MaxHeap，第一个元素必须总是大于或等于。
-         *
-         * @param firstElement 第一个元素
-         * @param secondElement 第二个元素
-         */
-        pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 最小堆
-     *
-     * 所有父结点都小于子结点
-     */
-    class MinHeap<T> extends Heap<T> {
-        /**
-         * 检查堆元素对的顺序是否正确。
-         * 对于MinHeap，第一个元素必须总是小于等于。
-         * 对于MaxHeap，第一个元素必须总是大于或等于。
-         *
-         * @param firstElement 第一个元素
-         * @param secondElement 第二个元素
-         */
-        pairIsInCorrectOrder(firstElement: T, secondElement: T): boolean;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 哈希表（散列表）
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/hash-table/HashTable.js
-     */
-    class HashTable {
-        private keys;
-        buckets: LinkedList<{
-            key: string;
-            value: any;
-        }>[];
-        /**
-         * 构建哈希表
-         * @param hashTableSize 哈希表尺寸
-         */
-        constructor(hashTableSize?: number);
-        /**
-         * 将字符串键转换为哈希数。
-         *
-         * @param key 字符串键
-         */
-        hash(key: string): number;
-        /**
-         * 设置值
-         *
-         * @param key 键
-         * @param value 值
-         */
-        set(key: string, value: any): void;
-        /**
-         * 删除指定键以及对于值
-         *
-         * @param key 键
-         */
-        delete(key: string): LinkedListNode<{
-            key: string;
-            value: any;
-        }>;
-        /**
-         * 获取与键对应的值
-         *
-         * @param key 键
-         */
-        get(key: string): any;
-        /**
-         * 是否拥有键
-         *
-         * @param key 键
-         */
-        has(key: string): any;
-        /**
-         * 获取键列表
-         */
-        getKeys(): string[];
-    }
-}
-declare namespace feng3d {
-    /**
-     * 优先队列
-     *
-     * 所有元素按优先级排序
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/priority-queue/PriorityQueue.js
-     */
-    class PriorityQueue<T> {
-        private items;
-        /**
-         * 队列长度
-         */
-        get length(): number;
-        /**
-         * 比较函数
-         */
-        get compare(): (a: T, b: T) => number;
-        set compare(v: (a: T, b: T) => number);
-        private _compare;
-        /**
-         * 构建优先数组
-         * @param   compare     比较函数
-         */
-        constructor(compare: (a: T, b: T) => number);
-        /**
-         * 尾部添加元素（进队）
-         * @param items 元素列表
-         * @returns 长度
-         */
-        push(...items: T[]): number;
-        /**
-         * 头部移除元素（出队）
-         */
-        shift(): T;
-        /**
-         * 转换为数组
-         */
-        toArray(): T[];
-        /**
-         * 从数组初始化链表
-         */
-        fromArray(array: T[]): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 优先队列
-     *
-     * 与最小堆相同，只是与元素比较时不同
-     * 我们考虑的不是元素的值，而是它的优先级。
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/priority-queue/PriorityQueue.js
-     */
-    class PriorityQueue1<T> extends MinHeap<T> {
-        private priorities;
-        constructor();
-        /**
-         * 新增元素
-         *
-         * @param item 元素
-         * @param priority 优先级
-         */
-        add(item: T, priority?: number): this;
-        /**
-         * 移除元素
-         *
-         * @param item 元素
-         * @param customFindingComparator 自定义查找比较器
-         */
-        remove(item: T, customFindingComparator?: Comparator<T>): this;
-        /**
-         * 改变元素优先级
-         *
-         * @param item 元素
-         * @param priority 优先级
-         */
-        changePriority(item: T, priority: number): this;
-        /**
-         * 查找元素所在索引
-         *
-         * @param item 元素
-         */
-        findByValue(item: T): number[];
-        /**
-         * 是否拥有元素
-         *
-         * @param item 元素
-         */
-        hasValue(item: T): boolean;
-        /**
-         * 比较两个元素优先级
-         *
-         * @param a 元素a
-         * @param b 元素b
-         */
-        comparePriority(a: T, b: T): 1 | 0 | -1;
-        /**
-         * 比较两个元素大小
-         *
-         * @param a 元素a
-         * @param b 元素b
-         */
-        compareValue(a: T, b: T): 1 | 0 | -1;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 布隆过滤器 （ 在 JavaScript中 该类可由Object对象代替）
-     *
-     * 用于判断某元素是否可能插入
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/bloom-filter/BloomFilter.js
-     * @see https://baike.baidu.com/item/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8
-     */
-    class BloomFilter {
-        private size;
-        private storage;
-        /**
-         *
-         * @param size 尺寸
-         */
-        constructor(size?: number);
-        /**
-         * 插入
-         *
-         * @param item 元素
-         */
-        insert(item: string): void;
-        /**
-         * 可能包含
-         *
-         * @param item 元素
-         */
-        mayContain(item: string): boolean;
-        /**
-         * 创建存储器
-         * @param size 尺寸
-         */
-        createStore(size: number): {
-            getValue(index: any): any;
-            setValue(index: any): void;
-        };
-        /**
-         * 计算哈希值1
-         *
-         * @param item 元素
-         */
-        hash1(item: string): number;
-        /**
-         * 计算哈希值2
-         *
-         * @param item 元素
-         */
-        hash2(item: string): number;
-        /**
-         * 计算哈希值3
-         *
-         * @param item 元素
-         */
-        hash3(item: string): number;
-        /**
-         * 获取3个哈希值组成的数组
-         */
-        getHashValues(item: string): number[];
-    }
-}
-declare namespace feng3d {
-    /**
-     * 并查集
-     *
-     * 并查集是一种树型的数据结构，用于处理一些不交集（Disjoint Sets）的合并及查询问题。
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/disjoint-set/DisjointSet.js
-     * @see https://en.wikipedia.org/wiki/Disjoint-set_data_structure
-     * @see https://www.youtube.com/watch?v=wU6udHRIkcc&index=14&t=0s&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8
-     */
-    class DisjointSet<T> {
-        private items;
-        /**
-         * 计算键值函数
-         */
-        private keyCallback;
-        /**
-         * 构建 并查集
-         * @param keyCallback 计算键值函数
-         */
-        constructor(keyCallback?: (value: T) => string);
-        /**
-         * 创建集合
-         *
-         * @param nodeValue 结点值
-         */
-        makeSet(nodeValue: T): this;
-        /**
-         * 查找给出值所在集合根结点键值
-         *
-         * @param nodeValue 结点值
-         */
-        find(nodeValue: T): string;
-        /**
-         * 合并两个值所在的集合
-         *
-         * @param valueA 值a
-         * @param valueB 值b
-         */
-        union(valueA: T, valueB: T): this;
-        /**
-         * 判断两个值是否在相同集合中
-         *
-         * @param valueA 值A
-         * @param valueB 值B
-         */
-        inSameSet(valueA: T, valueB: T): boolean;
-    }
-    /**
-     * 并查集结点
-     */
-    class DisjointSetNode<T> {
-        /**
-         * 值
-         */
-        value: T;
-        /**
-         * 计算键值函数
-         */
-        keyCallback: (value: T) => string;
-        /**
-         * 父结点
-         */
-        parent: DisjointSetNode<T>;
-        /**
-         * 子结点
-         */
-        children: any;
-        /**
-         * 构建 并查集 项
-         *
-         * @param value 值
-         * @param keyCallback 计算键值函数
-         */
-        constructor(value: T, keyCallback?: (value: T) => string);
-        /**
-         * 获取键值
-         */
-        getKey(): string;
-        /**
-         * 获取根结点
-         */
-        getRoot(): DisjointSetNode<T>;
-        /**
-         * 是否为根结点
-         */
-        isRoot(): boolean;
-        /**
-         * 获取所有子孙结点数量
-         */
-        getRank(): number;
-        /**
-         * 获取子结点列表
-         */
-        getChildren(): any[];
-        /**
-         * 设置父结点
-         * @param parentNode 父结点
-         */
-        setParent(parentNode: DisjointSetNode<T>): this;
-        /**
-         * 添加子结点
-         * @param childNode 子结点
-         */
-        addChild(childNode: DisjointSetNode<T>): this;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 图
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/graph/Graph.js
-     * @see https://en.wikipedia.org/wiki/Graph_(abstract_data_type)
-     * @see https://www.youtube.com/watch?v=gXgEDyodOJU&index=9&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8
-     * @see https://www.youtube.com/watch?v=k1wraWzqtvQ&index=10&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8
-     */
-    class Graph<T> {
-        /**
-         * 顶点列表
-         */
-        vertices: {
-            [key: string]: GraphVertex<T>;
-        };
-        /**
-         * 边列表
-         */
-        edges: {
-            [key: string]: GraphEdge<T>;
-        };
-        /**
-         * 是否有向
-         */
-        isDirected: boolean;
-        /**
-         * 构建图
-         *
-         * @param isDirected 是否有向
-         */
-        constructor(isDirected?: boolean);
-        /**
-         * 新增顶点
-         *
-         * @param newVertex 新顶点
-         */
-        addVertex(newVertex: GraphVertex<T>): this;
-        /**
-         * 获取顶点
-         *
-         * @param vertexKey 顶点键值
-         */
-        getVertexByKey(vertexKey: string): GraphVertex<T>;
-        /**
-         * 获取相邻点
-         *
-         * @param vertex 顶点
-         */
-        getNeighbors(vertex: GraphVertex<T>): any;
-        /**
-         * 获取所有顶点
-         */
-        getAllVertices(): GraphVertex<T>[];
-        /**
-         * 获取所有边
-         */
-        getAllEdges(): GraphEdge<T>[];
-        /**
-         * 新增边
-         *
-         * @param edge 边
-         */
-        addEdge(edge: GraphEdge<T>): this;
-        /**
-         * 删除边
-         *
-         * @param edge 边
-         */
-        deleteEdge(edge: GraphEdge<T>): void;
-        /**
-         * 查找边
-         *
-         * @param startVertex 起始顶点
-         * @param endVertex 结束顶点
-         */
-        findEdge(startVertex: GraphVertex<T>, endVertex: GraphVertex<T>): GraphEdge<T>;
-        /**
-         * 获取权重
-         */
-        getWeight(): number;
-        /**
-         * 反转
-         */
-        reverse(): this;
-        /**
-         * 获取所有顶点索引
-         */
-        getVerticesIndices(): {};
-        /**
-         * 获取邻接矩阵
-         */
-        getAdjacencyMatrix(): any[];
-        /**
-         * 转换为字符串
-         */
-        toString(): string;
-    }
-    /**
-     * 图边
-     */
-    class GraphEdge<T> {
-        /**
-         * 起始顶点
-         */
-        startVertex: GraphVertex<T>;
-        /**
-         * 结束顶点
-         */
-        endVertex: GraphVertex<T>;
-        /**
-         * 权重
-         */
-        weight: number;
-        /**
-         * 构建图边
-         * @param startVertex 起始顶点
-         * @param endVertex 结束顶点
-         * @param weight 权重
-         */
-        constructor(startVertex: GraphVertex<T>, endVertex: GraphVertex<T>, weight?: number);
-        /**
-         * 获取键值
-         */
-        getKey(): string;
-        /**
-         * 反转
-         */
-        reverse(): this;
-        /**
-         * 转换为字符串
-         */
-        toString(): string;
-    }
-    /**
-     * 图顶点
-     */
-    class GraphVertex<T> {
-        /**
-         * 值
-         */
-        value: T;
-        /**
-         * 边列表
-         */
-        edges: LinkedList<GraphEdge<T>>;
-        /**
-         * 构建图顶点
-         *
-         * @param value 值
-         */
-        constructor(value: T);
-        /**
-         * 新增边
-         *
-         * @param edge 边
-         */
-        addEdge(edge: GraphEdge<T>): this;
-        /**
-         * 删除边
-         *
-         * @param edge 边
-         */
-        deleteEdge(edge: GraphEdge<T>): void;
-        /**
-         * 获取相邻顶点
-         */
-        getNeighbors(): any;
-        /**
-         * 获取边列表
-         */
-        getEdges(): GraphEdge<T>[];
-        /**
-         * 获取边的数量
-         */
-        getDegree(): number;
-        /**
-         * 是否存在指定边
-         *
-         * @param requiredEdge 边
-         */
-        hasEdge(requiredEdge: GraphEdge<T>): boolean;
-        /**
-         * 是否有相邻顶点
-         *
-         * @param vertex 顶点
-         */
-        hasNeighbor(vertex: GraphVertex<T>): boolean;
-        /**
-         * 查找边
-         *
-         * @param vertex 顶点
-         */
-        findEdge(vertex: GraphVertex<T>): GraphEdge<T>;
-        /**
-         * 获取键值
-         */
-        getKey(): string;
-        /**
-         * 删除所有边
-         */
-        deleteAllEdges(): this;
-        /**
-         * 转换为字符串
-         *
-         * @param callback 转换为字符串函数
-         */
-        toString(callback?: (value: T) => string): string;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 二叉树结点
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/tree/BinaryTreeNode.js
-     */
-    class BinaryTreeNode<T> {
-        /**
-         * 左结点
-         */
-        left: BinaryTreeNode<T>;
-        /**
-         * 右结点
-         */
-        right: BinaryTreeNode<T>;
-        /**
-         * 父结点
-         */
-        parent: BinaryTreeNode<T>;
-        /**
-         * 结点值
-         */
-        value: T;
-        /**
-         * 结点比较器
-         */
-        nodeComparator: Comparator<BinaryTreeNode<T>>;
-        meta: HashTable;
-        /**
-         * 构建二叉树结点
-         *
-         * @param value 结点值
-         */
-        constructor(value?: T);
-        /**
-         * 左结点高度
-         */
-        get leftHeight(): any;
-        /**
-         * 右结点高度
-         */
-        get rightHeight(): any;
-        /**
-         * 高度
-         */
-        get height(): number;
-        /**
-         * 平衡系数
-         */
-        get balanceFactor(): number;
-        /**
-         * 获取叔伯结点
-         */
-        get uncle(): BinaryTreeNode<T>;
-        /**
-         * 设置结点值
-         *
-         * @param value 值
-         */
-        setValue(value: T): this;
-        /**
-         * 设置左结点
-         *
-         * @param node 结点
-         */
-        setLeft(node: BinaryTreeNode<T> | null): this;
-        /**
-         * 设置右结点
-         *
-         * @param node 结点
-         */
-        setRight(node: BinaryTreeNode<T> | null): this;
-        /**
-         * 移除子结点
-         *
-         * @param nodeToRemove 子结点
-         */
-        removeChild(nodeToRemove: BinaryTreeNode<T>): boolean;
-        /**
-         * 替换节点
-         *
-         * @param nodeToReplace 被替换的节点
-         * @param replacementNode 替换后的节点
-         */
-        replaceChild(nodeToReplace: BinaryTreeNode<T>, replacementNode: BinaryTreeNode<T>): boolean;
-        /**
-         * 拷贝节点
-         *
-         * @param sourceNode 源节点
-         * @param targetNode 目标节点
-         */
-        static copyNode<T>(sourceNode: BinaryTreeNode<T>, targetNode: BinaryTreeNode<T>): void;
-        /**
-         * 左序深度遍历
-         */
-        traverseInOrder(): any[];
-        /**
-         * 转换为字符串
-         */
-        toString(): string;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 二叉查找树结点
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/tree/binary-search-tree/BinarySearchTreeNode.js
-     */
-    class BinarySearchTreeNode<T> extends BinaryTreeNode<T> {
-        /**
-         * 左结点
-         */
-        left: BinarySearchTreeNode<T>;
-        /**
-         * 右结点
-         */
-        right: BinarySearchTreeNode<T>;
-        /**
-         * 父结点
-         */
-        parent: BinarySearchTreeNode<T>;
-        /**
-         * 比较函数
-         */
-        private compareFunction;
-        /**
-         * 结点值比较器
-         */
-        private nodeValueComparator;
-        /**
-         * 构建二叉查找树结点
-         *
-         * @param value 结点值
-         * @param compareFunction 比较函数
-         */
-        constructor(value?: T, compareFunction?: CompareFunction<T>);
-        /**
-         * 插入值
-         *
-         * @param value 值
-         */
-        insert(value: T): any;
-        /**
-         * 查找结点
-         *
-         * @param value 值
-         */
-        find(value: T): BinarySearchTreeNode<T>;
-        /**
-         * 是否包含指定值
-         *
-         * @param value 结点值
-         */
-        contains(value: T): boolean;
-        /**
-         * 移除指定值
-         *
-         * @param value 结点值
-         */
-        remove(value: T): boolean;
-        /**
-         * 查找最小值
-         */
-        findMin(): BinarySearchTreeNode<T>;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 二叉查找树
-     *
-     * 二叉查找树（英语：Binary Search Tree），也称为二叉搜索树、有序二叉树（ordered binary tree）或排序二叉树（sorted binary tree），是指一棵空树或者具有下列性质的二叉树：
-     *
-     * 1. 若任意节点的左子树不空，则左子树上所有节点的值均小于它的根节点的值；
-     * 1. 若任意节点的右子树不空，则右子树上所有节点的值均大于它的根节点的值；
-     * 1. 任意节点的左、右子树也分别为二叉查找树；
-     * 1. 没有键值相等的节点。
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/blob/master/src/data-structures/tree/binary-search-tree/BinarySearchTree.js
-     * @see https://en.wikipedia.org/wiki/Binary_search_tree
-     * @see https://www.youtube.com/watch?v=wcIRPqTR3Kc&list=PLLXdhg_r2hKA7DPDsunoDZ-Z769jWn4R8&index=9&t=0s
-     */
-    class BinarySearchTree<T> {
-        /**
-         * 根结点
-         */
-        root: BinarySearchTreeNode<T>;
-        /**
-         * 结点比较器
-         */
-        nodeComparator: Comparator<BinaryTreeNode<T>>;
-        /**
-         * 构建 二叉查找树
-         *
-         * @param nodeValueCompareFunction 结点值比较器
-         */
-        constructor(nodeValueCompareFunction?: CompareFunction<T>);
-        /**
-         * 插入值
-         *
-         * @param value 值
-         */
-        insert(value: T): any;
-        /**
-         * 是否包含指定值
-         *
-         * @param value 值
-         */
-        contains(value: T): boolean;
-        /**
-         * 移除指定值
-         *
-         * @param value 值
-         */
-        remove(value: T): boolean;
-        /**
-         * 转换为字符串
-         */
-        toString(): string;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 平衡二叉树
-     *
-     * AVL树（以发明者Adelson-Velsky和Landis 命名）是自平衡二叉搜索树。
-     *
-     * @see https://github.com/trekhleb/javascript-algorithms/tree/master/src/data-structures/tree/avl-tree
-     * @see https://en.wikipedia.org/wiki/AVL_tree
-     * @see https://www.tutorialspoint.com/data_structures_algorithms/avl_tree_algorithm.htm
-     * @see http://btechsmartclass.com/data_structures/avl-trees.html
-     */
-    class AvlTree<T> extends BinarySearchTree<T> {
-        /**
-         * @param {*} value
-         */
-        insert(value: T): void;
-        /**
-         * @param {*} value
-         * @return {boolean}
-         */
-        remove(value: T): boolean;
-        /**
-         * @param {BinarySearchTreeNode} node
-         */
-        balance(node: BinarySearchTreeNode<T>): void;
-        /**
-         * @param {BinarySearchTreeNode} rootNode
-         */
-        rotateLeftLeft(rootNode: BinarySearchTreeNode<T>): void;
-        /**
-         * @param {BinarySearchTreeNode} rootNode
-         */
-        rotateLeftRight(rootNode: BinarySearchTreeNode<T>): void;
-        /**
-         * @param {BinarySearchTreeNode} rootNode
-         */
-        rotateRightLeft(rootNode: BinarySearchTreeNode<T>): void;
-        /**
-         * @param {BinarySearchTreeNode} rootNode
-         */
-        rotateRightRight(rootNode: BinarySearchTreeNode<T>): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 方程求解
-     */
-    var equationSolving: EquationSolving;
-    /**
-     * 方程求解
-     *
-     * 求解方程 f(x) == 0 在[a, b]上的解
-     *
-     * 参考：高等数学 第七版上册 第三章第八节 方程的近似解
-     * 当f(x)在区间 [a, b] 上连续，且f(a) * f(b) <= 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == 0
-     *
-     * 当f(x)在区间 [a, b] 上连续，且 (f(a) - y) * (f(b) - y) < 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == y
-     *
-     * @author feng / http://feng3d.com 05/06/2018
-     */
-    class EquationSolving {
-        /**
-         * 获取数字的(正负)符号
-         * @param n 数字
-         */
-        private getSign;
-        /**
-         * 比较 a 与 b 是否相等
-         * @param a 值a
-         * @param b 值b
-         * @param precision 比较精度
-         */
-        private equalNumber;
-        /**
-         * 获取近似导函数 f'(x)
-         *
-         * 导函数定义
-         * f'(x) = (f(x + Δx) - f(x)) / Δx , Δx → 0
-         *
-         * 注：通过测试Δx不能太小，由于方程内存在x的n次方问题（比如0.000000000000001的10次方为0），过小会导致计算机计算进度不够反而导致求导不准确！
-         *
-         * 另外一种办法是还原一元多次函数，然后求出导函数。
-         *
-         * @param f 函数
-         * @param delta Δx，进过测试该值太小或者过大都会导致求导准确率降低（个人猜测是计算机计算精度问题导致）
-         */
-        getDerivative(f: (x: number) => number, delta?: number): (x: number) => number;
-        /**
-         * 函数是否连续
-         * @param f 函数
-         */
-        isContinuous(f: (x: number) => number): boolean;
-        /**
-         * 方程 f(x) == 0 在 [a, b] 区间内是否有解
-         *
-         * 当f(x)在区间 [a, b] 上连续，且f(a) * f(b) <= 0 时，f(x)在区间 [a, b] 上至少存在一个解使得 f(x) == 0
-         *
-         * @param f 函数f(x)
-         * @param a 区间起点
-         * @param b 区间终点
-         * @param errorcallback  错误回调函数
-         *
-         * @returns 是否有解
-         */
-        hasSolution(f: (x: number) => number, a: number, b: number, errorcallback?: (err: Error) => void): boolean;
-        /**
-         * 二分法 求解 f(x) == 0
-         *
-         * 通过区间中点作为边界来逐步缩小求解区间，最终获得解
-         *
-         * @param f 函数f(x)
-         * @param a 区间起点
-         * @param b 区间终点
-         * @param precision 求解精度
-         * @param errorcallback  错误回调函数
-         *
-         * @returns 不存在解时返回 undefined ，存在时返回 解
-         */
-        binary(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        /**
-         * 连线法 求解 f(x) == 0
-         *
-         * 连线法是我自己想的方法，自己取的名字，目前没有找到相应的资料（这方法大家都能够想得到。）
-         *
-         * 用曲线弧两端的连线来代替曲线弧与X轴交点作为边界来逐步缩小求解区间，最终获得解
-         *
-         * 通过 A，B两点连线与x轴交点来缩小求解区间最终获得解
-         *
-         * A，B两点直线方程 f(x) = f(a) + (f(b) - f(a)) / (b - a) * (x-a) ,求 f(x) == 0 解得 x = a - fa * (b - a)/ (fb - fa)
-         *
-         * @param f 函数f(x)
-         * @param a 区间起点
-         * @param b 区间终点
-         * @param precision 求解精度
-         * @param errorcallback  错误回调函数
-         *
-         * @returns 不存在解时返回 undefined ，存在时返回 解
-         */
-        line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        /**
-         * 切线法 求解 f(x) == 0
-         *
-         * 用曲线弧一端的切线来代替曲线弧，从而求出方程实根的近似解。
-         *
-         * 迭代公式： Xn+1 = Xn - f(Xn) / f'(Xn)
-         *
-         * #### 额外需求
-         * 1. f(x)在[a, b]上具有一阶导数 f'(x)
-         * 1. f'(x)在[a, b]上保持定号；意味着f(x)在[a, b]上单调
-         * 1. f''(x)在[a, b]上保持定号；意味着f'(x)在[a, b]上单调
-         *
-         * 切记，当无法满足这些额外要求时，该函数将找不到[a, b]上的解！！！！！！！！！！！
-         *
-         * @param f 函数f(x)
-         * @param f1 一阶导函数 f'(x)
-         * @param f2 二阶导函数 f''(x)
-         * @param a 区间起点
-         * @param b 区间终点
-         * @param precision 求解精度
-         * @param errorcallback  错误回调函数
-         *
-         * @returns 不存在解与无法使用该函数求解时返回 undefined ，否则返回 解
-         */
-        tangent(f: (x: number) => number, f1: (x: number) => number, f2: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        /**
-         * 割线法（弦截法） 求解 f(x) == 0
-         *
-         * 使用 (f(Xn) - f(Xn-1)) / (Xn - Xn-1) 代替切线法迭代公式 Xn+1 = Xn - f(Xn) / f'(Xn) 中的 f'(x)
-         *
-         * 迭代公式：Xn+1 = Xn - f(Xn) * (Xn - Xn-1) / (f(Xn) - f(Xn-1));
-         *
-         * 用过点(Xn-1,f(Xn-1))和点(Xn,f(Xn))的割线来近似代替(Xn,f(Xn))处的切线，将这条割线与X轴交点的横坐标作为新的近似解。
-         *
-         * #### 额外需求
-         * 1. f(x)在[a, b]上具有一阶导数 f'(x)
-         * 1. f'(x)在[a, b]上保持定号；意味着f(x)在[a, b]上单调
-         * 1. f''(x)在[a, b]上保持定号；意味着f'(x)在[a, b]上单调
-         *
-         * 切记，当无法满足这些额外要求时，该函数将找不到[a, b]上的解！！！！！！！！！！！
-         *
-         * @param f 函数f(x)
-         * @param a 区间起点
-         * @param b 区间终点
-         * @param precision 求解精度
-         * @param errorcallback  错误回调函数
-         *
-         * @returns 不存在解与无法使用该函数求解时返回 undefined ，否则返回 解
-         */
-        secant(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 高次函数
-     *
-     * 处理N次函数定义，求值，方程求解问题
-     *
-     * n次函数定义
-     * f(x) = a0 * pow(x, n) + a1 * pow(x, n - 1) +.....+ an_1 * pow(x, 1) + an
-     *
-     * 0次 f(x) = a0;
-     * 1次 f(x) = a0 * x + a1;
-     * 2次 f(x) = a0 * x * x + a1 * x + a2;
-     * ......
-     *
-     */
-    class HighFunction {
-        private as;
-        /**
-         * 构建函数
-         * @param as 函数系数 a0-an 数组
-         */
-        constructor(as: number[]);
-        /**
-         * 获取函数 f(x) 的值
-         * @param x x坐标
-         */
-        getValue(x: number): number;
-    }
 }
 declare namespace feng3d {
     /**
@@ -3009,6 +2260,8 @@ declare namespace feng3d {
          */
         RIGHT_HANDED = 1
     }
+}
+interface MixinsMathUtil {
     /**
      * 引擎中使用的坐标系统，默认左手坐标系统。
      *
@@ -3016,11 +2269,11 @@ declare namespace feng3d {
      * playcanvas 右手坐标系统。
      * unity    左手坐标系统。
      */
-    var coordinateSystem: CoordinateSystem;
+    DefaultCoordinateSystem: feng3d.CoordinateSystem;
 }
 declare namespace feng3d {
     /**
-     * 用于表示欧拉角的旋转顺序
+     * 欧拉角的旋转顺序。
      *
      * 如果顺序为XYZ，则依次按 ZYZ 轴旋转。为什么循序与定义相反？因为three.js中都这么定义，他们为什么这么定义就不清楚了。
      */
@@ -3056,6 +2309,8 @@ declare namespace feng3d {
          */
         XZY = 5
     }
+}
+interface MixinsMathUtil {
     /**
      * 引擎中使用的旋转顺序。
      *
@@ -3063,7 +2318,7 @@ declare namespace feng3d {
      * playcanvas ZYX
      * three.js XYZ
      */
-    var defaultRotationOrder: RotationOrder;
+    DefaultRotationOrder: feng3d.RotationOrder;
 }
 declare namespace feng3d {
     /**
@@ -3089,7 +2344,7 @@ declare namespace feng3d {
      * 颜色
      */
     class Color3 {
-        __class__: "feng3d.Color3";
+        __class__: 'feng3d.Color3';
         static WHITE: Color3;
         static BLACK: Color3;
         static fromUnit(color: number): Color3;
@@ -3108,9 +2363,9 @@ declare namespace feng3d {
         b: number;
         /**
          * 构建颜色
-         * @param r     红[0,1]
-         * @param g     绿[0,1]
-         * @param b     蓝[0,1]
+         * @param r 红[0,1]
+         * @param g 绿[0,1]
+         * @param b 蓝[0,1]
          */
         constructor(r?: number, g?: number, b?: number);
         setTo(r: number, g: number, b: number): this;
@@ -3127,13 +2382,13 @@ declare namespace feng3d {
         /**
          * 混合颜色
          * @param color 混入的颜色
-         * @param rate  混入比例
+         * @param rate 混入比例
          */
         mix(color: Color3, rate: number): this;
         /**
          * 混合颜色
          * @param color 混入的颜色
-         * @param rate  混入比例
+         * @param rate 混入比例
          */
         mixTo(color: Color3, rate: number, vout?: Color3): Color3;
         /**
@@ -3171,7 +2426,7 @@ declare namespace feng3d {
          */
         static ToHex(i: number): string;
     }
-    var ColorKeywords: {
+    const ColorKeywords: {
         aliceblue: number;
         antiquewhite: number;
         aqua: number;
@@ -3327,7 +2582,7 @@ declare namespace feng3d {
      * 颜色（包含透明度）
      */
     class Color4 {
-        __class__: "feng3d.Color4";
+        __class__: 'feng3d.Color4';
         static readonly WHITE: Readonly<Color4>;
         static readonly BLACK: Readonly<Color4>;
         static fromUnit(color: number): Color4;
@@ -3351,10 +2606,10 @@ declare namespace feng3d {
         a: number;
         /**
          * 构建颜色
-         * @param r     红[0,1]
-         * @param g     绿[0,1]
-         * @param b     蓝[0,1]
-         * @param a     透明度[0,1]
+         * @param r 红[0,1]
+         * @param g 绿[0,1]
+         * @param b 蓝[0,1]
+         * @param a 透明度[0,1]
          */
         constructor(r?: number, g?: number, b?: number, a?: number);
         setTo(r: number, g: number, b: number, a?: number): this;
@@ -3363,6 +2618,8 @@ declare namespace feng3d {
          * @param color
          */
         fromUnit(color: number): this;
+        fromUnit24(color: number, a?: number): this;
+        fromColor3(color3: Color3, a?: number): this;
         toInt(): number;
         /**
          * 输出16进制字符串
@@ -3375,32 +2632,32 @@ declare namespace feng3d {
         /**
          * 混合颜色
          * @param color 混入的颜色
-         * @param rate  混入比例
+         * @param rate 混入比例
          */
         mix(color: Color4, rate?: number): this;
         /**
          * 混合颜色
          * @param color 混入的颜色
-         * @param rate  混入比例
+         * @param rate 混入比例
          */
         mixTo(color: Color4, rate: number, vout?: Color4): Color4;
         /**
          * 乘以指定颜色
          * @param c 乘以的颜色
-         * @return 返回自身
+         * @returns 返回自身
          */
         multiply(c: Color4): this;
         /**
          * 乘以指定颜色
          * @param v 乘以的颜色
-         * @return 返回新颜色
+         * @returns 返回新颜色
          */
         multiplyTo(v: Color4, vout?: Color4): Color4;
         /**
          * 乘以指定常量
          *
          * @param scale 缩放常量
-         * @return 返回自身
+         * @returns 返回自身
          */
         multiplyNumber(scale: number): this;
         /**
@@ -3427,18 +2684,412 @@ declare namespace feng3d {
          * 克隆
          */
         clone(): Color4;
+        /**
+         * 随机`Color4`
+         *
+         * @param randomAlpha 透明值是否随机
+         */
+        random(randomAlpha?: boolean): this;
+    }
+}
+declare namespace feng3d {
+    interface VectorLike {
+    }
+    /**
+     * 向量
+     */
+    interface Vector {
+        /**
+         * 将另一个点的坐标添加到此点的坐标。
+         * @param v 要添加的点。
+         */
+        add(v: VectorLike): Vector;
+        /**
+         * 将另一个点的坐标添加到此点的坐标以创建一个新点。
+         * @param v 要添加的点。
+         * @param vout 用于接收计算结果。
+         * @returns 新点。
+         */
+        addTo(v: VectorLike, vout?: Vector): Vector;
+        /**
+         * 从此点的坐标中减去另一个点的坐标。
+         * @param v 要减去的点。
+         */
+        sub(v: VectorLike): Vector;
+        /**
+         * 从此点的坐标中减去另一个点的坐标以创建一个新点。
+         * @param v 要减去的点。
+         * @param vout 用于接收计算结果。
+         * @returns 新点。
+         */
+        subTo(v: VectorLike, vout?: Vector): Vector;
+        /**
+         * 乘以向量
+         * @param v 向量
+         */
+        multiply(v: VectorLike): this;
+        /**
+         * 乘以向量
+         * @param v 向量
+         * @param vout 输出向量
+         */
+        multiplyTo(v: VectorLike, vout?: Vector): Vector;
+        /**
+         * 除以向量
+         * @param v 向量
+         */
+        divide(v: VectorLike): this;
+        /**
+         * 除以向量
+         * @param v 向量
+         * @param vout 输出向量
+         */
+        divideTo(v: VectorLike, vout?: Vector): Vector;
+        /**
+         * 确定两个向量是否相同。如果两个向量具有相同的分量值，则它们是相同的向量。
+         * @param toCompare 要比较的向量。
+         * @returns 如果该对象与此 向量 对象相同，则为 true 值，如果不相同，则为 false。
+         */
+        equals(toCompare: VectorLike, precision?: number): boolean;
+        /**
+         * 将源 Vector 对象中的所有点数据复制到调用方 Vector 对象中。
+         * @param source 要从中复制数据的 Vector 对象。
+         */
+        copy(source: VectorLike): Vector;
+        /**
+         * 与目标点之间的距离
+         * @param p 目标点
+         */
+        distance(p: VectorLike): number;
+        /**
+         * 与目标点之间的距离平方
+         * @param p 目标点
+         */
+        distanceSquared(p: VectorLike): number;
+        /**
+         * 将 (0,0) 和当前点之间的线段缩放为设定的长度。
+         */
+        normalize(): void;
     }
 }
 declare namespace feng3d {
     /**
-     * Vector2 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
+     * Representation of 2D vectors and points.
      */
-    class Vector2 {
-        __class__: "feng3d.Vector2";
+    /**
+     * 二维向量和点的表示。
+     */
+    class Vector2 implements Vector {
+        __class__: 'Vector2';
         /**
-         * 原点
+         * X component of the vector.
          */
-        static ZERO: Readonly<Vector2>;
+        /**
+         * 向量的X分量。
+         */
+        x: number;
+        /**
+         * Y component of the vector.
+         */
+        /**
+         * 向量的Y分量。
+         */
+        y: number;
+        /**
+         * The length of this vector.
+         */
+        /**
+         * 向量的长度。
+         */
+        get length(): number;
+        /**
+         * The squared length of this vector.
+         */
+        /**
+         * 向量长度的平方。
+         */
+        get lengthSquared(): number;
+        /**
+         * The length of this vector.
+         */
+        /**
+         * 向量的长度。
+         */
+        get magnitude(): number;
+        /**
+         * The squared length of this vector.
+         */
+        /**
+         * 向量长度的平方。
+         */
+        get sqrMagnitude(): number;
+        /**
+         * 返回大小为 1 的此向量（只读）。
+         *
+         * 归一化后，向量保持相同的方向，但其长度为 1.0。
+         *
+         * 请注意，当前向量不变，并返回一个新的归一化向量。如果要对当前向量进行归一化，请使用Normalize函数。
+         *
+         * 如果向量太小而无法归一化，则将返回零向量。
+         */
+        /**
+         * Returns this vector with a magnitude of 1 (Read Only).
+         *
+         * When normalized, a vector keeps the same direction but its length is 1.0.
+         *
+         * Note that the current vector is unchanged and a new normalized vector is returned. If you want to normalize the current vector, use Normalize function.
+         *
+         * If the vector is too small to be normalized a zero vector will be returned.
+         */
+        get normalized(): Vector2;
+        /**
+         * Constructs a new vector with given x, y components.
+         *
+         * @param x X component of the vector.
+         * @param y Y component of the vector.
+         */
+        /**
+         * 用给定的 x, y 分量构造一个新向量。
+         *
+         * @param x 向量的X分量。
+         * @param y 向量的Y分量。
+         */
+        constructor(x?: number, y?: number);
+        /**
+         * Set x and y components of an existing Vector2.
+         *
+         * @param x The new X component of the vector
+         * @param y The new Y component of the vector
+         */
+        /**
+         * 设置现有Vector2的x和y分量。
+         *
+         * @param x 向量的新的X分量
+         * @param y 向量的新的Y分量
+         */
+        set(x: number, y: number): this;
+        /**
+         * Determine if it is equal to the given vector.
+         *
+         * @param other the given vector.
+         * @param precision comparative precision.
+         * @returns Returns true if the given vector is exactly equal to this vector.
+         */
+        /**
+         * 判断与给定向量是否相等。
+         *
+         * @param other 给定的向量。
+         * @param precision 比较精度。
+         * @returns 如果给定向量完全等于该向量，则返回 true。
+         */
+        equals(other: Vector2, precision?: number): boolean;
+        /**
+         * Makes this vector have a magnitude of 1.
+         *
+         * When normalized, a vector keeps the same direction but its length is 1.0.
+         *
+         * Note that this function will change the current vector. If you want to keep the current vector unchanged, use normalized variable.
+         *
+         * If this vector is too small to be normalized it will be set to zero.
+         *
+         */
+        /**
+         * 使该向量的大小为 1。
+         *
+         * 归一化后，向量保持相同的方向，但其长度为 1.0。
+         *
+         * 请注意，此函数将更改当前向量。如果要保持当前向量不变，请使用归一化变量。
+         *
+         * 如果这个向量太小而无法归一化，它将被设置为零。
+         */
+        normalize(): void;
+        /**
+         * 克隆点对象
+         */
+        clone(): Vector2;
+        /**
+         * 返回此向量的格式化字符串。
+         */
+        /**
+         * Returns a formatted string for this vector.
+         */
+        toString(): string;
+        /**
+         * Shorthand for writing Vector2(0, 0).
+         */
+        /**
+         * 零向量`Vector2(0, 0)`。
+         */
+        static readonly zero: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(1, 1).
+         */
+        /**
+         * 单元向量`Vector2(1, 1)`。
+         */
+        static readonly one: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(0, 1).
+         */
+        static readonly up: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(0, -1).
+         */
+        static readonly down: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(-1, 0).
+         */
+        static readonly left: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(1, 0).
+         */
+        static readonly right: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(Infinity, Infinity).
+         */
+        static readonly positiveInfinity: Readonly<Vector2>;
+        /**
+         * Shorthand for writing Vector2(-Infinity, -Infinity).
+         */
+        static readonly negativeInfinity: Readonly<Vector2>;
+        /**
+         * 可允许误差。
+         */
+        static readonly kEpsilon = 0.00001;
+        /**
+         * 可允许误差平方。
+         */
+        static readonly kEpsilonNormalSqrt = 1e-15;
+        /**
+         * Linearly interpolates between vectors a and b by t.
+         *
+         * The parameter t is clamped to the range [0, 1].
+         *
+         * When t = 0 returns a.
+         * When t = 1 return b.
+         * When t = 0.5 returns the midpoint of a and b.
+         *
+         * @param a Start point.
+         * @param b End point.
+         * @param t Interpolated coefficient.
+         */
+        /**
+         * 返回起始向量`a`与终止向量`b`在`t`位置的线性插值。
+         *
+         * 参数`t`将被裁减到[0, 1]的范围内。
+         *
+         * 当 t = 0 时返回`a`.
+         * 当 t = 1 时返回`b`.
+         * 当 t = 0.5 时返回`a`与`b`的中间值.
+         *
+         * @param a 起始点。
+         * @param b 终止点。
+         * @param t 插值系数。
+         */
+        static Lerp(a: Vector2, b: Vector2, t: number): Vector2;
+        /**
+         * Linearly interpolates between vectors a and b by t.
+         *
+         * When t = 0 returns a.
+         * When t = 1 return b.
+         * When t = 0.5 returns the midpoint of a and b.
+         *
+         * @param a Start point.
+         * @param b End point.
+         * @param t Interpolated coefficient.
+         */
+        /**
+         * 返回起始向量`a`与终止向量`b`在`t`位置的线性插值。
+         *
+         * 当 t = 0 时返回`a`.
+         * 当 t = 1 时返回`b`.
+         * 当 t = 0.5 时返回`a`与`b`的中间值.
+         *
+         * @param a 起始点。
+         * @param b 终止点。
+         * @param t 插值系数。
+         */
+        static LerpUnclamped(a: Vector2, b: Vector2, t: number): Vector2;
+        static MoveTowards(current: Vector2, target: Vector2, maxDistanceDelta: number): Vector2;
+        static Scale(a: Vector2, b: Vector2): Vector2;
+        static Reflect(inDirection: Vector2, inNormal: Vector2): Vector2;
+        static Perpendicular(inDirection: Vector2): Vector2;
+        /**
+         * Dot Product of two vectors.
+         *
+         * For normalized vectors Dot returns 1 if they point in exactly the same direction; -1 if they point in completely opposite directions; and a number in between for other cases (e.g. Dot returns zero if vectors are perpendicular).
+         *
+         * @param lhs The left-hand vector.
+         * @param rhs The right-hand vector.
+         * @returns Dot Product of two vectors.
+         */
+        /**
+         * 两个向量的点乘值。
+         *
+         * 对于归一化向量，如果它们指向完全相同的方向，则 Dot 返回 1；如果它们指向完全相反的方向则返回 -1；其他情况返回-1与1之间的数字（例如，如果向量垂直，则 Dot 返回零）。
+         *
+         * @param lhs 左侧向量。
+         * @param rhs 右侧向量。
+         * @returns 两个向量的点乘值。
+         */
+        static Dot(lhs: Vector2, rhs: Vector2): number;
+        /**
+         * Gets the unsigned angle in degrees between from and to.
+         *
+         * The angle returned is the unsigned angle between the two vectors.
+         * Note: The angle returned will always be between 0 and 180 degrees, because the method returns the smallest angle between the vectors. That is, it will never return a reflex angle. Angles are calculated from world origin point (0,0,0) as the vertex.
+         *
+         * @param from 	The vector from which the angular difference is measured.
+         * @param to The vector to which the angular difference is measured.
+         * @returns The unsigned angle in degrees between the two vectors.
+         */
+        /**
+         * 获取从起始向量和终止向量之间的无符号角度。
+         *
+         * 返回的角度是两个向量之间的无符号角度。
+         * 注意：返回的角度总是在 0 到 180 度之间，因为该方法返回向量之间的最小角度。也就是说，它永远不会返回反射角。角度是从世界原点 (0,0,0) 作为顶点计算的。
+         *
+         * @param from 测量角度差的起始向量。
+         * @param to 测量角度差的终止向量。
+         * @returns 两个向量之间的无符号角度，以度为单位。
+         */
+        static Angle(from: Vector2, to: Vector2): number;
+        static SignedAngle(from: Vector2, to: Vector2): number;
+        /**
+         * Returns the distance between a and b.
+         *
+         * @param a Start point.
+         * @param b End point.
+         * @returns The distance between a and b.
+         */
+        /**
+         * 返回两点的距离。
+         *
+         * @param a 起始点。
+         * @param b 终止点。
+         * @returns 两点的距离。
+         */
+        static Distance(a: Vector2, b: Vector2): number;
+        /**
+         * Returns a copy of vector with its magnitude clamped to maxLength.
+         *
+         * @param vector Restricted vector.
+         * @param maxLength The maximum length to be restricted.
+         * @returns A copy of vector with its magnitude clamped to maxLength.
+         */
+        /**
+         * 返回其长度被限制最大值为`maxLength`的向量副本。
+         *
+         * @param vector 被限制的向量。
+         * @param maxLength 被限制的最大长度。
+         * @returns 限制后的向量副本。
+         */
+        static ClampMagnitude(vector: Vector2, maxLength: number): Vector2;
+        static Min(lhs: Vector2, rhs: Vector2): Vector2;
+        static Max(lhs: Vector2, rhs: Vector2): Vector2;
+        static SmoothDamp(current: Vector2, target: Vector2, currentVelocity: Vector2, smoothTime: number, maxSpeed: number): Vector2;
+        static SmoothDamp1(current: Vector2, target: Vector2, currentVelocity: Vector2, smoothTime: number): Vector2;
+        static SmoothDamp2(current: Vector2, target: Vector2, currentVelocity: Vector2, smoothTime: number, maxSpeed?: number, deltaTime?: number): Vector2;
         /**
          * 将一对极坐标转换为笛卡尔点坐标。
          * @param len 极坐标对的长度。
@@ -3446,54 +3097,10 @@ declare namespace feng3d {
          */
         static polar(len: number, angle: number): Vector2;
         /**
-         * 创建一个 Vector2 对象.若不传入任何参数，将会创建一个位于（0，0）位置的点。
-         *
-         * @param x 该对象的x属性值，默认为0
-         * @param y 该对象的y属性值，默认为0
+         * 将另一个点的坐标添加到此点的坐标。
+         * @param v 要添加的点。
          */
-        constructor(x?: number, y?: number);
-        /**
-         * 该点的水平坐标。
-         * @default 0
-         */
-        x: number;
-        /**
-         * 该点的垂直坐标。
-         * @default 0
-         */
-        y: number;
-        /**
-         * 从 (0,0) 到此点的线段长度。
-         */
-        get length(): number;
-        /**
-         * 将 Point 的成员设置为指定值
-         * @param x 该对象的x属性值
-         * @param y 该对象的y属性值
-         */
-        init(x: number, y: number): Vector2;
-        /**
-         * 克隆点对象
-         */
-        clone(): Vector2;
-        /**
-         * 确定两个点是否相同。如果两个点具有相同的 x 和 y 值，则它们是相同的点。
-         * @param toCompare 要比较的点。
-         * @returns 如果该对象与此 Point 对象相同，则为 true 值，如果不相同，则为 false。
-         */
-        equals(toCompare: Vector2): boolean;
-        /**
-         * 返回 pt1 和 pt2 之间的距离。
-         * @param p1 第一个点
-         * @param p2 第二个点
-         * @returns 第一个点和第二个点之间的距离。
-         */
-        static distance(p1: Vector2, p2: Vector2): number;
-        /**
-         * 将源 Point 对象中的所有点数据复制到调用方 Point 对象中。
-         * @param sourcePoint 要从中复制数据的 Point 对象。
-         */
-        copy(sourcePoint: Vector2): this;
+        add(v: Vector2): Vector2;
         /**
          * 将另一个点的坐标添加到此点的坐标以创建一个新点。
          * @param v 要添加的点。
@@ -3501,10 +3108,55 @@ declare namespace feng3d {
          */
         addTo(v: Vector2, vout?: Vector2): Vector2;
         /**
-         * 将 (0,0) 和当前点之间的线段缩放为设定的长度。
-         * @param thickness 缩放值。例如，如果当前点为 (0,5) 并且您将它规范化为 1，则返回的点位于 (0,1) 处。
+         * 从此点的坐标中减去另一个点的坐标以创建一个新点。
+         * @param v 要减去的点。
+         * @returns 新点。
          */
-        normalize(thickness?: number): this;
+        sub(v: Vector2): this;
+        /**
+         * 减去向量返回新向量
+         * @param v 减去的向量
+         * @returns 返回的新向量
+         */
+        subTo(v: Vector2, vout?: Vector2): Vector2;
+        /**
+         * 乘以向量
+         * @param v 向量
+         */
+        multiply(v: Vector2): this;
+        /**
+         * 乘以向量
+         * @param v 向量
+         * @param vout 输出向量
+         */
+        multiplyTo(v: Vector2, vout?: Vector2): Vector2;
+        /**
+         * 除以向量
+         * @param v 向量
+         */
+        divide(v: Vector2): this;
+        /**
+         * 除以向量
+         * @param v 向量
+         * @param vout 输出向量
+         */
+        divideTo(v: Vector2, vout?: Vector2): Vector2;
+        /**
+         * 将源 Vector2 对象中的所有点数据复制到调用方 Vector2 对象中。
+         * @param source 要从中复制数据的 Vector2 对象。
+         */
+        copy(source: Vector2): this;
+        /**
+         * 返回与目标点之间的距离。
+         * @param p 目标点
+         * @returns 与目标点之间的距离。
+         */
+        distance(p: Vector2): number;
+        /**
+         * 与目标点之间的距离平方
+         * @param p 目标点
+         */
+        distanceSquared(p: Vector3): number;
         /**
          * 负向量
          */
@@ -3538,60 +3190,37 @@ declare namespace feng3d {
          */
         scaleTo(s: Vector2, vout?: Vector2): Vector2;
         /**
-         * 按指定量偏移 Point 对象。dx 的值将添加到 x 的原始值中以创建新的 x 值。dy 的值将添加到 y 的原始值中以创建新的 y 值。
+         * 按指定量偏移 Vector2 对象。dx 的值将添加到 x 的原始值中以创建新的 x 值。dy 的值将添加到 y 的原始值中以创建新的 y 值。
          * @param dx 水平坐标 x 的偏移量。
          * @param dy 水平坐标 y 的偏移量。
          */
         offset(dx: number, dy: number): Vector2;
         /**
-         * 从此点的坐标中减去另一个点的坐标以创建一个新点。
-         * @param v 要减去的点。
-         * @returns 新点。
-         */
-        sub(v: Vector2): this;
-        /**
-         * 从此点的坐标中减去另一个点的坐标以创建一个新点。
-         * @param v 要减去的点。
-         * @returns 新点。
-         */
-        subTo(v: Vector2, vout?: Vector2): Vector2;
-        /**
-         * 乘以向量
-         * @param a 向量
-         */
-        multiply(a: Vector2): this;
-        /**
-         * 乘以向量
-         * @param a 向量
-         * @param vout 输出向量
-         */
-        multiplyTo(a: Vector2, vout?: Vector2): Vector2;
-        /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerp(p: Vector2, alpha: Vector2): Vector2;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         lerpTo(v: Vector2, alpha: Vector2, vout?: Vector2): Vector2;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerpNumber(v: Vector2, alpha: number): this;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerpNumberTo(v: Vector2, alpha: number, vout?: Vector2): Vector2;
         /**
@@ -3621,25 +3250,25 @@ declare namespace feng3d {
          */
         round(): this;
         /**
-         * 返回包含 x 和 y 坐标的值的字符串。该字符串的格式为 "(x=x, y=y)"，因此为点 23,17 调用 toString() 方法将返回 "(x=23, y=17)"。
-         * @returns 坐标的字符串表示形式。
-         */
-        toString(): string;
-        /**
          * 转换为数组
          * @param array 数组
          * @param offset 偏移
-         * @return 返回数组
+         * @returns 返回数组
          */
         toArray(array?: number[], offset?: number): number[];
     }
 }
 declare namespace feng3d {
+    interface Vector3Like {
+        x: number;
+        y: number;
+        z: number;
+    }
     /**
      * Vector3 类使用笛卡尔坐标 x、y 和 z 表示三维空间中的点或位置
      */
-    class Vector3 {
-        __class__: "feng3d.Vector3";
+    class Vector3 implements Vector, Vector3Like {
+        __class__: 'feng3d.Vector3';
         /**
         * 定义为 Vector3 对象的 x 轴，坐标为 (1,0,0)。
         */
@@ -3664,7 +3293,7 @@ declare namespace feng3d {
          * 从数组中初始化向量
          * @param array 数组
          * @param offset 偏移
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         static fromArray(array: ArrayLike<number>, offset?: number): Vector3;
         /**
@@ -3723,46 +3352,39 @@ declare namespace feng3d {
          */
         toVector2(vector?: Vector2): Vector2;
         /**
-         * 转换为Vector4
+         * 加上指定向量
+         * @param v 加向量
          */
-        toVector4(vector4?: Vector4): Vector4;
+        add(v: Vector3): this;
         /**
          * 加上指定向量得到新向量
          * @param v 加向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
-        add(a: Vector3): this;
+        addTo(v: Vector3, vout?: Vector3): Vector3;
         /**
-         * 加上指定向量得到新向量
-         * @param v 加向量
-         * @return 返回新向量
+         * 减去向量
+         * @param a 减去的向量
+         * @returns 返回新向量
          */
-        addTo(a: Vector3, vout?: Vector3): Vector3;
+        sub(a: Vector3): this;
         /**
-         * Scale a vector and add it to this vector. Save the result in "this". (this = this + vector * scalar)
-         * @param scalar
-         * @param vector
-         * @param  target The vector to save the result in.
+         * 减去向量返回新向量
+         * @param v 减去的向量
+         * @returns 返回的新向量
          */
-        addScaledVector(scalar: number, vector: Vector3): this;
-        /**
-         * Scale a vector and add it to this vector. Save the result in "target". (target = this + vector * scalar)
-         * @param scalar
-         * @param vector
-         * @param  target The vector to save the result in.
-         */
-        addScaledVectorTo(scalar: number, vector: Vector3, target?: Vector3): Vector3;
+        subTo(v: Vector3, vout?: Vector3): Vector3;
         /**
          * 乘以向量
-         * @param a 向量
+         * @param v 向量
          */
-        multiply(a: Vector3): this;
+        multiply(v: Vector3): this;
         /**
          * 乘以向量
-         * @param a 向量
+         * @param v 向量
          * @param vout 输出向量
          */
-        multiplyTo(a: Vector3, vout?: Vector3): Vector3;
+        multiplyTo(v: Vector3, vout?: Vector3): Vector3;
         /**
          * 除以向量
          * @param a 向量
@@ -3773,22 +3395,58 @@ declare namespace feng3d {
          * @param a 向量
          * @param vout 输出向量
          */
-        divideTo(a: Vector3, vout?: Vector3): Vector3;
+        divideTo(a: Vector3Like, vout?: Vector3): Vector3;
+        /**
+         * 通过将当前 Vector3 对象的 x、y 和 z 元素与指定的 Vector3 对象的 x、y 和 z 元素进行比较，确定这两个对象是否相等。
+         */
+        equals(v: Vector3Like, precision?: number): boolean;
+        /**
+         * 将源 Vector3 对象中的所有矢量数据复制到调用方 Vector3 对象中。
+         * @returns 要从中复制数据的 Vector3 对象。
+         */
+        copy(v: Vector3Like): this;
+        /**
+         * 与目标点之间的距离
+         * @param p 目标点
+         */
+        distance(p: Vector3Like): number;
+        /**
+         * 与目标点之间的距离平方
+         * @param p 目标点
+         */
+        distanceSquared(p: Vector3Like): number;
+        /**
+         * 通过将最前面的三个元素（x、y、z）除以矢量的长度可将 Vector3 对象转换为单位矢量。
+         */
+        normalize(thickness?: number): this;
+        /**
+         * Scale a vector and add it to this vector. Save the result in "this". (this = this + vector * scalar)
+         * @param scalar
+         * @param vector
+         */
+        addScaledVector(scalar: number, vector: Vector3): this;
+        /**
+         * Scale a vector and add it to this vector. Save the result in "target". (target = this + vector * scalar)
+         * @param scalar
+         * @param vector
+         * @param target The vector to save the result in.
+         */
+        addScaledVectorTo(scalar: number, vector: Vector3Like, target?: Vector3): Vector3;
         /**
          * 叉乘向量
          * @param a 向量
          */
-        cross(a: Vector3): Vector3;
+        cross(a: Vector3Like): Vector3;
         /**
          * 叉乘向量
          * @param a 向量
          * @param vout 输出向量
          */
-        crossTo(a: Vector3, vout?: Vector3): Vector3;
+        crossTo(a: Vector3Like, vout?: Vector3): Vector3;
         /**
          * 如果当前 Vector3 对象和作为参数指定的 Vector3 对象均为单位顶点，此方法将返回这两个顶点之间所成角的余弦值。
          */
-        dot(a: Vector3): number;
+        dot(a: Vector3Like): number;
         /**
          * 是否为零向量
          */
@@ -3803,8 +3461,8 @@ declare namespace feng3d {
         /**
          * 检查这个向量是否与另一个向量反平行。
          *
-         * @param  v
-         * @param  precision 设置为零以进行精确比较
+         * @param v
+         * @param precision 设置为零以进行精确比较
          */
         isAntiparallelTo(v: Vector3, precision?: number): boolean;
         /**
@@ -3851,18 +3509,9 @@ declare namespace feng3d {
         divideNumberTo(n: number, vout?: Vector3): Vector3;
         /**
          * 返回一个新 Vector3 对象，它是与当前 Vector3 对象完全相同的副本。
-         * @return 一个新 Vector3 对象，它是当前 Vector3 对象的副本。
+         * @returns 一个新 Vector3 对象，它是当前 Vector3 对象的副本。
          */
         clone(): Vector3;
-        /**
-         * 将源 Vector3 对象中的所有矢量数据复制到调用方 Vector3 对象中。
-         * @return 要从中复制数据的 Vector3 对象。
-         */
-        copy(v: Vector3): this;
-        /**
-         * 通过将当前 Vector3 对象的 x、y 和 z 元素与指定的 Vector3 对象的 x、y 和 z 元素进行比较，确定这两个对象是否相等。
-         */
-        equals(v: Vector3, precision?: number): boolean;
         /**
          * 负向量
          * (a,b,c)->(-a,-b,-c)
@@ -3883,10 +3532,6 @@ declare namespace feng3d {
          * (a,b,c)->(1/a,1/b,1/c)
          */
         inverseTo(vout?: Vector3): Vector3;
-        /**
-         * 通过将最前面的三个元素（x、y、z）除以矢量的长度可将 Vector3 对象转换为单位矢量。
-         */
-        normalize(thickness?: number): this;
         /**
          * 得到这个向量长度为1
          */
@@ -3910,43 +3555,31 @@ declare namespace feng3d {
          */
         scaleTo(s: Vector3, vout?: Vector3): Vector3;
         /**
-         * 减去向量
-         * @param a 减去的向量
-         * @return 返回新向量
-         */
-        sub(a: Vector3): this;
-        /**
-         * 减去向量
-         * @param a 减去的向量
-         * @return 返回新向量
-         */
-        subTo(a: Vector3, vout?: Vector3): Vector3;
-        /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerp(v: Vector3, alpha: Vector3): this;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerpTo(v: Vector3, alpha: Vector3, vout?: Vector3): Vector3;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerpNumber(v: Vector3, alpha: number): this;
         /**
          * 插值到指定向量
          * @param v 目标向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerpNumberTo(v: Vector3, alpha: number, vout?: Vector3): Vector3;
         /**
@@ -3992,26 +3625,6 @@ declare namespace feng3d {
          */
         max(v: Vector3): this;
         /**
-         * 应用矩阵
-         * @param mat 矩阵
-         */
-        applyMatrix4x4(mat: Matrix4x4): this;
-        /**
-         * 应用四元素
-         * @param q 四元素
-         */
-        applyQuaternion(q: Quaternion): this;
-        /**
-         * 与点之间的距离平方
-         * @param v 点
-         */
-        distanceSquared(v: Vector3): number;
-        /**
-         * 与点之间的距离平方
-         * @param v 点
-         */
-        distance(v: Vector3): number;
-        /**
          * 反射
          * @param normal
          */
@@ -4041,7 +3654,17 @@ declare namespace feng3d {
          * 从向量中得到叉乘矩阵a_cross，使得a x b = a_cross * b = c
          * @see http://www8.cs.umu.se/kurser/TDBD24/VT06/lectures/Lecture6.pdf
          */
-        crossmat(): Matrix3x3;
+        crossmat(this: Vector3, outMatrix: Matrix3x3): Matrix3x3;
+        /**
+         * 应用四元素
+         * @param q 四元素
+         */
+        applyQuaternion(q: Quaternion): this;
+        /**
+         * 应用矩阵
+         * @param mat 矩阵
+         */
+        applyMatrix4x4(mat: Matrix4x4): this;
         /**
          * 返回当前 Vector3 对象的字符串表示形式。
          */
@@ -4050,9 +3673,50 @@ declare namespace feng3d {
          * 转换为数组
          * @param array 数组
          * @param offset 偏移
-         * @return 返回数组
+         * @returns 返回数组
          */
         toArray(array?: number[], offset?: number): number[];
+        /**
+         * 转换为Vector4
+         */
+        toVector4(vector4: Vector4): Vector4;
+        static readonly kEpsilon = 0.00001;
+        static readonly kEpsilonNormalSqrt = 1e-15;
+        static Lerp(a: Vector3, b: Vector3, t: number): Vector3;
+        static LerpUnclamped(a: Vector3, b: Vector3, t: number): Vector3;
+        static MoveTowards(current: Vector3, target: Vector3, maxDistanceDelta: number): Vector3;
+        static SmoothDamp(current: Vector3, target: Vector3, currentVelocity: Vector3, smoothTime: number, maxSpeed: number): Vector3;
+        static SmoothDamp1(current: Vector3, target: Vector3, currentVelocity: Vector3, smoothTime: number): Vector3;
+        static SmoothDamp2(current: Vector3, target: Vector3, currentVelocity: Vector3, smoothTime: number, maxSpeed?: number, deltaTime?: number): Vector3;
+        static Scale(a: Vector3, b: Vector3): Vector3;
+        static Cross(lhs: Vector3, rhs: Vector3): Vector3;
+        static Reflect(inDirection: Vector3, inNormal: Vector3): Vector3;
+        static Normalize(value: Vector3): Vector3;
+        Normalize(): void;
+        get normalized(): Vector3;
+        static Dot(lhs: Vector3, rhs: Vector3): number;
+        static Project(vector: Vector3, onNormal: Vector3): Readonly<Vector3>;
+        static ProjectOnPlane(vector: Vector3, planeNormal: Vector3): Vector3;
+        static Angle(from: Vector3, to: Vector3): number;
+        static SignedAngle(from: Vector3, to: Vector3, axis: Vector3): number;
+        static Distance(a: Vector3, b: Vector3): number;
+        static ClampMagnitude(vector: Vector3, maxLength: number): Vector3;
+        static Magnitude(vector: Vector3): number;
+        get magnitude(): number;
+        static SqrMagnitude(vector: Vector3): number;
+        get sqrMagnitude(): number;
+        static Min(lhs: Vector3, rhs: Vector3): Vector3;
+        static Max(lhs: Vector3, rhs: Vector3): Vector3;
+        static readonly zero: Readonly<Vector3>;
+        static readonly one: Readonly<Vector3>;
+        static readonly up: Readonly<Vector3>;
+        static readonly down: Readonly<Vector3>;
+        static readonly left: Readonly<Vector3>;
+        static readonly right: Readonly<Vector3>;
+        static readonly forward: Readonly<Vector3>;
+        static readonly back: Readonly<Vector3>;
+        static readonly positiveInfinity: Readonly<Vector3>;
+        static readonly negativeInfinity: Readonly<Vector3>;
     }
 }
 declare namespace feng3d {
@@ -4060,7 +3724,7 @@ declare namespace feng3d {
      * 四维向量
      */
     class Vector4 {
-        __class__: "feng3d.Vector4";
+        __class__: 'feng3d.Vector4';
         static fromArray(array: ArrayLike<number>, offset?: number): Vector4;
         static fromVector3(vector3: Vector3, w?: number): Vector4;
         static random(): Vector4;
@@ -4094,21 +3758,21 @@ declare namespace feng3d {
          * @param y 第二个元素
          * @param z 第三个元素
          * @param w 第四个元素
-         * @return 返回自身
+         * @returns 返回自身
          */
-        init(x: number, y: number, z: number, w: number): this;
+        set(x: number, y: number, z?: number, w?: number): this;
         /**
          * 从数组初始化
          * @param array 提供数据的数组
          * @param offset 数组中起始位置
-         * @return 返回自身
+         * @returns 返回自身
          */
         fromArray(array: ArrayLike<number>, offset?: number): this;
         /**
          * 从三维向量初始化
          * @param vector3 三维向量
          * @param w 向量第四个值
-         * @return 返回自身
+         * @returns 返回自身
          */
         fromVector3(vector3: Vector3, w?: number): this;
         /**
@@ -4125,89 +3789,89 @@ declare namespace feng3d {
         /**
          * 加上指定向量得到新向量
          * @param v 加向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         add(v: Vector4): this;
         /**
          * 加上指定向量得到新向量
          * @param v 加向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         addTo(v: Vector4, vout?: Vector4): Vector4;
         /**
          * 克隆一个向量
-         * @return 返回一个拷贝向量
+         * @returns 返回一个拷贝向量
          */
         clone(): Vector4;
         /**
          * 从指定向量拷贝数据
          * @param v 被拷贝向量
-         * @return 返回自身
+         * @returns 返回自身
          */
         copy(v: Vector4): this;
         /**
          * 减去指定向量
          * @param v 减去的向量
-         * @return 返回自身
+         * @returns 返回自身
          */
         sub(v: Vector4): this;
         /**
          * 减去指定向量
          * @param v 减去的向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         subTo(v: Vector4, vout?: Vector4): Vector4;
         /**
          * 乘以指定向量
          * @param v 乘以的向量
-         * @return 返回自身
+         * @returns 返回自身
          */
         multiply(v: Vector4): this;
         /**
          * 乘以指定向量
          * @param v 乘以的向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         multiplyTo(v: Vector4, vout?: Vector4): Vector4;
         /**
          * 除以指定向量
          * @param v 除以的向量
-         * @return 返回自身
+         * @returns 返回自身
          */
         div(v: Vector4): this;
         /**
          * 除以指定向量
          * @param v 除以的向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         divTo(v: Vector4, vout?: Vector4): Vector4;
         /**
          * 与指定向量比较是否相等
          * @param v 比较的向量
          * @param precision 允许误差
-         * @return 相等返回true，否则false
+         * @returns 相等返回true，否则false
          */
         equals(v: Vector4, precision?: number): boolean;
         /**
          * 负向量
-         * @return 返回自身
+         * @returns 返回自身
          */
         negate(): this;
         /**
          * 负向量
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         negateTo(vout?: Vector4): Vector4;
         /**
          * 缩放指定系数
          * @param s 缩放系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         scale(s: number): this;
         /**
          * 缩放指定系数
          * @param s 缩放系数
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         scaleTo(s: number): Vector4;
         /**
@@ -4218,14 +3882,14 @@ declare namespace feng3d {
          * 获取到指定向量的插值
          * @param v 终点插值向量
          * @param alpha 插值系数
-         * @return 返回自身
+         * @returns 返回自身
          */
         lerp(v: Vector4, alpha: number): this;
         /**
          * 获取到指定向量的插值
          * @param v 终点插值向量
          * @param alpha 插值系数
-         * @return 返回新向量
+         * @returns 返回新向量
          */
         lerpTo(v: Vector4, alpha: number, vout?: Vector4): Vector4;
         /**
@@ -4237,9 +3901,167 @@ declare namespace feng3d {
          * 返回当前 Vector4 对象的字符串表示形式。
          */
         toString(): string;
+        static Lerp(a: Vector4, b: Vector4, t: number): Vector4;
+        static LerpUnclamped(a: Vector4, b: Vector4, t: number): Vector4;
+        static MoveTowards(current: Vector4, target: Vector4, maxDistanceDelta: number): Vector4;
+        static Scale(a: Vector4, b: Vector4): Vector4;
+        Scale(scale: Vector4): void;
+        Equals(other: Vector4): boolean;
+        static Normalize(a: Vector4): Vector4;
+        Normalize(): void;
+        get normalized(): Vector4;
+        static Dot(a: Vector4, b: Vector4): number;
+        static Project(a: Vector4, b: Vector4): Vector4;
+        static Distance(a: Vector4, b: Vector4): number;
+        static Magnitude(a: Vector4): number;
+        get magnitude(): number;
+        get sqrMagnitude(): number;
+        static Min(lhs: Vector4, rhs: Vector4): Vector4;
+        static Max(lhs: Vector4, rhs: Vector4): Vector4;
+        static readonly zero: Readonly<Vector4>;
+        static readonly one: Readonly<Vector4>;
+        static readonly positiveInfinity: Readonly<Vector4>;
+        static readonly negativeInfinity: Readonly<Vector4>;
+        static readonly kEpsilon = 0.00001;
     }
 }
 declare namespace feng3d {
+    /**
+     * 欧拉角
+     *
+     * 由特定的顺序分别围绕X、Y、Z三个轴进行旋转。
+     *
+     * @see https://github.com/mrdoob/three.js/blob/dev/src/math/Euler.js
+     */
+    class Euler {
+        /**
+         * 围绕X轴旋转角度。
+         */
+        x: number;
+        /**
+         * 围绕Y轴旋转角度。
+         */
+        y: number;
+        /**
+         * 围绕Z轴旋转角度。
+         */
+        z: number;
+        /**
+         * X、Y、Z轴旋顺序。
+         */
+        order: RotationOrder;
+        /**
+         * 构建欧拉角。
+         *
+         * @param x 围绕X轴旋转角度。
+         * @param y 围绕Y轴旋转角度。
+         * @param z 围绕Z轴旋转角度。
+         * @param order X、Y、Z轴旋顺序。
+         */
+        constructor(x?: number, y?: number, z?: number, order?: RotationOrder);
+        /**
+         * 设置欧拉角初始值。
+         *
+         * @param x 围绕X轴旋转角度。
+         * @param y 围绕Y轴旋转角度。
+         * @param z 围绕Z轴旋转角度。
+         * @param order X、Y、Z轴旋顺序。
+         */
+        set(x: number, y: number, z: number, order?: RotationOrder): this;
+        /**
+         * 随机欧拉角。
+         */
+        random(): this;
+        /**
+         * 克隆欧拉角。
+         */
+        clone(): Euler;
+        /**
+         * 从旋转矩阵初始化欧拉角。
+         *
+         * @param rotationMatrix 仅包含旋转的矩阵。
+         * @param order X、Y、Z轴旋顺序。
+         * @returns 从旋转矩阵初始化的欧拉角。
+         */
+        fromRotationMatrix(rotationMatrix: Matrix4x4, order?: RotationOrder): this;
+        /**
+         * 从四元素初始化欧拉角。
+         *
+         * @param q 四元素。
+         * @param order X、Y、Z轴旋顺序。
+         * @returns 初始化后的四元素。
+         */
+        fromQuaternion(q: Quaternion, order?: RotationOrder): this;
+        /**
+         * 从三个轴的旋转角度初始化四元素。
+         *
+         * @param v 存储X、Y、Z轴旋转量的向量。
+         * @param order X、Y、Z轴旋顺序。
+         * @returns 初始化后的四元素。
+         */
+        fromVector3(v: Vector3, order?: RotationOrder): this;
+        /**
+         * 在不改变旋转量的情况下更换X、Y、Z轴旋顺序。
+         *
+         * @param newOrder 新的X、Y、Z轴旋顺序。
+         * @returns 重置旋转角度。
+         */
+        reorder(newOrder: RotationOrder): this;
+        /**
+         * 判断与指定欧拉角是否相等。
+         *
+         * @param euler 被比较的欧拉角。
+         * @returns 如果值为true则两个欧拉角相等，否则不相等。
+         */
+        equals(euler: Euler): boolean;
+        /**
+         * 从数组初始化欧拉角。
+         *
+         * @param array 存储X、Y、Z轴旋角度以及旋转顺序的数组。
+         * @param offset 数组中存储便宜位置。
+         * @returns 初始化后的四元素。
+         */
+        fromArray(array: number[], offset?: number): this;
+        /**
+         * 转换为存储X、Y、Z轴旋转角度以及旋转顺序的数组。
+         *
+         * @param array 存储X、Y、Z轴旋转角度以及旋转顺序的数组。
+         * @param offset 数组中存储便宜位置。
+         * @returns 存储X、Y、Z轴旋转角度以及旋转顺序的数组。
+         */
+        toArray(array?: number[], offset?: number): number[];
+        /**
+         * 转换为存储X、Y、Z轴旋转角度的向量。
+         *
+         * @param vector3 存储X、Y、Z轴旋转角度的向量。
+         * @returns 存储X、Y、Z轴旋转角度的向量。
+         */
+        toVector3(vector3?: Vector3): Vector3;
+    }
+}
+declare namespace feng3d {
+    interface IRectangle {
+        /**
+         * 矩形左上角的 x 坐标。
+         * @default 0
+         */
+        x: number;
+        /**
+         * 矩形左上角的 y 坐标。
+         * @default 0
+         */
+        y: number;
+        /**
+         * 矩形的宽度。
+         * @default 0
+         */
+        width: number;
+        /**
+         * 矩形的高度。
+         * @default 0
+         */
+        height: number;
+    }
     /**
      * 矩形
      *
@@ -4317,7 +4139,7 @@ declare namespace feng3d {
          * 将源 Rectangle 对象中的所有矩形数据复制到调用方 Rectangle 对象中。
          * @param sourceRect 要从中复制数据的 Rectangle 对象。
          */
-        copyFrom(sourceRect: Rectangle): Rectangle;
+        copyFrom(sourceRect: IRectangle): Rectangle;
         /**
          * 将 Rectangle 的成员设置为指定值
          * @param x 矩形左上角的 x 坐标。
@@ -4430,6 +4252,17 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    type NmberArray9 = [
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number
+    ];
     /**
      * Matrix3x3 类表示一个转换矩阵，该矩阵确定二维 (2D) 显示对象的位置和方向。
      * 该矩阵可以执行转换功能，包括平移（沿 x 和 y 轴重新定位）、旋转和缩放（调整大小）。
@@ -4447,17 +4280,18 @@ declare namespace feng3d {
      *  ---                                   ---
      * ```
      */
-    class Matrix3x3 {
+    export class Matrix3x3 {
         /**
          * 长度为9的向量，包含所有的矩阵元素
          */
-        elements: [number, number, number, number, number, number, number, number, number];
+        elements: NmberArray9;
         /**
          * 构建3x3矩阵
          *
          * @param elements 九个元素的数组
          */
-        constructor(elements?: [number, number, number, number, number, number, number, number, number]);
+        constructor(elements?: NmberArray9);
+        set(elements: NmberArray9): void;
         /**
          * 设置矩阵为单位矩阵
          */
@@ -4490,7 +4324,7 @@ declare namespace feng3d {
         smult(s: number): void;
         /**
          * 矩阵乘法
-         * @param  m 要从左边乘的矩阵。
+         * @param m 要从左边乘的矩阵。
          */
         mmult(m: Matrix3x3, target?: Matrix3x3): Matrix3x3;
         /**
@@ -4555,20 +4389,39 @@ declare namespace feng3d {
         transposeTo(target?: Matrix3x3): Matrix3x3;
         formMatrix4x4(matrix4x4: Matrix4x4): this;
         /**
+         * 转换为4x4矩阵
+         *
+         * @param outMatrix4x4 4x4矩阵
+         */
+        toMatrix4x4(outMatrix4x4: Matrix4x4): Matrix4x4;
+        /**
          * 转换为数组
          * @param array 数组
          * @param offset 偏移
          */
         toArray(array?: number[], offset?: number): number[];
-        /**
-         * 转换为4x4矩阵
-         *
-         * @param out 4x4矩阵
-         */
-        toMatrix4x4(out?: Matrix4x4): Matrix4x4;
     }
+    export {};
 }
 declare namespace feng3d {
+    type NmberArray16 = [
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number
+    ];
     /**
      * Matrix4x4 类表示一个转换矩阵，该矩阵确定三维 (3D) 显示对象的位置和方向。
      * 该矩阵可以执行转换功能，包括平移（沿 x、y 和 z 轴重新定位）、旋转和缩放（调整大小）。
@@ -4589,26 +4442,60 @@ declare namespace feng3d {
      *  ---                                   ---
      * ```
      *
+     * @see https://help.adobe.com/zh_CN/FlashPlatform/reference/actionscript/3/flash/geom/Matrix3D.html
      * @see https://github.com/mrdoob/three.js/blob/dev/src/math/Matrix4.js
+     * @see https://docs.unity3d.com/ScriptReference/Matrix4x4.html
      */
-    class Matrix4x4 {
-        /**
-         * 用于运算临时变量
-         */
-        static RAW_DATA_CONTAINER: number[];
+    export class Matrix4x4 {
         /**
          * 通过位移旋转缩放重组矩阵
          *
          * @param position 位移
-         * @param rotation 旋转，按照指定旋转顺序旋转。
+         * @param rotation 旋转角度，按照指定旋转顺序旋转角度。
          * @param scale 缩放。
          * @param order 旋转顺序。
          */
-        static recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): Matrix4x4;
+        static fromTRS(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): Matrix4x4;
+        /**
+         * 从轴与旋转角度创建矩阵
+         *
+         * @param axis 旋转轴
+         * @param degrees 角度
+         */
+        static fromAxisRotate(axis: Vector3, degrees: number): Matrix4x4;
+        /**
+         * 从欧拉角旋转角度初始化矩阵。
+         *
+         * @param rx 用于沿 x 轴旋转对象的角度。
+         * @param ry 用于沿 y 轴旋转对象的角度。
+         * @param rz 用于沿 z 轴旋转对象的角度。
+         * @param order 绕轴旋转的顺序。
+         */
+        static fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): Matrix4x4;
+        /**
+         * 从四元素初始化矩阵。
+         *
+         * @param q 四元素
+         */
+        static fromQuaternion(q: Quaternion): Matrix4x4;
+        /**
+         * 创建缩放矩阵
+         * @param sx 用于沿 x 轴缩放对象的乘数。
+         * @param sy 用于沿 y 轴缩放对象的乘数。
+         * @param sz 用于沿 z 轴缩放对象的乘数。
+         */
+        static fromScale(sx: number, sy: number, sz: number): Matrix4x4;
+        /**
+         * 创建位移矩阵
+         * @param x 沿 x 轴的增量平移。
+         * @param y 沿 y 轴的增量平移。
+         * @param z 沿 z 轴的增量平移。
+         */
+        static fromPosition(x: number, y: number, z: number): Matrix4x4;
         /**
          * 一个由 16 个数字组成的矢量，其中，每四个元素可以是 4x4 矩阵的一列。
          */
-        rawData: number[];
+        elements: NmberArray16;
         /**
          * 获取位移
          *
@@ -4625,7 +4512,7 @@ declare namespace feng3d {
          * 获取欧拉旋转角度。
          *
          * @param rotation 欧拉旋转角度。
-         * @param order   绕轴旋转的顺序。
+         * @param order 绕轴旋转的顺序。
          */
         getRotation(rotation?: Vector3, order?: RotationOrder): Vector3;
         /**
@@ -4652,62 +4539,47 @@ declare namespace feng3d {
          */
         get determinant(): number;
         /**
-         * 前方（+Z轴方向）
+         * 获取X轴向量
+         *
+         * @param out 保存X轴向量
          */
-        get forward(): Vector3;
+        getAxisX(out?: Vector3): Vector3;
         /**
-         * 上方（+y轴方向）
+         * 设置X轴向量
+         *
+         * @param vector X轴向量
          */
-        get up(): Vector3;
+        setAxisX(vector?: Vector3): this;
         /**
-         * 右方（+x轴方向）
+         * 获取Y轴向量
+         *
+         * @param out 保存Y轴向量
          */
-        get right(): Vector3;
+        getAxisY(out?: Vector3): Vector3;
         /**
-         * 后方（-z轴方向）
+         * 设置Y轴向量
+         *
+         * @param vector X轴向量
          */
-        get back(): Vector3;
+        setAxisY(vector?: Vector3): this;
         /**
-         * 下方（-y轴方向）
+         * 获取Z轴向量
+         *
+         * @param out 保存Z轴向量
          */
-        get down(): Vector3;
-        /**
-         * 左方（-x轴方向）
-         */
-        get left(): Vector3;
+        getAxisZ(out?: Vector3): Vector3;
         /**
          * 创建 Matrix4x4 对象。
-         * @param   datas    一个由 16 个数字组成的矢量，其中，每四个元素可以是 4x4 矩阵的一列。
+         * @param rawData 一个由 16 个数字组成的矢量，其中，每四个元素可以是 4x4 矩阵的一列。
          */
-        constructor(datas?: number[]);
-        /**
-         * 创建旋转矩阵
-         * @param   axis            旋转轴
-         * @param   degrees         角度
-         */
-        static fromAxisRotate(axis: Vector3, degrees: number): Matrix4x4;
+        constructor(rawData?: NmberArray16);
         /**
          * 从欧拉角旋转角度初始化矩阵。
          *
-         * @param   rx      用于沿 x 轴旋转对象的角度。
-         * @param   ry      用于沿 y 轴旋转对象的角度。
-         * @param   rz      用于沿 z 轴旋转对象的角度。
-         * @param   order   绕轴旋转的顺序。
-         */
-        static fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): Matrix4x4;
-        /**
-         * 从四元素初始化矩阵。
-         *
-         * @param q 四元素
-         */
-        static fromQuaternion(q: Quaternion): Matrix4x4;
-        /**
-         * 从欧拉角旋转角度初始化矩阵。
-         *
-         * @param   rx      用于沿 x 轴旋转对象的角度。
-         * @param   ry      用于沿 y 轴旋转对象的角度。
-         * @param   rz      用于沿 z 轴旋转对象的角度。
-         * @param   order   绕轴旋转的顺序。
+         * @param rx 用于沿 x 轴旋转对象的角度。
+         * @param ry 用于沿 y 轴旋转对象的角度。
+         * @param rz 用于沿 z 轴旋转对象的角度。
+         * @param order 绕轴旋转的顺序。
          */
         fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): this;
         /**
@@ -4717,42 +4589,35 @@ declare namespace feng3d {
          */
         fromQuaternion(q: Quaternion): this;
         /**
-         * 创建缩放矩阵
-         * @param   xScale      用于沿 x 轴缩放对象的乘数。
-         * @param   yScale      用于沿 y 轴缩放对象的乘数。
-         * @param   zScale      用于沿 z 轴缩放对象的乘数。
+         * 从轴与旋转角度创建矩阵
+         *
+         * @param axis 旋转轴
+         * @param degrees 角度
          */
-        static fromScale(xScale: number, yScale: number, zScale: number): Matrix4x4;
-        /**
-         * 创建位移矩阵
-         * @param   x   沿 x 轴的增量平移。
-         * @param   y   沿 y 轴的增量平移。
-         * @param   z   沿 z 轴的增量平移。
-         */
-        static fromPosition(x: number, y: number, z: number): Matrix4x4;
+        fromAxisRotate(axis: Vector3, degrees: number): this;
         /**
          * 通过将另一个 Matrix4x4 对象与当前 Matrix4x4 对象相乘来后置一个矩阵。
          */
         append(lhs: Matrix4x4): this;
         /**
          * 在 Matrix4x4 对象上后置一个增量旋转。
-         * @param   axis            旋转轴
-         * @param   degrees         角度
-         * @param   pivotPoint      旋转中心点
+         * @param axis 旋转轴
+         * @param degrees 角度
+         * @param pivotPoint 旋转中心点
          */
         appendRotation(axis: Vector3, degrees: number, pivotPoint?: Vector3): this;
         /**
          * 在 Matrix4x4 对象上后置一个增量缩放，沿 x、y 和 z 轴改变位置。
-         * @param   xScale      用于沿 x 轴缩放对象的乘数。
-         * @param   yScale      用于沿 y 轴缩放对象的乘数。
-         * @param   zScale      用于沿 z 轴缩放对象的乘数。
+         * @param sx 用于沿 x 轴缩放对象的乘数。
+         * @param sy 用于沿 y 轴缩放对象的乘数。
+         * @param sz 用于沿 z 轴缩放对象的乘数。
          */
-        appendScale(xScale: number, yScale: number, zScale: number): this;
+        appendScale(sx: number, sy: number, sz: number): this;
         /**
          * 在 Matrix4x4 对象上后置一个增量平移，沿 x、y 和 z 轴重新定位。
-         * @param   x   沿 x 轴的增量平移。
-         * @param   y   沿 y 轴的增量平移。
-         * @param   z   沿 z 轴的增量平移。
+         * @param x 沿 x 轴的增量平移。
+         * @param y 沿 y 轴的增量平移。
+         * @param z 沿 z 轴的增量平移。
          */
         appendTranslation(x: number, y: number, z: number): this;
         /**
@@ -4760,68 +4625,39 @@ declare namespace feng3d {
          */
         clone(): Matrix4x4;
         /**
-         * 将 Vector3 对象复制到调用方 Matrix4x4 对象的特定列中。
-         * @param   column      副本的目标列。
-         * @param   vector3D    要从中复制数据的 Vector3 对象。
-         */
-        copyColumnFrom(column: number, vector3D: Vector4): this;
-        /**
-         * 将调用方 Matrix4x4 对象的特定列复制到 Vector3 对象中。
-         * @param   column       要从中复制数据的列。
-         * @param   vector3D     副本的目标 Vector3 对象。
-         */
-        copyColumnToVector3(column: number, vector3D?: Vector3): Vector3;
-        /**
-         * 将调用方 Matrix4x4 对象的特定列复制到 Vector3 对象中。
-         * @param   column       要从中复制数据的列。
-         * @param   vector3D     副本的目标 Vector3 对象。
-         */
-        copyColumnToVector4(column: number, vector3D?: Vector4): Vector4;
-        /**
          * 将源 Matrix4x4 对象中的所有矩阵数据复制到调用方 Matrix4x4 对象中。
-         * @param   source      要从中复制数据的 Matrix4x4 对象。
+         * @param source 要从中复制数据的 Matrix4x4 对象。
          */
-        copyFrom(source: Matrix4x4): this;
+        copy(source: Matrix4x4): this;
         /**
-         * 将源 Vector 对象中的所有矢量数据复制到调用方 Matrix4x4 对象中。利用可选索引参数，您可以选择矢量中的任何起始文字插槽。
-         * @param   vector      要从中复制数据的 Vector 对象。
-         * @param   index       vector中的起始位置
-         * @param   transpose   是否转置当前矩阵
+         * 从数组中初始化
+         *
+         * @param array 包含矩阵数据的数组
+         * @param index 数组中的起始位置
+         * @param transpose 是否转置
          */
-        copyRawDataFrom(vector: number[], index?: number, transpose?: boolean): this;
+        fromArray(array: number[], index?: number, transpose?: boolean): this;
         /**
-         * 将调用方 Matrix4x4 对象中的所有矩阵数据复制到提供的矢量中。
-         * @param   vector      要将数据复制到的 Vector 对象。
-         * @param   index       vector中的起始位置
-         * @param   transpose   是否转置当前矩阵
+         * 将矩阵数据转换为数组
+         *
+         * @param array 保存矩阵数据的数组
+         * @param index 数组中的起始位置
+         * @param transpose 是否转置
          */
-        copyRawDataTo(vector: number[] | Float32Array, index?: number, transpose?: boolean): this;
+        toArray(array?: number[] | Float32Array, index?: number, transpose?: boolean): number[] | Float32Array;
         /**
-         * 将 Vector3 对象复制到调用方 Matrix4x4 对象的特定行中。
-         * @param   row         要将数据复制到的行。
-         * @param   vector3D    要从中复制数据的 Vector3 对象。
+         * 随机矩阵。
          */
-        copyRowFrom(row: number, vector3D: Vector4): this;
-        /**
-         * 将调用方 Matrix4x4 对象的特定行复制到 Vector3 对象中。
-         * @param   row         要从中复制数据的行。
-         * @param   vector3D    将作为数据复制目的地的 Vector3 对象。
-         */
-        copyRowTo(row: number, vector3D: Vector4): this;
-        /**
-         * 拷贝当前矩阵
-         * @param   dest    目标矩阵
-         */
-        copyToMatrix(dest: Matrix4x4): this;
+        random(): this;
         /**
          * 通过位移旋转缩放重组矩阵
          *
          * @param position 位移
-         * @param rotation 旋转角度，按照指定旋转顺序旋转。
+         * @param rotation 旋转角度，按照指定旋转顺序旋转角度。
          * @param scale 缩放。
          * @param order 旋转顺序。
          */
-        recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): this;
+        fromTRS(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): this;
         /**
          * 把矩阵分解为位移旋转缩放。
          *
@@ -4830,82 +4666,93 @@ declare namespace feng3d {
          * @param scale 缩放。
          * @param order 旋转顺序。
          */
-        decompose(position?: Vector3, rotation?: Vector3, scale?: Vector3, order?: RotationOrder): Vector3[];
-        /**
-         * 使用不含平移元素的转换矩阵将 Vector3 对象从一个空间坐标转换到另一个空间坐标。
-         * @param   v   一个容纳要转换的坐标的 Vector3 对象。
-         * @return  一个包含转换后的坐标的 Vector3 对象。
-         */
-        deltaTransformVector(v: Vector3, vout?: Vector3): Vector3;
+        toTRS(position?: Vector3, rotation?: Vector3, scale?: Vector3, order?: RotationOrder): Vector3[];
         /**
          * 将当前矩阵转换为恒等或单位矩阵。
          */
         identity(): this;
         /**
          * 反转当前矩阵。逆矩阵
-         * @return      如果成功反转矩阵，则返回 该矩阵。
+         * @returns      如果成功反转矩阵，则返回 该矩阵。
          */
         invert(): this;
         /**
          * 通过将当前 Matrix4x4 对象与另一个 Matrix4x4 对象相乘来前置一个矩阵。得到的结果将合并两个矩阵转换。
-         * @param   rhs     个右侧矩阵，它与当前 Matrix4x4 对象相乘。
+         * @param rhs 个右侧矩阵，它与当前 Matrix4x4 对象相乘。
          */
         prepend(rhs: Matrix4x4): this;
         /**
          * 在 Matrix4x4 对象上前置一个增量旋转。在将 Matrix4x4 对象应用于显示对象时，矩阵会在 Matrix4x4 对象中先执行旋转，然后再执行其他转换。
-         * @param   axis        旋转的轴或方向。常见的轴为 X_AXIS (Vector3(1,0,0))、Y_AXIS (Vector3(0,1,0)) 和 Z_AXIS (Vector3(0,0,1))。此矢量的长度应为 1。
-         * @param   degrees     旋转的角度。
-         * @param   pivotPoint  一个用于确定旋转中心的点。对象的默认轴点为该对象的注册点。
+         * @param axis 旋转的轴或方向。常见的轴为 X_AXIS (Vector3(1,0,0))、Y_AXIS (Vector3(0,1,0)) 和 Z_AXIS (Vector3(0,0,1))。此矢量的长度应为 1。
+         * @param degrees 旋转的角度。
+         * @param pivotPoint 一个用于确定旋转中心的点。对象的默认轴点为该对象的注册点。
          */
-        prependRotation(axis: Vector3, degrees: number, pivotPoint?: Vector3): this;
+        prependRotation(axis: Vector3, degrees: number, _pivotPoint?: Vector3): this;
         /**
          * 在 Matrix4x4 对象上前置一个增量缩放，沿 x、y 和 z 轴改变位置。在将 Matrix4x4 对象应用于显示对象时，矩阵会在 Matrix4x4 对象中先执行缩放更改，然后再执行其他转换。
-         * @param   xScale      用于沿 x 轴缩放对象的乘数。
-         * @param   yScale      用于沿 y 轴缩放对象的乘数。
-         * @param   zScale      用于沿 z 轴缩放对象的乘数。
+         * @param xScale 用于沿 x 轴缩放对象的乘数。
+         * @param yScale 用于沿 y 轴缩放对象的乘数。
+         * @param zScale 用于沿 z 轴缩放对象的乘数。
          */
         prependScale(xScale: number, yScale: number, zScale: number): this;
         prependScale1(xScale: number, yScale: number, zScale: number): this;
         /**
          * 在 Matrix4x4 对象上前置一个增量平移，沿 x、y 和 z 轴重新定位。在将 Matrix4x4 对象应用于显示对象时，矩阵会在 Matrix4x4 对象中先执行平移更改，然后再执行其他转换。
-         * @param   x   沿 x 轴的增量平移。
-         * @param   y   沿 y 轴的增量平移。
-         * @param   z   沿 z 轴的增量平移。
+         * @param x 沿 x 轴的增量平移。
+         * @param y 沿 y 轴的增量平移。
+         * @param z 沿 z 轴的增量平移。
          */
         prependTranslation(x: number, y: number, z: number): this;
         /**
          * X轴方向移动
-         * @param distance  移动距离
+         * @param distance 移动距离
          */
         moveRight(distance: number): this;
         /**
          * Y轴方向移动
-         * @param distance  移动距离
+         * @param distance 移动距离
          */
         moveUp(distance: number): this;
         /**
          * Z轴方向移动
-         * @param distance  移动距离
+         * @param distance 移动距离
          */
         moveForward(distance: number): this;
         /**
          * 使用转换矩阵将 Vector3 对象从一个空间坐标转换到另一个空间坐标。
-         * @param   vin   一个容纳要转换的坐标的 Vector3 对象。
-         * @return  一个包含转换后的坐标的 Vector3 对象。
+         * @param vin 一个容纳要转换的坐标的 Vector3 对象。
+         * @returns  一个包含转换后的坐标的 Vector3 对象。
          */
-        transformVector(vin: Vector3, vout?: Vector3): Vector3;
+        transformPoint3(vin: Vector3, vout?: Vector3): Vector3;
         /**
-         * 使用转换矩阵将 Vector3 对象从一个空间坐标转换到另一个空间坐标。
-         * @param   vin   一个容纳要转换的坐标的 Vector3 对象。
-         * @return  一个包含转换后的坐标的 Vector3 对象。
+         * 变换Vector3向量
+         *
+         * 与变换点不同，并不会受到矩阵平移分量的影响。
+         *
+         * @param vin 被变换的向量
+         * @param vout 变换后的向量
+         */
+        transformVector3(vin: Vector3, vout?: Vector3): Vector3;
+        /**
+         * 变换Vector4向量
+         *
+         * @param vin 被变换的向量
+         * @param vout 变换后的向量
          */
         transformVector4(vin: Vector4, vout?: Vector4): Vector4;
         /**
-         * 使用转换矩阵将由数字构成的矢量从一个空间坐标转换到另一个空间坐标。
-         * @param   vin     一个由多个数字组成的矢量，其中每三个数字构成一个要转换的 3D 坐标 (x,y,z)。
-         * @param   vout    一个由多个数字组成的矢量，其中每三个数字构成一个已转换的 3D 坐标 (x,y,z)。
+         * 变换坐标数组数据
+         *
+         * @param vin 被变换坐标数组数据
+         * @param vout 变换后的坐标数组数据
          */
-        transformVectors(vin: number[], vout: number[]): void;
+        transformPoints(vin: number[], vout?: number[]): number[];
+        /**
+         * 变换旋转角度
+         *
+         * @param vin 被变换的旋转角度
+         * @param vout 变换后的旋转角度
+         */
         transformRotation(vin: Vector3, vout?: Vector3): Vector3;
         /**
          * 使用转换矩阵将 Ray3 对象从一个空间坐标转换到另一个空间坐标。
@@ -4925,8 +4772,8 @@ declare namespace feng3d {
         equals(matrix: Matrix4x4, precision?: number): boolean;
         /**
          * 看向目标位置
-         * @param target    目标位置
-         * @param upAxis    向上朝向
+         * @param target 目标位置
+         * @param upAxis 向上朝向
          */
         lookAt(target: Vector3, upAxis?: Vector3): this;
         /**
@@ -4972,12 +4819,6 @@ declare namespace feng3d {
          */
         setPerspective(left: number, right: number, top: number, bottom: number, near: number, far: number): this;
         /**
-         * 转换为数组
-         * @param array 数组
-         * @param offset 偏移
-         */
-        toArray(array?: number[], offset?: number): number[];
-        /**
          * 转换为3x3矩阵
          *
          * @param out 3x3矩阵
@@ -4987,7 +4828,24 @@ declare namespace feng3d {
          * 以字符串返回矩阵的值
          */
         toString(): string;
+        GetColumn(index: number): Vector4;
+        GetRow(index: number): Vector4;
+        SetColumn(index: number, column: Vector4): void;
+        SetRow(index: number, row: Vector4): void;
+        MultiplyPoint(point: Vector3, res?: Vector3): Vector3;
+        MultiplyPoint3x4(point: Vector3, res?: Vector3): Vector3;
+        MultiplyVector(vector: Vector3, res?: Vector3): Vector3;
+        TransformPlane(plane: Plane, result?: Plane): Plane;
+        static Scale(vector: Vector3, m?: Matrix4x4): Matrix4x4;
+        static Translate(vector: Vector3, m?: Matrix4x4): Matrix4x4;
+        static Rotate(q: Quaternion, m?: Matrix4x4): Matrix4x4;
+        static readonly zero: Matrix4x4;
+        static readonly identity: Matrix4x4;
+        get rotation(): Quaternion;
+        get lossyScale(): Vector3;
+        get isIdentity(): boolean;
     }
+    export {};
 }
 declare namespace feng3d {
     /**
@@ -5081,16 +4939,16 @@ declare namespace feng3d {
          * 将四元数转换为轴/角表示形式
          *
          * @param targetAxis 要重用的向量对象，用于存储轴
-         * @return 一个数组，第一个元素是轴，第二个元素是弧度
+         * @returns 一个数组，第一个元素是轴，第二个元素是弧度
          */
         toAxisAngle(targetAxis?: Vector3): (number | Vector3)[];
         /**
-         * 给定两个向量，设置四元数值。得到的旋转将是将u旋转到v所需要的旋转。
+         * 给定两个单位向量，设置四元数值。得到的旋转将是将u旋转到v所需要的旋转。
          *
-         * @param u
-         * @param v
+         * @param u 表示起始方向的单位向量。
+         * @param v 表示终止方向的单位向量。
          */
-        setFromVectors(u: Vector3, v: Vector3): this;
+        fromUnitVectors(u: Vector3, v: Vector3): this;
         /**
          * 与目标四元数之间进行球面内插，提供了具有恒定角度变化率的旋转之间的内插。
          * @param qb 目标四元素
@@ -5112,17 +4970,9 @@ declare namespace feng3d {
          */
         lerp(qa: Quaternion, qb: Quaternion, t: number): void;
         /**
-         * Fills the quaternion object with values representing the given euler rotation.
-         *
-         * @param    ax        The angle in radians of the rotation around the ax axis.
-         * @param    ay        The angle in radians of the rotation around the ay axis.
-         * @param    az        The angle in radians of the rotation around the az axis.
-         */
-        fromEulerAngles(ax: number, ay: number, az: number): this;
-        /**
          * Fills a target Vector3 object with the Euler angles that form the rotation represented by this quaternion.
          * @param target An optional Vector3 object to contain the Euler angles. If not provided, a new object is created.
-         * @return The Vector3 containing the Euler angles.
+         * @returns The Vector3 containing the Euler angles.
          */
         toEulerAngles(target?: Vector3): Vector3;
         /**
@@ -5177,7 +5027,7 @@ declare namespace feng3d {
          * @param angularVelocity
          * @param dt
          * @param angularFactor
-         * @param  target
+         * @param target
          */
         integrateTo(angularVelocity: Vector3, dt: number, angularFactor: Vector3, target?: Quaternion): Quaternion;
         /**
@@ -5199,16 +5049,29 @@ declare namespace feng3d {
          */
         toEuler(target: Vector3, order?: string): void;
         /**
-         * See http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
-         * @param x
-         * @param y
-         * @param z
-         * @param order The order to apply angles: 'XYZ' or 'YXZ' or any other combination
+         * 从欧拉角初始化四元素。
+         *
+         * @param x 围绕X轴旋转角度。
+         * @param y 围绕Y轴旋转角度。
+         * @param z 围绕Z轴旋转角度。
+         * @param order X、Y、Z轴旋顺序。
+         *
+         * @see http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
          */
-        setFromEuler(x: number, y: number, z: number, order?: string): this;
+        fromEuler(x: number, y: number, z: number, order?: RotationOrder): this;
+        /**
+         * 与指定四元素比较是否相等。
+         *
+         * @param v 比较的向量。
+         * @param precision 允许误差。
+         * @returns 相等返回true，否则false。
+         */
+        equals(v: Quaternion, precision?: number): boolean;
     }
 }
 declare namespace feng3d {
+    interface Line3 extends MixinsLine3 {
+    }
     /**
      * 3d直线
      */
@@ -5255,10 +5118,6 @@ declare namespace feng3d {
          * @param direction 直线的方向
          */
         fromPosAndDir(position: Vector3, direction: Vector3): this;
-        /**
-         * 获取经过该直线的平面
-         */
-        getPlane(plane?: Plane): Plane;
         /**
          * 获取直线上的一个点
          * @param length 与原点距离
@@ -5307,7 +5166,7 @@ declare namespace feng3d {
          * 与指定向量比较是否相等
          * @param v 比较的向量
          * @param precision 允许误差
-         * @return 相等返回true，否则false
+         * @returns 相等返回true，否则false
          */
         equals(line: Line3, precision?: number): boolean;
         /**
@@ -5431,7 +5290,6 @@ declare namespace feng3d {
      * 3D射线
      */
     class Ray3 extends Line3 {
-        constructor(origin?: Vector3, direction?: Vector3);
     }
 }
 declare namespace feng3d {
@@ -5441,9 +5299,9 @@ declare namespace feng3d {
     class Triangle3 {
         /**
          * 通过3顶点定义一个三角形
-         * @param p0		点0
-         * @param p1		点1
-         * @param p2		点2
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
          */
         static fromPoints(p0: Vector3, p1: Vector3, p2: Vector3): Triangle3;
         /**
@@ -5513,9 +5371,9 @@ declare namespace feng3d {
         getOrthocenter(pout?: Vector3): Vector3;
         /**
          * 通过3顶点定义一个三角形
-         * @param p0		点0
-         * @param p1		点1
-         * @param p2		点2
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
          */
         fromPoints(p0: Vector3, p1: Vector3, p2: Vector3): this;
         /**
@@ -5563,10 +5421,6 @@ declare namespace feng3d {
          * 获取指定点分别占三个点的混合值
          */
         blendWithPoint(p: Vector3): Vector3;
-        /**
-         * 是否与盒子相交
-         */
-        intersectsBox(box: Box3): boolean;
         /**
          * 与指定点最近的点
          * @param point 点
@@ -5803,13 +5657,13 @@ declare namespace feng3d {
          * 与射线相交
          * @param position 射线起点
          * @param direction 射线方向
-         * @param targetNormal 相交处法线
-         * @return 起点到包围盒距离
+         * @param outTargetNormal 相交处法线
+         * @returns 起点到包围盒距离
          *
          * @todo 可用以下方法优化？
          * @see 3D数学基础：图形与游戏开发 P290
          */
-        rayIntersection(position: Vector3, direction: Vector3, targetNormal?: Vector3): number;
+        rayIntersection(position: Vector3, direction: Vector3, outTargetNormal?: Vector3): number;
         /**
          * 获取包围盒上距离指定点最近的点
          *
@@ -5910,7 +5764,7 @@ declare namespace feng3d {
          * @param position 射线起点
          * @param direction 射线方向
          * @param targetNormal 目标法线
-         * @return 射线起点到交点的距离
+         * @returns 射线起点到交点的距离
          */
         rayIntersection(position: Vector3, direction: Vector3, targetNormal: Vector3): number;
         /**
@@ -5996,15 +5850,15 @@ declare namespace feng3d {
     class Plane {
         /**
          * 通过3顶点定义一个平面
-         * @param p0		点0
-         * @param p1		点1
-         * @param p2		点2
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
          */
         static fromPoints(p0: Vector3, p1: Vector3, p2: Vector3): Plane;
         /**
          * 根据法线与点定义平面
-         * @param normal		平面法线
-         * @param point			平面上任意一点
+         * @param normal 平面法线
+         * @param point 平面上任意一点
          */
         static fromNormalAndPoint(normal: Vector3, point: Vector3): Plane;
         /**
@@ -6033,19 +5887,19 @@ declare namespace feng3d {
         d: number;
         /**
          * 创建一个平面
-         * @param a		A系数
-         * @param b		B系数
-         * @param c		C系数
-         * @param d		D系数
+         * @param a A系数
+         * @param b B系数
+         * @param c C系数
+         * @param d D系数
          */
         constructor(a?: number, b?: number, c?: number, d?: number);
         /**
          * 设置
          *
-         * @param a		A系数
-         * @param b		B系数
-         * @param c		C系数
-         * @param d		D系数
+         * @param a A系数
+         * @param b B系数
+         * @param c C系数
+         * @param d D系数
          */
         set(a: number, b: number, c: number, d: number): this;
         /**
@@ -6064,21 +5918,21 @@ declare namespace feng3d {
         getNormal(vout?: Vector3): Vector3;
         /**
          * 通过3顶点定义一个平面
-         * @param p0		点0
-         * @param p1		点1
-         * @param p2		点2
+         * @param p0 点0
+         * @param p1 点1
+         * @param p2 点2
          */
         fromPoints(p0: Vector3, p1: Vector3, p2: Vector3): this;
         /**
          * 根据法线与点定义平面
-         * @param normal		平面法线
-         * @param point			平面上任意一点
+         * @param normal 平面法线
+         * @param point 平面上任意一点
          */
         fromNormalAndPoint(normal: Vector3, point: Vector3): this;
         /**
          * 计算点与平面的距离
-         * @param p		点
-         * @returns		距离
+         * @param p 点
+         * @returns        距离
          */
         distanceWithPoint(p: Vector3): number;
         /**
@@ -6089,8 +5943,8 @@ declare namespace feng3d {
         /**
          * 顶点分类
          * <p>把顶点分为后面、前面、相交三类</p>
-         * @param p			顶点
-         * @return			顶点类型 PlaneClassification.BACK,PlaneClassification.FRONT,PlaneClassification.INTERSECT
+         * @param p 顶点
+         * @returns         顶点类型 PlaneClassification.BACK,PlaneClassification.FRONT,PlaneClassification.INTERSECT
          */
         classifyPoint(p: Vector3, precision?: number): PlaneClassification;
         /**
@@ -6163,6 +6017,12 @@ declare namespace feng3d {
         toString(): string;
     }
 }
+interface MixinsLine3 {
+    /**
+     * 获取经过该直线的平面
+     */
+    getPlane(plane?: feng3d.Plane): feng3d.Plane;
+}
 declare namespace feng3d {
     /**
      * 截头锥体
@@ -6194,9 +6054,9 @@ declare namespace feng3d {
         /**
          * 从矩阵初始化
          *
-         * @param m 矩阵
+         * @param matrix4x4 矩阵
          */
-        fromMatrix(m: Matrix4x4): this;
+        fromMatrix(matrix4x4: Matrix4x4): this;
         /**
          * 是否与球体相交
          *
@@ -6259,7 +6119,7 @@ declare namespace feng3d {
         /**
          * 给指定点分类
          * @param p 点
-         * @return 点相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内
+         * @returns 点相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内
          * 方案：当指定点不在几何体上时，在几何体上找到距离指定点最近点，最近点到给定点形成的向量与最近点所在面（当最近点在多个面上时取点乘摸最大的面）法线点乘大于0时给定点在几何体内，否则在几何体外。
          */
         classifyPoint(p: Vector3): 1 | 0 | -1;
@@ -6271,15 +6131,15 @@ declare namespace feng3d {
         /**
          * 给指定线段分类
          * @param segment 线段
-         * @return 线段相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内，2：横跨几何体
+         * @returns 线段相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内，2：横跨几何体
          */
-        classifySegment(segment: Segment3): 1 | 0 | -1 | 2;
+        classifySegment(segment: Segment3): 1 | 0 | 2 | -1;
         /**
          * 给指定三角形分类
          * @param triangle 三角形
-         * @return 三角形相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内
+         * @returns 三角形相对于几何体位置；0:在几何体表面上，1：在几何体外，-1：在几何体内
          */
-        classifyTriangle(triangle: Triangle3): void;
+        classifyTriangle(_triangle: Triangle3): void;
         /**
          * 与直线碰撞
          * @param line3d 直线
@@ -6291,7 +6151,7 @@ declare namespace feng3d {
         /**
          * 与线段相交
          * @param segment 线段
-         * @return 不相交时返回null，相交时返回 碰撞线段列表与碰撞点列表
+         * @returns 不相交时返回null，相交时返回 碰撞线段列表与碰撞点列表
          */
         intersectionWithSegment(segment: Segment3): {
             segments: Segment3[];
@@ -6301,7 +6161,7 @@ declare namespace feng3d {
          * 分解三角形
          * @param triangle 三角形
          */
-        decomposeTriangle(triangle: Triangle3): void;
+        decomposeTriangle(_triangle: Triangle3): void;
         /**
          * 拷贝
          */
@@ -6362,7 +6222,7 @@ declare namespace feng3d {
      * 颜色渐变
      */
     class Gradient {
-        __class__: "feng3d.Gradient";
+        __class__: 'feng3d.Gradient';
         /**
          * 渐变模式
          */
@@ -6444,7 +6304,7 @@ declare namespace feng3d {
      * 最大最小颜色渐变
      */
     class MinMaxGradient {
-        __class__: "feng3d.MinMaxGradient";
+        __class__: 'feng3d.MinMaxGradient';
         /**
          * Set the mode that the min-max gradient will use to evaluate colors.
          *
@@ -6497,10 +6357,6 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * Bézier曲线
-     */
-    var bezierCurve: BezierCurve;
-    /**
-     * Bézier曲线
      * @see https://en.wikipedia.org/wiki/B%C3%A9zier_curve
      * @author feng / http://feng3d.com 03/06/2018
      */
@@ -6527,11 +6383,11 @@ declare namespace feng3d {
         linearDerivative(t: number, p0: number, p1: number): number;
         /**
          * 线性Bézier曲线关于t的二阶导数
-         * @param t 插值度
-         * @param p0 点0
-         * @param p1 点1
+         * @param _t 插值度
+         * @param _p0 点0
+         * @param _p1 点1
          */
-        linearSecondDerivative(t: number, p0: number, p1: number): number;
+        linearSecondDerivative(_t: number, _p0: number, _p1: number): number;
         /**
          * 二次Bézier曲线
          *
@@ -6634,7 +6490,7 @@ declare namespace feng3d {
          * Bézier曲线可以定义为任意度n。
          *
          * @param t 插值度
-         * @param ps 点列表 ps.length == n+1
+         * @param ps 点列表 ps.length === n+1
          * @param processs 收集中间过程数据，可用作Bézier曲线动画数据
          */
         bn(t: number, ps: number[], processs?: number[][]): number;
@@ -6646,7 +6502,7 @@ declare namespace feng3d {
          * Bézier曲线可以定义为任意度n。
          *
          * @param t 插值度
-         * @param ps 点列表 ps.length == n+1
+         * @param ps 点列表 ps.length === n+1
          */
         bnDerivative(t: number, ps: number[]): number;
         /**
@@ -6657,7 +6513,7 @@ declare namespace feng3d {
          * Bézier曲线可以定义为任意度n。
          *
          * @param t 插值度
-         * @param ps 点列表 ps.length == n+1
+         * @param ps 点列表 ps.length === n+1
          */
         bnSecondDerivative(t: number, ps: number[]): number;
         /**
@@ -6667,7 +6523,7 @@ declare namespace feng3d {
          *
          * @param t 插值度
          * @param dn 求导次数
-         * @param ps 点列表     ps.length == n+1
+         * @param ps 点列表     ps.length === n+1
          */
         bnND(t: number, dn: number, ps: number[]): number;
         /**
@@ -6693,7 +6549,7 @@ declare namespace feng3d {
          *
          * @param ps 点列表
          * @param numSamples 采样次数，用于分段查找极值
-         * @param precision  查找精度
+         * @param precision 查找精度
          *
          * @returns 极值列表 {} {ts: 极值插值度列表,vs: 极值值列表}
          */
@@ -6719,7 +6575,7 @@ declare namespace feng3d {
          * @param targetV 目标值
          * @param ps 点列表
          * @param numSamples 分段数量，用于分段查找，用于解决寻找多个解、是否无解等问题；过少的分段可能会造成找不到存在的解决，过多的分段将会造成性能很差。
-         * @param precision  查找精度
+         * @param precision 查找精度
          *
          * @returns 返回解数组
          */
@@ -6757,6 +6613,10 @@ declare namespace feng3d {
             v: number;
         }[];
     }
+    /**
+     * Bézier曲线
+     */
+    const bezierCurve: BezierCurve;
 }
 declare namespace feng3d {
     /**
@@ -6821,7 +6681,7 @@ declare namespace feng3d {
      * 基于时间轴的连续三阶Bézier曲线
      */
     class AnimationCurve {
-        __class__: "feng3d.AnimationCurve";
+        __class__: 'feng3d.AnimationCurve';
         /**
          * 最大tan值，超出该值后将会变成分段
          */
@@ -6918,6 +6778,30 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
+     * Vector3 曲线
+     */
+    class AnimationCurveVector3 {
+        /**
+         * X 轴曲线
+         */
+        xCurve: AnimationCurve;
+        /**
+         * Y 轴曲线
+         */
+        yCurve: AnimationCurve;
+        /**
+         * Z 轴曲线
+         */
+        zCurve: AnimationCurve;
+        /**
+         * 获取值
+         * @param time 时间
+         */
+        getValue(time: number): Vector3;
+    }
+}
+declare namespace feng3d {
+    /**
      * 曲线模式
      */
     enum MinMaxCurveMode {
@@ -6952,7 +6836,7 @@ declare namespace feng3d {
      * 最大最小曲线
      */
     class MinMaxCurve {
-        __class__: "feng3d.MinMaxCurve";
+        __class__: 'feng3d.MinMaxCurve';
         /**
          * 模式
          */
@@ -7033,9 +6917,471 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 噪音
+     * Port from https://github.com/mapbox/earcut (v2.2.2)
      */
-    var noise: Noise;
+    class Earcut {
+        /**
+         * 三角化形状
+         *
+         * @param data 形状顶点数据
+         * @param holeIndices 空洞的起始顶点索引列表
+         * @param dim 相邻顶点数据之间的步长
+         */
+        static triangulate(data: number[], holeIndices: number[], dim?: number): number[];
+    }
+}
+declare namespace feng3d {
+    class ShapeUtils {
+        /**
+         * 计算多边形面积
+         * @param contour 多边形轮廓，使用顶点数组表示。
+         */
+        static area(contour: Vector2[]): number;
+        /**
+         * 判断多边形是否为顺时针方向
+         *
+         * @param contour 多边形轮廓，使用顶点数组表示。
+         */
+        static isClockWise(contour: Vector2[]): boolean;
+        /**
+         * 三角化多边形
+         *
+         * @param contour 多边形轮廓，使用顶点数组表示。
+         * @param holes 孔洞多边形数组，每个孔洞多边形使用顶点数组表示。
+         */
+        static triangulateShape(contour: Vector2[], holes: Vector2[][]): number[][];
+    }
+}
+declare namespace feng3d {
+    /**
+     * Bezier Curves formulas obtained from
+     * http://en.wikipedia.org/wiki/Bézier_curve
+     */
+    class Interpolations {
+        static CatmullRom(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static QuadraticBezier(t: number, p0: number, p1: number, p2: number): number;
+        static CubicBezier(t: number, p0: number, p1: number, p2: number, p3: number): number;
+    }
+}
+declare namespace feng3d {
+    /**
+     * An extensible curve object which contains methods for interpolation
+     */
+    class Curve<T extends Vector> {
+        /**
+         * This value determines the amount of divisions when calculating the cumulative segment lengths of a curve via .getLengths.
+         * To ensure precision when using methods like .getSpacedPoints, it is recommended to increase .arcLengthDivisions if the curve is very large.
+         */
+        arcLengthDivisions: number;
+        needsUpdate: boolean;
+        cacheArcLengths: number[];
+        getResolution(divisions: number): number;
+        /**
+         * Virtual base class method to overwrite and implement in subclasses
+         *
+         * - t [0 .. 1]
+         * Returns a vector for point t of the curve where t is between 0 and 1
+         */
+        getPoint(_t?: number, _optionalTarget?: T): T;
+        /**
+         * Get point at relative position in curve according to arc length
+         * Returns a vector for point at relative position in curve according to arc length
+         *
+         * @param u [0 .. 1]
+         * @param optionalTarget
+         */
+        getPointAt(u: number, optionalTarget?: T): T;
+        /**
+         * Get sequence of points using getPoint( t )
+         */
+        getPoints(divisions?: number): T[];
+        /**
+         * Get sequence of equi-spaced points using getPointAt( u )
+         */
+        getSpacedPoints(divisions: number): any[];
+        /**
+         * Get total curve arc length
+         */
+        getLength(): number;
+        /**
+         * Get list of cumulative segment lengths
+         */
+        getLengths(divisions?: number): number[];
+        /**
+         * Update the cumlative segment distance cache
+         */
+        updateArcLengths(): void;
+        /**
+         * Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance
+         */
+        getUtoTmapping(u: number, distance?: number): number;
+        /**
+         * Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation
+         * getTangent(t: number, optionalTarget?: T): T;
+         */
+        getTangent(t: number, optionalTarget: T): T;
+        /**
+         * Returns tangent at equidistance point u on the curve
+         * getTangentAt(u: number, optionalTarget?: T): T;
+         */
+        getTangentAt(u: number, optionalTarget: T): T;
+        computeFrenetFrames(segments: number, closed: boolean): {
+            tangents: Vector3[];
+            normals: Vector3[];
+            binormals: Vector3[];
+        };
+    }
+}
+declare namespace feng3d {
+    /**
+     * Curved Path - a curve path is simply a array of connected
+     * curves, but retains the api of a curve
+     */
+    class CurvePath<T extends Vector> extends Curve<T> {
+        curves: Curve<T>[];
+        autoClose: boolean;
+        cacheLengths: number[];
+        add(curve: Curve<T>): void;
+        closePath(): void;
+        getPoint(t: number): T;
+        getLength(): number;
+        updateArcLengths(): void;
+        getCurveLengths(): number[];
+        getSpacedPoints(divisions?: number): T[];
+        getPoints(divisions?: number): T[];
+    }
+}
+declare namespace feng3d {
+    class Path2 extends CurvePath<Vector2> {
+        currentPoint: Vector2;
+        constructor(points?: Vector2[]);
+        fromPoints(points: Vector2[]): this;
+        moveTo(x: number, y: number): this;
+        lineTo(x: number, y: number): this;
+        quadraticCurveTo(aCPx: number, aCPy: number, aX: number, aY: number): this;
+        bezierCurveTo(aCP1x: number, aCP1y: number, aCP2x: number, aCP2y: number, aX: number, aY: number): this;
+        splineThru(pts: Vector2[]): this;
+        arc(aX?: number, aY?: number, aRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean): this;
+        absarc(aX?: number, aY?: number, aRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean): this;
+        ellipse(aX?: number, aY?: number, xRadius?: number, yRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean, aRotation?: number): this;
+        absellipse(aX?: number, aY?: number, xRadius?: number, yRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean, aRotation?: number): this;
+    }
+}
+declare namespace feng3d {
+    class Shape2 extends Path2 {
+        holes: Path2[];
+        constructor(points?: Vector2[]);
+        getPointsHoles(divisions: number): Vector2[][];
+        extractPoints(divisions: number): {
+            shape: Vector2[];
+            holes: Vector2[][];
+        };
+        extractArray(divisions?: number): {
+            points: number[];
+            holes: number[][];
+        };
+        triangulate(geometry?: {
+            points: number[];
+            indices: number[];
+        }): {
+            points: number[];
+            indices: number[];
+        };
+        static triangulate(points: number[], holes?: number[][], geometry?: {
+            points: number[];
+            indices: number[];
+        }): {
+            points: number[];
+            indices: number[];
+        };
+    }
+}
+declare namespace feng3d {
+    class ShapePath2 {
+        color: Color4;
+        subPaths: Path2[];
+        currentPath: Path2;
+        constructor();
+        moveTo(x: number, y: number): this;
+        lineTo(x: number, y: number): this;
+        quadraticCurveTo(aCPx: number, aCPy: number, aX: number, aY: number): this;
+        bezierCurveTo(aCP1x: number, aCP1y: number, aCP2x: number, aCP2y: number, aX: number, aY: number): this;
+        splineThru(pts: Vector2[]): this;
+        closePath(): void;
+        toShapes(isCCW?: boolean, noHoles?: boolean): Shape2[];
+    }
+}
+declare namespace feng3d {
+    export class Font {
+        data: FontData;
+        isCCW: boolean;
+        private charGeometryCache;
+        constructor(data: FontData);
+        generateShapes(text: string, size: number, lineHeight?: number, align?: 'left' | 'center' | 'right'): Shape2[];
+        generateCharGeometry(char: string, geometry?: {
+            points: number[];
+            indices: number[];
+        }): {
+            geometry: {
+                points: number[];
+                indices: number[];
+            };
+            width: number;
+        };
+        calculateGeometry(text: string, fontSize: number, lineHeight?: number, align?: 'left' | 'center' | 'right', textBaseline?: 'alphabetic' | 'top' | 'middle' | 'bottom', tabCharWidth?: number): {
+            vertices: Float32Array;
+            normals: Float32Array;
+            uvs: Float32Array;
+            indices: Uint32Array;
+        };
+    }
+    export interface Glyph {
+        ha: number;
+        x_min: number;
+        x_max: number;
+        o: string;
+        _cachedOutline?: any[];
+    }
+    interface FontData {
+        glyphs: {
+            [index: string]: Glyph;
+        };
+        unitsPerEm: number;
+        ascender: number;
+        descender: number;
+        underlinePosition: number;
+        underlineThickness: number;
+        familyName: string;
+        boundingBox: {
+            yMin: number;
+            xMin: number;
+            yMax: number;
+            xMax: number;
+        };
+    }
+    export {};
+}
+declare namespace feng3d {
+    class LineCurve2 extends Curve<Vector2> {
+        v1: Vector2;
+        v2: Vector2;
+        constructor(v1?: Vector2, v2?: Vector2);
+        getResolution(_divisions: number): number;
+        getPoint(t: number, optionalTarget: Vector2): Vector2;
+        getPointAt(u: number, optionalTarget: Vector2): Vector2;
+        getTangent(t: number, optionalTarget?: Vector2): Vector2;
+    }
+}
+declare namespace feng3d {
+    class LineCurve3 extends Curve<Vector3> {
+        v1: Vector3;
+        v2: Vector3;
+        constructor(v1?: Vector3, v2?: Vector3);
+        getResolution(_divisions: number): number;
+        getPoint(t: number, optionalTarget?: Vector3): Vector3;
+        getPointAt(u: number, optionalTarget?: Vector3): Vector3;
+    }
+}
+declare namespace feng3d {
+    class SplineCurve2 extends Curve<Vector2> {
+        points: Vector2[];
+        constructor(points?: Vector2[]);
+        getResolution(divisions: number): number;
+        getPoint(t: number, optionalTarget: Vector2): Vector2;
+    }
+}
+declare namespace feng3d {
+    class EllipseCurve2 extends Curve<Vector2> {
+        aX: number;
+        aY: number;
+        xRadius: number;
+        yRadius: number;
+        aStartAngle: number;
+        aEndAngle: number;
+        aClockwise: boolean;
+        aRotation: number;
+        constructor(aX?: number, aY?: number, xRadius?: number, yRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean, aRotation?: number);
+        getResolution(divisions: number): number;
+        getPoint(t: number, optionalTarget?: Vector2): Vector2;
+    }
+}
+declare namespace feng3d {
+    class ArcCurve2 extends EllipseCurve2 {
+        constructor(aX?: number, aY?: number, aRadius?: number, aStartAngle?: number, aEndAngle?: number, aClockwise?: boolean);
+    }
+}
+declare namespace feng3d {
+    /**
+     * Centripetal CatmullRom Curve - which is useful for avoiding
+     * cusps and self-intersections in non-uniform catmull rom curves.
+     * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
+     *
+     * curve.type accepts centripetal(default), chordal and catmullrom
+     * curve.tension is used for catmullrom which defaults to 0.5
+     */
+    class CatmullRomCurve3 extends Curve<Vector3> {
+        isCatmullRomCurve3: boolean;
+        points: Vector3[];
+        closed: boolean;
+        curveType: string;
+        tension: number;
+        constructor(points?: Vector3[], closed?: boolean, curveType?: string, tension?: number);
+        getPoint(t: number, optionalTarget?: Vector3): Vector3;
+    }
+}
+declare namespace feng3d {
+    class CubicBezierCurve2 extends Curve<Vector2> {
+        v0: Vector2;
+        v1: Vector2;
+        v2: Vector2;
+        v3: Vector2;
+        constructor(v0?: Vector2, v1?: Vector2, v2?: Vector2, v3?: Vector2);
+        getPoint(t: number, optionalTarget?: Vector2): Vector2;
+    }
+}
+declare namespace feng3d {
+    class CubicBezierCurve3 extends Curve<Vector3> {
+        v0: Vector3;
+        v1: Vector3;
+        v2: Vector3;
+        v3: Vector3;
+        constructor(v0?: Vector3, v1?: Vector3, v2?: Vector3, v3?: Vector3);
+        getPoint(t: number, optionalTarget?: Vector3): Vector3;
+    }
+}
+declare namespace feng3d {
+    class QuadraticBezierCurve2 extends Curve<Vector2> {
+        v0: Vector2;
+        v1: Vector2;
+        v2: Vector2;
+        constructor(v0?: Vector2, v1?: Vector2, v2?: Vector2);
+        getPoint(t: number, optionalTarget?: Vector2): Vector2;
+    }
+}
+declare namespace feng3d {
+    class QuadraticBezierCurve3 extends Curve<Vector3> {
+        v0: Vector3;
+        v1: Vector3;
+        v2: Vector3;
+        constructor(v0?: Vector3, v1?: Vector3, v2?: Vector3);
+        getPoint(t: number, optionalTarget?: Vector3): Vector3;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 构建线条几何数据
+     *
+     * @param lineData - The graphics object containing all the necessary properties
+     * @param geometry - Geometry where to append output
+     *
+     * @see pixi.js https://github.com/pixijs/pixijs/blob/dev/packages/graphics/src/utils/buildLine.ts
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+     */
+    export function buildLineGeometry(lineData: {
+        /**
+         * Minimal distance between points that are considered different.
+         * Affects line tesselation.
+         *
+         * @default 1e-4
+         */
+        epsilon?: number;
+        /**
+         * 是否首尾相连。
+         *
+         * @default false
+         */
+        close?: boolean;
+        /**
+         * The style of the line.
+         */
+        lineStyle?: LineStyle;
+        /**
+         * The collection of points.
+         */
+        points: number[];
+    }, geometry?: {
+        /**
+         * An array of points to draw, 2 numbers per point
+         */
+        points: number[];
+        /**
+         * The indices of the vertices
+         */
+        indices: number[];
+    }): {
+        /**
+         * An array of points to draw, 2 numbers per point
+         */
+        points: number[];
+        /**
+         * The indices of the vertices
+         */
+        indices: number[];
+    };
+    /**
+     * Represents the line style for Graphics.
+     */
+    interface LineStyle {
+        /**
+         * The width (thickness) of any lines drawn.
+         *
+         * @default 1
+         */
+        width?: number;
+        /**
+         * The alignment of any lines drawn (0.5 = middle, 1 = outer, 0 = inner). WebGL only.
+         *
+         * @default 0.5
+         */
+        alignment?: number;
+        /**
+         * Line cap style.
+         *
+         * 'butt': don't add any cap at line ends (leaves orthogonal edges)
+         *
+         * 'round': add semicircle at ends
+         *
+         * 'square': add square at end (like `BUTT` except more length at end)
+         *
+         * @default  'butt'
+         */
+        cap?: 'butt' | 'round' | 'square';
+        /**
+         * Line join style.
+         *
+         * 'miter': make a sharp corner where outer part of lines meet
+         *
+         * 'bevel': add a square butt at each end of line segment and fill the triangle at turn
+         *
+         * 'round': add an arc at the joint
+         *
+         * @default 'miter'
+         *
+         * @see https://graphicdesign.stackexchange.com/questions/59018/what-is-a-bevel-join-of-two-lines-exactly-illustrator
+         */
+        join?: 'miter' | 'bevel' | 'round';
+        /**
+         * Miter limit.
+         *
+         * @default 10
+         */
+        miterLimit?: number;
+        /**
+         * 虚线模式中单位长度，通常被设置为线条宽度
+         *
+         * @default 1
+         */
+        dashedLinePatternUnit?: number;
+        /**
+         * 虚线模式
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash
+         */
+        dashedLinePattern?: number[];
+    }
+    export {};
+}
+declare namespace feng3d {
     /**
      * 柏林噪音
      *
@@ -7079,9 +7425,9 @@ declare namespace feng3d {
          * 如果是1D，2D，3D噪音，最好选用对于函数，perlinN中存在for循环因此效率比perlin3等性能差3到5（8）倍！
          *
          * 满足以下运算
-         * perlinN(x) == perlin1(x)
-         * perlinN(x,y) == perlin2(x,y)
-         * perlinN(x,y,z) == perlin3(x,y,z)
+         * perlinN(x) === perlin1(x)
+         * perlinN(x,y) === perlin2(x,y)
+         * perlinN(x,y,z) === perlin3(x,y,z)
          *
          * @param ps 每个轴的数值
          */
@@ -7103,92 +7449,133 @@ declare namespace feng3d {
      */
     function createGrad(n: number): number[][];
     function getBits(n: number): number[][];
+    /**
+     * 噪音
+     */
+    const noise: Noise;
 }
 declare namespace feng3d {
-    /**
-     * 代理 EventTarget, 处理js事件中this关键字问题
-     */
-    class EventProxy extends EventDispatcher {
-        pageX: number;
-        pageY: number;
-        clientX: number;
-        clientY: number;
+    class Mathf {
         /**
-         * 是否右击
+         * Returns the sine of angle `f` in radians.
          */
-        rightmouse: boolean;
-        key: string;
-        keyCode: number;
-        deltaY: number;
-        private listentypes;
-        get target(): EventTarget;
-        set target(v: EventTarget);
-        private _target;
-        constructor(target?: EventTarget);
+        static Sin(f: number): number;
         /**
-         * 监听一次事件后将会被移除
-         * @param type						事件的类型。
-         * @param listener					处理事件的侦听器函数。
-         * @param thisObject                listener函数作用域
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         * Returns the cosine of angle `f` in radians.
          */
-        once(type: string, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        /**
-         * 添加监听
-         * @param type						事件的类型。
-         * @param listener					处理事件的侦听器函数。
-         * @param priority					事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
-         */
-        on(type: string, listener: (event: any) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        /**
-         * 移除监听
-         * @param dispatcher 派发器
-         * @param type						事件的类型。
-         * @param listener					要删除的侦听器对象。
-         */
-        off(type?: string, listener?: (event: any) => any, thisObject?: any): void;
-        /**
-         * 处理鼠标按下时同时出发 "mousemove" 事件bug
-         */
-        private handleMouseMoveBug;
-        private mousedownposition;
-        /**
-         * 键盘按下事件
-         */
-        private onMouseKey;
-        /**
-         * 清理数据
-         */
-        private clear;
+        static Cos(f: number): number;
+        static Tan(f: number): number;
+        static Asin(f: number): number;
+        static Acos(f: number): number;
+        static Atan(f: number): number;
+        static Atan2(y: number, x: number): number;
+        static Sqrt(f: number): number;
+        static Abs(f: number): number;
+        static Min(a: number, b: number): number;
+        static Min(values: number[]): number;
+        static Max(a: number, b: number): number;
+        static Max(values: number[]): number;
+        static Pow(f: number, p: number): number;
+        static Exp(power: number): number;
+        static Log(f: number): number;
+        static Log10(f: number): number;
+        static Ceil(f: number): number;
+        static Floor(f: number): number;
+        static Round(f: number): number;
+        static CeilToInt(f: number): number;
+        static FloorToInt(f: number): number;
+        static RoundToInt(f: number): number;
+        static Sign(f: number): 1 | -1;
+        static readonly PI: number;
+        static readonly Infinity: number;
+        static readonly NegativeInfinity: number;
+        static readonly Deg2Rad: number;
+        static readonly Rad2Deg: number;
+        private static readonly kMaxDecimals;
+        static readonly Epsilon = 1.401298e-45;
+        static Clamp(value: number, min: number, max: number): number;
+        static Clamp01(value: number): number;
+        static Lerp(a: number, b: number, t: number): number;
+        static LerpUnclamped(a: number, b: number, t: number): number;
+        static LerpAngle(a: number, b: number, t: number): number;
+        static MoveTowards(current: number, target: number, maxDelta: number): number;
+        static MoveTowardsAngle(current: number, target: number, maxDelta: number): number;
+        static SmoothStep(from: number, to: number, t: number): number;
+        static Gamma(value: number, absmax: number, gamma: number): number;
+        static Approximately(a: number, b: number): boolean;
+        static SmoothDamp(current: number, target: number, currentVelocity: number, smoothTime: number, maxSpeed: number): number;
+        static SmoothDamp1(current: number, target: number, currentVelocity: number, smoothTime: number): number;
+        static SmoothDamp2(current: number, target: number, currentVelocity: number, smoothTime: number, maxSpeed?: number, deltaTime?: number): number;
+        static SmoothDampAngle(current: number, target: number, currentVelocity: number, smoothTime: number, maxSpeed: number): number;
+        static SmoothDampAngle1(current: number, target: number, currentVelocity: number, smoothTime: number): number;
+        static SmoothDampAngle2(current: number, target: number, currentVelocity: number, smoothTime: number, maxSpeed?: number, deltaTime?: number): number;
+        static Repeat(t: number, length: number): number;
+        static PingPong(t: number, length: number): number;
+        static InverseLerp(a: number, b: number, value: number): number;
+        static DeltaAngle(current: number, target: number): number;
+        static LineIntersection(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, result: Vector2): boolean;
+        static LineSegmentIntersection(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, result: Vector2): boolean;
+        static RoundToMultipleOf(value: number, roundingValue: number): number;
+        static GetClosestPowerOfTen(positiveNumber: number): number;
+        static GetNumberOfDecimalsForMinimumDifference(minDifference: number): number;
+        static GetNumberOfDecimalsForMinimumDifference1(minDifference: number): number;
     }
 }
 declare namespace feng3d {
-    interface WindowEventProxy {
-        once<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof WindowEventMap>(type: K, data?: WindowEventMap[K], bubbles?: boolean): any;
-        has<K extends keyof WindowEventMap>(type: K): boolean;
-        on<K extends keyof WindowEventMap>(type: K, listener: (event: WindowEventMap[K]) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof WindowEventMap>(type?: K, listener?: (event: WindowEventMap[K]) => any, thisObject?: any): void;
+    class Time {
+        static get time(): number;
+        static get timeAsDouble(): number;
+        static get timeSinceLevelLoad(): number;
+        static get timeSinceLevelLoadAsDouble(): number;
+        static get deltaTime(): number;
+        static get fixedTime(): number;
+        static get fixedTimeAsDouble(): number;
+        static get unscaledTime(): number;
+        static get unscaledTimeAsDouble(): number;
+        static get fixedUnscaledTime(): number;
+        static get fixedUnscaledTimeAsDouble(): number;
+        static get unscaledDeltaTime(): number;
+        static get fixedUnscaledDeltaTime(): void;
+        static fixedDeltaTime: number;
+        static maximumDeltaTime: number;
+        static get smoothDeltaTime(): number;
+        static maximumParticleDeltaTime: number;
+        static timeScale: number;
+        static get frameCount(): number;
+        static get renderedFrameCount(): number;
+        static get realtimeSinceStartup(): number;
+        static get realtimeSinceStartupAsDouble(): number;
+        static captureDeltaTime: number;
+        static get captureFramerate(): number;
+        static set captureFramerate(value: number);
+        static get inFixedTimeStep(): boolean;
     }
-    interface IEventProxy<T> {
-        once<K extends keyof T>(type: K, listener: (event: T[K]) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): any;
-        has<K extends keyof T>(type: K): boolean;
-        on<K extends keyof T>(type: K, listener: (event: T[K]) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(type?: K, listener?: (event: T[K]) => any, thisObject?: any): void;
-    }
-    class WindowEventProxy extends EventProxy {
-    }
-    /**
-     * 键盘鼠标输入
-     */
-    var windowEventProxy: IEventProxy<WindowEventMap> & EventProxy;
 }
 declare namespace feng3d {
-    /**
-     * 路径工具
-     */
-    var pathUtils: PathUtils;
+    interface MixinsGlobalEvents {
+        /**
+         * 删除文件
+         */
+        'fs.delete': string;
+        /**
+         * 写文件
+         */
+        'fs.write': string;
+    }
+}
+declare namespace feng3d {
+    class FS {
+        /**
+         * 默认文件系统
+         */
+        static fs: ReadFS;
+        /**
+         * 默认基础文件系统
+         */
+        static basefs: IReadFS;
+    }
+}
+declare namespace feng3d {
     /**
      * 路径工具
      */
@@ -7249,32 +7636,36 @@ declare namespace feng3d {
          */
         getDirDepth(path: string): number;
     }
+    /**
+     * 路径工具
+     */
+    const pathUtils: PathUtils;
 }
 declare namespace feng3d {
-    /**
-     * 加载类
-     */
-    var loader: Loader;
     /**
      * 加载类
      */
     class Loader {
         /**
          * 加载文本
-         * @param url   路径
+         * @param url 路径
          */
         loadText(url: string, onCompleted?: (content: string) => void, onRequestProgress?: () => void, onError?: (e: Error) => void): void;
         /**
          * 加载二进制
-         * @param url   路径
+         * @param url 路径
          */
         loadBinary(url: string, onCompleted?: (content: ArrayBuffer) => void, onRequestProgress?: () => void, onError?: (e: Error) => void): void;
         /**
          * 加载图片
-         * @param url   路径
+         * @param url 路径
          */
         loadImage(url: string, onCompleted?: (content: HTMLImageElement) => void, onRequestProgress?: () => void, onError?: (e: Error) => void): void;
     }
+    /**
+     * 加载类
+     */
+    const loader: Loader;
 }
 declare namespace feng3d {
     /**
@@ -7296,10 +7687,6 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    /**
-     *
-     */
-    var _indexedDB: _IndexedDB;
     /**
      *
      */
@@ -7411,6 +7798,10 @@ declare namespace feng3d {
          */
         objectStoreClear(dbname: string, objectStroreName: string, callback?: (err?: Error) => void): void;
     }
+    /**
+     *
+     */
+    const _indexedDB: _IndexedDB;
 }
 declare namespace feng3d {
     /**
@@ -7448,7 +7839,7 @@ declare namespace feng3d {
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path: string, callback: (err: Error, object: Object) => void): void;
+        readObject(path: string, callback: (err: Error, object: any) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
@@ -7461,16 +7852,8 @@ declare namespace feng3d {
          */
         getAbsolutePath(path: string): string;
     }
-    /**
-     * 默认基础文件系统
-     */
-    var basefs: IReadFS;
 }
 declare namespace feng3d {
-    /**
-     * 默认文件系统
-     */
-    var fs: ReadFS;
     /**
      * 可读文件系统
      */
@@ -7480,7 +7863,7 @@ declare namespace feng3d {
          */
         get fs(): IReadFS;
         set fs(v: IReadFS);
-        private _fs;
+        protected _fs: IReadFS;
         /**
          * 文件系统类型
          */
@@ -7503,7 +7886,7 @@ declare namespace feng3d {
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path: string, callback: (err: Error, object: Object) => void): void;
+        readObject(path: string, callback: (err: Error, object: any) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
@@ -7583,7 +7966,7 @@ declare namespace feng3d {
          * @param object 文件数据
          * @param callback 回调函数
          */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        writeObject(path: string, object: any, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
@@ -7593,8 +7976,8 @@ declare namespace feng3d {
         writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
         /**
          * 复制文件
-         * @param src    源路径
-         * @param dest    目标路径
+         * @param src 源路径
+         * @param dest 目标路径
          * @param callback 回调函数
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
@@ -7620,6 +8003,9 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    interface ReadWriteFS {
+        get fs(): IReadWriteFS;
+    }
     /**
      * 可读写文件系统
      *
@@ -7630,7 +8016,6 @@ declare namespace feng3d {
          * 项目名称（表单名称）
          */
         projectname: string;
-        fs: IReadWriteFS;
         constructor(fs?: IReadWriteFS);
         /**
          * 文件是否存在
@@ -7685,7 +8070,7 @@ declare namespace feng3d {
          * @param object 文件数据
          * @param callback 回调函数
          */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        writeObject(path: string, object: any, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
@@ -7695,8 +8080,8 @@ declare namespace feng3d {
         writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
         /**
          * 复制文件
-         * @param src    源路径
-         * @param dest    目标路径
+         * @param src 源路径
+         * @param dest 目标路径
          * @param callback 回调函数
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
@@ -7782,10 +8167,6 @@ declare namespace feng3d {
     /**
      * 索引数据文件系统
      */
-    var indexedDBFS: IndexedDBFS;
-    /**
-     * 索引数据文件系统
-     */
     class IndexedDBFS implements IReadWriteFS {
         get type(): FSType;
         /**
@@ -7814,7 +8195,7 @@ declare namespace feng3d {
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path: string, callback: (err: Error, data: object) => void): void;
+        readObject(path: string, callback: (err: Error, data: any) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
@@ -7878,7 +8259,7 @@ declare namespace feng3d {
          * @param object 文件数据
          * @param callback 回调函数
          */
-        writeObject(path: string, object: Object, callback?: (err: Error) => void): void;
+        writeObject(path: string, object: any, callback?: (err: Error) => void): void;
         /**
          * 写图片
          * @param path 图片路径
@@ -7888,8 +8269,8 @@ declare namespace feng3d {
         writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void): void;
         /**
          * 复制文件
-         * @param src    源路径
-         * @param dest    目标路径
+         * @param src 源路径
+         * @param dest 目标路径
          * @param callback 回调函数
          */
         copyFile(src: string, dest: string, callback?: (err: Error) => void): void;
@@ -7906,6 +8287,10 @@ declare namespace feng3d {
          */
         initproject(projectname: string, callback: (err: Error) => void): void;
     }
+    /**
+     * 索引数据文件系统
+     */
+    const indexedDBFS: IndexedDBFS;
 }
 declare namespace feng3d {
     /**
@@ -7935,7 +8320,7 @@ declare namespace feng3d {
          * @param path 路径
          * @param callback 读取完成回调 当err不为null时表示读取失败
          */
-        readObject(path: string, callback: (err: Error, data: Object) => void): void;
+        readObject(path: string, callback: (err: Error, data: any) => void): void;
         /**
          * 加载图片
          * @param path 图片路径
@@ -7951,10 +8336,74 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    /**
+     * 代理 EventTarget, 处理js事件中this关键字问题
+     */
+    class EventProxy<T = any> extends EventEmitter<T> {
+        pageX: number;
+        pageY: number;
+        clientX: number;
+        clientY: number;
+        /**
+         * 是否右击
+         */
+        rightmouse: boolean;
+        key: string;
+        keyCode: number;
+        deltaY: number;
+        private listentypes;
+        get target(): EventTarget;
+        set target(v: EventTarget);
+        private _target;
+        constructor(target?: EventTarget);
+        /**
+         * 监听一次事件后将会被移除
+         * @param type 事件的类型。
+         * @param listener 处理事件的侦听器函数。
+         * @param thisObject listener函数作用域
+         * @param priority 事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         */
+        once<K extends keyof T>(type: K, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number): this;
+        /**
+         * 添加监听
+         * @param type 事件的类型。
+         * @param listener 处理事件的侦听器函数。
+         * @param priority 事件侦听器的优先级。数字越大，优先级越高。默认优先级为 0。
+         */
+        on<K extends keyof T & string>(type: K, listener: (event: IEvent<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): this;
+        /**
+         * 移除监听
+         * @param dispatcher 派发器
+         * @param type 事件的类型。
+         * @param listener 要删除的侦听器对象。
+         */
+        off<K extends keyof T & string>(type?: K, listener?: (event: IEvent<T[K]>) => void, thisObject?: any): this;
+        /**
+         * 处理鼠标按下时同时出发 "mousemove" 事件bug
+         */
+        private handleMouseMoveBug;
+        private mousedownposition;
+        /**
+         * 键盘按下事件
+         */
+        private onMouseKey;
+        /**
+         * 清理数据
+         */
+        private clear;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 键盘鼠标输入
+     */
+    const windowEventProxy: EventProxy<WindowEventMap>;
+}
+declare namespace feng3d {
     class KeyBoard {
         /**
          * 获取键盘按键名称
-         * @param code   按键值
+         * @param code 按键值
          */
         static getKey(code: number): string;
         /**
@@ -7967,7 +8416,6 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 按键捕获
-
      */
     class KeyCapture {
         /**
@@ -7978,11 +8426,12 @@ declare namespace feng3d {
          * 按键状态
          */
         private _keyState;
+        private shortcut;
         /**
          * 构建
-         * @param stage		舞台
+         * @param stage 舞台
          */
-        constructor(shortCut: ShortCut);
+        constructor(shortcut: ShortCut);
         /**
          * 鼠标事件
          */
@@ -8004,9 +8453,8 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 按键状态
-
      */
-    class KeyState extends EventDispatcher {
+    class KeyState extends EventEmitter {
         /**
          * 按键状态{key:键名称,value:是否按下}
          */
@@ -8017,14 +8465,14 @@ declare namespace feng3d {
         constructor();
         /**
          * 按下键
-         * @param key 	键名称
-         * @param data	携带数据
+         * @param key 键名称
+         * @param data 携带数据
          */
         pressKey(key: string, data: KeyboardEvent | WheelEvent | MouseEvent): void;
         /**
          * 释放键
-         * @param key	键名称
-         * @param data	携带数据
+         * @param key 键名称
+         * @param data 携带数据
          */
         releaseKey(key: string, data: KeyboardEvent | WheelEvent | MouseEvent): void;
         /**
@@ -8081,11 +8529,11 @@ declare namespace feng3d {
         private _stateCommands;
         /**
          * 构建快捷键捕获
-         * @param shortCut				快捷键环境
-         * @param key					快捷键；用“+”连接多个按键，“!”表示没按下某键；例如 “a+!b”表示按下“a”与没按下“b”时触发。
-         * @param command				要执行的command的id；使用“,”连接触发多个命令；例如 “commandA,commandB”表示满足触发条件后依次执行commandA与commandB命令。
-         * @param stateCommand			要执行的状态命令id；使用“,”连接触发多个状态命令，没带“!”表示激活该状态，否则表示使其处于非激活状态；例如 “stateA,!stateB”表示满足触发条件后激活状态“stateA，使“stateB处于非激活状态。
-         * @param when					快捷键激活的条件；使用“+”连接多个状态，没带“!”表示需要处于激活状态，否则需要处于非激活状态； 例如 “stateA+!stateB”表示stateA处于激活状态且stateB处于非激活状态时会判断按键是否满足条件。
+         * @param shortCut 快捷键环境
+         * @param key 快捷键；用“+”连接多个按键，“!”表示没按下某键；例如 “a+!b”表示按下“a”与没按下“b”时触发。
+         * @param command 要执行的command的id；使用“,”连接触发多个命令；例如 “commandA,commandB”表示满足触发条件后依次执行commandA与commandB命令。
+         * @param stateCommand 要执行的状态命令id；使用“,”连接触发多个状态命令，没带“!”表示激活该状态，否则表示使其处于非激活状态；例如 “stateA,!stateB”表示满足触发条件后激活状态“stateA，使“stateB处于非激活状态。
+         * @param when 快捷键激活的条件；使用“+”连接多个状态，没带“!”表示需要处于激活状态，否则需要处于非激活状态； 例如 “stateA+!stateB”表示stateA处于激活状态且stateB处于非激活状态时会判断按键是否满足条件。
          */
         constructor(shortCut: ShortCut, key: string, command?: string, stateCommand?: string, when?: string);
         /**
@@ -8124,22 +8572,22 @@ declare namespace feng3d {
         private getKeyValue;
         /**
          * 获取状态列表
-         * @param when		状态字符串
+         * @param when 状态字符串
          */
         private getStates;
         /**
          * 获取键列表
-         * @param key		快捷键
+         * @param key 快捷键
          */
         private getKeys;
         /**
          * 获取命令列表
-         * @param command	命令
+         * @param command 命令
          */
         private getCommands;
         /**
          * 获取状态命令列表
-         * @param stateCommand	状态命令
+         * @param stateCommand 状态命令
          */
         private getStateCommand;
         /**
@@ -8149,18 +8597,12 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-}
-declare namespace feng3d {
-    /**
-     * 快捷键
-     */
-    var shortcut: ShortCut;
     /**
      * 初始化快捷键模块
      *
      * <pre>
-var shortcuts:Array = [ //
-//在按下key1时触发命令command1
+    var shortcuts:Array = [ //
+    //在按下key1时触发命令command1
     {key: "key1", command: "command1", when: ""}, //
      //在按下key1时触发状态命令改变stateCommand1为激活状态
     {key: "key1", stateCommand: "stateCommand1", when: "state1"}, //
@@ -8169,16 +8611,16 @@ var shortcuts:Array = [ //
     //处于state1状态不处于state2时按下key1与没按下key2触发command1与command2，改变stateCommand1为激活状态，stateCommand2为非激活状态
     {key: "key1+ ! key2", command: "command1,command2", stateCommand: "stateCommand1,!stateCommand2", when: "state1+!state2"}, //
     ];
-//添加快捷键
-shortCut.addShortCuts(shortcuts);
-//监听命令
-Event.on(shortCut,<any>"run", function(e:Event):void
-{
+    //添加快捷键
+    shortCut.addShortCuts(shortcuts);
+    //监听命令
+    Event.on(shortCut,"run" as any, function(e:Event):void
+    {
     trace("接受到命令：" + e.type);
-});
+    });
      * </pre>
      */
-    class ShortCut extends EventDispatcher {
+    class ShortCut extends EventEmitter {
         /**
          * 按键状态
          */
@@ -8186,7 +8628,9 @@ Event.on(shortCut,<any>"run", function(e:Event):void
         /**
          * 状态字典
          */
-        stateDic: {};
+        stateDic: {
+            [state: string]: boolean;
+        };
         /**
          * 按键捕获
          */
@@ -8194,7 +8638,9 @@ Event.on(shortCut,<any>"run", function(e:Event):void
         /**
          * 捕获字典
          */
-        captureDic: {};
+        captureDic: {
+            [capture: string]: ShortCutCapture;
+        };
         /**
          * 启动
          */
@@ -8205,7 +8651,7 @@ Event.on(shortCut,<any>"run", function(e:Event):void
         constructor();
         /**
          * 添加快捷键
-         * @param shortcuts		快捷键列表
+         * @param shortcuts 快捷键列表
          */
         addShortCuts(shortcuts: {
             key: string;
@@ -8215,7 +8661,7 @@ Event.on(shortCut,<any>"run", function(e:Event):void
         }[]): void;
         /**
          * 删除快捷键
-         * @param shortcuts		快捷键列表
+         * @param shortcuts 快捷键列表
          */
         removeShortCuts(shortcuts: {
             key: string;
@@ -8247,41 +8693,60 @@ Event.on(shortCut,<any>"run", function(e:Event):void
          */
         private getShortcutUniqueKey;
     }
+    /**
+     * 快捷键
+     */
+    const shortcut: ShortCut;
 }
 declare namespace feng3d {
     /**
-     * 渲染模式
-     * A GLenum specifying the type primitive to render. Possible values are:
+     * 渲染模式，描述绘制图元的类型。
+     *
+     * A GLenum specifying the type primitive to render.
+     *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
      */
     enum RenderMode {
         /**
-         * 点渲染
+         * 绘制单个点。
+         *
          * gl.POINTS: Draws a single dot.
          */
         POINTS = "POINTS",
         /**
+         * 绘制循环连线。
+         *
          * gl.LINE_LOOP: Draws a straight line to the next vertex, and connects the last vertex back to the first.
          */
         LINE_LOOP = "LINE_LOOP",
         /**
+         * 绘制连线
+         *
          * gl.LINE_STRIP: Draws a straight line to the next vertex.
          */
         LINE_STRIP = "LINE_STRIP",
         /**
+         * 每两个顶点绘制一条线段。
+         *
          * gl.LINES: Draws a line between a pair of vertices.
          */
         LINES = "LINES",
         /**
+         * 每三个顶点绘制一个三角形。
+         *
          * gl.TRIANGLES: Draws a triangle for a group of three vertices.
          */
         TRIANGLES = "TRIANGLES",
         /**
+         * 绘制三角形条带。
+         *
          * gl.TRIANGLE_STRIP
          * @see https://en.wikipedia.org/wiki/Triangle_strip
          */
         TRIANGLE_STRIP = "TRIANGLE_STRIP",
         /**
+         * 绘制三角扇形。
+         *
          * gl.TRIANGLE_FAN
          * @see https://en.wikipedia.org/wiki/Triangle_fan
          */
@@ -8308,70 +8773,187 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 混合方法
+     *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendEquation
      */
     enum BlendEquation {
         /**
+         * 源 + 目标
+         *
          *  source + destination
          */
         FUNC_ADD = "FUNC_ADD",
         /**
+         * 源 - 目标
+         *
          * source - destination
          */
         FUNC_SUBTRACT = "FUNC_SUBTRACT",
         /**
+         * 目标 - 源
+         *
          * destination - source
          */
-        FUNC_REVERSE_SUBTRACT = "FUNC_REVERSE_SUBTRACT"
+        FUNC_REVERSE_SUBTRACT = "FUNC_REVERSE_SUBTRACT",
+        /**
+         * 源与目标的最小值，当开启 EXT_blend_minmax 扩展时生效。
+         *
+         * When using the EXT_blend_minmax extension:
+         * Minimum of source and destination
+         */
+        MIN_EXT = "MIN_EXT",
+        /**
+         * 源与目标的最大值，当开启 EXT_blend_minmax 扩展时生效。
+         *
+         * When using the EXT_blend_minmax extension:
+         * Maximum of source and destination.
+         */
+        MAX_EXT = "MAX_EXT",
+        /**
+         * 源与目标的最小值，在 WebGL 2 中可使用。
+         *
+         * using a WebGL 2 context
+         * Minimum of source and destination
+         */
+        MIN = "MIN",
+        /**
+         * 源与目标的最大值，在 WebGL 2 中可使用。
+         *
+         * using a WebGL 2 context
+         * Maximum of source and destination.
+         */
+        MAX = "MAX"
     }
 }
 declare namespace feng3d {
     /**
      * 混合因子（R分量系数，G分量系数，B分量系数）
+     *
+     * 混合颜色的公式可以这样描述：color(RGBA) = (sourceColor * sfactor) + (destinationColor * dfactor)。这里的 RGBA 值均在0与1之间。
+     *
+     * The formula for the blending color can be described like this: color(RGBA) = (sourceColor * sfactor) + (destinationColor * dfactor). The RBGA values are between 0 and 1.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
      */
     enum BlendFactor {
         /**
-         * 0.0  0.0 0.0
+         * Factor: 0,0,0,0
+         *
+         * 把所有颜色都乘以0。
+         *
+         * Multiplies all colors by 0.
          */
         ZERO = "ZERO",
         /**
-         * 1.0  1.0 1.0
+         * Factor: 1,1,1,1
+         *
+         * 把所有颜色都乘以1。
+         *
+         * Multiplies all colors by 1.
          */
         ONE = "ONE",
         /**
-         * Rs   Gs  Bs
+         * Factor: Rs, Gs, Bs, As
+         *
+         * 将所有颜色乘以源颜色。
+         *
+         * Multiplies all colors by the source colors.
          */
         SRC_COLOR = "SRC_COLOR",
         /**
-         * 1-Rs   1-Gs  1-Bs
+         * Factor: 1-Rs, 1-Gs, 1-Bs, 1-As
+         *
+         * 将所有颜色乘以1减去每个源颜色。
+         *
+         * Multiplies all colors by 1 minus each source color.
          */
         ONE_MINUS_SRC_COLOR = "ONE_MINUS_SRC_COLOR",
         /**
-         * Rd   Gd  Bd
+         * Factor: Rd, Gd, Bd, Ad
+         *
+         * 将所有颜色乘以目标颜色。
+         *
+         * Multiplies all colors by the destination color.
          */
         DST_COLOR = "DST_COLOR",
         /**
-         * 1-Rd   1-Gd  1-Bd
+         * Factor: 1-Rd, 1-Gd, 1-Bd, 1-Ad
+         *
+         * 将所有颜色乘以1减去每个目标颜色。
+         *
+         * Multiplies all colors by 1 minus each destination color.
          */
         ONE_MINUS_DST_COLOR = "ONE_MINUS_DST_COLOR",
         /**
-         * As   As  As
+         * Factor: As, As, As, As
+         *
+         * 将所有颜色乘以源alpha值。
+         *
+         * Multiplies all colors by the source alpha value.
          */
         SRC_ALPHA = "SRC_ALPHA",
         /**
-         * 1-As   1-As  1-As
+         * Factor: 1-As, 1-As, 1-As, 1-As
+         *
+         * 将所有颜色乘以1减去源alpha值。
+         *
+         * Multiplies all colors by 1 minus the source alpha value.
          */
         ONE_MINUS_SRC_ALPHA = "ONE_MINUS_SRC_ALPHA",
         /**
-         * Ad   Ad  Ad
+         * Factor: Ad, Ad, Ad, Ad
+         *
+         * 将所有颜色乘以目标alpha值。
+         *
+         * Multiplies all colors by the destination alpha value.
          */
         DST_ALPHA = "DST_ALPHA",
         /**
-         * 1-Ad   1-Ad  1-Ad
+         * Factor: 1-Ad, 1-Ad, 1-Ad, 1-Ad
+         *
+         * 将所有颜色乘以1减去目标alpha值。
+         *
+         * Multiplies all colors by 1 minus the destination alpha value.
          */
         ONE_MINUS_DST_ALPHA = "ONE_MINUS_DST_ALPHA",
         /**
-         * min(As-Ad)   min(As-Ad)  min(As-Ad)
+         * Factor: Rc, Gc, Bc, Ac
+         *
+         * 将所有颜色乘以一个常数颜色。
+         *
+         * Multiplies all colors by a constant color.
+         */
+        CONSTANT_COLOR = "CONSTANT_COLOR",
+        /**
+         * Factor: 1-Rc, 1-Gc, 1-Bc, 1-Ac
+         *
+         * 所有颜色乘以1减去一个常数颜色。
+         *
+         * Multiplies all colors by 1 minus a constant color.
+         */
+        ONE_MINUS_CONSTANT_COLOR = "ONE_MINUS_CONSTANT_COLOR",
+        /**
+         * Factor: Ac, Ac, Ac, Ac
+         *
+         * 将所有颜色乘以一个常量alpha值。
+         *
+         * Multiplies all colors by a constant alpha value.
+         */
+        CONSTANT_ALPHA = "CONSTANT_ALPHA",
+        /**
+         * Factor: 1-Ac, 1-Ac, 1-Ac, 1-Ac
+         *
+         * 将所有颜色乘以1减去一个常数alpha值。
+         *
+         * Multiplies all colors by 1 minus a constant alpha value.
+         */
+        ONE_MINUS_CONSTANT_ALPHA = "ONE_MINUS_CONSTANT_ALPHA",
+        /**
+         * Factor: min(As, 1 - Ad), min(As, 1 - Ad), min(As, 1 - Ad), 1
+         *
+         * 将RGB颜色乘以源alpha值与1减去目标alpha值的较小值。alpha值乘以1。
+         *
+         * Multiplies the RGB colors by the smaller of either the source alpha value or the value of 1 minus the destination alpha value. The alpha value is multiplied by 1.
          */
         SRC_ALPHA_SATURATE = "SRC_ALPHA_SATURATE"
     }
@@ -8420,14 +9002,19 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 正面方向枚举
+     *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
      */
     enum FrontFace {
         /**
+         * 顺时钟方向
+         *
          * Clock-wise winding.
          */
         CW = "CW",
         /**
+         * 逆时钟方向
+         *
          *  Counter-clock-wise winding.
          */
         CCW = "CCW"
@@ -8560,7 +9147,13 @@ declare namespace feng3d {
         /**
          * 32-bit floating point number
          */
-        FLOAT = "FLOAT"
+        FLOAT = "FLOAT",
+        UNSIGNED_INT = "UNSIGNED_INT",
+        /**
+         * using a WebGL 2 context
+         * 16-bit floating point number
+         */
+        HALF_FLOAT = "HALF_FLOAT"
     }
 }
 declare namespace feng3d {
@@ -8596,43 +9189,175 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 深度检测方法枚举
+     * 指定深度比较函数的枚举，该函数设置绘制像素的条件，默认 LESS，如果传入值小于深度缓冲区值则通过。
+     *
      * A GLenum specifying the depth comparison function, which sets the conditions under which the pixel will be drawn. The default value is gl.LESS.
+     *
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthFunc
      */
     enum DepthFunc {
         /**
-         * (never pass)
+         * 总是不通过。
+         *
+         * never pass.
          */
         NEVER = "NEVER",
         /**
-         *  (pass if the incoming value is less than the depth buffer value)
+         * 如果传入值小于深度缓冲区值则通过。
+         *
+         * pass if the incoming value is less than the depth buffer value.
          */
         LESS = "LESS",
         /**
-         *  (pass if the incoming value equals the the depth buffer value)
+         * 如果传入值等于深度缓冲区值则通过。
+         *
+         * pass if the incoming value equals the the depth buffer value.
          */
         EQUAL = "EQUAL",
         /**
-         *  (pass if the incoming value is less than or equal to the depth buffer value)
+         * 如果传入值小于或等于深度缓冲区值则通过。
+         *
+         * pass if the incoming value is less than or equal to the depth buffer value.
          */
         LEQUAL = "LEQUAL",
         /**
-         * (pass if the incoming value is greater than the depth buffer value)
+         * 如果传入值大于深度缓冲区值则通过。。
+         *
+         * pass if the incoming value is greater than the depth buffer value.
          */
         GREATER = "GREATER",
         /**
-         * (pass if the incoming value is not equal to the depth buffer value)
+         * 如果传入值不等于深度缓冲区值则通过。
+         *
+         * pass if the incoming value is not equal to the depth buffer value.
          */
         NOTEQUAL = "NOTEQUAL",
         /**
-         * (pass if the incoming value is greater than or equal to the depth buffer value)
+         * 如果传入值大于或等于深度缓冲区值则通过。
+         *
+         * pass if the incoming value is greater than or equal to the depth buffer value.
          */
         GEQUAL = "GEQUAL",
         /**
-         *  (always pass)
+         * 总是通过。
+         *
+         * always pass.
          */
         ALWAYS = "ALWAYS"
+    }
+}
+declare namespace feng3d {
+    /**
+     * A GLenum specifying the test function. The default function is gl.ALWAYS.
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilFunc
+     */
+    enum StencilFunc {
+        /**
+         * 总是不通过。
+         *
+         * Never pass.
+         */
+        NEVER = "NEVER",
+        /**
+         * 如果 (ref & mask) <  (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) <  (stencil & mask).
+         */
+        LESS = "LESS",
+        /**
+         * 如果 (ref & mask) = (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) = (stencil & mask).
+         */
+        EQUAL = "EQUAL",
+        /**
+         * 如果 (ref & mask) <= (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) <= (stencil & mask).
+         */
+        LEQUAL = "LEQUAL",
+        /**
+         * 如果 (ref & mask) > (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) > (stencil & mask).
+         */
+        GREATER = "GREATER",
+        /**
+         * 如果 (ref & mask) != (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) != (stencil & mask).
+         */
+        NOTEQUAL = "NOTEQUAL",
+        /**
+         * 如果 (ref & mask) >= (stencil & mask) 则通过。
+         *
+         * Pass if (ref & mask) >= (stencil & mask).
+         */
+        GEQUAL = "GEQUAL",
+        /**
+         * 总是通过。
+         *
+         * Always pass.
+         */
+        ALWAYS = "ALWAYS"
+    }
+}
+declare namespace feng3d {
+    /**
+     * The WebGLRenderingContext.stencilOp() method of the WebGL API sets both the front and back-facing stencil test actions.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilOp
+     */
+    enum StencilOp {
+        /**
+         * 保持当前值。
+         *
+         * Keeps the current value.
+         */
+        KEEP = "KEEP",
+        /**
+         * 设置模板缓冲值为0.
+         *
+         * Sets the stencil buffer value to 0.
+         */
+        ZERO = "ZERO",
+        /**
+         * 将模板缓冲区的值设置为WebGLRenderingContext.stencilFunc()指定的参考值。
+         *
+         * Sets the stencil buffer value to the reference value as specified by WebGLRenderingContext.stencilFunc().
+         */
+        REPLACE = "REPLACE",
+        /**
+         * 增加当前模板缓冲区的值。最大到可表示的无符号值的最大值。
+         *
+         * Increments the current stencil buffer value. Clamps to the maximum representable unsigned value.
+         */
+        INCR = "INCR",
+        /**
+         * 增加当前模板缓冲区的值。当增加最大的可表示无符号值时，将模板缓冲区值包装为零。
+         *
+         * Increments the current stencil buffer value. Wraps stencil buffer value to zero when incrementing the maximum representable unsigned value.
+         */
+        INCR_WRAP = "INCR_WRAP",
+        /**
+         * 递减当前模板缓冲区的值。最小为0。
+         *
+         * Decrements the current stencil buffer value. Clamps to 0.
+         */
+        DECR = "DECR",
+        /**
+         * 递减当前模板缓冲区的值。当模板缓冲区值减为0时，将模板缓冲区值包装为可表示的最大无符号值。
+         *
+         * Decrements the current stencil buffer value. Wraps stencil buffer value to the maximum representable unsigned value when decrementing a stencil buffer value of 0.
+         */
+        DECR_WRAP = "DECR_WRAP",
+        /**
+         * 按位反转当前模板缓冲区值。
+         *
+         * Inverts the current stencil buffer value bitwise.
+         */
+        INVERT = "INVERT"
     }
 }
 declare namespace feng3d {
@@ -8714,15 +9439,6 @@ declare namespace feng3d {
          * 缓存
          */
         cache: GLCache;
-    }
-    class GL {
-        static glList: GL[];
-        /**
-         * 获取 GL 实例
-         * @param canvas 画布
-         * @param contextAttributes
-         */
-        static getGL(canvas: HTMLCanvasElement, contextAttributes?: WebGLContextAttributes): GL;
     }
 }
 declare namespace feng3d {
@@ -8859,11 +9575,15 @@ declare namespace feng3d {
         /**
          * Shader中支持浮点类型的最高精度
          */
-        maxPrecision: "highp" | "mediump" | "lowp";
+        maxPrecision: 'highp' | 'mediump' | 'lowp';
         /**
          *
          */
         maxSamples: number;
+        /**
+         * 支持模板的位数
+         */
+        stencilBits: number;
         constructor(gl: GL);
     }
 }
@@ -8881,7 +9601,7 @@ declare namespace feng3d {
          * shader 中的 宏
          */
         shaderMacro: ShaderMacro;
-        constructor(shaderName?: string);
+        constructor(source?: gPartial<Shader>);
         setShader(vertex: string, fragment: string): void;
         /**
          * 激活渲染程序
@@ -8890,15 +9610,15 @@ declare namespace feng3d {
         /**
          * 着色器名称
          */
-        private shaderName;
+        shaderName: string;
         /**
          * 顶点着色器代码
          */
-        private vertex;
+        vertex: string;
         /**
          * 片段着色器代码
          */
-        private fragment;
+        fragment: string;
         /**
          * 更新渲染代码
          */
@@ -8974,87 +9694,222 @@ declare namespace feng3d {
      */
     class RenderParams {
         /**
-        * 渲染模式，默认RenderMode.TRIANGLES
-        */
-        renderMode: RenderMode;
+         * 渲染模式，默认 TRIANGLES，每三个顶点绘制一个三角形。
+         *
+         * A GLenum specifying the type primitive to render. Possible values are:
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
+         */
+        renderMode: "POINTS" | "LINE_LOOP" | "LINE_STRIP" | "LINES" | "TRIANGLES" | "TRIANGLE_STRIP" | "TRIANGLE_FAN";
         /**
-         * 剔除面
-         * 参考：http://www.jianshu.com/p/ee04165f2a02
+         * 剔除面，默认 BACK，剔除背面。
+         *
          * 默认情况下，逆时针的顶点连接顺序被定义为三角形的正面。
          * 使用gl.frontFace(gl.CW);调整顺时针为正面
+         *
+         * @see http://www.jianshu.com/p/ee04165f2a02
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
          */
-        cullFace: CullFace;
-        frontFace: FrontFace;
+        cullFace: "NONE" | "FRONT" | "BACK" | "FRONT_AND_BACK";
         /**
-         * 是否开启混合
+         * 正向方向，默认 CW。三角形顺时针方向为正面。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
+         */
+        frontFace: "CW" | "CCW";
+        /**
+         * 是否开启混合，默认 false，不开启混合。
+         *
          * <混合后的颜色> = <源颜色>*sfactor + <目标颜色>*dfactor
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendEquation
          */
         enableBlend: boolean;
         /**
-         * 混合方式，默认BlendEquation.FUNC_ADD
+         * 混合方式，默认 FUNC_ADD，源 + 目标。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendEquation
          */
-        blendEquation: BlendEquation;
+        blendEquation: "FUNC_ADD" | "FUNC_SUBTRACT" | "FUNC_REVERSE_SUBTRACT";
         /**
-         * 源混合因子，默认BlendFactor.SRC_ALPHA
+         * 源混合因子，默认 SRC_ALPHA，将所有颜色乘以源alpha值。
+         *
+         * @see BlendFactor
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
          */
-        sfactor: BlendFactor;
+        sfactor: "ZERO" | "ONE" | "SRC_COLOR" | "ONE_MINUS_SRC_COLOR" | "DST_COLOR" | "ONE_MINUS_DST_COLOR" | "SRC_ALPHA" | "ONE_MINUS_SRC_ALPHA" | "DST_ALPHA" | "ONE_MINUS_DST_ALPHA" | "SRC_ALPHA_SATURATE";
         /**
-         * 目标混合因子，默认BlendFactor.ONE_MINUS_SRC_ALPHA
+         * 目标混合因子，默认 ONE_MINUS_SRC_ALPHA，将所有颜色乘以1减去源alpha值。
+         *
+         * @see BlendFactor
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc
          */
-        dfactor: BlendFactor;
+        dfactor: "ZERO" | "ONE" | "SRC_COLOR" | "ONE_MINUS_SRC_COLOR" | "DST_COLOR" | "ONE_MINUS_DST_COLOR" | "SRC_ALPHA" | "ONE_MINUS_SRC_ALPHA" | "DST_ALPHA" | "ONE_MINUS_DST_ALPHA" | "SRC_ALPHA_SATURATE";
         /**
-         * 是否开启深度检查
+         * 是否开启深度检查，默认 true，开启深度检测。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthFunc
          */
         depthtest: boolean;
-        depthFunc: DepthFunc;
+        /**
+         * 指定深度比较函数的枚举，该函数设置绘制像素的条件，默认 LESS，如果传入值小于深度缓冲区值则通过。
+         *
+         * A GLenum specifying the depth comparison function, which sets the conditions under which the pixel will be drawn. The default value is gl.LESS.
+         *
+         * @see DepthFunc
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthFunc
+         */
+        depthFunc: "NEVER" | "LESS" | "EQUAL" | "LEQUAL" | "GREATER" | "NOTEQUAL" | "GEQUAL" | "ALWAYS";
         /**
          * 是否开启深度标记
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/depthMask
          */
         depthMask: boolean;
         /**
          * 控制那些颜色分量是否可以被写入到帧缓冲器。
          *
+         * [red, green, blue, alpha]
+         *
          * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/colorMask
          */
         colorMask: ColorMask;
         /**
-         * 绘制在画布上的区域
+         * 是否使用 viewport，默认不使用，不使用时viewport为画布区域。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/viewport
          */
-        viewRect: {
+        useViewPort: boolean;
+        /**
+         * 通过WebGL API的WebGLRenderingContext.viewport()方法设置了viewport，指定了x和y从标准化设备坐标到窗口坐标的仿射变换。
+         *
+         * The WebGLRenderingContext.viewport() method of the WebGL API sets the viewport, which specifies the affine transformation of x and y from normalized device coordinates to window coordinates.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/viewport
+         */
+        viewPort: {
             x: number;
             y: number;
             width: number;
             height: number;
         };
         /**
-         * 是否使用 viewRect
+         * 是否开启剪刀裁剪，默认不开启。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor
          */
-        useViewRect: boolean;
+        useScissor: boolean;
         /**
-         * https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
+         * WebGL API的WebGLRenderingContext.scissor()方法设置了一个剪刀盒，它将绘图限制为一个指定的矩形。
+         *
+         * The WebGLRenderingContext.scissor() method of the WebGL API sets a scissor box, which limits the drawing to a specified rectangle.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor
+         */
+        scissor: {
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+        };
+        /**
+         * 是否开启 gl.POLYGON_OFFSET_FILL，默认不开启。
+         *
+         * WebGL API的WebGLRenderingContext.polygonOffset()方法指定了计算深度值的比例因子和单位。
+         * 在执行深度测试和将值写入深度缓冲区之前添加偏移量。
          *
          * The WebGLRenderingContext.polygonOffset() method of the WebGL API specifies the scale factors and units to calculate depth values.
-         *
          * The offset is added before the depth test is performed and before the value is written into the depth buffer.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
          */
         usePolygonOffset: boolean;
         /**
+         * 为每个多边形设置可变深度偏移的比例因子。缺省值为0。
+         *
          * A GLfloat which sets the scale factor for the variable depth offset for each polygon. The default value is 0.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
          */
         polygonOffsetFactor: number;
         /**
+         * 它设置特定于实现的值乘以的乘数，以创建恒定的深度偏移量。缺省值为0。
+         *
          * A GLfloat which sets the multiplier by which an implementation-specific value is multiplied with to create a constant depth offset. The default value is 0.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/polygonOffset
          */
         polygonOffsetUnits: number;
+        /**
+         * 是否开启模板测试与更新模板缓冲。
+         *
+         * Activates stencil testing and updates to the stencil buffer.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilFunc
+         */
+        useStencil: boolean;
+        /**
+         * 描述模板测试的方法。默认ALWAYS，总是通过。
+         *
+         * A GLenum specifying the test function. The default function is gl.ALWAYS.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilFunc
+         */
+        stencilFunc: "NEVER" | "LESS" | "EQUAL" | "LEQUAL" | "GREATER" | "NOTEQUAL" | "GEQUAL" | "ALWAYS";
+        /**
+         * 一个为模板测试指定参考值。这个值被限制在0到2^n -1的范围内，其中n是模板缓冲区中的位数。默认0。
+         *
+         * A GLint specifying the reference value for the stencil test. This value is clamped to the range 0 to 2^n -1 where n is the number of bitplanes in the stencil buffer. The default value is 0.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilFunc
+         */
+        stencilFuncRef: number;
+        /**
+         * 模板测试时使用的mask值，默认1。
+         *
+         * A GLuint specifying a bit-wise mask that is used to AND the reference value and the stored stencil value when the test is done. The default value is all 1.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilFunc
+         */
+        stencilFuncMask: number;
+        /**
+         * 指定模板测试失败时使用的函数的枚举。默认KEEP，保持当前值。
+         *
+         * A GLenum specifying the function to use when the stencil test fails. The default value is gl.KEEP.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilMask
+         */
+        stencilOpFail: "KEEP" | "ZERO" | "REPLACE" | "INCR" | "INCR_WRAP" | "DECR" | "DECR_WRAP" | "INVERT";
+        /**
+         * 指定在模板测试通过但深度测试失败时使用的函数枚举。默认KEEP，保持当前值。
+         *
+         * A GLenum specifying the function to use when the stencil test passes, but the depth test fails. The default value is gl.KEEP.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilMask
+         */
+        stencilOpZFail: "KEEP" | "ZERO" | "REPLACE" | "INCR" | "INCR_WRAP" | "DECR" | "DECR_WRAP" | "INVERT";
+        /**
+         * 指定在模板测试和深度测试通过时使用的函数枚举，或在模板测试通过且没有深度缓冲或禁用深度测试时使用的函数枚举。默认KEEP，保持当前值。
+         *
+         * A GLenum specifying the function to use when both the stencil test and the depth test pass, or when the stencil test passes and there is no depth buffer or depth testing is disabled. The default value is gl.KEEP.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilMask
+         */
+        stencilOpZPass: "KEEP" | "ZERO" | "REPLACE" | "INCR" | "INCR_WRAP" | "DECR" | "DECR_WRAP" | "INVERT";
+        /**
+         * 指定位掩码以启用或禁用在模板平面中写入单个位的正整数。默认1。
+         *
+         * A GLuint specifying a bit mask to enable or disable writing of individual bits in the stencil planes. By default, the mask is all 1.
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/stencilMask
+         */
+        stencilMask: number;
         constructor(raw?: Partial<RenderParams>);
-    }
-    interface RenderParams {
-        viewRect: {
-            x: number;
-            y: number;
-            width: number;
-            height: number;
-        };
+        /**
+         * 更新渲染参数
+         *
+         * @param gl WebGL渲染上下文
+         */
+        updateRenderParams(gl: GL): void;
     }
 }
 declare namespace feng3d {
@@ -9069,11 +9924,15 @@ declare namespace feng3d {
         /**
          * 顶点索引缓冲
          */
-        indexBuffer: Index;
+        get index(): Index;
+        set index(v: Index);
+        private _index;
         /**
          * 属性数据列表
          */
-        attributes: Attributes;
+        get attributes(): Attributes;
+        set attributes(v: Attributes);
+        private _attributes;
         /**
          * Uniform渲染数据
          */
@@ -9085,7 +9944,9 @@ declare namespace feng3d {
         /**
          * 渲染程序
          */
-        shader: Shader;
+        get shader(): Shader;
+        set shader(v: Shader);
+        private _shader;
         /**
          * shader 中的 宏
          */
@@ -9093,7 +9954,10 @@ declare namespace feng3d {
         /**
          * 渲染参数
          */
-        renderParams: Partial<RenderParams>;
+        get renderParams(): RenderParams;
+        set renderParams(v: RenderParams);
+        private _renderParams;
+        constructor(source?: gPartial<RenderAtomic>);
         getIndexBuffer(): Index;
         getAttributes(attributes?: Attributes): Attributes;
         getAttributeByKey(key: string): Attribute;
@@ -9113,21 +9977,22 @@ declare namespace feng3d {
             [name: string]: Uniforms;
         };
         renderParams: RenderParams;
-        indexBuffer: Index;
+        index: Index;
         instanceCount: number;
     }
 }
 declare namespace feng3d {
     /**
      * 索引渲染数据
-
      */
     class Index {
         /**
          * 索引数据
          */
-        indices: number[];
-        constructor(indices?: number[]);
+        get indices(): number[];
+        set indices(v: number[]);
+        private _indices;
+        constructor(source?: gPartial<Index>);
         invalidate(): void;
         /**
          * 渲染数量
@@ -9170,7 +10035,9 @@ declare namespace feng3d {
         /**
          * 属性数据
          */
-        data: number[];
+        get data(): number[];
+        set data(v: number[]);
+        private _data;
         /**
          * 数据尺寸
          *
@@ -9187,7 +10054,7 @@ declare namespace feng3d {
             When using a WebGL 2 context, the following values are available additionally:
                - gl.HALF_FLOAT: 16-bit floating point number
          */
-        type: GLArrayType;
+        type: "BYTE" | "SHORT" | "UNSIGNED_BYTE" | "UNSIGNED_SHORT" | "FLOAT" | "UNSIGNED_INT" | "UNSIGNED_INT" | "HALF_FLOAT";
         /**
          * A GLboolean specifying whether integer data values should be normalized when being casted to a float.
               -  If true, signed integers are normalized to [-1, 1].
@@ -9211,10 +10078,18 @@ declare namespace feng3d {
          */
         divisor: number;
         /**
+         * A GLenum specifying the intended usage pattern of the data store for optimization purposes.
+         *
+         * 为优化目的指定数据存储的预期使用模式的GLenum。
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData
+         */
+        usage: AttributeUsage;
+        /**
          * 是否失效
          */
         invalid: boolean;
-        constructor(name: string, data: number[], size?: number, divisor?: number);
+        constructor(source?: gPartial<Attribute>);
         /**
          * 使数据失效
          */
@@ -9224,15 +10099,15 @@ declare namespace feng3d {
          * @param gl
          * @param location A GLuint specifying the index of the vertex attribute that is to be modified.
          */
-        static active(gl: GL, location: number, attribute: Attribute): void;
+        active(gl: GL, location: number): void;
         /**
          * 获取缓冲
          */
-        static getBuffer(gl: GL, attribute: Attribute): WebGLBuffer;
+        getBuffer(gl: GL): WebGLBuffer;
         /**
          * 清理缓冲
          */
-        static clear(attribute: Attribute): void;
+        clear(attribute: Attribute): void;
     }
 }
 declare namespace feng3d {
@@ -9273,6 +10148,7 @@ declare namespace feng3d {
          * 关节权重
          */
         a_skinWeights1: Attribute;
+        [attributeName: string]: Attribute;
     }
 }
 declare namespace feng3d {
@@ -9334,7 +10210,7 @@ declare namespace feng3d {
         static active(gl: GL, data: Texture): WebGLTexture;
         /**
          * 获取顶点属性缓冲
-         * @param data  数据
+         * @param data 数据
          */
         static getTexture(gl: GL, data: Texture): WebGLTexture;
         /**
@@ -9360,8 +10236,12 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     class RenderBuffer {
-        OFFSCREEN_WIDTH: number;
-        OFFSCREEN_HEIGHT: number;
+        get OFFSCREEN_WIDTH(): number;
+        set OFFSCREEN_WIDTH(v: number);
+        private _OFFSCREEN_WIDTH;
+        get OFFSCREEN_HEIGHT(): number;
+        set OFFSCREEN_HEIGHT(v: number);
+        private _OFFSCREEN_HEIGHT;
         /**
          * 是否失效
          */
@@ -9382,10 +10262,6 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    /**
-     * 着色器代码宏工具
-     */
-    var shaderMacroUtils: ShaderMacroUtils;
     class ShaderMacroUtils {
         /**
          * 从着色器代码中获取宏变量列表
@@ -9399,6 +10275,10 @@ declare namespace feng3d {
          */
         getMacroVariablesFromCode(code: string): string[];
     }
+    /**
+     * 着色器代码宏工具
+     */
+    const shaderMacroUtils: ShaderMacroUtils;
 }
 declare namespace feng3d {
     /**
@@ -9508,11 +10388,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    var shaderConfig: ShaderConfig;
-    /**
-     * shader 库
-     */
-    var shaderlib: ShaderLib;
+    const shaderConfig: ShaderConfig;
     /**
      * 着色器库，由shader.ts初始化
      */
@@ -9569,6 +10445,10 @@ declare namespace feng3d {
          */
         clearCache(): void;
     }
+    /**
+     * shader 库
+     */
+    const shaderlib: ShaderLib;
 }
 declare namespace feng3d {
     /**
@@ -9577,13 +10457,56 @@ declare namespace feng3d {
      * 所有渲染都由该渲染器执行
      */
     class WebGLRenderer {
+        static glList: GL[];
+        gl: GL;
+        private preActiveAttributes;
+        constructor(canvas: HTMLCanvasElement, contextAttributes?: WebGLContextAttributes);
+        render(renderAtomic: RenderAtomic): void;
+        private checkRenderData;
         /**
-         * 绘制
-         * @param renderAtomic  渲染原子
+         * 激活属性
          */
-        readonly draw: (renderAtomic: RenderAtomic) => void;
-        constructor(gl: GL);
+        private activeAttributes;
+        /**
+         * 激活常量
+         */
+        private activeUniforms;
+        /**
+         * 设置环境Uniform数据
+         */
+        private setContext3DUniform;
+        /**
+         */
+        private draw;
     }
+}
+declare namespace feng3d {
+    /**
+     *
+     */
+    interface MenuItem {
+        /**
+         * 标签的路径
+         */
+        path: string;
+        /**
+         * 优先级，数字越大，显示越靠前，默认为0
+         */
+        priority?: number;
+        /**
+         * 点击事件
+         */
+        click?: () => GameObject;
+        /**
+         * 是否启用，禁用时显示灰色
+         */
+        enable?: () => boolean;
+        /**
+         * 是否显示，默认显示
+         */
+        show?: () => boolean;
+    }
+    const createNodeMenu: MenuItem[];
 }
 declare namespace feng3d {
     /**
@@ -9624,43 +10547,6 @@ declare namespace feng3d {
          * 组件类定义
          */
         type: ComponentNames;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 全局事件
-     */
-    var globalDispatcher: IEventDispatcher<GlobalEvents>;
-    /**
-     * 事件列表
-     */
-    interface GlobalEvents {
-        /**
-         * shader资源发生变化
-         */
-        "asset.shaderChanged": any;
-        /**
-         * 脚本发生变化
-         */
-        "asset.scriptChanged": any;
-        /**
-         * 图片资源发生变化
-         */
-        "asset.imageAssetChanged": {
-            url: string;
-        };
-        /**
-         * 解析出资源
-         */
-        "asset.parsed": any;
-        /**
-         * 删除文件
-         */
-        "fs.delete": string;
-        /**
-         * 写文件
-         */
-        "fs.write": string;
     }
 }
 declare namespace feng3d {
@@ -9710,7 +10596,7 @@ declare namespace feng3d {
          * @param funcName 被扩展函数名称
          * @param extendFunc 在函数执行后执行的扩展函数
          */
-        extendFunction<T, K extends FunctionPropertyNames<T>, V extends T[K]>(object: T, funcName: K, extendFunc: (this: T, r: ReturnType<V>, ...ps: Parameters<V>) => ReturnType<V>): void;
+        extendFunction<T, K extends FunctionPropertyNames<T>, V extends (T[K] & ((...args: any) => any))>(object: T, funcName: K, extendFunc: (this: T, r: ReturnType<V>, ...ps: Parameters<V>) => ReturnType<V>): void;
         /**
          * 包装函数
          *
@@ -9724,7 +10610,7 @@ declare namespace feng3d {
          * @param beforeFunc 在函数执行前执行的函数
          * @param afterFunc 在函数执行后执行的函数
          */
-        wrap<T, K extends FunctionPropertyNames<T>, F extends T[K]>(object: T, funcName: K, beforeFunc?: F, afterFunc?: F): void;
+        wrap<T, K extends FunctionPropertyNames<T>, F extends T[K] & Function>(object: T, funcName: K, beforeFunc?: F, afterFunc?: F): void;
         /**
          * 取消包装函数
          *
@@ -9735,7 +10621,7 @@ declare namespace feng3d {
          * @param wrapFunc 在函数执行前执行的函数
          * @param before 运行在原函数之前
          */
-        unwrap<T, K extends FunctionPropertyNames<T>, V extends T[K]>(object: T, funcName: K, wrapFunc?: V): void;
+        unwrap<T, K extends FunctionPropertyNames<T>, V extends T[K] & Function>(object: T, funcName: K, wrapFunc?: V): void;
         /**
          * 包装一个异步函数，使其避免重复执行
          *
@@ -9782,10 +10668,6 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 调试工具
-     */
-    var debug: Debug;
-    /**
      * 是否开启调试
      */
     var debuger: boolean;
@@ -9801,6 +10683,10 @@ declare namespace feng3d {
          */
         time(fn: Function, labal?: string): void;
     }
+    /**
+     * 调试工具
+     */
+    const debug: Debug;
 }
 declare namespace feng3d {
     interface OAVComponentParamMap {
@@ -10054,107 +10940,6 @@ declare namespace feng3d {
          */
         reset(): this;
         private runfunc;
-    }
-}
-/**
- * The unescape() function computes a new string in which hexadecimal escape sequences are replaced with the character that it represents. The escape sequences might be introduced by a function like escape. Usually, decodeURI or decodeURIComponent are preferred over unescape.
- * @param str A string to be decoded.
- * @return A new string in which certain characters have been unescaped.
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/unescape
- */
-declare function unescape(str: string): string;
-/**
- * The escape() function computes a new string in which certain characters have been replaced by a hexadecimal escape sequence.
- * @param str A string to be encoded.
- * @return A new string in which certain characters have been escaped.
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/escape
- */
-declare function escape(str: string): string;
-declare namespace feng3d {
-    /**
-     * 数据类型转换
-     * TypeArray、ArrayBuffer、Blob、File、DataURL、canvas的相互转换
-     * @see http://blog.csdn.net/yinwhm12/article/details/73482904
-     */
-    var dataTransform: DataTransform;
-    /**
-     * 数据类型转换
-     * TypeArray、ArrayBuffer、Blob、File、DataURL、canvas的相互转换
-     * @see http://blog.csdn.net/yinwhm12/article/details/73482904
-     */
-    class DataTransform {
-        /**
-         * Blob to ArrayBuffer
-         */
-        blobToArrayBuffer(blob: Blob, callback: (arrayBuffer: ArrayBuffer) => void): void;
-        /**
-         * ArrayBuffer to Blob
-         */
-        arrayBufferToBlob(arrayBuffer: ArrayBuffer): Blob;
-        /**
-         * ArrayBuffer to Uint8
-         * Uint8数组可以直观的看到ArrayBuffer中每个字节（1字节 == 8位）的值。一般我们要将ArrayBuffer转成Uint类型数组后才能对其中的字节进行存取操作。
-         */
-        arrayBufferToUint8(arrayBuffer: ArrayBuffer): Uint8Array;
-        /**
-         * Uint8 to ArrayBuffer
-         * 我们Uint8数组可以直观的看到ArrayBuffer中每个字节（1字节 == 8位）的值。一般我们要将ArrayBuffer转成Uint类型数组后才能对其中的字节进行存取操作。
-         */
-        uint8ToArrayBuffer(uint8Array: Uint8Array): ArrayBuffer;
-        /**
-         * Array to ArrayBuffer
-         * @param array 例如：[0x15, 0xFF, 0x01, 0x00, 0x34, 0xAB, 0x11];
-         */
-        arrayToArrayBuffer(array: number[]): ArrayBuffer;
-        /**
-         * TypeArray to Array
-         */
-        uint8ArrayToArray(u8a: Uint8Array): number[];
-        /**
-         * canvas转换为dataURL
-         */
-        canvasToDataURL(canvas: HTMLCanvasElement, type?: "png" | "jpeg", quality?: number): string;
-        /**
-         * canvas转换为图片
-         */
-        canvasToImage(canvas: HTMLCanvasElement, type: "png" | "jpeg", quality: number, callback: (img: HTMLImageElement) => void): void;
-        /**
-         * File、Blob对象转换为dataURL
-         * File对象也是一个Blob对象，二者的处理相同。
-         */
-        blobToDataURL(blob: Blob, callback: (dataurl: string) => void): void;
-        /**
-         * dataURL转换为Blob对象
-         */
-        dataURLtoBlob(dataurl: string): Blob;
-        /**
-         * dataURL图片数据转换为HTMLImageElement
-         * dataURL图片数据绘制到canvas
-         * 先构造Image对象，src为dataURL，图片onload之后绘制到canvas
-         */
-        dataURLDrawCanvas(dataurl: string, canvas: HTMLCanvasElement, callback: (img: HTMLImageElement) => void): void;
-        dataURLToArrayBuffer(dataurl: string, callback: (arraybuffer: ArrayBuffer) => void): void;
-        arrayBufferToDataURL(arrayBuffer: ArrayBuffer, callback: (dataurl: string) => void): void;
-        dataURLToImage(dataurl: string, callback: (img: HTMLImageElement) => void): void;
-        imageToDataURL(img: HTMLImageElement, quality?: number): string;
-        imageToCanvas(img: HTMLImageElement): HTMLCanvasElement;
-        imageToArrayBuffer(img: HTMLImageElement, callback: (arraybuffer: ArrayBuffer) => void): void;
-        imageDataToDataURL(imageData: ImageData, quality?: number): string;
-        imageDataToCanvas(imageData: ImageData): HTMLCanvasElement;
-        imagedataToImage(imageData: ImageData, quality: number, callback: (img: HTMLImageElement) => void): void;
-        arrayBufferToImage(arrayBuffer: ArrayBuffer, callback: (img: HTMLImageElement) => void): void;
-        blobToText(blob: Blob, callback: (content: string) => void): void;
-        stringToArrayBuffer(str: string): ArrayBuffer;
-        arrayBufferToString(arrayBuffer: ArrayBuffer, callback: (content: string) => void): void;
-        /**
-         * ArrayBuffer 转换为 对象
-         *
-         * @param arrayBuffer
-         * @param callback
-         */
-        arrayBufferToObject(arrayBuffer: ArrayBuffer, callback: (object: Object) => void): void;
-        stringToUint8Array(str: string): Uint8Array;
-        uint8ArrayToString(arr: Uint8Array, callback: (str: string) => void): void;
     }
 }
 declare namespace feng3d {
@@ -10456,10 +11241,6 @@ declare namespace feng3d {
     /**
      * 常用正则表示式
      */
-    var regExps: RegExps;
-    /**
-     * 常用正则表示式
-     */
     class RegExps {
         /**
          * json文件
@@ -10482,6 +11263,10 @@ declare namespace feng3d {
          */
         classReg: RegExp;
     }
+    /**
+     * 常用正则表示式
+     */
+    const regExps: RegExps;
 }
 declare namespace feng3d {
     /**
@@ -10521,69 +11306,16 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    /**
-     * 任务，用于处理任务之间依赖
-     */
-    export var task: Task;
-    /**
-     * 任务函数
-     */
-    export interface TaskFunction {
-        /**
-         * 函数自身名称
-         */
-        readonly name?: string;
-        /**
-         * 函数自身
-         */
-        (callback: () => void): void;
+    interface Feng3dObjectEventMap {
     }
-    /**
-     * 任务
-     *
-     * 处理 异步任务(函数)串联并联执行功能
-     */
-    class Task {
-        /**
-         * 并联多个异步函数为一个函数
-         *
-         * 这些异步函数同时执行
-         *
-         * @param fns 一组异步函数
-         */
-        parallel(fns: TaskFunction[]): TaskFunction;
-        /**
-         * 串联多个异步函数为一个函数
-         *
-         * 这些异步函数按顺序依次执行，等待前一个异步函数执行完调用回调后才执行下一个异步函数。
-         *
-         * @param fns 一组异步函数
-         */
-        series(fns: TaskFunction[]): TaskFunction;
-        /**
-         * 创建一组并行同类任务，例如同时加载一组资源，并在回调中返回结果数组
-         *
-         * @param ps 一组参数
-         * @param fn 单一任务函数
-         * @param done 完成回调
-         */
-        parallelResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
-        /**
-         * 创建一组串联同类任务，例如排序加载一组资源
-         *
-         * @param ps 一组参数
-         * @param fn 单一任务函数
-         * @param done 完成回调
-         */
-        seriesResults<P, R>(ps: P[], fn: (p: P, callback: (r: R) => void) => void, done: (rs: R[]) => void): void;
-    }
-    export {};
-}
-declare namespace feng3d {
     /**
      * 所有feng3d对象的基类
      */
-    class Feng3dObject extends EventDispatcher implements IDisposable {
+    class Feng3dObject<T extends Feng3dObjectEventMap = Feng3dObjectEventMap> extends feng3d.EventEmitter<T> implements IDisposable {
+        /**
+         * 名称
+         */
+        name: string;
         /**
          * 隐藏标记，用于控制是否在层级界面、检查器显示，是否保存
          */
@@ -10595,7 +11327,8 @@ declare namespace feng3d {
         /**
          * 是否已销毁
          */
-        readonly disposed: boolean;
+        get disposed(): boolean;
+        protected _disposed: boolean;
         /**
          * 构建
          *
@@ -10611,7 +11344,7 @@ declare namespace feng3d {
          *
          * @param uuid 通用唯一标识符
          */
-        static getObject(uuid: string): Feng3dObject;
+        static getObject(uuid: string): Feng3dObject<Feng3dObjectEventMap>;
         /**
          * 获取对象
          *
@@ -10634,9 +11367,7 @@ declare namespace feng3d {
         /**
          * 资源名称
          */
-        get name(): string;
-        set name(v: string);
-        private _name;
+        get assetName(): string;
         /**
          * 资源编号
          */
@@ -10653,13 +11384,13 @@ declare namespace feng3d {
          * @param assetId 资源编号
          * @param data 资源数据
          */
-        static addAssetData<T extends AssetData>(assetId: string, data: T): T;
+        static addAssetData<T extends any>(assetId: string, data: T): T;
         /**
          * 删除资源数据
          *
          * @param data 资源数据
          */
-        static deleteAssetData(data: AssetData): void;
+        static deleteAssetData(data: any): void;
         static deleteAssetDataById(assetId: string): void;
         private static _delete;
         /**
@@ -10683,25 +11414,25 @@ declare namespace feng3d {
          *
          * @param object 资源对象
          */
-        static deserialize(object: any): AssetData;
+        static deserialize(object: any): any;
         /**
          * 获取已加载的资源数据
          *
          * @param assetId 资源编号
          */
-        static getLoadedAssetData(assetId: string): AssetData;
+        static getLoadedAssetData(assetId: string): any;
         /**
          * 获取所有已加载资源数据
          */
-        static getAllLoadedAssetDatas(): AssetData[];
+        static getAllLoadedAssetDatas(): any[];
         /**
          * 资源与编号对应表
          */
-        static assetMap: Map<AssetData, string>;
+        static assetMap: Map<any, string>;
         /**
          * 编号与资源对应表
          */
-        static idAssetMap: Map<string, AssetData>;
+        static idAssetMap: Map<string, any>;
     }
 }
 declare namespace feng3d {
@@ -10815,6 +11546,11 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    function getAssetTypeClass<K extends keyof AssetTypeClassMap>(type: K): AssetTypeClassMap[K];
+    function setAssetTypeClass<K extends keyof AssetTypeClassMap>(type: K, cls: AssetTypeClassMap[K]): void;
+    interface AssetTypeClassMap {
+    }
+    const assetTypeClassMap: AssetTypeClassMap;
     /**
      * feng3d资源
      */
@@ -10868,7 +11604,7 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        data: AssetData;
+        data: any;
         /**
          * 初始化资源
          */
@@ -10878,11 +11614,11 @@ declare namespace feng3d {
          *
          * @param callback 完成回调，当资源已加载时会立即调用回调，否则在资源加载完成后调用。
          */
-        getAssetData(callback?: (result: feng3d.AssetData) => void): AssetData;
+        getAssetData(callback?: (result: any) => void): any;
         /**
          * 资源已加载时获取资源数据，内部使用
          */
-        protected _getAssetData(): AssetData;
+        protected _getAssetData(): any;
         /**
          * 读取资源
          *
@@ -10968,6 +11704,39 @@ declare namespace feng3d {
          * 预览图路径
          */
         private get previewPath();
+    }
+}
+declare namespace feng3d {
+    /**
+     * 文件夹资源
+     */
+    class FolderAsset extends FileAsset {
+        static extenson: string;
+        assetType: AssetType;
+        /**
+         * 子资源列表
+         */
+        get childrenAssets(): FileAsset[];
+        initAsset(): void;
+        /**
+         * 删除资源
+         *
+         * @param callback 完成回调
+         */
+        delete(callback?: (err: Error) => void): void;
+        /**
+         * 保存文件
+         * @param callback 完成回调
+         */
+        saveFile(callback?: (err: Error) => void): void;
+        /**
+         * 读取文件
+         * @param callback 完成回调
+         */
+        readFile(callback?: (err: Error) => void): void;
+    }
+    interface AssetTypeClassMap {
+        "folder": new () => FolderAsset;
     }
 }
 declare namespace feng3d {
@@ -11069,7 +11838,7 @@ declare namespace feng3d {
          *
          * @param type 资源类型
          */
-        getLoadedAssetDatasByType<T extends AssetData>(type: Constructor<T>): T[];
+        getLoadedAssetDatasByType<T extends any>(type: Constructor<T>): T[];
         /**
          * 获取指定编号资源
          *
@@ -11144,14 +11913,13 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    interface ReadWriteRS {
+        get fs(): ReadWriteFS;
+    }
     /**
      * 可读写资源系统
      */
     class ReadWriteRS extends ReadRS {
-        /**
-         * 文件系统
-         */
-        fs: ReadWriteFS;
         /**
          * 延迟保存执行函数
          */
@@ -11469,7 +12237,7 @@ declare namespace feng3d {
     /**
      * 纹理信息
      */
-    abstract class TextureInfo extends AssetData implements Texture {
+    abstract class TextureInfo<T extends Feng3dObjectEventMap> extends Feng3dObject<T> implements Texture {
         /**
          * 纹理类型
          */
@@ -11499,13 +12267,13 @@ declare namespace feng3d {
         /**
          * 表示x轴的纹理的回环方式，就是当纹理的宽度小于需要贴图的平面的宽度的时候，平面剩下的部分应该p以何种方式贴图的问题。
          */
-        get wrapS(): TextureWrap.REPEAT | TextureWrap;
+        get wrapS(): TextureWrap;
         set wrapS(v: TextureWrap);
         private _wrapS;
         /**
          * 表示y轴的纹理回环方式。 magFilter和minFilter表示过滤的方式，这是OpenGL的基本概念，我将在下面讲一下，目前你不用担心它的使用。当您不设置的时候，它会取默认值，所以，我们这里暂时不理睬他。
          */
-        get wrapT(): TextureWrap.REPEAT | TextureWrap;
+        get wrapT(): TextureWrap;
         set wrapT(v: TextureWrap);
         private _wrapT;
         /**
@@ -11547,7 +12315,7 @@ declare namespace feng3d {
          * 使纹理失效
          */
         invalidate(): void;
-        get activePixels(): HTMLCanvasElement | HTMLImageElement | HTMLVideoElement | ImageBitmap | OffscreenCanvas | ImageData | TexImageSource[];
+        get activePixels(): TexImageSource | TexImageSource[];
         /**
          *
          */
@@ -11611,27 +12379,15 @@ declare namespace feng3d {
         /**
          * 渲染
          */
-        draw(gl: GL, scene: Scene, camera: Camera): void;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 深度渲染器
-     */
-    class DepthRenderer {
-        /**
-         * 渲染
-         */
-        draw(gl: GL, scene: Scene, camera: Camera): void;
+        draw(gl: WebGLRenderer, scene: Scene, camera: Camera): void;
     }
 }
 declare namespace feng3d {
     var mouseRenderer: MouseRenderer;
     /**
      * 鼠标拾取渲染器
-
      */
-    class MouseRenderer extends EventDispatcher {
+    class MouseRenderer extends feng3d.EventEmitter {
         private objects;
         /**
          * 渲染
@@ -11654,7 +12410,7 @@ declare namespace feng3d {
         /**
          * 渲染
          */
-        draw(gl: GL, scene: Scene, camera: Camera): void;
+        draw(gl: WebGLRenderer, scene: Scene, camera: Camera): void;
         private drawForSpotLight;
         private drawForPointLight;
         private drawForDirectionalLight;
@@ -11678,7 +12434,7 @@ declare namespace feng3d {
     class OutlineRenderer {
         renderAtomic: RenderAtomic;
         init(): void;
-        draw(gl: GL, scene: Scene, camera: Camera): void;
+        draw(gl: WebGLRenderer, scene: Scene, camera: Camera): void;
     }
 }
 declare namespace feng3d {
@@ -11692,11 +12448,11 @@ declare namespace feng3d {
         /**
          * 渲染
          */
-        draw(gl: GL, scene: Scene, camera: Camera): void;
+        draw(renderer: WebGLRenderer, scene: Scene, camera: Camera): void;
         /**
          * 绘制3D对象
          */
-        drawGameObject(gl: GL, renderable: Renderable, scene: Scene, camera: Camera, wireframeColor?: Color4): void;
+        drawGameObject(renderer: WebGLRenderer, renderable: Renderable, scene: Scene, camera: Camera, wireframeColor?: Color4): void;
     }
     interface RenderAtomic {
         /**
@@ -11708,17 +12464,31 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 组件名称与类定义映射，由 @RegisterComponent 装饰器进行填充。
-     */
-    const componentMap: ComponentMap;
-    /**
      * 注册组件
      *
      * 使用 @RegisterComponent 在组件类定义上注册组件，配合扩展 ComponentMap 接口后可使用 GameObject.getComponent 等方法。
      *
      * @param component 组件名称，默认使用类名称
      */
-    function RegisterComponent(component?: string): (constructor: Function) => void;
+    function RegisterComponent(component?: {
+        /**
+         * 组件名称，默认构造函数名称。当组件重名时可以使用该参数进行取别名，并且在接口 ComponentMap 中相应调整。
+         */
+        name: string;
+        /**
+         * 是否唯一，同类型组件只允许一个。
+         */
+        single?: boolean;
+        /**
+         * 所依赖的组件列表。当该组件被添加Entity上时，会补齐缺少的依赖组件。
+         */
+        dependencies?: Constructor<Component>[];
+    }): (constructor: Constructor<Component>) => void;
+    function getComponentType<T extends ComponentNames>(type: T): Constructor<ComponentMap[T]>;
+    /**
+     * 组件名称与类定义映射，由 @RegisterComponent 装饰器进行填充。
+     */
+    const componentMap: ComponentMap;
     /**
      * 组件名称与类定义映射，新建组件一般都需扩展该接口。
      */
@@ -11727,13 +12497,6 @@ declare namespace feng3d {
     }
     type ComponentNames = keyof ComponentMap;
     type Components = ComponentMap[ComponentNames];
-    interface Component {
-        once<K extends keyof GameObjectEventMap>(type: K, listener: (event: Event<GameObjectEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof GameObjectEventMap>(type: K, data?: GameObjectEventMap[K], bubbles?: boolean): Event<GameObjectEventMap[K]>;
-        has<K extends keyof GameObjectEventMap>(type: K): boolean;
-        on<K extends keyof GameObjectEventMap>(type: K, listener: (event: Event<GameObjectEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof GameObjectEventMap>(type?: K, listener?: (event: Event<GameObjectEventMap[K]>) => any, thisObject?: any): void;
-    }
     /**
      * 组件
      *
@@ -11741,7 +12504,7 @@ declare namespace feng3d {
      *
      * 注意，您的代码永远不会直接创建组件。相反，你可以编写脚本代码，并将脚本附加到GameObject(游戏物体)上。
      */
-    class Component extends Feng3dObject implements IDisposable {
+    class Component extends Feng3dObject<GameObjectEventMap> implements IDisposable {
         /**
          * 此组件附加到的游戏对象。组件总是附加到游戏对象上。
          */
@@ -11749,7 +12512,7 @@ declare namespace feng3d {
         /**
          * 标签
          */
-        tag: string;
+        get tag(): string;
         /**
          * The Transform attached to this GameObject (null if there is none attached).
          */
@@ -11758,11 +12521,6 @@ declare namespace feng3d {
          * 是否唯一，同类型3D对象组件只允许一个
          */
         get single(): boolean;
-        /**
-         * 是否已销毁
-         */
-        get disposed(): boolean;
-        private _disposed;
         /**
          * 创建一个组件
          */
@@ -11774,32 +12532,127 @@ declare namespace feng3d {
          */
         init(): void;
         /**
+         * Adds a component class of type componentType to the game object.
+         *
+         * @param type A component class of type.
+         * @returns The component that is added.
+         */
+        /**
+         * Adds a component class of type componentType to the game object.
+         *
+         * @param type 组件类定义。
+         * @returns 被添加的组件。
+         */
+        addComponent<T extends Component>(type: Constructor<T>): T;
+        /**
          * Returns the component of Type type if the game object has one attached, null if it doesn't.
-         * @param type				The type of Component to retrieve.
-         * @return                  返回指定类型组件
+         *
+         * Using gameObject.GetComponent will return the first component that is found. If you expect there to be more than one component of the
+         * same type, use gameObject.GetComponents instead, and cycle through the returned components testing for some unique property.
+         *
+         * @param type The type of Component to retrieve.
+         * @returns The component to retrieve.
          */
-        getComponent<T extends ComponentNames>(type: T): ComponentMap[T];
         /**
-         * Returns all components of Type type in the GameObject.
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
+         * 返回游戏对象附加的一个指定类型的组件，如果没有，则返回 null。
+         *
+         * 使用 gameObject.GetComponent 将返回找到的第一个组件。如果您希望有多个相同类型的组件，请改用 gameObject.GetComponents，并循环通过返回的组件测试某些唯一属性。
+         *
+         * @param type 要检索的组件类型。
+         * @returns 要检索的组件。
          */
-        getComponents<T extends ComponentNames>(type?: T): ComponentMap[T][];
+        getComponent<T extends Component>(type: Constructor<T>): T;
         /**
-         * Returns all components of Type type in the GameObject.
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
+         * Returns the component of Type type in the GameObject or any of its children using depth first search.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @returns A component of the matching type, if found.
          */
-        getComponentsInChildren<T extends ComponentNames>(type?: T, filter?: (compnent: ComponentMap[T]) => {
-            findchildren: boolean;
-            value: boolean;
-        }, result?: ComponentMap[T][]): ComponentMap[T][];
         /**
-         * 从父类中获取组件
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
+         * 使用深度优先搜索返回 GameObject 或其任何子项中的 Type 组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 是否包含不活跃组件。
+         * @returns 匹配类型的组件（如果找到）。
          */
-        getComponentsInParents<T extends ComponentNames>(type?: T, result?: ComponentMap[T][]): ComponentMap[T][];
+        getComponentInChildren<T extends Component>(type: Constructor<T>, includeInactive?: boolean): T;
+        /**
+         * Retrieves the component of Type type in the GameObject or any of its parents.
+         *
+         * This method recurses upwards until it finds a GameObject with a matching component. Only components on active GameObjects are matched.
+         *
+         * @param type Type of component to find.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @returns Returns a component if a component matching the type is found. Returns null otherwise.
+         */
+        /**
+         * 检索GameObject或其任何父项type中的 Type 组件。
+         *
+         * 此方法向上递归，直到找到具有匹配组件的 GameObject。仅匹配活动游戏对象上的组件。
+         *
+         * @param type 要查找的组件类型。
+         * @param includeInactive 是否包含不活跃组件。
+         * @returns 如果找到与类型匹配的组件，则返回一个组件。否则返回 null。
+         */
+        getComponentInParent<T extends Component>(type: Constructor<T>, includeInactive?: boolean): T;
+        /**
+         * Returns all components of Type `type` in the GameObject.
+         *
+         * @param type The type of component to retrieve.
+         * @param results List to receive the results.
+         * @returns all components of Type type in the GameObject.
+         */
+        /**
+         * 返回GameObject中指定类型的所有组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param results 列出接收找到的组件。
+         * @returns GameObject中指定类型的所有组件。
+         */
+        getComponents<T extends Component>(type: Constructor<T>, results?: T[]): T[];
+        /**
+         * Returns all components of Type type in the GameObject or any of its children children using depth first search. Works recursively.
+         *
+         * Unity searches for components recursively on child GameObjects. This means that it also includes all the child GameObjects of the target GameObject, and all subsequent child GameObjects.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @param results List to receive found Components.
+         * @returns All found Components.
+         */
+        /**
+         * 使用深度优先搜索返回 GameObject 或其任何子子项中 Type 的所有组件。递归工作。
+         *
+         * Unity 在子游戏对象上递归搜索组件。这意味着它还包括目标 GameObject 的所有子 GameObject，以及所有后续子 GameObject。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 非活动游戏对象上的组件是否应该包含在搜索结果中？
+         * @param results 列出接收找到的组件。
+         * @returns 所有找到的组件。
+         */
+        getComponentsInChildren<T extends Component>(type: Constructor<T>, includeInactive?: boolean, results?: T[]): T[];
+        /**
+         * Returns all components of Type type in the GameObject or any of its parents.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should inactive Components be included in the found set?
+         * @param results List holding the found Components.
+         * @returns All components of Type type in the GameObject or any of its parents.
+         */
+        /**
+         * 返回GameObject或其任何父级中指定的所有组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 非活动组件是否应该包含在搜索结果中？
+         * @param results 列出找到的组件。
+         * @returns GameObject或其任何父级中指定的所有组件。
+         */
+        getComponentsInParent<T extends Component>(type: Constructor<T>, includeInactive?: boolean, results?: T[]): T[];
+        /**
+         * 把事件分享到实体上。
+         */
+        getShareTargets(): GameObject[];
         /**
          * 销毁
          */
@@ -11817,6 +12670,25 @@ declare namespace feng3d {
          */
         setGameObject(gameObject: GameObject): void;
         protected _gameObject: GameObject;
+        /**
+         * 组件名称与类定义映射，由 @RegisterComponent 装饰器进行填充。
+         * @private
+         */
+        static _componentMap: {
+            [name: string]: Constructor<Component>;
+        };
+        /**
+         * 获取组件依赖列表
+         *
+         * @param type 组件类定义
+         */
+        static getDependencies(type: Constructor<Component>): Constructor<Component>[];
+        /**
+         * 判断组件是否为唯一组件。
+         *
+         * @param type 组件类定义
+         */
+        static isSingleComponent<T extends Component>(type: Constructor<T>): boolean;
     }
 }
 declare namespace feng3d {
@@ -11874,7 +12746,7 @@ declare namespace feng3d {
      */
     class SkyBox extends Component {
         __class__: "feng3d.SkyBox";
-        s_skyboxTexture: TextureCube;
+        s_skyboxTexture: TextureCube<TextureCubeEventMap>;
         beforeRender(renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
     }
 }
@@ -11891,18 +12763,18 @@ declare namespace feng3d {
         init(): void;
         /**
          * 绘制场景中天空盒
-         * @param gl
+         * @param renderer
          * @param scene 场景
          * @param camera 摄像机
          */
-        draw(gl: GL, scene: Scene, camera: Camera): void;
+        draw(renderer: WebGLRenderer, scene: Scene, camera: Camera): void;
         /**
          * 绘制天空盒
-         * @param gl
+         * @param renderer
          * @param skybox 天空盒
          * @param camera 摄像机
          */
-        drawSkyBox(gl: GL, skybox: SkyBox, scene: Scene, camera: Camera): void;
+        drawSkyBox(renderer: WebGLRenderer, skybox: SkyBox, scene: Scene, camera: Camera): void;
     }
 }
 declare namespace feng3d {
@@ -12086,24 +12958,6 @@ declare namespace feng3d {
          * 本地旋转矩阵
          */
         get rotationMatrix(): Matrix4x4;
-        /**
-         * 向前向量
-         */
-        get forwardVector(): Vector3;
-        /**
-         * 向右向量
-         */
-        get rightVector(): Vector3;
-        /**
-         * 向上向量
-         */
-        get upVector(): Vector3;
-        /**
-         * 向后向量
-         */
-        get backVector(): Vector3;
-        get leftVector(): Vector3;
-        get downVector(): Vector3;
         moveForward(distance: number): void;
         moveBackward(distance: number): void;
         moveLeft(distance: number): void;
@@ -12202,27 +13056,13 @@ declare namespace feng3d {
          */
         worldToLocalDirection(direction: Vector3): Vector3;
         /**
-         * Transforms position from world space to local space.
-         *
          * 将位置从世界空间转换为局部空间。
          *
          * @param position 世界坐标系中位置
          */
-        inverseTransformPoint(position: Vector3): Vector3;
-        /**
-         * 将位置从世界空间转换为局部空间。
-         *
-         * @param position 世界坐标系中位置
-         */
-        worldToLocalPoint(position: Vector3): Vector3;
+        worldToLocalPoint(position: Vector3, out?: Vector3): Vector3;
         /**
          * 将向量从世界空间转换为局部空间
-         *
-         * @param vector 世界坐标系中向量
-         */
-        inverseTransformVector(vector: Vector3): Vector3;
-        /**
-         * 将位置从世界空间转换为局部空间。
          *
          * @param vector 世界坐标系中向量
          */
@@ -12259,9 +13099,6 @@ declare namespace feng3d {
         private _invalidateSceneTransform;
         private _updateMatrix;
         private _updateLocalToWorldMatrix;
-        private _updateWorldToLocalMatrix;
-        private _updateITlocalToWorldMatrix;
-        private _upDateLocalToWorldRotationMatrix;
     }
 }
 declare namespace feng3d {
@@ -12353,26 +13190,24 @@ declare namespace feng3d {
          */
         selfBoundsChanged: Component;
     }
-    interface ComponentMap {
-        BoundingBox: BoundingBox;
-    }
     /**
      * 轴对称包围盒
      *
      * 用于优化计算射线碰撞检测以及视锥剔除等。
      */
-    class BoundingBox extends Component {
-        protected _selfBounds: Box3;
+    class BoundingBox {
+        private _gameObject;
+        protected _selfLocalBounds: Box3;
         protected _selfWorldBounds: Box3;
         protected _worldBounds: Box3;
         protected _selfBoundsInvalid: boolean;
         protected _selfWorldBoundsInvalid: boolean;
         protected _worldBoundsInvalid: boolean;
-        init(): void;
+        constructor(gameObject: GameObject);
         /**
-         * 自身包围盒通常有Renderable组件提供
+         * 自身局部包围盒通常有Renderable组件提供
          */
-        get selfBounds(): Box3;
+        get selfLocalBounds(): Box3;
         /**
          * 自身世界空间的包围盒
          */
@@ -12410,8 +13245,7 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
-    type Constructor<T> = (new (...args: any[]) => T);
-    interface GameObjectEventMap extends MouseEventMap {
+    interface GameObjectEventMap extends MouseEventMap, Feng3dObjectEventMap {
         /**
          * 添加子组件事件
          */
@@ -12469,19 +13303,48 @@ declare namespace feng3d {
          */
         refreshView: any;
     }
-    interface GameObject {
-        once<K extends keyof GameObjectEventMap>(type: K, listener: (event: Event<GameObjectEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof GameObjectEventMap>(type: K, data?: GameObjectEventMap[K], bubbles?: boolean): Event<GameObjectEventMap[K]>;
-        has<K extends keyof GameObjectEventMap>(type: K): boolean;
-        on<K extends keyof GameObjectEventMap>(type: K, listener: (event: Event<GameObjectEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof GameObjectEventMap>(type?: K, listener?: (event: Event<GameObjectEventMap[K]>) => any, thisObject?: any): void;
-    }
     /**
      * 游戏对象，场景唯一存在的对象类型
      */
-    class GameObject extends AssetData implements IDisposable {
+    class GameObject extends Feng3dObject<GameObjectEventMap> implements IDisposable {
         __class__: "feng3d.GameObject";
         assetType: AssetType;
+        /**
+         * 名称
+         */
+        name: string;
+        /**
+         * The local active state of this GameObject.
+         *
+         * This returns the local active state of this GameObject. Note that a GameObject may be inactive because a parent is not active, even if this returns true. This state will then be used once all parents are active. Use GameObject.activeInHierarchy if you want to check if the GameObject is actually treated as active in the Scene.
+         */
+        get activeSelf(): boolean;
+        set activeSelf(v: boolean);
+        private _activeSelf;
+        /**
+         * Defines whether the GameObject is active in the Scene.
+         *
+         * This lets you know whether a GameObject is active in the game. That is the case if its GameObject.activeSelf property is enabled, as well as that of all its parents.
+         */
+        get activeInHierarchy(): boolean;
+        /**
+         * The tag of this game object.
+         */
+        tag: string;
+        /**
+         * 自身以及子对象是否支持鼠标拾取
+         */
+        mouseEnabled: boolean;
+        /**
+         * 组件列表
+         */
+        get components(): Components[];
+        set components(value: Components[]);
+        protected _components: Components[];
+        /**
+         * 子组件个数
+         */
+        get numComponents(): number;
         /**
          * 预设资源编号
          */
@@ -12491,24 +13354,17 @@ declare namespace feng3d {
          */
         assetId: string;
         /**
-         * 名称
-         */
-        name: string;
-        /**
-         * 是否显示
-         */
-        get visible(): boolean;
-        set visible(v: boolean);
-        private _visible;
-        /**
-         * 自身以及子对象是否支持鼠标拾取
-         */
-        mouseEnabled: boolean;
-        /**
-         * 变换
+         * The Transform attached to this GameObject.
          */
         get transform(): Transform;
-        private _transform;
+        /**
+         * 轴对称包围盒
+         */
+        get boundingBox(): BoundingBox;
+        private _boundingBox;
+        get scene(): Scene;
+        protected _parent: GameObject;
+        protected _children: GameObject[];
         get parent(): GameObject;
         /**
          * 子对象
@@ -12517,26 +13373,209 @@ declare namespace feng3d {
         set children(value: GameObject[]);
         get numChildren(): number;
         /**
-         * 子组件个数
-         */
-        get numComponents(): number;
-        /**
-         * 全局是否可见
-         */
-        get globalVisible(): boolean;
-        get scene(): Scene;
-        get components(): Components[];
-        set components(value: Components[]);
-        /**
          * 构建3D对象
          */
         constructor();
+        /**
+         * Activates/Deactivates the GameObject, depending on the given true or false value.
+         *
+         * A GameObject may be inactive because a parent is not active. In that case, calling SetActive will not activate it, but only set the local state of the GameObject, which you can check using GameObject.activeSelf. Unity can then use this state when all parents become active.
+         *
+         * @param value Activate or deactivate the object, where true activates the GameObject and false deactivates the GameObject.
+         */
+        setActive(value: boolean): void;
+        /**
+         * Adds a component class of type componentType to the game object.
+         *
+         * @param type A component class of type.
+         * @returns The component that is added.
+         */
+        /**
+         * 添加一个类型为`type`的组件到游戏对象。
+         *
+         * @param type 组件类定义。
+         * @returns 被添加的组件。
+         */
+        addComponent<T extends Component>(type: Constructor<T>): T;
+        /**
+         * Returns the component of Type type if the game object has one attached, null if it doesn't.
+         *
+         * Using gameObject.GetComponent will return the first component that is found. If you expect there to be more than one component of the
+         * same type, use gameObject.GetComponents instead, and cycle through the returned components testing for some unique property.
+         *
+         * @param type The type of Component to retrieve.
+         * @returns The component to retrieve.
+         */
+        /**
+         * 返回游戏对象附加的一个指定类型的组件，如果没有，则返回 null。
+         *
+         * 使用 gameObject.GetComponent 将返回找到的第一个组件。如果您希望有多个相同类型的组件，请改用 gameObject.GetComponents，并循环通过返回的组件测试某些唯一属性。
+         *
+         * @param type 要检索的组件类型。
+         * @returns 要检索的组件。
+         */
+        getComponent<T extends Component>(type: Constructor<T>): T;
+        /**
+         * Returns the component of Type type in the GameObject or any of its children using depth first search.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @returns A component of the matching type, if found.
+         */
+        /**
+         * 使用深度优先搜索返回 GameObject 或其任何子项中的 Type 组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 是否包含不活跃组件。
+         * @returns 匹配类型的组件（如果找到）。
+         */
+        getComponentInChildren<T extends Component>(type: Constructor<T>, includeInactive?: boolean): T;
+        /**
+         * Retrieves the component of Type type in the GameObject or any of its parents.
+         *
+         * This method recurses upwards until it finds a GameObject with a matching component. Only components on active GameObjects are matched.
+         *
+         * @param type Type of component to find.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @returns Returns a component if a component matching the type is found. Returns null otherwise.
+         */
+        /**
+         * 检索GameObject或其任何父项type中的 Type 组件。
+         *
+         * 此方法向上递归，直到找到具有匹配组件的 GameObject。仅匹配活动游戏对象上的组件。
+         *
+         * @param type 要查找的组件类型。
+         * @param includeInactive 是否包含不活跃组件。
+         * @returns 如果找到与类型匹配的组件，则返回一个组件。否则返回 null。
+         */
+        getComponentInParent<T extends Component>(type: Constructor<T>, includeInactive?: boolean): T;
+        /**
+         * Returns all components of Type `type` in the GameObject.
+         *
+         * @param type The type of component to retrieve.
+         * @param results List to receive the results.
+         * @returns all components of Type type in the GameObject.
+         */
+        /**
+         * 返回GameObject中指定类型的所有组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param results 列出接收找到的组件。
+         * @returns GameObject中指定类型的所有组件。
+         */
+        getComponents<T extends Component = Component>(type?: Constructor<T>, results?: T[]): T[];
+        /**
+         * Returns all components of Type type in the GameObject or any of its children children using depth first search. Works recursively.
+         *
+         * Unity searches for components recursively on child GameObjects. This means that it also includes all the child GameObjects of the target GameObject, and all subsequent child GameObjects.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should Components on inactive GameObjects be included in the found set?
+         * @param results List to receive found Components.
+         * @returns All found Components.
+         */
+        /**
+         * 使用深度优先搜索返回 GameObject 或其任何子子项中 Type 的所有组件。递归工作。
+         *
+         * Unity 在子游戏对象上递归搜索组件。这意味着它还包括目标 GameObject 的所有子 GameObject，以及所有后续子 GameObject。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 非活动游戏对象上的组件是否应该包含在搜索结果中？
+         * @param results 列出接收找到的组件。
+         * @returns 所有找到的组件。
+         */
+        getComponentsInChildren<T extends Component>(type?: Constructor<T>, includeInactive?: boolean, results?: T[]): T[];
+        /**
+         * Returns all components of Type type in the GameObject or any of its parents.
+         *
+         * @param type The type of Component to retrieve.
+         * @param includeInactive Should inactive Components be included in the found set?
+         * @param results List holding the found Components.
+         * @returns All components of Type type in the GameObject or any of its parents.
+         */
+        /**
+         * 返回GameObject或其任何父级中指定的所有组件。
+         *
+         * @param type 要检索的组件类型。
+         * @param includeInactive 非活动组件是否应该包含在搜索结果中？
+         * @param results 列出找到的组件。
+         * @returns GameObject或其任何父级中指定的所有组件。
+         */
+        getComponentsInParent<T extends Component>(type?: Constructor<T>, includeInactive?: boolean, results?: T[]): T[];
+        /**
+         * 获取指定位置索引的子组件
+         * @param index			位置索引
+         * @return				子组件
+         */
+        getComponentAt(index: number): Component;
+        /**
+         * 设置子组件的位置
+         * @param component				子组件
+         * @param index				位置索引
+         */
+        setComponentIndex(component: Components, index: number): void;
+        /**
+         * 设置组件到指定位置
+         * @param component		被设置的组件
+         * @param index			索引
+         */
+        setComponentAt(component: Components, index: number): void;
+        /**
+         * 移除组件
+         * @param component 被移除组件
+         */
+        removeComponent(component: Components): void;
+        /**
+         * 获取组件在容器的索引位置
+         * @param component			查询的组件
+         * @return				    组件在容器的索引位置
+         */
+        getComponentIndex(component: Components): number;
+        /**
+         * 移除组件
+         * @param index		要删除的 Component 的子索引。
+         */
+        removeComponentAt(index: number): Component;
+        /**
+         * 交换子组件位置
+         * @param index1		第一个子组件的索引位置
+         * @param index2		第二个子组件的索引位置
+         */
+        swapComponentsAt(index1: number, index2: number): void;
+        /**
+         * 交换子组件位置
+         * @param a		第一个子组件
+         * @param b		第二个子组件
+         */
+        swapComponents(a: Components, b: Components): void;
+        /**
+         * 移除指定类型组件
+         * @param type 组件类型
+         */
+        removeComponentsByType<T extends Components>(type: Constructor<T>): T[];
+        /**
+         * 判断是否拥有组件
+         * @param com	被检测的组件
+         * @return		true：拥有该组件；false：不拥有该组件。
+         */
+        private hasComponent;
+        /**
+         * 添加组件到指定位置
+         * @param component		被添加的组件
+         * @param index			插入的位置
+         */
+        protected addComponentAt(component: Components, index: number): void;
         /**
          * 根据名称查找对象
          *
          * @param name 对象名称
          */
         find(name: string): GameObject;
+        /**
+         * 添加脚本
+         * @param script   脚本路径
+         */
+        addScript(scriptName: string): ScriptComponent;
         /**
          * 是否包含指定对象
          *
@@ -12585,107 +13624,7 @@ declare namespace feng3d {
          * 获取子对象列表（备份）
          */
         getChildren(): GameObject[];
-        /**
-         * 获取指定位置索引的子组件
-         * @param index			位置索引
-         * @return				子组件
-         */
-        getComponentAt(index: number): Component;
-        /**
-         * 添加指定组件类型到游戏对象
-         *
-         * @type type 被添加组件
-         */
-        addComponent<T extends ComponentNames>(type: T, callback?: (component: ComponentMap[T]) => void): ComponentMap[T];
-        /**
-         * 添加脚本
-         * @param script   脚本路径
-         */
-        addScript(scriptName: string): ScriptComponent;
-        /**
-         * 获取游戏对象上第一个指定类型的组件，不存在时返回null
-         *
-         * @param type				类定义
-         * @return                  返回指定类型组件
-         */
-        getComponent<T extends ComponentNames>(type: T): ComponentMap[T];
-        /**
-         * 获取游戏对象上所有指定类型的组件数组
-         *
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
-         */
-        getComponents<T extends ComponentNames>(type: T): ComponentMap[T][];
-        /**
-         * 从自身与子代（孩子，孩子的孩子，...）游戏对象中获取所有指定类型的组件
-         *
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
-         */
-        getComponentsInChildren<T extends ComponentNames>(type?: T, filter?: (compnent: ComponentMap[T]) => {
-            findchildren: boolean;
-            value: boolean;
-        }, result?: ComponentMap[T][]): ComponentMap[T][];
-        /**
-         * 从父代（父亲，父亲的父亲，...）中获取组件
-         *
-         * @param type		类定义
-         * @return			返回与给出类定义一致的组件
-         */
-        getComponentsInParents<T extends ComponentNames>(type?: T, result?: ComponentMap[T][]): ComponentMap[T][];
-        /**
-         * 设置子组件的位置
-         * @param component				子组件
-         * @param index				位置索引
-         */
-        setComponentIndex(component: Components, index: number): void;
-        /**
-         * 设置组件到指定位置
-         * @param component		被设置的组件
-         * @param index			索引
-         */
-        setComponentAt(component: Components, index: number): void;
-        /**
-         * 移除组件
-         * @param component 被移除组件
-         */
-        removeComponent(component: Components): void;
-        /**
-         * 获取组件在容器的索引位置
-         * @param component			查询的组件
-         * @return				    组件在容器的索引位置
-         */
-        getComponentIndex(component: Components): number;
-        /**
-         * 移除组件
-         * @param index		要删除的 Component 的子索引。
-         */
-        removeComponentAt(index: number): Component;
-        /**
-         * 交换子组件位置
-         * @param index1		第一个子组件的索引位置
-         * @param index2		第二个子组件的索引位置
-         */
-        swapComponentsAt(index1: number, index2: number): void;
-        /**
-         * 交换子组件位置
-         * @param a		第一个子组件
-         * @param b		第二个子组件
-         */
-        swapComponents(a: Components, b: Components): void;
-        /**
-         * 移除指定类型组件
-         * @param type 组件类型
-         */
-        removeComponentsByType<T extends Components>(type: Constructor<T>): T[];
-        /**
-         * 世界包围盒
-         */
-        get worldBounds(): Box3;
-        /**
-         * 监听对象的所有事件并且传播到所有组件中
-         */
-        private _onAnyListener;
+        private removeChildInternal;
         /**
          * 销毁
          */
@@ -12715,33 +13654,18 @@ declare namespace feng3d {
          * @param name
          */
         static find(name: string): GameObject;
-        /**
-         * 组件列表
-         */
-        protected _components: Components[];
-        protected _children: GameObject[];
         protected _scene: Scene;
-        protected _parent: GameObject;
-        protected _globalVisible: boolean;
-        protected _globalVisibleInvalid: boolean;
-        protected _updateGlobalVisible(): void;
-        protected _invalidateGlobalVisible(): void;
-        private _setParent;
+        protected _activeInHierarchy: boolean;
+        protected _activeInHierarchyInvalid: boolean;
+        protected _updateActiveInHierarchy(): void;
+        protected _invalidateActiveInHierarchy(): void;
+        protected _setParent(value: GameObject | null): void;
         private updateScene;
         private updateChildrenScene;
-        private removeChildInternal;
         /**
-         * 判断是否拥有组件
-         * @param com	被检测的组件
-         * @return		true：拥有该组件；false：不拥有该组件。
+         * 把事件分享到每个组件上。
          */
-        private hasComponent;
-        /**
-         * 添加组件到指定位置
-         * @param component		被添加的组件
-         * @param index			插入的位置
-         */
-        private addComponentAt;
+        getShareTargets(): Components[];
         /**
          * 创建指定类型的游戏对象。
          *
@@ -12767,7 +13691,7 @@ declare namespace feng3d {
     }
 }
 interface HTMLCanvasElement {
-    gl: feng3d.GL;
+    gl: feng3d.WebGLRenderer;
 }
 declare namespace feng3d {
     /**
@@ -12790,7 +13714,7 @@ declare namespace feng3d {
          * 根结点
          */
         get root(): GameObject;
-        get gl(): GL;
+        get gl(): WebGLRenderer;
         /**
          * 鼠标在3D视图中的位置
          */
@@ -13079,9 +14003,8 @@ declare namespace feng3d {
         dispose(): void;
         private _lightPicker;
         private _onGeometryChanged;
-        private _onMaterialChanged;
         protected _updateBounds(): void;
-        protected _onGetSelfBounds(event: Event<{
+        protected _onGetSelfBounds(event: feng3d.IEvent<{
             bounds: Box3[];
         }>): void;
     }
@@ -13331,17 +14254,10 @@ declare namespace feng3d {
          */
         boundsInvalid: Geometry;
     }
-    interface Geometry {
-        once<K extends keyof GeometryEventMap>(type: K, listener: (event: Event<GeometryEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof GeometryEventMap>(type: K, data?: GeometryEventMap[K], bubbles?: boolean): Event<GeometryEventMap[K]>;
-        has<K extends keyof GeometryEventMap>(type: K): boolean;
-        on<K extends keyof GeometryEventMap>(type: K, listener: (event: Event<GeometryEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof GeometryEventMap>(type?: K, listener?: (event: Event<GeometryEventMap[K]>) => any, thisObject?: any): void;
-    }
     /**
      * 几何体
      */
-    class Geometry extends AssetData {
+    class Geometry<T extends GeometryEventMap = GeometryEventMap> extends Feng3dObject<T> {
         private preview;
         name: string;
         /**
@@ -13528,7 +14444,8 @@ declare namespace feng3d {
         /**
          * 顶点索引缓冲
          */
-        indices: number[];
+        private get indicesData();
+        private set indicesData(value);
         /**
          * 属性数据列表
          */
@@ -13717,6 +14634,29 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    enum CameraClearFlags {
+        /**
+         * Clear with the skybox.
+         */
+        Skybox = 1,
+        /**
+         * Clear with a background color.
+         */
+        SolidColor = 2,
+        /**
+         * Clear only the depth buffer.
+         */
+        Depth = 3,
+        /**
+         * Don't clear anything.
+         */
+        Nothing = 4
+    }
+}
+declare namespace feng3d {
+    interface LensEventMap {
+        lensChanged: LensBase;
+    }
     /**
      * 摄像机镜头
      *
@@ -13727,7 +14667,12 @@ declare namespace feng3d {
      * GPU空间可视区域：立方体 [(-1, -1, -1), (1, 1, 1)]
      *
      */
-    abstract class LensBase extends Feng3dObject {
+    abstract class LensBase<T extends LensEventMap = LensEventMap> extends Feng3dObject<T> {
+        /**
+         * 摄像机投影类型
+         */
+        get projectionType(): Projection;
+        protected _projectionType: Projection;
         /**
          * 最近距离
          */
@@ -13827,7 +14772,6 @@ declare namespace feng3d {
 declare namespace feng3d {
     /**
      * 透视摄像机镜头
-
      */
     class PerspectiveLens extends LensBase {
         /**
@@ -13897,15 +14841,22 @@ declare namespace feng3d {
     class Camera extends Component {
         __class__: "feng3d.Camera";
         get single(): boolean;
-        projection: Projection;
+        get projection(): Projection;
+        set projection(v: Projection);
         /**
          * 镜头
          */
-        lens: LensBase;
+        get lens(): LensBase<LensEventMap>;
+        set lens(v: LensBase<LensEventMap>);
+        private _lens;
         /**
          * 场景投影矩阵，世界空间转投影空间
          */
         get viewProjection(): Matrix4x4;
+        /**
+         * 获取摄像机的截头锥体
+         */
+        get frustum(): Frustum;
         /**
          * 创建一个摄像机
          */
@@ -13941,15 +14892,12 @@ declare namespace feng3d {
         /**
          * 处理场景变换改变事件
          */
-        protected _onScenetransformChanged(): void;
+        protected invalidateViewProjection(): void;
         private _viewProjection;
         private _viewProjectionInvalid;
         private _backups;
-        /**
-         * 处理镜头变化事件
-         */
-        private _onLensChanged;
-        private _onProjectionChanged;
+        private _frustum;
+        private _frustumInvalid;
     }
     interface PrimitiveGameObject {
         Camera: GameObject;
@@ -14466,17 +15414,10 @@ declare namespace feng3d {
          */
         loadCompleted: any;
     }
-    interface Texture2D {
-        once<K extends keyof Texture2DEventMap>(type: K, listener: (event: Event<Texture2DEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof Texture2DEventMap>(type: K, data?: Texture2DEventMap[K], bubbles?: boolean): Event<Texture2DEventMap[K]>;
-        has<K extends keyof Texture2DEventMap>(type: K): boolean;
-        on<K extends keyof Texture2DEventMap>(type: K, listener: (event: Event<Texture2DEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof Texture2DEventMap>(type?: K, listener?: (event: Event<Texture2DEventMap[K]>) => any, thisObject?: any): void;
-    }
     /**
      * 2D纹理
      */
-    class Texture2D extends TextureInfo {
+    class Texture2D<T extends Texture2DEventMap = Texture2DEventMap> extends TextureInfo<T> {
         __class__: "feng3d.Texture2D";
         /**
          * 纹理类型
@@ -14531,7 +15472,7 @@ declare namespace feng3d {
          *
          * @param url 路径
          */
-        static fromUrl(url: string): Texture2D;
+        static fromUrl(url: string): Texture2D<Texture2DEventMap>;
     }
 }
 declare namespace feng3d {
@@ -14539,7 +15480,7 @@ declare namespace feng3d {
      * 2D纹理
      */
     class ImageTexture2D extends Texture2D {
-        image: HTMLImageElement;
+        imageSource: HTMLImageElement;
         private _imageChanged;
     }
 }
@@ -14581,18 +15522,11 @@ declare namespace feng3d {
          */
         loadCompleted: any;
     }
-    interface TextureCube {
-        once<K extends keyof TextureCubeEventMap>(type: K, listener: (event: Event<TextureCubeEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof TextureCubeEventMap>(type: K, data?: TextureCubeEventMap[K], bubbles?: boolean): Event<TextureCubeEventMap[K]>;
-        has<K extends keyof TextureCubeEventMap>(type: K): boolean;
-        on<K extends keyof TextureCubeEventMap>(type: K, listener: (event: Event<TextureCubeEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof TextureCubeEventMap>(type?: K, listener?: (event: Event<TextureCubeEventMap[K]>) => any, thisObject?: any): void;
-    }
     type TextureCubeImageName = "positive_x_url" | "positive_y_url" | "positive_z_url" | "negative_x_url" | "negative_y_url" | "negative_z_url";
     /**
      * 立方体纹理
      */
-    class TextureCube extends TextureInfo {
+    class TextureCube<T extends TextureCubeEventMap = TextureCubeEventMap> extends TextureInfo<T> {
         __class__: "feng3d.TextureCube";
         textureType: TextureType;
         assetType: AssetType;
@@ -14650,7 +15584,7 @@ declare namespace feng3d {
     /**
      * 材质
      */
-    class Material extends AssetData {
+    class Material extends Feng3dObject {
         __class__: "feng3d.Material";
         static create<K extends keyof UniformsTypes>(shaderName: K, uniforms?: gPartial<UniformsTypes[K]>, renderParams?: gPartial<RenderParams>): Material;
         init<K extends keyof UniformsTypes>(shaderName: K, uniforms?: gPartial<UniformsTypes[K]>, renderParams?: gPartial<RenderParams>): this;
@@ -14707,6 +15641,15 @@ declare namespace feng3d {
     }
 }
 declare namespace feng3d {
+    interface UniformsTypes {
+        skybox: SkyBoxUniforms;
+    }
+    class SkyBoxUniforms {
+        __class__: "feng3d.SkyBoxUniforms";
+        s_skyboxTexture: TextureCube<TextureCubeEventMap>;
+    }
+}
+declare namespace feng3d {
     /**
      * 雾模式
      */
@@ -14728,7 +15671,7 @@ declare namespace feng3d {
         /**
          * 漫反射纹理
          */
-        s_diffuse: Texture2D;
+        s_diffuse: Texture2D<Texture2DEventMap>;
         /**
          * 基本颜色
          */
@@ -14740,11 +15683,11 @@ declare namespace feng3d {
         /**
          * 法线纹理
          */
-        s_normal: Texture2D;
+        s_normal: Texture2D<Texture2DEventMap>;
         /**
          * 镜面反射光泽图
          */
-        s_specular: Texture2D;
+        s_specular: Texture2D<Texture2DEventMap>;
         /**
          * 镜面反射颜色
          */
@@ -14756,7 +15699,7 @@ declare namespace feng3d {
         /**
          * 环境纹理
          */
-        s_ambient: Texture2D;
+        s_ambient: Texture2D<Texture2DEventMap>;
         /**
          * 环境光颜色
          */
@@ -14764,7 +15707,7 @@ declare namespace feng3d {
         /**
          * 环境映射贴图
          */
-        s_envMap: TextureCube;
+        s_envMap: TextureCube<TextureCubeEventMap>;
         /**
          * 反射率
          */
@@ -14835,7 +15778,7 @@ declare namespace feng3d {
         /**
          * 纹理数据
          */
-        s_texture: Texture2D;
+        s_texture: Texture2D<Texture2DEventMap>;
     }
 }
 declare namespace feng3d {
@@ -15014,7 +15957,7 @@ declare namespace feng3d {
         private invalidRange;
     }
     interface PrimitiveGameObject {
-        "Point light": GameObject;
+        "Point Light": GameObject;
     }
 }
 declare namespace feng3d {
@@ -15049,7 +15992,7 @@ declare namespace feng3d {
         private _invalidAngle;
     }
     interface PrimitiveGameObject {
-        "Spot light": GameObject;
+        "Spot Light": GameObject;
     }
 }
 declare namespace feng3d {
@@ -15442,17 +16385,380 @@ declare namespace feng3d {
         u_size: number;
         u_distortionScale: number;
         u_waterColor: Color3;
-        s_normalSampler: Texture2D;
+        s_normalSampler: Texture2D<Texture2DEventMap>;
         /**
          * 镜面反射贴图
          */
-        s_mirrorSampler: Texture2D;
+        s_mirrorSampler: Texture2D<Texture2DEventMap>;
         u_textureMatrix: Matrix4x4;
         u_sunColor: Color3;
         u_sunDirection: Vector3;
     }
     interface DefaultMaterial {
         "Water-Material": Material;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 骨骼关节数据
+
+     */
+    class SkeletonJoint {
+        /** 父关节索引 （-1说明本身是总父结点，这个序号其实就是行号了，譬如上面”origin“结点的序号就是0，无父结点； "body"结点序号是1，父结点序号是0，也就是说父结点是”origin“）*/
+        parentIndex: number;
+        /** 关节名字 */
+        name: string;
+        /** 骨骼全局矩阵 */
+        matrix: Matrix4x4;
+        children: number[];
+        get invertMatrix(): Matrix4x4;
+        private _invertMatrix;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        SkeletonComponent: SkeletonComponent;
+    }
+    class SkeletonComponent extends Component {
+        __class__: "feng3d.SkeletonComponent";
+        /** 骨骼关节数据列表 */
+        joints: SkeletonJoint[];
+        /**
+         * 当前骨骼姿势的全局矩阵
+         * @see #globalPose
+         */
+        get globalMatrices(): Matrix4x4[];
+        private isInitJoints;
+        private jointGameobjects;
+        private jointGameObjectMap;
+        private _globalPropertiesInvalid;
+        private _jointsInvalid;
+        private _globalMatrixsInvalid;
+        private globalMatrixs;
+        private _globalMatrices;
+        initSkeleton(): void;
+        /**
+         * 更新骨骼全局变换矩阵
+         */
+        private updateGlobalProperties;
+        private invalidjoint;
+        private createSkeletonGameObject;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        SkinnedMeshRenderer: SkinnedMeshRenderer;
+    }
+    class SkinnedMeshRenderer extends Renderable {
+        __class__: "feng3d.SkinnedMeshRenderer";
+        get single(): boolean;
+        skinSkeleton: SkinSkeleton;
+        initMatrix: Matrix4x4;
+        /**
+         * 创建一个骨骼动画类
+         */
+        init(): void;
+        beforeRender(renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
+        /**
+         * 销毁
+         */
+        dispose(): void;
+        /**
+         * 缓存，通过寻找父结点获得
+         */
+        private cacheSkeletonComponent;
+        private cacheU_skeletonGlobalMatriices;
+        private get u_modelMatrix();
+        private get u_ITModelMatrix();
+        private get u_skeletonGlobalMatriices();
+    }
+    class SkinSkeleton {
+        /**
+         * [在整个骨架中的编号，骨骼名称]
+         */
+        joints: [number, string][];
+        /**
+         * 当前模型包含骨骼数量
+         */
+        numJoint: number;
+    }
+    class SkinSkeletonTemp extends SkinSkeleton {
+        /**
+         * temp 解析时临时数据
+         */
+        cache_map: {
+            [oldjointid: number]: number;
+        };
+        resetJointIndices(jointIndices: number[], skeleton: SkeletonComponent): void;
+    }
+}
+declare namespace feng3d {
+    class PropertyClip {
+        /**
+         * 属性路径
+         */
+        path: PropertyClipPath;
+        propertyName: string;
+        type: "Number" | "Vector3" | "Quaternion";
+        propertyValues: [number, number[]][];
+        private _cacheValues;
+        private _propertyValues;
+        getValue(cliptime: number, fps: number): any;
+        private interpolation;
+        private getpropertyValue;
+        cacheIndex: number;
+    }
+    /**
+     * [time:number,value:number | Vector3 | Quaternion]
+     */
+    type ClipPropertyType = number | Vector3 | Quaternion;
+    type PropertyClipPath = [PropertyClipPathItemType, string][];
+    enum PropertyClipPathItemType {
+        GameObject = 0,
+        Component = 1
+    }
+}
+declare namespace feng3d {
+    class AnimationClip extends Feng3dObject {
+        readonly assetType = AssetType.anim;
+        name: string;
+        /**
+         * 动画时长，单位ms
+         */
+        length: number;
+        loop: boolean;
+        propertyClips: PropertyClip[];
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Animation: Animation;
+    }
+    class Animation extends Behaviour {
+        animation: AnimationClip;
+        animations: AnimationClip[];
+        /**
+         * 动画事件，单位为ms
+         */
+        time: number;
+        isplaying: boolean;
+        /**
+         * 播放速度
+         */
+        playspeed: number;
+        /**
+         * 动作名称
+         */
+        get clipName(): string;
+        get frame(): number;
+        update(interval: number): void;
+        dispose(): void;
+        private num;
+        private _fps;
+        private _objectCache;
+        private _updateAni;
+        private getPropertyHost;
+        private _onAnimationChanged;
+        private _onTimeChanged;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 鼠标事件管理
+     */
+    class Mouse3DManager {
+        mouseInput: MouseInput;
+        get selectedGameObject(): GameObject;
+        set selectedGameObject(v: GameObject);
+        /**
+         * 视窗，鼠标在该矩形内时为有效事件
+         */
+        viewport: Lazy<Rectangle>;
+        /**
+         * 拾取
+         * @param scene 场景
+         * @param camera 摄像机
+         */
+        pick(view: View, scene: Scene, camera: Camera): GameObject;
+        constructor(mouseInput: MouseInput, viewport?: Lazy<Rectangle>);
+        private _selectedGameObject;
+        private _mouseEventTypes;
+        /**
+         * 鼠标按下时的对象，用于与鼠标弹起时对象做对比，如果相同触发click
+         */
+        private preMouseDownGameObject;
+        /**
+         * 统计处理click次数，判断是否达到dblclick
+         */
+        private gameObjectClickNum;
+        private _mouseInputChanged;
+        private dispatch;
+        /**
+         * 监听鼠标事件收集事件类型
+         */
+        private onMouseEvent;
+        /**
+         * 设置选中对象
+         */
+        private setSelectedGameObject;
+    }
+    /**
+     * 鼠标事件输入
+     */
+    class MouseInput<T = MouseEventMap> extends feng3d.EventEmitter<T> {
+        /**
+         * 是否启动
+         */
+        enable: boolean;
+        /**
+         * 是否捕获鼠标移动
+         */
+        catchMouseMove: boolean;
+        /**
+         * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
+         * @param type                      事件的类型。类型区分大小写。
+         * @param data                      事件携带的自定义数据。
+         * @param bubbles                   表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
+         */
+        emit<K extends keyof T & string>(type: K, data?: T[K], bubbles?: boolean): IEvent<T[K]>;
+        /**
+         * 派发事件
+         * @param event   事件对象
+         */
+        emitEvent<K extends keyof T & string>(event: feng3d.IEvent<T[K]>): IEvent<T[K]>;
+    }
+    /**
+     * Window鼠标事件输入
+     */
+    class WindowMouseInput extends MouseInput {
+        constructor();
+        /**
+         * 监听鼠标事件收集事件类型
+         */
+        private onMouseEvent;
+    }
+    interface MouseEventMap {
+        /**
+         * 鼠标移出对象
+         */
+        mouseout: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标移入对象
+         */
+        mouseover: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标在对象上移动
+         */
+        mousemove: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标左键按下
+         */
+        mousedown: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标左键弹起
+         */
+        mouseup: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 单击
+         */
+        click: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标中键按下
+         */
+        middlemousedown: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标中键弹起
+         */
+        middlemouseup: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标中键单击
+         */
+        middleclick: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标右键按下
+         */
+        rightmousedown: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标右键弹起
+         */
+        rightmouseup: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标右键单击
+         */
+        rightclick: {
+            clientX: number;
+            clientY: number;
+        };
+        /**
+         * 鼠标双击
+         */
+        dblclick: {
+            clientX: number;
+            clientY: number;
+        };
+    }
+}
+declare namespace feng3d {
+    interface MixinsGlobalEvents {
+        /**
+         * shader资源发生变化
+         */
+        'asset.shaderChanged': any;
+        /**
+         * 脚本发生变化
+         */
+        'asset.scriptChanged': any;
+        /**
+         * 图片资源发生变化
+         */
+        'asset.imageAssetChanged': {
+            url: string;
+        };
+        /**
+         * 解析出资源
+         */
+        'asset.parsed': any;
+        /**
+         * 删除文件
+         */
+        'fs.delete': string;
+        /**
+         * 写文件
+         */
+        'fs.write': string;
     }
 }
 declare namespace feng3d {
@@ -15466,7 +16772,7 @@ declare namespace feng3d {
         /**
          * 高度图路径
          */
-        heightMap: Texture2D;
+        heightMap: Texture2D<Texture2DEventMap>;
         /**
          * 地形宽度
          */
@@ -15531,10 +16837,10 @@ declare namespace feng3d {
     }
     class TerrainUniforms extends StandardUniforms {
         __class__: "feng3d.TerrainUniforms";
-        s_splatTexture1: Texture2D;
-        s_splatTexture2: Texture2D;
-        s_splatTexture3: Texture2D;
-        s_blendTexture: Texture2D;
+        s_splatTexture1: Texture2D<Texture2DEventMap>;
+        s_splatTexture2: Texture2D<Texture2DEventMap>;
+        s_splatTexture3: Texture2D<Texture2DEventMap>;
+        s_blendTexture: Texture2D<Texture2DEventMap>;
         u_splatRepeats: Vector4;
     }
     interface DefaultMaterial {
@@ -15545,9 +16851,9 @@ declare namespace feng3d {
     /**
      * 地形材质
      */
-    class TerrainMergeMethod extends EventDispatcher {
-        splatMergeTexture: Texture2D;
-        blendTexture: Texture2D;
+    class TerrainMergeMethod extends EventEmitter {
+        splatMergeTexture: Texture2D<Texture2DEventMap>;
+        blendTexture: Texture2D<Texture2DEventMap>;
         splatRepeats: Vector4;
         /**
          * 构建材质
@@ -15599,7 +16905,7 @@ declare namespace feng3d {
          */
         assign: TerrainData;
         geometry: TerrainGeometry;
-        material: Material;
+        constructor();
     }
     interface PrimitiveGameObject {
         Terrain: GameObject;
@@ -15713,7 +17019,7 @@ declare namespace feng3d {
         /**
          * 粒子贴图
          */
-        _MainTex: Texture2D;
+        _MainTex: Texture2D<Texture2DEventMap>;
         /**
          * 粒子贴图使用的UV变换
          */
@@ -15736,7 +17042,7 @@ declare namespace feng3d {
         /**
          * 粒子贴图
          */
-        _MainTex: Texture2D;
+        _MainTex: Texture2D<Texture2DEventMap>;
         /**
          * 粒子贴图使用的UV变换
          */
@@ -16965,7 +18271,7 @@ declare namespace feng3d {
     /**
      * 粒子模块
      */
-    class ParticleModule extends EventDispatcher {
+    class ParticleModule extends EventEmitter {
         /**
          * 是否开启
          */
@@ -18683,200 +19989,6 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 骨骼关节数据
-
-     */
-    class SkeletonJoint {
-        /** 父关节索引 （-1说明本身是总父结点，这个序号其实就是行号了，譬如上面”origin“结点的序号就是0，无父结点； "body"结点序号是1，父结点序号是0，也就是说父结点是”origin“）*/
-        parentIndex: number;
-        /** 关节名字 */
-        name: string;
-        /** 骨骼全局矩阵 */
-        matrix: Matrix4x4;
-        children: number[];
-        get invertMatrix(): Matrix4x4;
-        private _invertMatrix;
-    }
-}
-declare namespace feng3d {
-    interface ComponentMap {
-        SkeletonComponent: SkeletonComponent;
-    }
-    class SkeletonComponent extends Component {
-        __class__: "feng3d.SkeletonComponent";
-        /** 骨骼关节数据列表 */
-        joints: SkeletonJoint[];
-        /**
-         * 当前骨骼姿势的全局矩阵
-         * @see #globalPose
-         */
-        get globalMatrices(): Matrix4x4[];
-        private isInitJoints;
-        private jointGameobjects;
-        private jointGameObjectMap;
-        private _globalPropertiesInvalid;
-        private _jointsInvalid;
-        private _globalMatrixsInvalid;
-        private globalMatrixs;
-        private _globalMatrices;
-        initSkeleton(): void;
-        /**
-         * 更新骨骼全局变换矩阵
-         */
-        private updateGlobalProperties;
-        private invalidjoint;
-        private createSkeletonGameObject;
-    }
-}
-declare namespace feng3d {
-    interface ComponentMap {
-        SkinnedMeshRenderer: SkinnedMeshRenderer;
-    }
-    class SkinnedMeshRenderer extends Renderable {
-        __class__: "feng3d.SkinnedMeshRenderer";
-        get single(): boolean;
-        skinSkeleton: SkinSkeleton;
-        initMatrix: Matrix4x4;
-        /**
-         * 创建一个骨骼动画类
-         */
-        init(): void;
-        beforeRender(renderAtomic: RenderAtomic, scene: Scene, camera: Camera): void;
-        /**
-         * 销毁
-         */
-        dispose(): void;
-        /**
-         * 缓存，通过寻找父结点获得
-         */
-        private cacheSkeletonComponent;
-        private cacheU_skeletonGlobalMatriices;
-        private get u_modelMatrix();
-        private get u_ITModelMatrix();
-        private get u_skeletonGlobalMatriices();
-    }
-    class SkinSkeleton {
-        /**
-         * [在整个骨架中的编号，骨骼名称]
-         */
-        joints: [number, string][];
-        /**
-         * 当前模型包含骨骼数量
-         */
-        numJoint: number;
-    }
-    class SkinSkeletonTemp extends SkinSkeleton {
-        /**
-         * temp 解析时临时数据
-         */
-        cache_map: {
-            [oldjointid: number]: number;
-        };
-        resetJointIndices(jointIndices: number[], skeleton: SkeletonComponent): void;
-    }
-}
-declare namespace feng3d {
-    class PropertyClip {
-        /**
-         * 属性路径
-         */
-        path: PropertyClipPath;
-        propertyName: string;
-        type: "Number" | "Vector3" | "Quaternion";
-        propertyValues: [number, number[]][];
-        private _cacheValues;
-        private _propertyValues;
-        getValue(cliptime: number, fps: number): any;
-        private interpolation;
-        private getpropertyValue;
-        cacheIndex: number;
-    }
-    /**
-     * [time:number,value:number | Vector3 | Quaternion]
-     */
-    type ClipPropertyType = number | Vector3 | Quaternion;
-    type PropertyClipPath = [PropertyClipPathItemType, string][];
-    enum PropertyClipPathItemType {
-        GameObject = 0,
-        Component = 1
-    }
-}
-declare namespace feng3d {
-    class AnimationClip extends AssetData {
-        readonly assetType = AssetType.anim;
-        name: string;
-        /**
-         * 动画时长，单位ms
-         */
-        length: number;
-        loop: boolean;
-        propertyClips: PropertyClip[];
-    }
-}
-declare namespace feng3d {
-    interface ComponentMap {
-        Animation: Animation;
-    }
-    class Animation extends Behaviour {
-        animation: AnimationClip;
-        animations: AnimationClip[];
-        /**
-         * 动画事件，单位为ms
-         */
-        time: number;
-        isplaying: boolean;
-        /**
-         * 播放速度
-         */
-        playspeed: number;
-        /**
-         * 动作名称
-         */
-        get clipName(): string;
-        get frame(): number;
-        update(interval: number): void;
-        dispose(): void;
-        private num;
-        private _fps;
-        private _objectCache;
-        private _updateAni;
-        private getPropertyHost;
-        private _onAnimationChanged;
-        private _onTimeChanged;
-    }
-}
-declare namespace feng3d {
-    /**
-     * 文件夹资源
-     */
-    class FolderAsset extends FileAsset {
-        static extenson: string;
-        assetType: AssetType;
-        /**
-         * 子资源列表
-         */
-        get childrenAssets(): FileAsset[];
-        initAsset(): void;
-        /**
-         * 删除资源
-         *
-         * @param callback 完成回调
-         */
-        delete(callback?: (err: Error) => void): void;
-        /**
-         * 保存文件
-         * @param callback 完成回调
-         */
-        saveFile(callback?: (err: Error) => void): void;
-        /**
-         * 读取文件
-         * @param callback 完成回调
-         */
-        readFile(callback?: (err: Error) => void): void;
-    }
-}
-declare namespace feng3d {
-    /**
      * 二进制 资源
      */
     class ArrayBufferAsset extends FileAsset {
@@ -18900,10 +20012,13 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 字符串 资源
+     * 文本 资源
      */
-    abstract class StringAsset extends FileAsset {
+    class TextAsset extends FileAsset {
+        static extenson: string;
+        assetType: AssetType;
         textContent: string;
+        initAsset(): void;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -18911,6 +20026,9 @@ declare namespace feng3d {
          * @param callback 完成回调
          */
         readFile(callback?: (err: Error) => void): void;
+    }
+    interface AssetTypeClassMap {
+        'txt': new () => TextAsset;
     }
 }
 declare namespace feng3d {
@@ -18921,7 +20039,7 @@ declare namespace feng3d {
         /**
          * 资源对象
          */
-        data: AssetData;
+        data: any;
         saveFile(callback?: (err: Error) => void): void;
         /**
          * 读取文件
@@ -18937,7 +20055,7 @@ declare namespace feng3d {
     /**
      * 脚本资源
      */
-    class ScriptAsset extends StringAsset {
+    class ScriptAsset extends TextAsset {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
@@ -18956,6 +20074,9 @@ declare namespace feng3d {
         private _invalidate;
         private _update;
     }
+    interface AssetTypeClassMap {
+        'script': new () => ScriptAsset;
+    }
 }
 declare namespace feng3d {
     /**
@@ -18965,35 +20086,36 @@ declare namespace feng3d {
         static extenson: string;
         assetType: AssetType;
     }
+    interface AssetTypeClassMap {
+        'shader': new () => ShaderAsset;
+    }
 }
 declare namespace feng3d {
     /**
      * JS资源
      */
-    class JSAsset extends StringAsset {
+    class JSAsset extends TextAsset {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
         initAsset(): void;
+    }
+    interface AssetTypeClassMap {
+        'js': new () => JSAsset;
     }
 }
 declare namespace feng3d {
     /**
      * JSON 资源
      */
-    class JsonAsset extends StringAsset {
+    class JsonAsset extends TextAsset {
         static extenson: string;
         assetType: AssetType;
         textContent: string;
         initAsset(): void;
     }
-}
-declare namespace feng3d {
-    class TextAsset extends StringAsset {
-        static extenson: string;
-        assetType: AssetType;
-        textContent: string;
-        initAsset(): void;
+    interface AssetTypeClassMap {
+        'json': new () => JsonAsset;
     }
 }
 declare namespace feng3d {
@@ -19009,7 +20131,7 @@ declare namespace feng3d {
      * 纹理文件
      */
     class TextureAsset extends FileAsset {
-        static extenson: ".jpg" | ".png" | ".jpeg" | ".gif";
+        static extenson: '.jpg' | '.png' | '.jpeg' | '.gif';
         /**
          * 材质
          */
@@ -19059,6 +20181,9 @@ declare namespace feng3d {
         assetType: AssetType;
         initAsset(): void;
     }
+    interface AssetTypeClassMap {
+        'texturecube': new () => TextureCubeAsset;
+    }
 }
 declare namespace feng3d {
     /**
@@ -19073,6 +20198,9 @@ declare namespace feng3d {
         assetType: AssetType;
         initAsset(): void;
     }
+    interface AssetTypeClassMap {
+        'geometry': new () => GeometryAsset;
+    }
 }
 declare namespace feng3d {
     /**
@@ -19086,6 +20214,9 @@ declare namespace feng3d {
         data: Material;
         assetType: AssetType;
         initAsset(): void;
+    }
+    interface AssetTypeClassMap {
+        'material': new () => MaterialAsset;
     }
 }
 declare namespace feng3d {
@@ -19820,177 +20951,902 @@ declare namespace feng3d {
 }
 declare namespace feng3d {
     /**
-     * 鼠标事件管理
+     * UIRenderMode for the Canvas.
+     *
+     * Canvas的渲染模式
      */
-    class Mouse3DManager {
-        mouseInput: MouseInput;
-        get selectedGameObject(): GameObject;
-        set selectedGameObject(v: GameObject);
+    enum UIRenderMode {
         /**
-         * 视窗，鼠标在该矩形内时为有效事件
+         * Render at the end of the Scene using a 2D Canvas.
+         *
+         * 在场景的最后使用2D画布渲染。
          */
-        viewport: Lazy<Rectangle>;
+        ScreenSpaceOverlay = 0,
         /**
-         * 拾取
-         * @param scene 场景
-         * @param camera 摄像机
+         * Render using the Camera configured on the Canvas.
+         *
+         * 使用在画布上配置的摄像机进行渲染。
          */
-        pick(view: View, scene: Scene, camera: Camera): GameObject;
-        constructor(mouseInput: MouseInput, viewport?: Lazy<Rectangle>);
-        private _selectedGameObject;
-        private _mouseEventTypes;
+        ScreenSpaceCamera = 1,
         /**
-         * 鼠标按下时的对象，用于与鼠标弹起时对象做对比，如果相同触发click
+         * Render using any Camera in the Scene that can render the layer.
+         *
+         * 使用场景中任何可以渲染图层的相机渲染。
          */
-        private preMouseDownGameObject;
-        /**
-         * 统计处理click次数，判断是否达到dblclick
-         */
-        private gameObjectClickNum;
-        private _mouseInputChanged;
-        private dispatch;
-        /**
-         * 监听鼠标事件收集事件类型
-         */
-        private onMouseEvent;
-        /**
-         * 设置选中对象
-         */
-        private setSelectedGameObject;
+        WorldSpace = 2
     }
-    interface MouseInput {
-        once<K extends keyof MouseEventMap>(type: K, listener: (event: Event<MouseEventMap[K]>) => void, thisObject?: any, priority?: number): void;
-        has<K extends keyof MouseEventMap>(type: K): boolean;
-        on<K extends keyof MouseEventMap>(type: K, listener: (event: Event<MouseEventMap[K]>) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof MouseEventMap>(type?: K, listener?: (event: Event<MouseEventMap[K]>) => any, thisObject?: any): void;
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Transform2D: Transform2D;
     }
     /**
-     * 鼠标事件输入
+     * 2D变换
+     *
+     * 提供了比Transform更加适用于2D元素的API
+     *
+     * 通过修改Transform的数值实现
      */
-    class MouseInput extends EventDispatcher {
+    class Transform2D extends feng3d.Component {
+        get single(): boolean;
+        transformLayout: feng3d.TransformLayout;
         /**
-         * 是否启动
+         * 描述了2D对象在未经过变换前的位置与尺寸
          */
-        enable: boolean;
+        get rect(): Vector4;
+        private _rect;
         /**
-         * 是否捕获鼠标移动
+         * 位移
          */
-        catchMouseMove: boolean;
+        get position(): Vector2;
+        set position(v: Vector2);
+        private readonly _position;
         /**
-         * 将事件调度到事件流中. 事件目标是对其调用 dispatchEvent() 方法的 IEvent 对象。
-         * @param type                      事件的类型。类型区分大小写。
-         * @param data                      事件携带的自定义数据。
-         * @param bubbles                   表示事件是否为冒泡事件。如果事件可以冒泡，则此值为 true；否则为 false。
+         * 尺寸，宽高。
          */
-        dispatch(type: string, data?: any, bubbles?: boolean): Event<any>;
+        get size(): Vector2;
+        set size(v: Vector2);
+        private _size;
         /**
-         * 派发事件
-         * @param event   事件对象
+         * 与最小最大锚点形成的边框的left、right、top、bottom距离。当 anchorMin.x != anchorMax.x 时对 layout.x layout.y 赋值生效，当 anchorMin.y != anchorMax.y 时对 layout.z layout.w 赋值生效，否则赋值无效，自动被覆盖。
          */
-        dispatchEvent(event: Event<any>): boolean;
-    }
-    /**
-     * Window鼠标事件输入
-     */
-    class WindowMouseInput extends MouseInput {
+        get layout(): Vector4;
+        set layout(v: Vector4);
+        private _layout;
+        /**
+         * 最小锚点，父Transform2D中左上角锚定的规范化位置。
+         */
+        get anchorMin(): Vector2;
+        set anchorMin(v: Vector2);
+        private _anchorMin;
+        /**
+         * 最大锚点，父Transform2D中左上角锚定的规范化位置。
+         */
+        get anchorMax(): Vector2;
+        set anchorMax(v: Vector2);
+        private _anchorMax;
+        /**
+         * The normalized position in this RectTransform that it rotates around.
+         */
+        get pivot(): Vector2;
+        set pivot(v: Vector2);
+        private _pivot;
+        /**
+         * 旋转
+         */
+        get rotation(): number;
+        set rotation(v: number);
+        private _rotation;
+        /**
+         * 缩放
+         */
+        get scale(): Vector2;
+        set scale(v: Vector2);
+        private readonly _scale;
+        /**
+         * 创建一个实体，该类为虚类
+         */
         constructor();
-        /**
-         * 监听鼠标事件收集事件类型
-         */
-        private onMouseEvent;
+        init(): void;
+        private _onAddComponent;
+        private _onRemovedComponent;
+        private _onTransformLayoutChanged;
+        beforeRender(renderAtomic: feng3d.RenderAtomic, scene: feng3d.Scene, camera: feng3d.Camera): void;
     }
-    interface MouseEventMap {
+    interface GameObject {
         /**
-         * 鼠标移出对象
+         * 游戏对象上的2D变换。
          */
-        mouseout: {
-            clientX: number;
-            clientY: number;
+        transform2D: Transform2D;
+    }
+    interface Component {
+        /**
+         * 游戏对象上的2D变换。
+         */
+        transform2D: Transform2D;
+    }
+}
+declare namespace feng3d {
+    /**
+     * UI几何体
+     */
+    class UIGeometry extends feng3d.Geometry {
+        __class__: "UIGeometry";
+        constructor();
+    }
+    interface GeometryTypes {
+        UIGeometry: UIGeometry;
+    }
+    interface DefaultGeometry {
+        "Default-UIGeometry": UIGeometry;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        CanvasRenderer: CanvasRenderer;
+    }
+    /**
+     * 可在画布上渲染组件，使得拥有该组件的GameObject可以在画布上渲染。
+     */
+    class CanvasRenderer extends feng3d.Renderable {
+        readonly renderAtomic: RenderAtomic;
+        geometry: UIGeometry;
+        material: Material;
+        /**
+         * 与世界空间射线相交
+         *
+         * @param worldRay 世界空间射线
+         *
+         * @return 相交信息
+         */
+        worldRayIntersection(worldRay: feng3d.Ray3): PickingCollisionVO;
+        protected _updateBounds(): void;
+        /**
+         * 渲染
+         */
+        static draw(view: feng3d.View): void;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Canvas: Canvas;
+    }
+    /**
+     * Element that can be used for screen rendering.
+     *
+     * 能够被用于屏幕渲染的元素
+     */
+    class Canvas extends feng3d.Behaviour {
+        /**
+         * Is the Canvas in World or Overlay mode?
+         *
+         * 画布是在世界或覆盖模式?
+         */
+        renderMode: UIRenderMode;
+        /**
+         * 获取鼠标射线（与鼠标重叠的摄像机射线）
+         */
+        mouseRay: Ray3;
+        /**
+         * 投影矩阵
+         *
+         * 渲染前自动更新
+         */
+        projection: Matrix4x4;
+        /**
+         * 最近距离
+         */
+        near: number;
+        /**
+         * 最远距离
+         */
+        far: number;
+        init(): void;
+        /**
+         * 更新布局
+         *
+         * @param width 画布宽度
+         * @param height 画布高度
+         */
+        layout(width: number, height: number): void;
+        /**
+         * 计算鼠标射线
+         *
+         * @param view
+         */
+        calcMouseRay3D(view: feng3d.View): void;
+    }
+    interface PrimitiveGameObject {
+        Canvas: GameObject;
+    }
+}
+declare namespace feng3d {
+    class UIUniforms {
+        __class__: "feng3d.ImageUniforms";
+        /**
+         * UI几何体尺寸，在shader中进行对几何体缩放。
+         */
+        u_rect: Vector4;
+        /**
+         * 颜色
+         */
+        u_color: Color4;
+        /**
+         * 纹理数据
+         */
+        s_texture: Texture2D<Texture2DEventMap>;
+        /**
+         * 控制图片的显示区域。
+         */
+        u_uvRect: Vector4;
+    }
+    interface UniformsTypes {
+        ui: UIUniforms;
+    }
+    interface Uniforms extends UIUniforms {
+    }
+    interface DefaultMaterial {
+        "Default-UIMaterial": Material;
+    }
+}
+declare namespace feng3d {
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Rect: Rect;
+    }
+    /**
+     * 矩形纯色组件
+     *
+     * 用于填充UI中背景等颜色。
+     */
+    class Rect extends feng3d.Component {
+        /**
+         * 填充颜色。
+         */
+        color: Color4;
+        beforeRender(renderAtomic: feng3d.RenderAtomic, scene: feng3d.Scene, camera: feng3d.Camera): void;
+    }
+    interface PrimitiveGameObject {
+        Rect: GameObject;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Image: Image;
+    }
+    /**
+     * 图片组件
+     *
+     * 用于显示图片
+     */
+    class Image extends feng3d.Component {
+        /**
+         * The source texture of the Image element.
+         *
+         * 图像元素的源纹理。
+         */
+        image: Texture2D<Texture2DEventMap>;
+        /**
+         * Tinting color for this Image.
+         *
+         * 为该图像着色。
+         */
+        color: Color4;
+        /**
+         * 使图片显示实际尺寸
+         */
+        setNativeSize(): void;
+        beforeRender(renderAtomic: feng3d.RenderAtomic, scene: feng3d.Scene, camera: feng3d.Camera): void;
+    }
+    interface PrimitiveGameObject {
+        Image: GameObject;
+    }
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Button: Button;
+    }
+    /**
+     * 按钮状态
+     */
+    enum ButtonState {
+        /**
+         * 弹起状态，默认状态。
+         */
+        up = "up",
+        /**
+         * 鼠标在按钮上状态。
+         */
+        over = "over",
+        /**
+         * 鼠标按下状态。
+         */
+        down = "down",
+        /**
+         * 选中时弹起状态。
+         */
+        selected_up = "selected_up",
+        /**
+         * 选中时鼠标在按钮上状态。
+         */
+        selected_over = "selected_over",
+        /**
+         * 选中时鼠标按下状态。
+         */
+        selected_down = "selected_down",
+        /**
+         * 禁用状态。
+         */
+        disabled = "disabled"
+    }
+    /**
+     * 按钮
+     */
+    class Button extends feng3d.Behaviour {
+        /**
+         * 按钮所处状态。
+         */
+        state: ButtonState;
+        /**
+         * 所有状态数据，每一个状态数据中记录了子对象的当前数据。
+         */
+        allStateData: {};
+        private _stateInvalid;
+        /**
+         * 保存当前状态，例如在编辑器中编辑完按钮某一状态后调用该方法进行保存当前状态数据。
+         */
+        saveState(): void;
+        private _onStateChanged;
+        /**
+         * 每帧执行
+         */
+        update(interval?: number): void;
+        /**
+         * 更新状态
+         */
+        private _updateState;
+    }
+    interface PrimitiveGameObject {
+        Button: GameObject;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 绘制文本
+     *
+     * @param canvas 画布
+     * @param _text 文本
+     * @param style 文本样式
+     * @param resolution 分辨率
+     */
+    function drawText(canvas: HTMLCanvasElement, _text: string, style: TextStyle, resolution?: number): HTMLCanvasElement;
+}
+declare namespace feng3d {
+    /**
+     * 文本上渐变方向。
+     */
+    enum TEXT_GRADIENT {
+        /**
+         * 纵向梯度。
+         */
+        LINEAR_VERTICAL = 0,
+        /**
+         * 横向梯度。
+         */
+        LINEAR_HORIZONTAL = 1
+    }
+    /**
+     * 通用字体。
+     */
+    enum FontFamily {
+        'Arial' = "Arial",
+        'serif' = "serif",
+        'sans-serif' = "sans-serif",
+        'monospace' = "monospace",
+        'cursive' = "cursive",
+        'fantasy' = "fantasy",
+        'system-ui' = "system-ui",
+        '宋体' = "\u5B8B\u4F53"
+    }
+    /**
+     * 字体样式。
+     */
+    enum FontStyle {
+        'normal' = "normal",
+        'italic' = "italic",
+        'oblique' = "oblique"
+    }
+    /**
+     * 字体变体。
+     */
+    enum FontVariant {
+        'normal' = "normal",
+        'small-caps' = "small-caps"
+    }
+    enum FontWeight {
+        'normal' = "normal",
+        'bold' = "bold",
+        'bolder' = "bolder",
+        'lighter' = "lighter"
+    }
+    /**
+     * 设置创建的角的类型，它可以解决带尖刺的文本问题。
+     */
+    enum CanvasLineJoin {
+        "round" = "round",
+        "bevel" = "bevel",
+        "miter" = "miter"
+    }
+    /**
+     * 画布文本基线
+     */
+    enum CanvasTextBaseline {
+        "top" = "top",
+        "hanging" = "hanging",
+        "middle" = "middle",
+        "alphabetic" = "alphabetic",
+        "ideographic" = "ideographic",
+        "bottom" = "bottom"
+    }
+    /**
+     * 文本对齐方式
+     */
+    enum TextAlign {
+        'left' = "left",
+        'center' = "center",
+        'right' = "right"
+    }
+    enum WhiteSpaceHandle {
+        "normal" = "normal",
+        'pre' = "pre",
+        'pre-line' = "pre-line"
+    }
+    interface TextStyleEventMap {
+        /**
+         * 发生变化
+         */
+        changed: any;
+    }
+    /**
+     * 文本样式
+     *
+     * 从pixi.js移植
+     *
+     * @see https://github.com/pixijs/pixi.js/blob/dev/packages/text/src/TextStyle.js
+     */
+    class TextStyle<T extends TextStyleEventMap = TextStyleEventMap> extends feng3d.EventEmitter<T> {
+        /**
+         * @param style 样式参数
+         */
+        constructor(style?: Partial<TextStyle>);
+        /**
+         * 字体。
+         */
+        fontFamily: FontFamily;
+        /**
+         * 字体尺寸。
+         */
+        fontSize: number;
+        /**
+         * 字体样式。
+         */
+        fontStyle: FontStyle;
+        /**
+         * 字体变体。
+         */
+        fontVariant: FontVariant;
+        /**
+         * 字型粗细。
+         */
+        fontWeight: FontWeight;
+        /**
+         * 用于填充文本的颜色。
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle
+         */
+        fill: Color4;
+        /**
+         * 如果填充是一个创建渐变的颜色数组，这可以改变渐变的方向。
+         */
+        fillGradientType: TEXT_GRADIENT;
+        /**
+         * 如果填充是一个颜色数组来创建渐变，这个数组可以设置停止点
+         */
+        fillGradientStops: number[];
+        /**
+         * 将用于文本笔划的画布填充样式。
+         */
+        stroke: Color4;
+        /**
+         * 一个表示笔画厚度的数字。
+         */
+        strokeThickness: number;
+        /**
+         * lineJoin属性设置创建的角的类型，它可以解决带尖刺的文本问题。
+         */
+        lineJoin: CanvasLineJoin;
+        /**
+         * 当使用“miter”lineJoin模式时，miter限制使用。这可以减少或增加呈现文本的尖锐性。
+         */
+        miterLimit: number;
+        /**
+         * 字母之间的间距，默认为0
+         */
+        letterSpacing: number;
+        /**
+         * 呈现文本的基线。
+         */
+        textBaseline: CanvasTextBaseline;
+        /**
+         * 是否为文本设置一个投影。
+         */
+        dropShadow: boolean;
+        /**
+         * 投影颜色。
+         */
+        dropShadowColor: Color4;
+        /**
+         * 投影角度。
+         */
+        dropShadowAngle: number;
+        /**
+         * 阴影模糊半径。
+         */
+        dropShadowBlur: number;
+        /**
+         * 投影距离。
+         */
+        dropShadowDistance: number;
+        /**
+         * 是否应使用自动换行。
+         */
+        wordWrap: boolean;
+        /**
+         * 能否把单词分多行。
+         */
+        breakWords: boolean;
+        /**
+         * 多行文本对齐方式。
+         */
+        align: TextAlign;
+        /**
+         * 如何处理换行与空格。
+         * Default is 'pre' (preserve, preserve).
+         *
+         *  value       | New lines     |   Spaces
+         *  ---         | ---           |   ---
+         * 'normal'     | Collapse      |   Collapse
+         * 'pre'        | Preserve      |   Preserve
+         * 'pre-line'   | Preserve      |   Collapse
+         */
+        whiteSpace: WhiteSpaceHandle;
+        /**
+         * 文本的换行宽度。
+         */
+        wordWrapWidth: number;
+        /**
+         * 行高。
+         */
+        lineHeight: number;
+        /**
+         * 行距。
+         */
+        leading: number;
+        /**
+         * 内边距，用于文字被裁减问题。
+         */
+        padding: number;
+        /**
+         * 是否修剪透明边界。
+         */
+        trim: boolean;
+        /**
+         * 使数据失效
+         */
+        invalidate(): void;
+        /**
+         *
+         * 生成用于' TextMetrics.measureFont() '的字体样式字符串。
+         */
+        toFontString(): string;
+    }
+}
+declare namespace feng3d {
+    /**
+     * 文本度量
+     *
+     * 用于度量指定样式的文本的宽度。
+     *
+     * 从pixi.js移植
+     *
+     * @see https://github.com/pixijs/pixi.js/blob/dev/packages/text/src/TextMetrics.js
+     */
+    export class TextMetrics {
+        /**
+         * 被测量的文本。
+         */
+        text: string;
+        /**
+         * 被测量的样式。
+         */
+        style: TextStyle;
+        /**
+         * 测量出的宽度。
+         */
+        width: number;
+        /**
+         * 测量出的高度。
+         */
+        height: number;
+        /**
+         * 根据样式分割成的多行文本。
+         */
+        lines: string[];
+        /**
+         * An array of the line widths for each line matched to `lines`
+         */
+        lineWidths: number[];
+        /**
+         * The measured line height for this style
+         */
+        lineHeight: number;
+        /**
+         * The maximum line width for all measured lines
+         */
+        maxLineWidth: number;
+        /**
+         * The font properties object from TextMetrics.measureFont
+         */
+        fontProperties: IFontMetrics;
+        /**
+         * Cached canvas element for measuring text
+         */
+        static _canvas: HTMLCanvasElement;
+        /**
+         * Cache for context to use.
+         */
+        static _context: CanvasRenderingContext2D;
+        /**
+         * Cache of {@see PIXI.TextMetrics.FontMetrics} objects.
+         */
+        static _fonts: {
+            [key: string]: IFontMetrics;
         };
         /**
-         * 鼠标移入对象
+         * String used for calculate font metrics.
+         * These characters are all tall to help calculate the height required for text.
          */
-        mouseover: {
-            clientX: number;
-            clientY: number;
-        };
+        static METRICS_STRING: string;
         /**
-         * 鼠标在对象上移动
+         * Baseline symbol for calculate font metrics.
          */
-        mousemove: {
-            clientX: number;
-            clientY: number;
-        };
+        static BASELINE_SYMBOL: string;
         /**
-         * 鼠标左键按下
+         * Baseline multiplier for calculate font metrics.
          */
-        mousedown: {
-            clientX: number;
-            clientY: number;
-        };
+        static BASELINE_MULTIPLIER: number;
         /**
-         * 鼠标左键弹起
+         * Cache of new line chars.
          */
-        mouseup: {
-            clientX: number;
-            clientY: number;
-        };
+        static _newlines: number[];
         /**
-         * 单击
+         * Cache of breaking spaces.
          */
-        click: {
-            clientX: number;
-            clientY: number;
-        };
+        static _breakingSpaces: number[];
         /**
-         * 鼠标中键按下
+         * @param text - the text that was measured
+         * @param style - the style that was measured
+         * @param width - the measured width of the text
+         * @param height - the measured height of the text
+         * @param lines - an array of the lines of text broken by new lines and wrapping if specified in style
+         * @param lineWidths - an array of the line widths for each line matched to `lines`
+         * @param lineHeight - the measured line height for this style
+         * @param maxLineWidth - the maximum line width for all measured lines
+         * @param fontProperties - the font properties object from TextMetrics.measureFont
          */
-        middlemousedown: {
-            clientX: number;
-            clientY: number;
-        };
+        constructor(text: string, style: TextStyle, width: number, height: number, lines: string[], lineWidths: number[], lineHeight: number, maxLineWidth: number, fontProperties: IFontMetrics);
         /**
-         * 鼠标中键弹起
+         * Measures the supplied string of text and returns a Rectangle.
+         *
+         * @param text - the text to measure.
+         * @param style - the text style to use for measuring
+         * @param wordWrap - optional override for if word-wrap should be applied to the text.
+         * @param canvas - optional specification of the canvas to use for measuring.
+         * @return measured width and height of the text.
          */
-        middlemouseup: {
-            clientX: number;
-            clientY: number;
-        };
+        static measureText(text: string, style: TextStyle, wordWrap: boolean, canvas?: HTMLCanvasElement): TextMetrics;
         /**
-         * 鼠标中键单击
+         * Applies newlines to a string to have it optimally fit into the horizontal
+         * bounds set by the Text object's wordWrapWidth property.
+         *
+         * @private
+         * @param text - String to apply word wrapping to
+         * @param style - the style to use when wrapping
+         * @param canvas - optional specification of the canvas to use for measuring.
+         * @return New string with new lines applied where required
          */
-        middleclick: {
-            clientX: number;
-            clientY: number;
-        };
+        static wordWrap(text: string, style: TextStyle, canvas?: HTMLCanvasElement): string;
         /**
-         * 鼠标右键按下
+         * Convienience function for logging each line added during the wordWrap
+         * method
+         *
+         * @private
+         * @param  line        - The line of text to add
+         * @param  newLine     - Add new line character to end
+         * @return A formatted line
          */
-        rightmousedown: {
-            clientX: number;
-            clientY: number;
-        };
+        static addLine(line: string, newLine?: boolean): string;
         /**
-         * 鼠标右键弹起
+         * Gets & sets the widths of calculated characters in a cache object
+         *
+         * @private
+         * @param key            The key
+         * @param letterSpacing  The letter spacing
+         * @param cache          The cache
+         * @param context        The canvas context
+         * @return The from cache.
          */
-        rightmouseup: {
-            clientX: number;
-            clientY: number;
-        };
+        static getFromCache(key: string, letterSpacing: number, cache: {
+            [key: string]: number;
+        }, context: CanvasRenderingContext2D): number;
         /**
-         * 鼠标右键单击
+         * Determines whether we should collapse breaking spaces
+         *
+         * @private
+         * @param whiteSpace  The TextStyle property whiteSpace
+         * @return should collapse
          */
-        rightclick: {
-            clientX: number;
-            clientY: number;
-        };
+        static collapseSpaces(whiteSpace: string): boolean;
         /**
-         * 鼠标双击
+         * Determines whether we should collapse newLine chars
+         *
+         * @private
+         * @param whiteSpace  The white space
+         * @return should collapse
          */
-        dblclick: {
-            clientX: number;
-            clientY: number;
-        };
+        static collapseNewlines(whiteSpace: string): boolean;
+        /**
+         * trims breaking whitespaces from string
+         *
+         * @private
+         * @param text  The text
+         * @return trimmed string
+         */
+        static trimRight(text: string): string;
+        /**
+         * Determines if char is a newline.
+         *
+         * @private
+         * @param char  The character
+         * @return True if newline, False otherwise.
+         */
+        static isNewline(char: string): boolean;
+        /**
+         * Determines if char is a breaking whitespace.
+         *
+         * @private
+         * @param char  The character
+         * @return True if whitespace, False otherwise.
+         */
+        static isBreakingSpace(char: string): boolean;
+        /**
+         * Splits a string into words, breaking-spaces and newLine characters
+         *
+         * @private
+         * @param text       The text
+         * @return A tokenized array
+         */
+        static tokenize(text: string): string[];
+        /**
+         * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
+         *
+         * It allows one to customise which words should break
+         * Examples are if the token is CJK or numbers.
+         * It must return a boolean.
+         *
+         * @param token       The token
+         * @param breakWords  The style attr break words
+         * @return whether to break word or not
+         */
+        static canBreakWords(token: string, breakWords: boolean): boolean;
+        /**
+         * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
+         *
+         * It allows one to determine whether a pair of characters
+         * should be broken by newlines
+         * For example certain characters in CJK langs or numbers.
+         * It must return a boolean.
+         *
+         * @param char      The character
+         * @param nextChar  The next character
+         * @param token     The token/word the characters are from
+         * @param index     The index in the token of the char
+         * @param breakWords  The style attr break words
+         * @return whether to break word or not
+         */
+        static canBreakChars(char: string, nextChar: string, token: string, index: number, breakWords: boolean): boolean;
+        /**
+         * Overridable helper method used internally by TextMetrics, exposed to allow customizing the class's behavior.
+         *
+         * It is called when a token (usually a word) has to be split into separate pieces
+         * in order to determine the point to break a word.
+         * It must return an array of characters.
+         *
+         * @example
+         * // Correctly splits emojis, eg "🤪🤪" will result in two element array, each with one emoji.
+         * TextMetrics.wordWrapSplit = (token) => [...token];
+         *
+         * @param token The token to split
+         * @return The characters of the token
+         */
+        static wordWrapSplit(token: string): string[];
+        /**
+         * Calculates the ascent, descent and fontSize of a given font-style
+         *
+         * @param font - String representing the style of the font
+         * @return Font properties object
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
+         */
+        static measureFont(font: string): IFontMetrics;
+        /**
+         * Clear font metrics in metrics cache.
+         *
+         * @param font - font name. If font name not set then clear cache for all fonts.
+         */
+        static clearMetrics(font?: string): void;
+    }
+    /**
+     * A number, or a string containing a number.
+     */
+    interface IFontMetrics {
+        /**
+         * Font ascent
+         */
+        ascent: number;
+        /**
+         * Font descent
+         */
+        descent: number;
+        /**
+         * Font size
+         */
+        fontSize: number;
+    }
+    export {};
+}
+declare namespace feng3d {
+    interface ComponentMap {
+        Text: Text;
+    }
+    /**
+     * 文本组件
+     *
+     * 用于显示文字。
+     */
+    class Text extends feng3d.Component {
+        /**
+         * 文本内容。
+         */
+        text: string;
+        /**
+         * 是否根据文本自动调整宽高。
+         */
+        autoSize: boolean;
+        style: TextStyle<TextStyleEventMap>;
+        /**
+         * 显示图片的区域，(0, 0, 1, 1)表示完整显示图片。
+         */
+        private _uvRect;
+        private _image;
+        private _canvas;
+        private _invalid;
+        beforeRender(renderAtomic: feng3d.RenderAtomic, scene: feng3d.Scene, camera: feng3d.Camera): void;
+        invalidate(): void;
+        private _styleChanged;
+    }
+    interface PrimitiveGameObject {
+        Text: GameObject;
     }
 }
 declare namespace feng3d {
@@ -19999,4 +21855,4 @@ declare namespace feng3d {
      */
     var version: string;
 }
-//# sourceMappingURL=feng3d.d.ts.map
+//# sourceMappingURL=index.d.ts.map

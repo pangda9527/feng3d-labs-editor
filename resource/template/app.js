@@ -10,9 +10,9 @@ feng3d.rs.init(() =>
 
 function loadProjectJs(callback)
 {
-    if (feng3d.fs.type == feng3d.FSType.http)
+    if (feng3d.FS.fs.type == feng3d.FSType.http)
     {
-        var path = feng3d.fs.getAbsolutePath("project.js");
+        var path = feng3d.FS.fs.getAbsolutePath("project.js");
         var script = document.createElement("script");
         script.onload = () => { callback(); };
         script.src = path;
@@ -20,7 +20,7 @@ function loadProjectJs(callback)
     } else
     {
         // 读取项目脚本
-        feng3d.fs.readString("project.js", (err, content) =>
+        feng3d.FS.fs.readString("project.js", (err, content) =>
         {
             //
             var windowEval = eval.bind(window);
@@ -34,14 +34,14 @@ function loadProjectJs(callback)
 function initProject()
 {
     // 加载并初始化场景
-    feng3d.fs.readObject("default.scene.json", (err, obj) =>
+    feng3d.FS.fs.readObject("default.scene.json", (err, obj) =>
     {
         feng3d.rs.deserializeWithAssets(obj, (scene) =>
         {
-            if (scene.getComponent("Scene"))
-                view.scene = scene.getComponent("Scene");
+            if (scene.getComponent(feng3d.Scene))
+                view.scene = scene.getComponent(feng3d.Scene);
 
-            var cameras = view.root.getComponentsInChildren("Camera");
+            var cameras = view.root.getComponentsInChildren(feng3d.Camera);
             if (cameras.length > 0)
             {
                 view.camera = cameras[0];
