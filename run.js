@@ -1,4 +1,4 @@
-/// <reference path="../feng3d/out/feng3d.d.ts" />
+/// <reference path="../feng3d/dist/index.d.ts" />
 
 var fstype = GetQueryString("fstype");
 
