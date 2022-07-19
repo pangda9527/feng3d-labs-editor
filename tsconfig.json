@@ -88,6 +88,8 @@
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
         //
+        "src/net/client.ts",
+        //
         "src/polyfill/typescript/typescriptServices.ts",
         // 扩展 feng3d
         "src/polyfill/feng3d/ClassUtils.ts",
