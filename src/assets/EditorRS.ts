@@ -7,8 +7,6 @@ var templateurls = [
     ["resource/template/default.scene.json", "default.scene.json"],
     ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
     ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-    ["resource/template/libs/feng2d.js", "libs/feng2d.js"],
-    ["resource/template/libs/feng2d.d.ts", "libs/feng2d.d.ts"],
     ["resource/template/libs/cannon.js", "libs/cannon.js"],
     ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
     ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],

@@ -1,5 +1,5 @@
-/// <reference path="../feng3d/out/feng3d.d.ts" />
-/// <reference path="out/editor.d.ts" />
+/// <reference path="../feng3d/dist/index.d.ts" />
+/// <reference path="dist/index.d.ts" />
 /// <reference path="libs/monaco-editor/monaco.d.ts" />
 
 // 参考 https://microsoft.github.io/monaco-editor/api/index.html
@@ -24,7 +24,7 @@ initMonaco(() =>
         };
     }
 
-    feng3d.globalDispatcher.on("codeeditor.openScript", (e) =>
+    feng3d.globalEmitter.on("codeeditor.openScript", (e) =>
     {
         openScript(e.data);
     });
@@ -33,7 +33,7 @@ initMonaco(() =>
 
 function openScript(script)
 {
-    feng3d.globalDispatcher.dispatch("script.gettslibs", {
+    feng3d.globalEmitter.emit("script.gettslibs", {
         callback: (tslibs) =>
         {
             codeEditor(tslibs, script);
@@ -167,7 +167,7 @@ function codeEditor(tslibs, file)
 function triggerCompile(callback)
 {
     logLabel.textContent = "正在编译。。。。";
-    feng3d.globalDispatcher.dispatch("script.compile", {
+    feng3d.globalEmitter.emit("script.compile", {
         onComplete: () =>
         {
             logLabel.textContent = "完成编译。。。。";
