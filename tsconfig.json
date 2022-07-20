@@ -16,9 +16,6 @@
     },
     "references": [
         {
-            "path": "../feng3d/packages/event",
-        },
-        {
             "path": "../feng3d/packages/bezier",
         },
         {
@@ -77,6 +74,8 @@
         },
     ],
     "files": [
+        //
+        "../feng3d/packages/event/index.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
