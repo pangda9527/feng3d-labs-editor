@@ -5,8 +5,6 @@ var fstype = GetQueryString("fstype");
 var result = [];
 
 var modules = [
-    // "../feng3d/tsconfig.json",
-    "../cannon/tsconfig.json",
     "../cannon-plugin/tsconfig.json",
 ];
 
