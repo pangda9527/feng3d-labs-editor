@@ -5,7 +5,6 @@ var fstype = GetQueryString("fstype");
 var result = [];
 
 var modules = [
-    "../cannon-plugin/tsconfig.json",
 ];
 
 loadModule(modules, () =>

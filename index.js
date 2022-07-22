@@ -9,7 +9,6 @@ var result = [
 ];
 
 var modules = [
-    "../cannon-plugin/tsconfig.json",
     //
     "tsconfig.json",
 ];
