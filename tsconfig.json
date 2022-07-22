@@ -14,14 +14,6 @@
         "outFile": "dist/index.js"
         // "outDir": "debug"
     },
-    "references": [
-        {
-            "path": "../cannon",
-        },
-        {
-            "path": "../cannon-plugin"
-        },
-    ],
     "files": [
         //
         "../feng3d/index.d.ts",
