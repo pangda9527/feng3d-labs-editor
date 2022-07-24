@@ -1,11 +1,11 @@
 import { Vector2, Camera, GameObject, Vector3, Matrix4x4, Stats, serialization, FPSController, Scene, RunEnvironment, loader, shortcut, globalEmitter, windowEventProxy, raycaster, ticker, PerspectiveLens, IEvent } from 'feng3d';
-import { editorData } from '../Editor';
 import { EditorComponent } from '../feng3d/EditorComponent';
 import { EditorView } from '../feng3d/EditorView';
 import { GroundGrid } from '../feng3d/GroundGrid';
 import { hierarchy } from '../feng3d/hierarchy/Hierarchy';
 import { MRSTool } from '../feng3d/mrsTool/MRSTool';
 import { SceneRotateTool } from '../feng3d/scene/SceneRotateTool';
+import { EditorData } from '../global/EditorData';
 import { Modules } from '../Modules';
 import { sceneControlConfig } from '../shortcut/Editorshortcut';
 import { AreaSelectRect } from './components/AreaSelectRect';
@@ -96,7 +96,7 @@ export class SceneView extends eui.Component implements ModuleView
 			mrsTool.editorCamera = editorCamera;
 			this.view.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 			//
-			loader.loadText(editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
+			loader.loadText(EditorData.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
 			{
 				var trident: GameObject = serialization.deserialize(JSON.parse(content));
 				editorScene.gameObject.addChild(trident);
@@ -215,7 +215,7 @@ export class SceneView extends eui.Component implements ModuleView
 		{
 			return !!hierarchy.getNode(g);
 		});
-		editorData.selectMultiObject(gs0);
+		EditorData.editorData.selectMultiObject(gs0);
 	}
 
 	private _onAreaSelectEnd()
@@ -262,10 +262,10 @@ export class SceneView extends eui.Component implements ModuleView
 		if (gameObjects.length > 0)
 			return;
 		//
-		gameObjects = raycaster.pickAll(this.view.mouseRay3D, editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+		gameObjects = raycaster.pickAll(this.view.mouseRay3D, EditorData.editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
 		if (gameObjects.length == 0)
 		{
-			editorData.clearSelectedObjects();
+			EditorData.editorData.clearSelectedObjects();
 			return;
 		}
 		//
@@ -298,12 +298,12 @@ export class SceneView extends eui.Component implements ModuleView
 				selectedObjectsHistory.length = 0;
 				gameObject = gameObjects[0];
 			}
-			editorData.selectObject(gameObject);
+			EditorData.editorData.selectObject(gameObject);
 			selectedObjectsHistory.push(gameObject);
 		}
 		else
 		{
-			editorData.clearSelectedObjects();
+			EditorData.editorData.clearSelectedObjects();
 		}
 	}
 
@@ -315,7 +315,7 @@ export class SceneView extends eui.Component implements ModuleView
 		this.rotateSceneCameraGlobalMatrix = this.editorCamera.transform.localToWorldMatrix.clone();
 		this.rotateSceneCenter = null;
 		//获取第一个 游戏对象
-		var transformBox = editorData.transformBox;
+		var transformBox = EditorData.editorData.transformBox;
 		if (transformBox)
 		{
 			this.rotateSceneCenter = transformBox.getCenter();
@@ -435,7 +435,7 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.mouseInView) return;
 
-		var transformBox = editorData.transformBox;
+		var transformBox = EditorData.editorData.transformBox;
 		if (transformBox)
 		{
 			var scenePosition = transformBox.getCenter();

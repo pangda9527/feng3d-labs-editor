@@ -3,8 +3,8 @@
 import { globalEmitter, IEvent, ScriptAsset, ticker } from 'feng3d';
 import { editorRS } from './assets/EditorRS';
 import { nativeAPI } from './assets/NativeRequire';
-import { editorData } from './Editor';
-import { editorAsset } from './ui/assets/EditorAsset';
+import { EditorData } from './global/EditorData';
+import { EditorAsset, editorAsset } from './ui/assets/EditorAsset';
 
 export var scriptCompiler: ScriptCompiler;
 
@@ -25,12 +25,12 @@ export class ScriptCompiler
 
     private onOpenScript(e)
     {
-        editorData.openScript = e.data;
+        EditorData.editorData.openScript = e.data;
 
         if (nativeAPI)
         {
             // 使用本地 VSCode 打开
-            var path = editorRS.fs.getAbsolutePath(editorData.openScript.assetPath);
+            var path = editorRS.fs.getAbsolutePath(EditorData.editorData.openScript.assetPath);
             nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
             {
                 if (err) throw err;
@@ -41,12 +41,11 @@ export class ScriptCompiler
             });
         } else
         {
-
-            if (codeeditoWin) codeeditoWin.close();
-            codeeditoWin = window.open(`codeeditor.html`);
-            codeeditoWin.onload = () =>
+            if (EditorAsset.codeeditoWin) EditorAsset.codeeditoWin.close();
+            EditorAsset.codeeditoWin = window.open(`codeeditor.html`);
+            EditorAsset.codeeditoWin.onload = () =>
             {
-                globalEmitter.emit("codeeditor.openScript", editorData.openScript);
+                globalEmitter.emit("codeeditor.openScript", EditorData.editorData.openScript);
             };
         }
     }

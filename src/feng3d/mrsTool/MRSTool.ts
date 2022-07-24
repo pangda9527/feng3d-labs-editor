@@ -1,6 +1,5 @@
 import { Camera, Component, GameObject, globalEmitter, HideFlags, RegisterComponent, Renderable, serialization, ticker } from 'feng3d';
-import { editorData } from '../../Editor';
-import { MRSToolType } from '../../global/EditorData';
+import { EditorData, MRSToolType } from '../../global/EditorData';
 import { MRSToolBase } from './MRSToolBase';
 import { MRSToolTarget } from './MRSToolTarget';
 import { MTool } from './MTool';
@@ -70,8 +69,8 @@ export class MRSTool extends Component
         //
         this.currentTool = this.mTool;
         //
-        globalEmitter.on("selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        globalEmitter.on("toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.on("editor.toolTypeChanged", this.onToolTypeChange, this);
     }
 
     dispose()
@@ -89,8 +88,8 @@ export class MRSTool extends Component
         this.sTool.dispose();
         this.sTool = null;
         //
-        globalEmitter.off("selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        globalEmitter.off("toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.off("editor.toolTypeChanged", this.onToolTypeChange, this);
 
         super.dispose();
     }
@@ -109,7 +108,7 @@ export class MRSTool extends Component
 
     private onSelectedGameObjectChange()
     {
-        var objects = editorData.selectedGameObjects.filter(v => !(v.hideFlags & HideFlags.DontTransform));
+        var objects = EditorData.editorData.selectedGameObjects.filter(v => !(v.hideFlags & HideFlags.DontTransform));
 
         //筛选出 工具控制的对象
         if (objects.length > 0)
@@ -124,7 +123,7 @@ export class MRSTool extends Component
 
     private onToolTypeChange()
     {
-        switch (editorData.toolType)
+        switch (EditorData.editorData.toolType)
         {
             case MRSToolType.MOVE:
                 this.currentTool = this.mTool;

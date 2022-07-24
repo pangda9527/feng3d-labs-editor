@@ -1,7 +1,7 @@
-import { OAVComponent, AttributeViewInfo, watcher, MenuItem, Texture2D, TextureCube, AudioAsset, ScriptAsset, Material, Geometry } from 'feng3d';
+import { OAVComponent, AttributeViewInfo, watcher, Texture2D, TextureCube, AudioAsset, ScriptAsset, Material, Geometry } from 'feng3d';
 import { editorRS } from '../../assets/EditorRS';
-import { editorData } from '../../Editor';
-import { menu } from '../../ui/components/Menu';
+import { EditorData } from '../../global/EditorData';
+import { menu, MenuItem } from '../../ui/components/Menu';
 import { DragDataMap, drag } from '../../ui/drag/Drag';
 import { OAVBase } from './OAVBase';
 
@@ -176,7 +176,7 @@ export class OAVPick extends OAVBase
     {
         if (this.attributeValue && typeof this.attributeValue == "object")
         {
-            editorData.selectObject(this.attributeValue);
+            EditorData.editorData.selectObject(this.attributeValue);
         }
     }
 }

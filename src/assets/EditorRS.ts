@@ -1,4 +1,4 @@
-import { ReadWriteRS, loader, task, FS, indexedDBFS, ReadWriteFS, rs } from 'feng3d';
+import { ReadWriteRS, loader, task, FS, indexedDBFS, ReadWriteFS, ReadRS } from 'feng3d';
 import { editorcache } from '../caches/Editorcache';
 import { NativeFS } from './NativeFS';
 import { supportNative, nativeFS } from './NativeRequire';
@@ -252,7 +252,7 @@ if (supportNative)
     FS.basefs = indexedDBFS;
 }
 FS.fs = new ReadWriteFS();
-rs = editorRS = new EditorRS();
+ReadRS.rs = editorRS = new EditorRS();
 
 //
 var isSelectFile = false;

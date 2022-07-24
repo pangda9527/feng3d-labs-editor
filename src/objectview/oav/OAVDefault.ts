@@ -1,5 +1,5 @@
 import { OAVComponent, AttributeViewInfo, watcher } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { DragDataMap, drag } from '../../ui/drag/Drag';
 import { OAVBase } from './OAVBase';
 
@@ -96,7 +96,7 @@ export class OAVDefault extends OAVBase
 
 	private onDoubleClick()
 	{
-		editorData.selectObject(this.attributeValue);
+		EditorData.editorData.selectObject(this.attributeValue);
 	}
 
 	private onTextChange()

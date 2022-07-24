@@ -1,3 +1,5 @@
+import { EditorAsset } from '../ui/assets/EditorAsset';
+import { TopView } from '../ui/TopView';
 
 export class EditorCache
 {
@@ -51,7 +53,7 @@ export var editorcache = new EditorCache();
 
 window.addEventListener("beforeunload", () =>
 {
-    if (codeeditoWin) codeeditoWin.close();
-    if (runwin) runwin.close();
+    if (EditorAsset.codeeditoWin) EditorAsset.codeeditoWin.close();
+    if (TopView.runwin) TopView.runwin.close();
     editorcache.save();
 });

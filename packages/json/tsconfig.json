@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "outFile": "./dist/index.d.ts"
+        "declaration": true,
+        "declarationMap": true,
+        "outFile": "./dist/index.js"
     },
     "files": [
         "src/json.ts",

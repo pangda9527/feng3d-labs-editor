@@ -3,6 +3,11 @@ import { hierarchy } from '../../feng3d/hierarchy/Hierarchy';
 import { shortCutStates } from '../../polyfill/feng3d/ShortCut';
 import { AssetNode } from '../assets/AssetNode';
 
+declare global
+{
+	interface MixinsDragDataMap { }
+}
+
 export var drag: Drag;
 
 export class Drag
@@ -91,7 +96,7 @@ export class DragData
 /**
  * 拖拽数据
  */
-export interface DragDataMap
+export interface DragDataMap extends MixinsDragDataMap
 {
 	gameobject: GameObject;
 	animationclip: AnimationClip;

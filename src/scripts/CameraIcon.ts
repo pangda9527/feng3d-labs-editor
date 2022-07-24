@@ -1,5 +1,5 @@
 import { RegisterComponent, Camera, watcher, GameObject, BillboardComponent, MeshRenderer, Material, TextureUniforms, Texture2D, TextureFormat, PlaneGeometry, HideFlags, SegmentUniforms, Color4, RenderMode, SegmentGeometry, PointUniforms, PointGeometry, PointInfo, Segment, PerspectiveLens, OrthographicLens, Vector3, shortcut, ticker } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 import { EditorScript } from './EditorScript';
 
 declare global
@@ -39,7 +39,7 @@ export class CameraIcon extends EditorScript
             material.shaderName = "texture";
             const uniforms = material.uniforms as TextureUniforms;
             uniforms.s_texture = new Texture2D();
-            uniforms.s_texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/camera.png") };
+            uniforms.s_texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/camera.png") };
             uniforms.s_texture.format = TextureFormat.RGBA;
             material.renderParams.enableBlend = true;
             material.renderParams.depthMask = false;
@@ -95,7 +95,7 @@ export class CameraIcon extends EditorScript
     {
         if (!this.camera) return;
 
-        if (editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1)
+        if (EditorData.editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1)
         {
             if (this._lensChanged)
             {
@@ -217,7 +217,7 @@ export class CameraIcon extends EditorScript
 
     private onMousedown()
     {
-        editorData.selectObject(this.camera.gameObject);
+        EditorData.editorData.selectObject(this.camera.gameObject);
         // 防止再次调用鼠标拾取
         shortcut.activityState("selectInvalid");
         ticker.once(100, () =>

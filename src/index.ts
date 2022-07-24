@@ -1,6 +1,4 @@
 export * from './net/client';
-//
-export * from './polyfill/typescript/typescriptServices';
 // 扩展 feng3d
 export * from './polyfill/feng3d/ClassUtils';
 export * from './polyfill/feng3d/ShortCut';
@@ -10,8 +8,6 @@ export * from './polyfill/egret/MouseEvent';
 export * from './polyfill/egret/TextField';
 export * from './polyfill/egret/DisplayObject';
 export * from './polyfill/egret/Scroller';
-// 扩展 json ，支持注释
-export * from './polyfill/json/json';
 //
 export * from './oauth/GiteeOauth';
 //
@@ -172,11 +168,10 @@ export * from './configs/ViewLayoutConfig';
 export * from './configs/ObjectViewConfig';
 export * from './configs/ShortcutConfig';
 //
-export * from './polyfill/typescript/typescriptSorting';
 export * from './ScriptCompiler';
 // 粒子系统
 export * from './ui/ParticleEffectController';
 export * from './ui/components/ParticleComponentView';
 export * from './objectview/oav/OAVParticleComponentList';
 //
-export * from './Editor.ts"
+export * from './Editor';

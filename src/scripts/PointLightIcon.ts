@@ -1,5 +1,5 @@
 import { RegisterComponent, PointLight, Camera, watcher, GameObject, BillboardComponent, MeshRenderer, PlaneGeometry, Material, TextureUniforms, Texture2D, TextureFormat, serialization, HideFlags, RenderMode, Renderable, Vector3, Segment, Color4, SegmentGeometry, PointGeometry, shortcut, ticker } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 import { EditorScript } from './EditorScript';
 
 declare global
@@ -43,7 +43,7 @@ export class PointLightIcon extends EditorScript
         material.shaderName = "texture";
         const uniforms = material.uniforms as TextureUniforms;
         const texture = uniforms.s_texture = new Texture2D()
-        texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/light.png") };
+        texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/light.png") };
         texture.format = TextureFormat.RGBA;
         texture.premulAlpha = true;
         material.renderParams.enableBlend = true;
@@ -55,13 +55,13 @@ export class PointLightIcon extends EditorScript
             name: "Lines", mouseEnabled: false, hideFlags: HideFlags.Hide,
             components: [{
                 __class__: "feng3d.MeshRenderer", material: {
-                    __class__: "Material",
+                    __class__: "feng3d.Material",
                     shaderName: "segment",
                     uniforms: {
-                        u_segmentColor: { __class__: "Color4", r: 1, g: 1, b: 1, a: 0.5 },
+                        u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 },
                     }, renderParams: { renderMode: RenderMode.LINES, enableBlend: true, }
                 },
-                geometry: { __class__: "SegmentGeometry" },
+                geometry: { __class__: "feng3d.SegmentGeometry" },
             }]
         });
         this._segmentGeometry = <any>lightLines.getComponent(Renderable).geometry;
@@ -70,19 +70,19 @@ export class PointLightIcon extends EditorScript
         var lightpoints = this._lightpoints = serialization.setValue(new GameObject(), {
             name: "points", mouseEnabled: false, hideFlags: HideFlags.Hide,
             components: [{
-                __class__: "MeshRenderer",
+                __class__: "feng3d.MeshRenderer",
                 geometry: {
-                    __class__: "PointGeometry",
+                    __class__: "feng3d.PointGeometry",
                     points: [
-                        { position: { __class__: "Vector3", x: 1 }, color: { __class__: "Color4", r: 1 } },
-                        { position: { __class__: "Vector3", x: -1 }, color: { __class__: "Color4", r: 1 } },
-                        { position: { __class__: "Vector3", y: 1 }, color: { __class__: "Color4", g: 1 } },
-                        { position: { __class__: "Vector3", y: -1 }, color: { __class__: "Color4", g: 1 } },
-                        { position: { __class__: "Vector3", z: 1 }, color: { __class__: "Color4", b: 1 } },
-                        { position: { __class__: "Vector3", z: -1 }, color: { __class__: "Color4", b: 1 } }],
+                        { position: { __class__: "feng3d.Vector3", x: 1 }, color: { __class__: "feng3d.Color4", r: 1 } },
+                        { position: { __class__: "feng3d.Vector3", x: -1 }, color: { __class__: "feng3d.Color4", r: 1 } },
+                        { position: { __class__: "feng3d.Vector3", y: 1 }, color: { __class__: "feng3d.Color4", g: 1 } },
+                        { position: { __class__: "feng3d.Vector3", y: -1 }, color: { __class__: "feng3d.Color4", g: 1 } },
+                        { position: { __class__: "feng3d.Vector3", z: 1 }, color: { __class__: "feng3d.Color4", b: 1 } },
+                        { position: { __class__: "feng3d.Vector3", z: -1 }, color: { __class__: "feng3d.Color4", b: 1 } }],
                 },
                 material: {
-                    __class__: "Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: RenderMode.POINTS, enableBlend: true, },
+                    __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: RenderMode.POINTS, enableBlend: true, },
                 },
             }],
         });
@@ -97,12 +97,12 @@ export class PointLightIcon extends EditorScript
         if (!this.light) return;
         if (!this.editorCamera) return;
 
-        (<TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
+        (this._textureMaterial.uniforms as TextureUniforms).u_color = this.light.color.toColor4() as any;
         this._lightLines.transform.scale =
             this._lightpoints.transform.scale =
             new Vector3(this.light.range, this.light.range, this.light.range);
 
-        if (editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
+        if (EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
         {
             //
             var camerapos = this.gameObject.transform.worldToLocalPoint(this.editorCamera.gameObject.transform.worldPosition);
@@ -236,7 +236,7 @@ export class PointLightIcon extends EditorScript
 
     private onMousedown()
     {
-        editorData.selectObject(this.light.gameObject);
+        EditorData.editorData.selectObject(this.light.gameObject);
         // 防止再次调用鼠标拾取
         shortcut.activityState("selectInvalid");
         ticker.once(100, () =>

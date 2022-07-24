@@ -7,6 +7,7 @@
         "declarationMap": true,
         "declaration": true,
         "experimentalDecorators": true,
+        "skipLibCheck": true,
         "lib": [
             "ES2015",
             "DOM",
@@ -14,6 +15,9 @@
         "outDir": "lib"
     },
     "files": [
+        "./packages/json/dist/index.d.ts",
+        "./packages/typescript/dist/index.d.ts",
+        //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
         "libs/modules/res/res.d.ts",

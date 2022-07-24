@@ -1,5 +1,5 @@
 import { View, Color4, Scene, RunEnvironment, forwardRenderer, Renderable, wireframeRenderer } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 import { EditorComponent } from './EditorComponent';
 import { hierarchy } from './hierarchy/Hierarchy';
 
@@ -19,13 +19,13 @@ export class EditorView extends View
      */
     render()
     {
-        if (editorData.gameScene != this.scene)
+        if (EditorData.editorData.gameScene != this.scene)
         {
             if (this.scene)
             {
                 this.scene.runEnvironment = RunEnvironment.feng3d;
             }
-            this.scene = editorData.gameScene;
+            this.scene = EditorData.editorData.gameScene;
             if (this.scene)
             {
                 this.scene.runEnvironment = RunEnvironment.editor;
@@ -55,7 +55,7 @@ export class EditorView extends View
         }
         if (this.scene)
         {
-            editorData.selectedGameObjects.forEach(element =>
+            EditorData.editorData.selectedGameObjects.forEach(element =>
             {
                 if (element.getComponent(Renderable))
                     wireframeRenderer.drawGameObject(this.gl, element.getComponent(Renderable), this.scene, this.camera, this.wireframeColor);

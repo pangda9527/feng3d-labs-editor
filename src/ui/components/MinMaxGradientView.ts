@@ -1,7 +1,7 @@
-import { watch, MinMaxGradient, MinMaxGradientMode, ImageUtil, Color4, MenuItem, serialization, Gradient } from 'feng3d';
-import { ColorPickerView, colorPickerView } from './ColorPickerView';
-import { GradientEditor, gradientEditor } from './GradientEditor';
-import { menu } from './Menu';
+import { Color4, Gradient, ImageUtil, MinMaxGradient, MinMaxGradientMode, serialization, watch } from 'feng3d';
+import { ColorPickerView } from './ColorPickerView';
+import { GradientEditor } from './GradientEditor';
+import { menu, MenuItem } from './Menu';
 import { popupview } from './Popupview';
 
 /**
@@ -126,24 +126,24 @@ export class MinMaxGradientView extends eui.Component
                 switch (this.minMaxGradient.mode)
                 {
                     case MinMaxGradientMode.Color:
-                        view = colorPickerView = colorPickerView || new ColorPickerView();
-                        colorPickerView.color = this.minMaxGradient.color;
+                        view = ColorPickerView.colorPickerView = ColorPickerView.colorPickerView || new ColorPickerView();
+                        ColorPickerView.colorPickerView.color = this.minMaxGradient.color;
                         break;
                     case MinMaxGradientMode.Gradient:
-                        view = gradientEditor = gradientEditor || new GradientEditor();
-                        gradientEditor.gradient = this.minMaxGradient.gradient;
+                        view = GradientEditor.gradientEditor = GradientEditor.gradientEditor || new GradientEditor();
+                        GradientEditor.gradientEditor.gradient = this.minMaxGradient.gradient;
                         break;
                     case MinMaxGradientMode.TwoColors:
-                        view = colorPickerView = colorPickerView || new ColorPickerView();
-                        colorPickerView.color = this.minMaxGradient.colorMin;
+                        view = ColorPickerView.colorPickerView = ColorPickerView.colorPickerView || new ColorPickerView();
+                        ColorPickerView.colorPickerView.color = this.minMaxGradient.colorMin;
                         break;
                     case MinMaxGradientMode.TwoGradients:
-                        view = gradientEditor = gradientEditor || new GradientEditor();
-                        gradientEditor.gradient = this.minMaxGradient.gradientMin;
+                        view = GradientEditor.gradientEditor = GradientEditor.gradientEditor || new GradientEditor();
+                        GradientEditor.gradientEditor.gradient = this.minMaxGradient.gradientMin;
                         break;
                     case MinMaxGradientMode.RandomColor:
-                        view = gradientEditor = gradientEditor || new GradientEditor();
-                        gradientEditor.gradient = this.minMaxGradient.gradient;
+                        view = GradientEditor.gradientEditor = GradientEditor.gradientEditor || new GradientEditor();
+                        GradientEditor.gradientEditor.gradient = this.minMaxGradient.gradient;
                         break;
                 }
                 break;
@@ -152,12 +152,12 @@ export class MinMaxGradientView extends eui.Component
                 switch (this.minMaxGradient.mode)
                 {
                     case MinMaxGradientMode.TwoColors:
-                        view = colorPickerView = colorPickerView || new ColorPickerView();
-                        colorPickerView.color = this.minMaxGradient.colorMax;
+                        view = ColorPickerView.colorPickerView = ColorPickerView.colorPickerView || new ColorPickerView();
+                        ColorPickerView.colorPickerView.color = this.minMaxGradient.colorMax;
                         break;
                     case MinMaxGradientMode.TwoGradients:
-                        view = gradientEditor = gradientEditor || new GradientEditor();
-                        gradientEditor.gradient = this.minMaxGradient.gradientMax;
+                        view = GradientEditor.gradientEditor = GradientEditor.gradientEditor || new GradientEditor();
+                        GradientEditor.gradientEditor.gradient = this.minMaxGradient.gradientMax;
                         break;
                 }
                 break;
@@ -192,19 +192,19 @@ export class MinMaxGradientView extends eui.Component
             switch (this.minMaxGradient.mode)
             {
                 case MinMaxGradientMode.Color:
-                    this.minMaxGradient.color = (<Color4>colorPickerView.color).clone();
+                    this.minMaxGradient.color = (<Color4>ColorPickerView.colorPickerView.color).clone();
                     break;
                 case MinMaxGradientMode.Gradient:
-                    this.minMaxGradient.gradient = gradientEditor.gradient;
+                    this.minMaxGradient.gradient = GradientEditor.gradientEditor.gradient;
                     break;
                 case MinMaxGradientMode.TwoColors:
-                    this.minMaxGradient.colorMin = (<Color4>colorPickerView.color).clone();
+                    this.minMaxGradient.colorMin = (<Color4>ColorPickerView.colorPickerView.color).clone();
                     break;
                 case MinMaxGradientMode.TwoGradients:
-                    this.minMaxGradient.gradientMin = gradientEditor.gradient;
+                    this.minMaxGradient.gradientMin = GradientEditor.gradientEditor.gradient;
                     break;
                 case MinMaxGradientMode.RandomColor:
-                    this.minMaxGradient.gradient = gradientEditor.gradient;
+                    this.minMaxGradient.gradient = GradientEditor.gradientEditor.gradient;
                     break;
             }
         } else if (this.activeColorGroup == this.colorGroup1)
@@ -212,10 +212,10 @@ export class MinMaxGradientView extends eui.Component
             switch (this.minMaxGradient.mode)
             {
                 case MinMaxGradientMode.TwoColors:
-                    this.minMaxGradient.colorMax = (<Color4>colorPickerView.color).clone();
+                    this.minMaxGradient.colorMax = (<Color4>ColorPickerView.colorPickerView.color).clone();
                     break;
                 case MinMaxGradientMode.TwoGradients:
-                    this.minMaxGradient.gradientMax = gradientEditor.gradient;
+                    this.minMaxGradient.gradientMax = GradientEditor.gradientEditor.gradient;
                     break;
             }
         }

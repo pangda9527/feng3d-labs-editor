@@ -1,7 +1,7 @@
-import { watch, MinMaxCurve, MinMaxCurveMode, ImageUtil, Color4, MenuItem, serialization } from 'feng3d';
+import { Color4, ImageUtil, MinMaxCurve, MinMaxCurveMode, serialization, watch } from 'feng3d';
 import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
-import { menu } from './Menu';
-import { MinMaxCurveEditor, minMaxCurveEditor } from './MinMaxCurveEditor';
+import { menu, MenuItem } from './Menu';
+import { MinMaxCurveEditor } from './MinMaxCurveEditor';
 import { popupview } from './Popupview';
 
 /**
@@ -110,17 +110,17 @@ export class MinMaxCurveView extends eui.Component
                 });
                 break;
             case this.curveGroup:
-                minMaxCurveEditor = minMaxCurveEditor || new MinMaxCurveEditor();
-                minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
+                MinMaxCurveEditor.minMaxCurveEditor = MinMaxCurveEditor.minMaxCurveEditor || new MinMaxCurveEditor();
+                MinMaxCurveEditor.minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
 
                 var pos = this.localToGlobal(0, 0);
                 pos.x = pos.x - 318;
-                minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                MinMaxCurveEditor.minMaxCurveEditor.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                 //
-                popupview.popupView(minMaxCurveEditor, {
+                popupview.popupView(MinMaxCurveEditor.minMaxCurveEditor, {
                     x: pos.x, y: pos.y, closecallback: () =>
                     {
-                        minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                        MinMaxCurveEditor.minMaxCurveEditor.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
                     }
                 });
                 break;

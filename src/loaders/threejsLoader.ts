@@ -1,6 +1,6 @@
 import feng3d = require('feng3d');
 import { editorRS } from '../assets/EditorRS';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 import { loadjs } from './load';
 
 export class ThreejsLoader
@@ -384,7 +384,7 @@ var prepare = (() =>
                 "threejs/loaders/ctm/lzma.js",
                 "threejs/loaders/ctm/ctm.js",
                 "threejs/loaders/ctm/CTMLoader.js",
-            ].map((value) => { return editorData.getEditorAssetPath(value); }),
+            ].map((value) => { return EditorData.editorData.getEditorAssetPath(value); }),
             bundleId: "threejs",
             success: () =>
             {

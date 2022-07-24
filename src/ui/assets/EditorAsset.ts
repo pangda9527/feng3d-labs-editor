@@ -1,16 +1,15 @@
-import { watch, globalEmitter, Scene, GameObject, FileAsset, gPartial, FolderAsset, MenuItem, ScriptAsset, ShaderAsset, JSAsset, JsonAsset, TextAsset, TextureCubeAsset, TextureCube, MaterialAsset, Material, GeometryAsset, PlaneGeometry, CubeGeometry, SphereGeometry, CapsuleGeometry, CylinderGeometry, ConeGeometry, TorusGeometry, SegmentGeometry, ImageUtil, Color4, dataTransform, Texture2D, GameObjectAsset, regExps, TextureAsset, AudioAsset, ArrayBufferAsset, pathUtils, mdlLoader, objLoader, mtlLoader, md5Loader, IEvent } from 'feng3d';
+import { ArrayBufferAsset, AudioAsset, CapsuleGeometry, Color4, ConeGeometry, CubeGeometry, CylinderGeometry, dataTransform, FileAsset, FolderAsset, GameObject, GameObjectAsset, GeometryAsset, globalEmitter, gPartial, IEvent, ImageUtil, JSAsset, JsonAsset, Material, MaterialAsset, pathUtils, PlaneGeometry, regExps, Scene, ScriptAsset, SegmentGeometry, ShaderAsset, SphereGeometry, TextAsset, Texture2D, TextureAsset, TextureCube, TextureCubeAsset, TorusGeometry, watch } from 'feng3d';
 import { editorRS } from '../../assets/EditorRS';
 import { nativeAPI } from '../../assets/NativeRequire';
-import { editorData } from '../../Editor';
-import { threejsLoader } from '../../loaders/threejsLoader';
-import { menu } from '../components/Menu';
+import { EditorData } from '../../global/EditorData';
+import { menu, MenuItem } from '../components/Menu';
 import { assetFileTemplates } from './AssetFileTemplates';
 import { AssetNode } from './AssetNode';
 
-export var editorAsset: EditorAsset;
-
 export class EditorAsset
 {
+    static codeeditoWin: Window;
+
     /**
      * 资源ID字典
      */
@@ -183,7 +182,7 @@ export class EditorAsset
 
                 folderNode.addChild(assetNode);
 
-                editorData.selectObject(assetNode);
+                EditorData.editorData.selectObject(assetNode);
 
                 callback && callback(null, assetNode);
             } else
@@ -431,7 +430,7 @@ export class EditorAsset
     {
         if (files.length == 0)
         {
-            editorData.selectMultiObject(assetNodes);
+            EditorData.editorData.selectMultiObject(assetNodes);
             callback && callback(assetNodes);
             return;
         }
@@ -517,12 +516,12 @@ export class EditorAsset
             var extensions = pathUtils.extname(filePath);
             switch (extensions)
             {
-                case "mdl": menuconfig.push({ label: "解析", click: () => mdlLoader.load(filePath) }); break;
-                case "obj": menuconfig.push({ label: "解析", click: () => objLoader.load(filePath) }); break;
-                case "mtl": menuconfig.push({ label: "解析", click: () => mtlLoader.load(filePath) }); break;
-                case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(filePath) }); break;
-                case "md5mesh": menuconfig.push({ label: "解析", click: () => md5Loader.load(filePath) }); break;
-                case "md5anim": menuconfig.push({ label: "解析", click: () => md5Loader.loadAnim(filePath) }); break;
+                // case "mdl": menuconfig.push({ label: "解析", click: () => mdlLoader.load(filePath) }); break;
+                // case "obj": menuconfig.push({ label: "解析", click: () => objLoader.load(filePath) }); break;
+                // case "mtl": menuconfig.push({ label: "解析", click: () => mtlLoader.load(filePath) }); break;
+                // case "fbx": menuconfig.push({ label: "解析", click: () => threejsLoader.load(filePath) }); break;
+                // case "md5mesh": menuconfig.push({ label: "解析", click: () => md5Loader.load(filePath) }); break;
+                // case "md5anim": menuconfig.push({ label: "解析", click: () => md5Loader.loadAnim(filePath) }); break;
             }
         }
     }
@@ -543,6 +542,5 @@ export class EditorAsset
     }
 }
 
-editorAsset = new EditorAsset();
 
-var codeeditoWin: Window;
+export const editorAsset = new EditorAsset();

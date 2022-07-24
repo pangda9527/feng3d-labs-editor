@@ -1,5 +1,5 @@
-import { OAVComponent, AttributeViewInfo, TextureCube, dataTransform, rs, Texture2D, MenuItem, objectEmitter } from 'feng3d';
-import { menu } from '../../ui/components/Menu';
+import { OAVComponent, AttributeViewInfo, TextureCube, dataTransform, Texture2D, objectEmitter, ReadRS } from 'feng3d';
+import { menu, MenuItem } from '../../ui/components/Menu';
 import { ObjectViewEvent } from '../events/ObjectViewEvent';
 import { OAVBase } from './OAVBase';
 
@@ -82,7 +82,7 @@ export class OAVCubeMap extends OAVBase
 		if (index != -1)
 		{
 			var textureCube: TextureCube = this.space;
-			var texture2ds = rs.getLoadedAssetDatasByType(Texture2D);
+			var texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
 			var menus: MenuItem[] = [{
 				label: `None`, click: () =>
 				{

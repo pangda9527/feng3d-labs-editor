@@ -1,25 +1,22 @@
-import { createNodeMenu, GameObject, getComponentType, globalEmitter, loader, MenuItem, View } from 'feng3d';
+import * as feng3d from 'feng3d';
+import { createNodeMenu, GameObject, getComponentType, globalEmitter, loader, View } from 'feng3d';
 import { editorRS } from '../assets/EditorRS';
 import { nativeAPI } from '../assets/NativeRequire';
 import { editorcache } from '../caches/Editorcache';
-import { editorData } from '../Editor';
 import { hierarchy } from '../feng3d/hierarchy/Hierarchy';
+import { EditorData } from '../global/EditorData';
 import { editorui } from '../global/editorui';
 import { ShortCutSetting } from '../shortcut/ShortCutSetting';
 import { AnimationView } from '../ui/animation/AnimationView';
 import { editorAsset } from '../ui/assets/EditorAsset';
 import { ProjectView } from '../ui/assets/ProjectView';
+import { MenuItem } from '../ui/components/Menu';
 import { popupview } from '../ui/components/Popupview';
 import { TabView } from '../ui/components/TabView';
 import { HierarchyView } from '../ui/hierarchy/HierarchyView';
 import { InspectorView } from '../ui/inspector/InspectorView';
 import { SceneView } from '../ui/SceneView';
 import { viewLayoutConfig } from './ViewLayoutConfig';
-
-/**
- * 菜单配置
- */
-export var menuConfig: MenuConfig;
 
 /**
  * 创建对象菜单
@@ -44,7 +41,7 @@ export class MenuConfig
                         label: "新建场景",
                         click: () =>
                         {
-                            editorData.gameScene = View.createNewScene();
+                            EditorData.editorData.gameScene = View.createNewScene();
                         },
                     },
                     {
@@ -53,7 +50,7 @@ export class MenuConfig
                         {
                             alert("未实现！");
                             //
-                            // editorData.gameScene = View.createNewScene();
+                            // EditorData.editorData.gameScene = View.createNewScene();
                         },
                     },
                     {
@@ -124,7 +121,7 @@ export class MenuConfig
                                             {
                                                 editorAsset.readScene("default.scene.json", (err, scene) =>
                                                 {
-                                                    editorData.gameScene = scene;
+                                                    EditorData.editorData.gameScene = scene;
                                                     editorui.assetview.invalidateAssettree();
                                                     console.log("打开项目完成!");
                                                 });
@@ -225,7 +222,7 @@ export class MenuConfig
                             {
                                 editorAsset.runProjectScript(() =>
                                 {
-                                    editorData.gameScene = View.createNewScene()
+                                    EditorData.editorData.gameScene = View.createNewScene()
                                     editorui.assetview.invalidateAssettree();
                                     console.log("清空项目完成!");
                                 });
@@ -410,7 +407,7 @@ export class MenuConfig
         var menu: MenuItem[] = [];
 
         // 处理 由 AddComponentMenu 添加的菜单
-        menuConfig.component.forEach(item =>
+        feng3d.menuConfig.component.forEach(item =>
         {
             var paths = item.path.split("/");
             var currentmenu = menu;
@@ -441,7 +438,11 @@ export class MenuConfig
     }
 
 }
-menuConfig = new MenuConfig();
+
+/**
+ * 菜单配置
+ */
+export var menuConfig = new MenuConfig();
 
 /**
  * 下载项目
@@ -470,7 +471,7 @@ function downloadProject(projectname: string, callback?: () => void)
                 {
                     editorAsset.readScene("default.scene.json", (err, scene) =>
                     {
-                        editorData.gameScene = scene;
+                        EditorData.editorData.gameScene = scene;
                         editorui.assetview.invalidateAssettree();
                         console.log(`${projectname} 项目下载完成!`);
                         callback && callback();

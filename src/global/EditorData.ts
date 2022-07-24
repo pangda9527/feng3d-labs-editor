@@ -1,12 +1,6 @@
 import { Scene, ArrayUtils, globalEmitter, shortcut, GameObject, Box3, TextAsset } from 'feng3d';
 import { AssetNode } from '../ui/assets/AssetNode';
 
-
-/**
- * 编辑器数据
- */
-export var editorData: EditorData;
-
 /**
  * 游戏对象控制器类型
  */
@@ -31,6 +25,8 @@ export enum MRSToolType
  */
 export class EditorData
 {
+    static editorData = new EditorData();
+
     /**
      * 游戏运行时的场景
      */
@@ -214,7 +210,7 @@ export class EditorData
                 this.selectedGameObjects.forEach(cv =>
                 {
                     var box = cv.boundingBox.worldBounds;
-                    if (editorData.isBaryCenter || this._transformBox == null)
+                    if (EditorData.editorData.isBaryCenter || this._transformBox == null)
                     {
                         this._transformBox = box.clone();
                     } else
@@ -272,5 +268,3 @@ export class EditorData
         return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
     }
 }
-
-editorData = new EditorData();

@@ -1,12 +1,15 @@
-import { globalEmitter, menuConfig, serialization, FSType, FS, Rectangle, MenuItem, windowEventProxy, Vector2 } from 'feng3d';
+import { FS, FSType, globalEmitter, Rectangle, serialization, Vector2, windowEventProxy } from 'feng3d';
 import { editorRS } from '../assets/EditorRS';
 import { editorcache } from '../caches/Editorcache';
-import { editorData } from '../Editor';
-import { MRSToolType } from '../global/EditorData';
-import { menu } from './components/Menu';
+import { menuConfig } from '../configs/CommonConfig';
+import { EditorData, MRSToolType } from '../global/EditorData';
+import { menu, MenuItem } from './components/Menu';
 
 export class TopView extends eui.Component implements eui.UIComponent
 {
+	// 运行窗口
+	static runwin: Window;
+
 	public menuList: eui.List;
 	public labelLab: eui.Label;
 	public topGroup: eui.Group;
@@ -84,8 +87,8 @@ export class TopView extends eui.Component implements eui.UIComponent
 
 		globalEmitter.off("editor.toolTypeChanged", this.updateview, this);
 
-		if (runwin) runwin.close();
-		runwin = null;
+		if (TopView.runwin) TopView.runwin.close();
+		TopView.runwin = null;
 	}
 
 	private onHelpButtonClick()
@@ -98,24 +101,24 @@ export class TopView extends eui.Component implements eui.UIComponent
 		switch (event.currentTarget)
 		{
 			case this.moveButton:
-				editorData.toolType = MRSToolType.MOVE;
+				EditorData.editorData.toolType = MRSToolType.MOVE;
 				break;
 			case this.rotateButton:
-				editorData.toolType = MRSToolType.ROTATION;
+				EditorData.editorData.toolType = MRSToolType.ROTATION;
 				break;
 			case this.scaleButton:
-				editorData.toolType = MRSToolType.SCALE;
+				EditorData.editorData.toolType = MRSToolType.SCALE;
 				break;
 			case this.worldButton:
-				editorData.isWoldCoordinate = !editorData.isWoldCoordinate;
+				EditorData.editorData.isWoldCoordinate = !EditorData.editorData.isWoldCoordinate;
 				break;
 			case this.centerButton:
-				editorData.isBaryCenter = !editorData.isBaryCenter;
+				EditorData.editorData.isBaryCenter = !EditorData.editorData.isBaryCenter;
 				break;
 			case this.playBtn:
 				var e = globalEmitter.emit("inspector.saveShowData", () =>
 				{
-					let obj = serialization.serialize(editorData.gameScene.gameObject);
+					let obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
 					editorRS.fs.writeObject("default.scene.json", obj, (err) =>
 					{
 						if (err)
@@ -125,13 +128,13 @@ export class TopView extends eui.Component implements eui.UIComponent
 						}
 						if (editorRS.fs.type == FSType.indexedDB)
 						{
-							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${FS.fs.type}&project=${editorcache.projectname}`);
+							if (TopView.runwin) TopView.runwin.close();
+							TopView.runwin = window.open(`run.html?fstype=${FS.fs.type}&project=${editorcache.projectname}`);
 							return;
 						}
 						var path = editorRS.fs.getAbsolutePath("index.html");
-						if (runwin) runwin.close();
-						runwin = window.open(path);
+						if (TopView.runwin) TopView.runwin.close();
+						TopView.runwin = window.open(path);
 					});
 				});
 				var a = e;
@@ -148,11 +151,11 @@ export class TopView extends eui.Component implements eui.UIComponent
 	private updateview()
 	{
 		this.labelLab.text = editorcache.projectname;
-		this.moveButton.selected = editorData.toolType == MRSToolType.MOVE;
-		this.rotateButton.selected = editorData.toolType == MRSToolType.ROTATION;
-		this.scaleButton.selected = editorData.toolType == MRSToolType.SCALE;
-		this.worldButton.selected = !editorData.isWoldCoordinate;
-		this.centerButton.selected = editorData.isBaryCenter;
+		this.moveButton.selected = EditorData.editorData.toolType == MRSToolType.MOVE;
+		this.rotateButton.selected = EditorData.editorData.toolType == MRSToolType.ROTATION;
+		this.scaleButton.selected = EditorData.editorData.toolType == MRSToolType.SCALE;
+		this.worldButton.selected = !EditorData.editorData.isWoldCoordinate;
+		this.centerButton.selected = EditorData.editorData.isBaryCenter;
 	}
 }
 
@@ -266,5 +269,3 @@ function onRemoveFromeStage()
 	windowEventProxy.off("mousemove", onMenuMouseMove);
 }
 
-// 运行窗口
-export var runwin: Window;

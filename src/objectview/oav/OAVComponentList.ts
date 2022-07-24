@@ -1,4 +1,5 @@
-import { OAVComponent, GameObject, AttributeViewInfo, menuConfig, Components, HideFlags, IEvent, Component } from 'feng3d';
+import { AttributeViewInfo, Component, Components, GameObject, HideFlags, IEvent, OAVComponent } from 'feng3d';
+import { menuConfig } from '../../configs/CommonConfig';
 import { ComponentView } from '../../ui/components/ComponentView';
 import { menu } from '../../ui/components/Menu';
 import { drag } from '../../ui/drag/Drag';

@@ -1,6 +1,6 @@
-import { AudioListener, AudioSource, Behaviour, Camera, classUtils, Components, DirectionalLight, FPSController, globalEmitter, IObjectView, MenuItem, objectview, PointLight, Renderable, ScriptComponent, SpotLight, Terrain, Transform, watcher, Water } from 'feng3d';
+import { AudioListener, AudioSource, Behaviour, Camera, classUtils, Components, DirectionalLight, FPSController, globalEmitter, IObjectView, objectview, PointLight, Renderable, ScriptComponent, SpotLight, Terrain, Transform, watcher, Water } from 'feng3d';
 import { Accordion } from './Accordion';
-import { menu } from './Menu';
+import { menu, MenuItem } from './Menu';
 
 export const componentIconMap = new Map<any, string>();
 

@@ -1,5 +1,5 @@
 import { ParticleSystem, globalEmitter } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 
 /**
  * 粒子特效控制器
@@ -95,7 +95,7 @@ export class ParticleEffectController extends eui.Component
 
     private onDataChange()
     {
-        var particleSystems = editorData.selectedGameObjects.reduce((pv: ParticleSystem[], cv) => { var ps = cv.getComponent(ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+        var particleSystems = EditorData.editorData.selectedGameObjects.reduce((pv: ParticleSystem[], cv) => { var ps = cv.getComponent(ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
         this.particleSystems.forEach(v =>
         {
             v.pause()

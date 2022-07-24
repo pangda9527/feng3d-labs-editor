@@ -1,4 +1,4 @@
-import { task, View, serialization } from 'feng3d';
+import { serialization, task, View } from 'feng3d';
 import { editorRS } from './assets/EditorRS';
 import { editorcache } from './caches/Editorcache';
 import { EditorData } from './global/EditorData';
@@ -10,9 +10,6 @@ import { editorAsset } from './ui/assets/EditorAsset';
 import { Message } from './ui/components/Message';
 import { MainUI } from './ui/MainUI';
 import { MainView } from './ui/MainView';
-
-//
-export var editorData: EditorData;
 
 /**
  * editor的版本号
@@ -100,9 +97,9 @@ export class Editor extends eui.UILayer
                 editorAsset.readScene("default.scene.json", (err, scene) =>
                 {
                     if (err)
-                        editorData.gameScene = View.createNewScene();
+                        EditorData.editorData.gameScene = View.createNewScene();
                     else
-                        editorData.gameScene = scene;
+                        EditorData.editorData.gameScene = scene;
 
                     //
                     this.initMainView()
@@ -115,7 +112,7 @@ export class Editor extends eui.UILayer
 
         window.addEventListener("beforeunload", () =>
         {
-            let obj = serialization.serialize(editorData.gameScene.gameObject);
+            let obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
             editorRS.fs.writeObject("default.scene.json", obj);
         });
     }

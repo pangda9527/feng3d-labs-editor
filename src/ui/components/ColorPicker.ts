@@ -1,5 +1,5 @@
 import { Color3, Color4 } from 'feng3d';
-import { ColorPickerView, colorPickerView } from './ColorPickerView';
+import { ColorPickerView } from './ColorPickerView';
 import { popupview } from './Popupview';
 
 export class ColorPicker extends eui.Component implements eui.UIComponent
@@ -56,25 +56,25 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
 
     private onClick()
     {
-        if (!colorPickerView) colorPickerView = new ColorPickerView();
-        colorPickerView.color = this.value;
+        if (!ColorPickerView.colorPickerView) ColorPickerView.colorPickerView = new ColorPickerView();
+        ColorPickerView.colorPickerView.color = this.value;
         var pos = this.localToGlobal(0, 0);
         // pos.x = pos.x - colorPickerView.width;
         pos.x = pos.x - 318;
-        colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+        ColorPickerView.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
         //
-        popupview.popupView(colorPickerView, {
+        popupview.popupView(ColorPickerView.colorPickerView, {
             x: pos.x, y: pos.y,
             closecallback: () =>
             {
-                colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
+                ColorPickerView.colorPickerView.removeEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
             }
         });
     }
 
     private onPickerViewChanged()
     {
-        this.value = colorPickerView.color;
+        this.value = ColorPickerView.colorPickerView.color;
         this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
     }
 }

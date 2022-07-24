@@ -4,10 +4,10 @@ import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
 import { ColorPicker } from './ColorPicker';
 import { ComboBox } from './ComboBox';
 
-export var gradientEditor: GradientEditor;
-
 export class GradientEditor extends eui.Component
 {
+    static gradientEditor: GradientEditor;
+
     @watch("_onGradientChanged")
     gradient = new Gradient();
 

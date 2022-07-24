@@ -1,6 +1,6 @@
-import { OAVComponent, AttributeViewInfo, watcher, MenuItem, rs, Texture2D } from 'feng3d';
-import { editorData } from '../../Editor';
-import { menu } from '../../ui/components/Menu';
+import { OAVComponent, AttributeViewInfo, watcher, Texture2D, ReadRS } from 'feng3d';
+import { EditorData } from '../../global/EditorData';
+import { menu, MenuItem } from '../../ui/components/Menu';
 import { OAVBase } from './OAVBase';
 
 /**
@@ -41,7 +41,7 @@ export class OAVTexture2D extends OAVBase
     private ontxtClick()
     {
         var menus: MenuItem[] = [];
-        var texture2ds = rs.getLoadedAssetDatasByType(Texture2D);
+        var texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
         texture2ds.forEach(texture2d =>
         {
             menus.push({
@@ -67,6 +67,6 @@ export class OAVTexture2D extends OAVBase
     private onDoubleClick()
     {
         if (this.attributeValue && typeof this.attributeValue == "object")
-            editorData.selectObject(this.attributeValue);
+            EditorData.editorData.selectObject(this.attributeValue);
     }
 }

@@ -3,10 +3,10 @@ import { editorui } from '../../global/editorui';
 import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
 import { menu } from './Menu';
 
-export var minMaxCurveEditor: MinMaxCurveEditor;
-
 export class MinMaxCurveEditor extends eui.Component
 {
+    static minMaxCurveEditor: MinMaxCurveEditor;
+
     @watch("_onMinMaxCurveChanged")
     minMaxCurve = new MinMaxCurve();
 

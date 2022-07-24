@@ -1,7 +1,8 @@
-import { watcher, ticker, menuConfig } from 'feng3d';
-import { editorData } from '../../Editor';
+import { ticker, watcher } from 'feng3d';
+import { menuConfig } from '../../configs/CommonConfig';
 import { hierarchy } from '../../feng3d/hierarchy/Hierarchy';
 import { HierarchyNode } from '../../feng3d/hierarchy/HierarchyNode';
+import { EditorData } from '../../global/EditorData';
 import { Modules } from '../../Modules';
 import { menu } from '../components/Menu';
 import { ModuleView } from '../components/TabView';
@@ -120,7 +121,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 	{
 		if (e.target == this.list)
 		{
-			editorData.selectObject(null)
+			EditorData.editorData.selectObject(null)
 		}
 	}
 
@@ -128,7 +129,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 	{
 		if (e.target == this.list)
 		{
-			editorData.selectObject(null);
+			EditorData.editorData.selectObject(null);
 			menu.popup(menuConfig.getCreateObjectMenu());
 		}
 	}

@@ -1,7 +1,8 @@
-import { shortcut, MenuItem, GameObject, serialization, menuConfig } from 'feng3d';
-import { editorData } from '../../Editor';
+import { GameObject, serialization, shortcut } from 'feng3d';
+import { menuConfig } from '../../configs/CommonConfig';
 import { HierarchyNode } from '../../feng3d/hierarchy/HierarchyNode';
-import { menu } from '../components/Menu';
+import { EditorData } from '../../global/EditorData';
+import { menu, MenuItem } from '../components/Menu';
 import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
 import { TreeItemRenderer } from '../components/TreeItemRenderer';
 import { drag, DragData } from '../drag/Drag';
@@ -47,7 +48,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
 
     private onclick()
     {
-        editorData.selectObject(this.data.gameobject);
+        EditorData.editorData.selectObject(this.data.gameobject);
     }
 
     private onDoubleClick()
@@ -65,32 +66,32 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                 {
                     label: "复制", click: () =>
                     {
-                        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
-                        editorData.copyObjects = objects;
+                        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
+                        EditorData.editorData.copyObjects = objects;
                     }
                 },
                 {
                     label: "粘贴", click: () =>
                     {
-                        var undoSelectedObjects = editorData.selectedObjects;
+                        var undoSelectedObjects = EditorData.editorData.selectedObjects;
                         //
-                        var objects: GameObject[] = editorData.copyObjects.filter(v => v instanceof GameObject);
+                        var objects: GameObject[] = EditorData.editorData.copyObjects.filter(v => v instanceof GameObject);
                         if (objects.length == 0) return;
                         var newGameObjects = objects.map(v => serialization.clone(v));
                         newGameObjects.forEach(v =>
                         {
                             this.data.gameobject.parent.addChild(v);
                         });
-                        editorData.selectMultiObject(newGameObjects);
+                        EditorData.editorData.selectMultiObject(newGameObjects);
 
                         // undo
-                        editorData.undoList.push(() =>
+                        EditorData.editorData.undoList.push(() =>
                         {
                             newGameObjects.forEach(v =>
                             {
                                 v.remove();
                             });
-                            editorData.selectMultiObject(undoSelectedObjects, false);
+                            EditorData.editorData.selectMultiObject(undoSelectedObjects, false);
                         });
                     }
                 },
@@ -98,25 +99,25 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                 {
                     label: "副本", click: () =>
                     {
-                        var undoSelectedObjects = editorData.selectedObjects;
+                        var undoSelectedObjects = EditorData.editorData.selectedObjects;
                         //
-                        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
+                        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
                         var newGameObjects = objects.map(v =>
                         {
                             var no = serialization.clone(v);
                             v.parent.addChild(no);
                             return no;
                         });
-                        editorData.selectMultiObject(newGameObjects);
+                        EditorData.editorData.selectMultiObject(newGameObjects);
 
                         // undo
-                        editorData.undoList.push(() =>
+                        EditorData.editorData.undoList.push(() =>
                         {
                             newGameObjects.forEach(v =>
                             {
                                 v.remove();
                             });
-                            editorData.selectMultiObject(undoSelectedObjects, false);
+                            EditorData.editorData.selectMultiObject(undoSelectedObjects, false);
                         });
                     }
                 },
@@ -124,12 +125,12 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                     label: "删除", click: () =>
                     {
                         this.data.gameobject.parent.removeChild(this.data.gameobject);
-                        var index = editorData.selectedObjects.indexOf(this.data.gameobject);
+                        var index = EditorData.editorData.selectedObjects.indexOf(this.data.gameobject);
                         if (index != -1)
                         {
-                            var selectedObjects = editorData.selectedObjects.concat();
+                            var selectedObjects = EditorData.editorData.selectedObjects.concat();
                             selectedObjects.splice(index, 1);
-                            editorData.selectMultiObject(selectedObjects);
+                            EditorData.editorData.selectMultiObject(selectedObjects);
                         }
                     }
                 }

@@ -1,5 +1,5 @@
 import { Transform, Vector3, globalEmitter, ticker, Matrix4x4 } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 
 export class MRSToolTarget
 {
@@ -58,7 +58,7 @@ export class MRSToolTarget
     private onSelectedGameObjectChange()
     {
         //筛选出 工具控制的对象
-        var transforms = <Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
+        var transforms = <Transform[]>EditorData.editorData.selectedGameObjects.reduce((result, item) =>
         {
             result.push(item.transform);
             return result;
@@ -85,7 +85,7 @@ export class MRSToolTarget
 
         var transform = this._controllerTargets[this._controllerTargets.length - 1];
         var position = new Vector3();
-        if (editorData.isBaryCenter)
+        if (EditorData.editorData.isBaryCenter)
         {
             position.copy(transform.worldPosition);
         } else
@@ -97,7 +97,7 @@ export class MRSToolTarget
             position.scaleNumber(1 / this._controllerTargets.length);
         }
         var rotation = new Vector3();
-        if (!editorData.isWoldCoordinate)
+        if (!EditorData.editorData.isWoldCoordinate)
         {
             rotation = this._controllerTargets[0].rotation;
         }
@@ -170,7 +170,7 @@ export class MRSToolTarget
         objects.push(this._controllerTool);
         var localnormal: Vector3;
         var gameobject = objects[0];
-        if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+        if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
         {
             if (gameobject.parent)
                 localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(normal);
@@ -179,7 +179,7 @@ export class MRSToolTarget
         {
             gameobject = objects[i];
             var tempTransform = this._startTransformDic.get(gameobject);
-            if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+            if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
             {
                 gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
             } else
@@ -187,7 +187,7 @@ export class MRSToolTarget
                 localnormal = normal.clone();
                 if (gameobject.parent)
                     localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal);
-                if (editorData.isBaryCenter)
+                if (EditorData.editorData.isBaryCenter)
                 {
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 } else
@@ -214,7 +214,7 @@ export class MRSToolTarget
         var objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
         var gameobject = objects[0];
-        if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+        if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
         {
             if (gameobject.parent)
             {
@@ -228,7 +228,7 @@ export class MRSToolTarget
             var tempsceneTransform = this._startTransformDic.get(gameobject);
             var tempPosition = tempsceneTransform.position.clone();
             var tempRotation = tempsceneTransform.rotation.clone();
-            if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
+            if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
             {
                 tempRotation = this.rotateRotation(tempRotation, normal2, angle2);
                 gameobject.rotation = this.rotateRotation(tempRotation, normal1, angle1);
@@ -241,7 +241,7 @@ export class MRSToolTarget
                     localnormal1 = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal1);
                     localnormal2 = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal2);
                 }
-                if (editorData.isBaryCenter)
+                if (EditorData.editorData.isBaryCenter)
                 {
                     tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                     gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);

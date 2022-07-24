@@ -1,5 +1,5 @@
 import { Canvas, GameObject, GameObjectAsset, globalEmitter, HideFlags, IEvent, Transform2D, watcher } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { HierarchyNode } from './HierarchyNode';
 
 export var hierarchy: Hierarchy;
@@ -21,7 +21,7 @@ export class Hierarchy
      */
     getSelectedNode()
     {
-        var node = editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
+        var node = EditorData.editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
         return node;
     }
 
@@ -62,7 +62,7 @@ export class Hierarchy
             selectedNode.gameobject.addChild(gameobject);
         else
             this.rootnode.gameobject.addChild(gameobject);
-        editorData.selectObject(gameobject);
+        EditorData.editorData.selectObject(gameobject);
     }
 
     /**
@@ -87,7 +87,7 @@ export class Hierarchy
             }
             canvas.gameObject.addChild(gameobject);
         }
-        editorData.selectObject(gameobject);
+        EditorData.editorData.selectObject(gameobject);
     }
 
     addGameoObjectFromAsset(gameobjectAsset: GameObjectAsset, parent?: GameObject)
@@ -100,7 +100,7 @@ export class Hierarchy
             parent.addChild(gameobject);
         else
             this.rootnode.gameobject.addChild(gameobject);
-        editorData.selectObject(gameobject);
+        EditorData.editorData.selectObject(gameobject);
         return gameobject;
     }
 
@@ -131,7 +131,7 @@ export class Hierarchy
             else
                 debugger; // 为什么为空，是否被允许？
         });
-        this._selectedGameObjects = editorData.selectedGameObjects.concat();
+        this._selectedGameObjects = EditorData.editorData.selectedGameObjects.concat();
         this._selectedGameObjects.forEach(element =>
         {
             var node = this.getNode(element);

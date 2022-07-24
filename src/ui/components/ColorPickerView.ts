@@ -5,6 +5,8 @@ var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff00
  */
 export class ColorPickerView extends eui.Component
 {
+    static colorPickerView: ColorPickerView;
+
     public group0: eui.Group;
     public image0: eui.Image;
     public pos0: eui.Group;
@@ -360,5 +362,3 @@ function getMixColorAtRatio(ratio: number, colors: number[], ratios?: number[])
     return colors1[0];
 }
 
-
-export var colorPickerView: ColorPickerView;

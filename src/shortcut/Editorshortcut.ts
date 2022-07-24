@@ -1,8 +1,7 @@
 import { shortcut, GameObject, serialization } from 'feng3d';
 import { nativeAPI } from '../assets/NativeRequire';
 import { shortcutConfig } from '../configs/ShortcutConfig';
-import { editorData } from '../Editor';
-import { MRSToolType } from '../global/EditorData';
+import { EditorData, MRSToolType } from '../global/EditorData';
 import { AssetNode } from '../ui/assets/AssetNode';
 
 export class Editorshortcut
@@ -29,22 +28,22 @@ export class Editorshortcut
 
     private onGameobjectMoveTool()
     {
-        editorData.toolType = MRSToolType.MOVE;
+        EditorData.editorData.toolType = MRSToolType.MOVE;
     }
 
     private onGameobjectRotationTool()
     {
-        editorData.toolType = MRSToolType.ROTATION;
+        EditorData.editorData.toolType = MRSToolType.ROTATION;
     }
 
     private onGameobjectScaleTool()
     {
-        editorData.toolType = MRSToolType.SCALE;
+        EditorData.editorData.toolType = MRSToolType.SCALE;
     }
 
     private onDeleteSeletedGameObject()
     {
-        var selectedObject = editorData.selectedObjects;
+        var selectedObject = EditorData.editorData.selectedObjects;
 
         if (!selectedObject)
             return;
@@ -59,7 +58,7 @@ export class Editorshortcut
                 element.delete();
             }
         });
-        editorData.clearSelectedObjects();
+        EditorData.editorData.clearSelectedObjects();
     }
 
     private onOpenDevTools()
@@ -74,15 +73,15 @@ export class Editorshortcut
 
     private onCopy()
     {
-        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
-        editorData.copyObjects = objects;
+        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
+        EditorData.editorData.copyObjects = objects;
     }
 
     private onPaste()
     {
-        var undoSelectedObjects = editorData.selectedObjects;
+        var undoSelectedObjects = EditorData.editorData.selectedObjects;
         //
-        var objects: GameObject[] = editorData.copyObjects.filter(v => v instanceof GameObject);
+        var objects: GameObject[] = EditorData.editorData.copyObjects.filter(v => v instanceof GameObject);
         if (objects.length == 0) return;
         var parent = objects[0].parent;
         var newGameObjects = objects.map(v => serialization.clone(v));
@@ -90,22 +89,22 @@ export class Editorshortcut
         {
             parent.addChild(v);
         });
-        editorData.selectMultiObject(newGameObjects, false);
+        EditorData.editorData.selectMultiObject(newGameObjects, false);
 
         // undo
-        editorData.undoList.push(() =>
+        EditorData.editorData.undoList.push(() =>
         {
             newGameObjects.forEach(v =>
             {
                 v.remove();
             });
-            editorData.selectMultiObject(undoSelectedObjects, false);
+            EditorData.editorData.selectMultiObject(undoSelectedObjects, false);
         });
     }
 
     private onUndo()
     {
-        var item = editorData.undoList.pop();
+        var item = EditorData.editorData.undoList.pop();
         if (item) item();
     }
 }

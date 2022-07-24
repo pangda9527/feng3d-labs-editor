@@ -1,5 +1,5 @@
 import { globalEmitter, GameObject, Scene, shortcut, AssetData } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { drag } from '../drag/Drag';
 import { AssetNode } from './AssetNode';
 import { editorAsset } from './EditorAsset';
@@ -90,7 +90,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
             var scene = this.data.asset.getComponent(Scene);
             if (scene)
             {
-                editorData.gameScene = scene;
+                EditorData.editorData.gameScene = scene;
             }
         }
     }
@@ -104,16 +104,16 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
             var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
             var index = source.indexOf(this.data);
             var min = index, max = index;
-            if (editorData.selectedAssetNodes.indexOf(preAssetFile) != -1)
+            if (EditorData.editorData.selectedAssetNodes.indexOf(preAssetFile) != -1)
             {
                 index = source.indexOf(preAssetFile);
                 if (index < min) min = index;
                 if (index > max) max = index;
             }
-            editorData.selectMultiObject(source.slice(min, max + 1));
+            EditorData.editorData.selectMultiObject(source.slice(min, max + 1));
         } else
         {
-            editorData.selectObject(this.data);
+            EditorData.editorData.selectObject(this.data);
             preAssetFile = this.data;
         }
     }
@@ -121,7 +121,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
     private onrightclick(e: egret.Event)
     {
         e.stopPropagation();
-        editorData.selectObject(this.data);
+        EditorData.editorData.selectObject(this.data);
         editorAsset.popupmenu(this.data);
     }
 
@@ -130,11 +130,11 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         var selected = false;
         if (this.data)
         {
-            var selectedAssetFile = editorData.selectedAssetNodes;
+            var selectedAssetFile = EditorData.editorData.selectedAssetNodes;
             selected = selectedAssetFile.indexOf(this.data) != -1;
             if (!selected)
             {
-                var assetids = editorData.selectedObjects.map(v => (<AssetData>v).assetId);
+                var assetids = EditorData.editorData.selectedObjects.map(v => (<AssetData>v).assetId);
                 selected = assetids.indexOf(this.data.asset.assetId) != -1;
             }
         }

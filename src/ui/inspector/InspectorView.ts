@@ -1,6 +1,6 @@
-import { IEvent, rs, globalEmitter, Feng3dObject, HideFlags, objectview, FileAsset } from 'feng3d';
+import { IEvent, globalEmitter, Feng3dObject, HideFlags, objectview, FileAsset, ReadRS } from 'feng3d';
 import { editorRS } from '../../assets/EditorRS';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { Modules } from '../../Modules';
 import { ObjectViewEvent } from '../../objectview/events/ObjectViewEvent';
 import { AssetNode } from '../assets/AssetNode';
@@ -52,7 +52,7 @@ export class InspectorView extends eui.Component implements ModuleView
 	{
 		this._historySelectedObject.pop();
 		var v = this._historySelectedObject.pop();
-		editorData.selectedObjects = v;
+		EditorData.editorData.selectedObjects = v;
 	}
 
 	private showData(data: any)
@@ -123,7 +123,7 @@ export class InspectorView extends eui.Component implements ModuleView
 		{
 			if (this._viewData.assetId)
 			{
-				var feng3dAsset = rs.getAssetById(this._viewData.assetId);
+				var feng3dAsset = ReadRS.rs.getAssetById(this._viewData.assetId);
 				if (feng3dAsset)
 				{
 					editorRS.writeAsset(feng3dAsset, (err) =>
@@ -185,10 +185,10 @@ export class InspectorView extends eui.Component implements ModuleView
 
 	private onSelectedObjectsChanged()
 	{
-		this._historySelectedObject.push(editorData.selectedObjects);
+		this._historySelectedObject.push(EditorData.editorData.selectedObjects);
 		if (this._historySelectedObject.length > this._maxHistorySelectedObject) this._historySelectedObject.shift();
 
-		var data = inspectorMultiObject.convertInspectorObject(editorData.selectedObjects);
+		var data = inspectorMultiObject.convertInspectorObject(EditorData.editorData.selectedObjects);
 		this.showData(data);
 	}
 

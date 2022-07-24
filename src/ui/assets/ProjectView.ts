@@ -1,5 +1,5 @@
 import { globalEmitter, watcher, ticker, Vector2, shortcut, windowEventProxy, Rectangle } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { editorui } from '../../global/editorui';
 import { Modules } from '../../Modules';
 import { AreaSelectRect } from '../components/AreaSelectRect';
@@ -230,7 +230,7 @@ export class ProjectView extends eui.Component implements ModuleView
 
     private selectedfilechanged()
     {
-        var selectedAssetFile = editorData.selectedAssetNodes;
+        var selectedAssetFile = EditorData.editorData.selectedAssetNodes;
         if (selectedAssetFile.length > 0)
             this.filepathLabel.text = selectedAssetFile.map(v =>
             {
@@ -249,13 +249,13 @@ export class ProjectView extends eui.Component implements ModuleView
     {
         if (e.target == this.filelist)
         {
-            editorData.clearSelectedObjects()
+            EditorData.editorData.clearSelectedObjects()
         }
     }
 
     private onfilelistrightclick(e: egret.MouseEvent)
     {
-        editorData.clearSelectedObjects();
+        EditorData.editorData.clearSelectedObjects();
 
         editorAsset.popupmenu(editorAsset.showFloder);
     }
@@ -294,7 +294,7 @@ export class ProjectView extends eui.Component implements ModuleView
             var rectangle = v.getGlobalBounds();
             return areaRect.intersects(rectangle);
         }).map(v => v.data);
-        editorData.selectMultiObject(datas);
+        EditorData.editorData.selectMultiObject(datas);
     }
 
     private onMouseUp()

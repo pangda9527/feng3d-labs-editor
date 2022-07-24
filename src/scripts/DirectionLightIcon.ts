@@ -1,5 +1,5 @@
 import { RegisterComponent, DirectionalLight, Camera, watcher, GameObject, BillboardComponent, MeshRenderer, PlaneGeometry, Material, TextureUniforms, Texture2D, TextureFormat, Segment, Vector3, HideFlags, HoldSizeComponent, SegmentUniforms, Color4, RenderMode, SegmentGeometry, shortcut, ticker } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 import { EditorScript } from './EditorScript';
 
 declare global
@@ -48,7 +48,7 @@ export class DirectionLightIcon extends EditorScript
             material.shaderName = "texture";
             const uniforms = material.uniforms as TextureUniforms;
             const texture = uniforms.s_texture = new Texture2D();
-            texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/sun.png") };
+            texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/sun.png") };
             texture.format = TextureFormat.RGBA;
             texture.premulAlpha = true;
             material.renderParams.enableBlend = true;
@@ -109,8 +109,8 @@ export class DirectionLightIcon extends EditorScript
     {
         if (!this.light) return;
 
-        (<TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
-        this._lightLines.activeSelf = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
+        (this._textureMaterial.uniforms as TextureUniforms).u_color = this.light.color.toColor4() as any;
+        this._lightLines.activeSelf = EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
     }
 
     dispose()
@@ -149,7 +149,7 @@ export class DirectionLightIcon extends EditorScript
 
     private onMousedown()
     {
-        editorData.selectObject(this.light.gameObject);
+        EditorData.editorData.selectObject(this.light.gameObject);
         shortcut.activityState("selectInvalid");
         ticker.once(100, () =>
         {

@@ -1,5 +1,5 @@
 import { View, ticker, Camera, globalEmitter } from 'feng3d';
-import { editorData } from '../Editor';
+import { EditorData } from '../global/EditorData';
 
 export class CameraPreview extends eui.Component
 {
@@ -87,7 +87,7 @@ export class CameraPreview extends eui.Component
 
     private onDataChange()
     {
-        var selectedGameObjects = editorData.selectedGameObjects;
+        var selectedGameObjects = EditorData.editorData.selectedGameObjects;
         if (selectedGameObjects.length > 0)
         {
             for (let i = 0; i < selectedGameObjects.length; i++)
@@ -107,9 +107,9 @@ export class CameraPreview extends eui.Component
 
     private onframe()
     {
-        if (this.previewView.scene != editorData.gameScene)
+        if (this.previewView.scene != EditorData.editorData.gameScene)
         {
-            this.previewView.scene = editorData.gameScene;
+            this.previewView.scene = EditorData.editorData.gameScene;
         }
         this.previewView.render();
     }

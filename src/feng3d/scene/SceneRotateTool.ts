@@ -1,5 +1,5 @@
 import { RegisterComponent, Component, GameObject, loader, serialization, ticker, mathUtil, Vector3, Rectangle, windowEventProxy, shortcut, View, IEvent, Matrix4x4, globalEmitter, Quaternion } from 'feng3d';
-import { editorData } from '../../Editor';
+import { EditorData } from '../../global/EditorData';
 import { sceneControlConfig } from '../../shortcut/Editorshortcut';
 import { menu } from '../../ui/components/Menu';
 import { EditorView } from '../EditorView';
@@ -41,7 +41,7 @@ export class SceneRotateTool extends Component
         if (this.isload) return;
         this.isload = true;
 
-        loader.loadText(editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
+        loader.loadText(EditorData.editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
         {
             var rotationToolModel: GameObject = serialization.deserialize(JSON.parse(content));
             this.onLoaded(rotationToolModel);
@@ -233,10 +233,10 @@ export class SceneRotateTool extends Component
         var camera = this.view.camera;
         var forward = camera.transform.matrix.getAxisZ();
         var lookDistance: number;
-        if (editorData.selectedGameObjects.length > 0)
+        if (EditorData.editorData.selectedGameObjects.length > 0)
         {
             //计算观察距离
-            var selectedObj = editorData.selectedGameObjects[0];
+            var selectedObj = EditorData.editorData.selectedGameObjects[0];
             var lookray = selectedObj.transform.worldPosition.subTo(camera.transform.worldPosition);
             lookDistance = Math.max(0, forward.dot(lookray));
         } else

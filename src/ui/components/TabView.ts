@@ -10,20 +10,20 @@ import { menu } from './Menu';
 import { SplitGroup } from './SplitGroup';
 import { WindowView } from './WindowView';
 
+declare global
+{
+	export interface MixinsDragDataMap
+	{
+		moduleView: { tabView: TabView, moduleName: string };
+	}
+}
+
 export interface ModuleView extends eui.Component
 {
 	/**
 	 * 模块名称
 	 */
 	moduleName: string;
-}
-
-/**
- * 拖拽数据
- */
-export interface DragDataMap
-{
-	moduleView: { tabView: TabView, moduleName: string };
 }
 
 /**
