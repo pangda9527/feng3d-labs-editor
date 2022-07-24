@@ -34,7 +34,9 @@
   "author": "feng",
   "license": "ISC",
   "dependencies": {
-    "feng3d": "0.4.1",
+    "feng3d": "0.5.0",
+    "@feng3d/cannon": "0.5.0",
+    "@feng3d/cannon-plugin": "0.5.0",
     "websocket": "^1.0.34"
   },
   "devDependencies": {
