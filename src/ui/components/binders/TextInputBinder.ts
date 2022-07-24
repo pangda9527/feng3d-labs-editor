@@ -1,151 +1,152 @@
-namespace eui
+declare global
 {
-    export interface Component
+    namespace eui
     {
-        addBinder(...binders: editor.UIBinder[]): void;
-    }
-
-    eui.Component.prototype["addBinder"] = function (...binders: editor.UIBinder[])
-    {
-        this._binders = this._binders || [];
-        binders.forEach(v =>
+        export interface Component
         {
-            this._binders.push(v);
-        });
-    }
-
-    var old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
-    eui.Component.prototype["$onRemoveFromStage"] = function ()
-    {
-        if (this._binders)
-        {
-            this._binders.forEach(v => v.dispose());
-            this._binders.length = 0;
+            addBinder(...binders: editor.UIBinder[]): void;
         }
-        old$onRemoveFromStage.call(this);
-    };
+    }
 }
 
-namespace editor
+eui.Component.prototype["addBinder"] = function (...binders: editor.UIBinder[])
 {
-    export interface UIBinder
+    this._binders = this._binders || [];
+    binders.forEach(v =>
     {
-        init(v: Partial<this>): this;
-        dispose(): void;
+        this._binders.push(v);
+    });
+}
+
+var old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
+eui.Component.prototype["$onRemoveFromStage"] = function ()
+{
+    if (this._binders)
+    {
+        this._binders.forEach(v => v.dispose());
+        this._binders.length = 0;
+    }
+    old$onRemoveFromStage.call(this);
+};
+
+
+export interface UIBinder
+{
+    init(v: Partial<this>): this;
+    dispose(): void;
+}
+
+export interface TextInputBinderEventMap
+{
+    valueChanged
+}
+
+export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinderEventMap> extends feng3d.EventEmitter<T> implements UIBinder
+{
+    space: any;
+
+    /**
+     * 绑定属性名称
+     */
+    attribute: string;
+
+    textInput: eui.TextInput;
+
+    /**
+     * 是否可编辑
+     */
+    editable = true;
+
+    /**
+     * 绑定属性值转换为文本
+     */
+    toText(v: any)
+    {
+        return v;
     }
 
-    export interface TextInputBinderEventMap
+    /**
+     * 文本转换为绑定属性值
+     */
+    toValue(v: any)
     {
-        valueChanged
+        return v;
     }
 
-    export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinderEventMap> extends feng3d.EventEmitter<T> implements UIBinder
+    init(v: Partial<this>)
     {
-        space: any;
+        Object.assign(this, v);
 
-        /**
-         * 绑定属性名称
-         */
-        attribute: string;
+        //
+        this.initView();
+        this.invalidateView();
+        //
+        return this;
+    }
 
-        textInput: eui.TextInput;
+    dispose()
+    {
+        feng3d.watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
 
-        /**
-         * 是否可编辑
-         */
-        editable = true;
+        //
+        this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+        this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+        this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
+    }
 
-        /**
-         * 绑定属性值转换为文本
-         */
-        toText(v: any)
+    protected initView()
+    {
+        //
+        if (this.editable)
         {
-            return v;
+            this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
+            this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
+            this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
         }
+        feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
+        this.textInput.enabled = this.editable;
+    }
 
-        /**
-         * 文本转换为绑定属性值
-         */
-        toValue(v: any)
+    protected onValueChanged()
+    {
+        var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+        objectViewEvent.space = this.space;
+        objectViewEvent.attributeName = this.attribute;
+        objectViewEvent.attributeValue = this.space[this.attribute];
+        this.textInput.dispatchEvent(objectViewEvent);
+
+        this.emit("valueChanged");
+
+        this.invalidateView();
+    }
+
+    protected updateView()
+    {
+        if (!this._textfocusintxt)
         {
-            return v;
+            this.textInput.text = this.toText(this.space[this.attribute]);
         }
+    }
 
-        init(v: Partial<this>)
-        {
-            Object.assign(this, v);
+    protected onTextChange()
+    {
+        this.space[this.attribute] = this.toValue(this.textInput.text);
+    }
 
-            //
-            this.initView();
-            this.invalidateView();
-            //
-            return this;
-        }
+    private _textfocusintxt: boolean;
+    protected ontxtfocusin()
+    {
+        this._textfocusintxt = true;
+    }
 
-        dispose()
-        {
-            feng3d.watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
+    protected ontxtfocusout()
+    {
+        this._textfocusintxt = false;
+        this.invalidateView();
+    }
 
-            //
-            this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-            this.textInput.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-            this.textInput.removeEventListener(egret.Event.CHANGE, this.onTextChange, this);
-        }
-
-        protected initView()
-        {
-            //
-            if (this.editable)
-            {
-                this.textInput.addEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
-                this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
-                this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
-            }
-            feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
-            this.textInput.enabled = this.editable;
-        }
-
-        protected onValueChanged()
-        {
-            var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-            objectViewEvent.space = this.space;
-            objectViewEvent.attributeName = this.attribute;
-            objectViewEvent.attributeValue = this.space[this.attribute];
-            this.textInput.dispatchEvent(objectViewEvent);
-
-            this.emit("valueChanged");
-
-            this.invalidateView();
-        }
-
-        protected updateView()
-        {
-            if (!this._textfocusintxt)
-            {
-                this.textInput.text = this.toText(this.space[this.attribute]);
-            }
-        }
-
-        protected onTextChange()
-        {
-            this.space[this.attribute] = this.toValue(this.textInput.text);
-        }
-
-        private _textfocusintxt: boolean;
-        protected ontxtfocusin()
-        {
-            this._textfocusintxt = true;
-        }
-
-        protected ontxtfocusout()
-        {
-            this._textfocusintxt = false;
-            this.invalidateView();
-        }
-
-        protected invalidateView()
-        {
-            feng3d.ticker.nextframe(this.updateView, this);
-        }
+    protected invalidateView()
+    {
+        feng3d.ticker.nextframe(this.updateView, this);
     }
 }

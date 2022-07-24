@@ -1,146 +1,144 @@
-namespace editor
+
+export interface TreeNodeMap
 {
-	export interface TreeNodeMap
+	added: TreeNode;
+	removed: TreeNode;
+	openChanged: TreeNode;
+}
+
+export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventEmitter<T>
+{
+	/**
+	 * 标签
+	 */
+	label = "";
+	/**
+	 * 目录深度
+	 */
+	get depth()
 	{
-		added: TreeNode;
-		removed: TreeNode;
-		openChanged: TreeNode;
+		var d = 0;
+		var p = this.parent;
+		while (p)
+		{
+			d++;
+			p = p.parent;
+		}
+		return d;
+	}
+	/**
+	 * 是否打开
+	 */
+	@feng3d.watch("openChanged")
+	isOpen = false;
+
+	/**
+	 * 是否选中
+	 */
+	@feng3d.watch("selectedChanged")
+	selected = false;
+	/** 
+	 * 父结点
+	 */
+	parent: TreeNode = null;
+	/**
+	 * 子结点列表
+	 */
+	children: TreeNode[];
+
+	constructor(obj?: feng3d.gPartial<TreeNode>)
+	{
+		super();
+		if (obj)
+		{
+			Object.assign(this, obj);
+		}
 	}
 
-	export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventEmitter<T>
+	/**
+	 * 销毁
+	 */
+	destroy()
 	{
-		/**
-		 * 标签
-		 */
-		label = "";
-		/**
-         * 目录深度
-         */
-		get depth()
+		if (this.children)
 		{
-			var d = 0;
-			var p = this.parent;
-			while (p)
+			this.children.concat().forEach(element =>
 			{
-				d++;
-				p = p.parent;
-			}
-			return d;
+				element.destroy();
+			});
 		}
-		/**
-		 * 是否打开
-		 */
-		@feng3d.watch("openChanged")
-		isOpen = false;
+		this.remove();
 
-		/**
-		 * 是否选中
-		 */
-		@feng3d.watch("selectedChanged")
-		selected = false;
-        /** 
-         * 父结点
-         */
-		parent: TreeNode = null;
-        /**
-         * 子结点列表
-         */
-		children: TreeNode[];
+		this.parent = null;
+		this.children = null;
+	}
 
-		constructor(obj?: feng3d.gPartial<TreeNode>)
+	/**
+	 * 判断是否包含结点
+	 */
+	contain(node: TreeNode)
+	{
+		while (node)
 		{
-			super();
-			if (obj)
-			{
-				Object.assign(this, obj);
-			}
+			if (node == this) return true;
+			node = node.parent;
 		}
+		return false;
+	}
 
-		/**
-         * 销毁
-         */
-		destroy()
+	addChild(node: TreeNode)
+	{
+		node.remove();
+
+		console.assert(!node.contain(this), "无法添加到自身结点中!");
+
+		if (this.children.indexOf(node) == -1) this.children.push(node);
+		node.parent = this;
+
+		this.emit("added", node, true);
+	}
+
+	remove()
+	{
+		if (this.parent)
 		{
-			if (this.children)
-			{
-				this.children.concat().forEach(element =>
-				{
-					element.destroy();
-				});
-			}
-			this.remove();
-
+			var index = this.parent.children.indexOf(this);
+			if (index != -1) this.parent.children.splice(index, 1);
+			this.emit("removed", this, true);
 			this.parent = null;
-			this.children = null;
 		}
+	}
 
-		/**
-         * 判断是否包含结点
-         */
-		contain(node: TreeNode)
+	getShowNodes()
+	{
+		var nodes: TreeNode[] = [this];
+		if (this.isOpen)
 		{
-			while (node)
+			this.children.forEach(element =>
 			{
-				if (node == this) return true;
-				node = node.parent;
-			}
-			return false;
+				nodes = nodes.concat(element.getShowNodes());
+			});
 		}
+		return nodes;
+	}
 
-		addChild(node: TreeNode)
+	openParents()
+	{
+		var p = this.parent;
+		while (p)
 		{
-			node.remove();
-
-			console.assert(!node.contain(this), "无法添加到自身结点中!");
-
-			if (this.children.indexOf(node) == -1) this.children.push(node);
-			node.parent = this;
-
-			this.emit("added", node, true);
+			p.isOpen = true;
+			p = p.parent;
 		}
+	}
 
-		remove()
-		{
-			if (this.parent)
-			{
-				var index = this.parent.children.indexOf(this);
-				if (index != -1) this.parent.children.splice(index, 1);
-				this.emit("removed", this, true);
-				this.parent = null;
-			}
-		}
+	private openChanged()
+	{
+		this.emit("openChanged", null, true);
+	}
 
-		getShowNodes()
-		{
-			var nodes: TreeNode[] = [this];
-			if (this.isOpen)
-			{
-				this.children.forEach(element =>
-				{
-					nodes = nodes.concat(element.getShowNodes());
-				});
-			}
-			return nodes;
-		}
-
-		openParents()
-		{
-			var p = this.parent;
-			while (p)
-			{
-				p.isOpen = true;
-				p = p.parent;
-			}
-		}
-
-		private openChanged()
-		{
-			this.emit("openChanged", null, true);
-		}
-
-		private selectedChanged()
-		{
-			this.openParents();
-		}
+	private selectedChanged()
+	{
+		this.openParents();
 	}
 }

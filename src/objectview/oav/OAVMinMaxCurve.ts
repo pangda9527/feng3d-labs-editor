@@ -1,46 +1,44 @@
-namespace editor
+
+@feng3d.OAVComponent()
+export class OAVMinMaxCurve extends OAVBase
 {
-    @feng3d.OAVComponent()
-    export class OAVMinMaxCurve extends OAVBase
+    public labelLab: eui.Label;
+    public minMaxCurveView: editor.MinMaxCurveView;
+
+    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
     {
-        public labelLab: eui.Label;
-        public minMaxCurveView: editor.MinMaxCurveView;
+        super(attributeViewInfo);
 
-        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+        this.skinName = "OAVMinMaxCurve";
+    }
+
+    initView()
+    {
+        if (this._attributeViewInfo.editable)
         {
-            super(attributeViewInfo);
-
-            this.skinName = "OAVMinMaxCurve";
+            this.minMaxCurveView.addEventListener(egret.Event.CHANGE, this.onChange, this);
         }
 
-        initView()
+        this.minMaxCurveView.minMaxCurve = this.attributeValue;
+
+        this.minMaxCurveView.touchEnabled = this.minMaxCurveView.touchChildren = this._attributeViewInfo.editable;
+    }
+
+    dispose()
+    {
+        if (this._attributeViewInfo.editable)
         {
-            if (this._attributeViewInfo.editable)
-            {
-                this.minMaxCurveView.addEventListener(egret.Event.CHANGE, this.onChange, this);
-            }
-
-            this.minMaxCurveView.minMaxCurve = this.attributeValue;
-
-            this.minMaxCurveView.touchEnabled = this.minMaxCurveView.touchChildren = this._attributeViewInfo.editable;
+            this.minMaxCurveView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
         }
+    }
 
-        dispose()
-        {
-            if (this._attributeViewInfo.editable)
-            {
-                this.minMaxCurveView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
-            }
-        }
+    updateView()
+    {
 
-        updateView()
-        {
+    }
 
-        }
+    private onChange()
+    {
 
-        private onChange()
-        {
-
-        }
     }
 }

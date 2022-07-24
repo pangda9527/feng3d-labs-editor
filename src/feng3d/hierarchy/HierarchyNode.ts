@@ -1,85 +1,83 @@
-namespace editor
+
+export class HierarchyNode extends TreeNode
 {
-    export class HierarchyNode extends TreeNode
+    isOpen = false;
+
+    /**
+     * 游戏对象
+     */
+    gameobject: feng3d.GameObject;
+    /** 
+     * 父结点
+     */
+    parent: HierarchyNode = null;
+    /**
+     * 子结点列表
+     */
+    children: HierarchyNode[] = [];
+
+    constructor(obj: feng3d.gPartial<HierarchyNode>)
     {
-        isOpen = false;
+        super(obj);
 
-        /**
-         * 游戏对象
-         */
-        gameobject: feng3d.GameObject;
-        /** 
-         * 父结点
-         */
-        parent: HierarchyNode = null;
-        /**
-         * 子结点列表
-         */
-        children: HierarchyNode[] = [];
+        feng3d.watcher.watch(this.gameobject, "name", this.update, this);
 
-        constructor(obj: feng3d.gPartial<HierarchyNode>)
+        this.update();
+    }
+
+    /**
+     * 提供拖拽数据
+     * 
+     * @param dragSource 
+     */
+    setdargSource(dragSource: DragData)
+    {
+        dragSource.addDragData("gameobject", this.gameobject);
+    }
+
+    /**
+     * 接受拖拽数据
+     * 
+     * @param dragdata 
+     */
+    acceptDragDrop(dragdata: DragData)
+    {
+        dragdata.getDragData("gameobject").forEach(v =>
         {
-            super(obj);
-
-            feng3d.watcher.watch(this.gameobject, "name", this.update, this);
-
-            this.update();
-        }
-
-        /**
-         * 提供拖拽数据
-         * 
-         * @param dragSource 
-         */
-        setdargSource(dragSource: DragData)
-        {
-            dragSource.addDragData("gameobject", this.gameobject);
-        }
-
-        /**
-         * 接受拖拽数据
-         * 
-         * @param dragdata 
-         */
-        acceptDragDrop(dragdata: DragData)
-        {
-            dragdata.getDragData("gameobject").forEach(v =>
+            if (!v.contains(this.gameobject))
             {
-                if (!v.contains(this.gameobject))
-                {
-                    var localToWorldMatrix = v.transform.localToWorldMatrix
-                    this.gameobject.addChild(v);
-                    v.transform.localToWorldMatrix = localToWorldMatrix;
-                    //
-                    hierarchy.getNode(v).openParents();
-                }
-            });
-            dragdata.getDragData("file_gameobject").forEach(v =>
-            {
-                let gameobject = hierarchy.addGameoObjectFromAsset(v, this.gameobject);
-                hierarchy.getNode(gameobject).openParents();
-            });
-            dragdata.getDragData("file_script").forEach(v =>
-            {
-                this.gameobject.addScript(v.scriptName);
-            })
-
-        }
-
-        /**
-         * 销毁
-         */
-        destroy()
+                var localToWorldMatrix = v.transform.localToWorldMatrix
+                this.gameobject.addChild(v);
+                v.transform.localToWorldMatrix = localToWorldMatrix;
+                //
+                hierarchy.getNode(v).openParents();
+            }
+        });
+        dragdata.getDragData("file_gameobject").forEach(v =>
         {
-            feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
-
-            this.gameobject = null;
-            super.destroy();
-        }
-
-        private update()
+            let gameobject = hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+            hierarchy.getNode(gameobject).openParents();
+        });
+        dragdata.getDragData("file_script").forEach(v =>
         {
-            this.label = this.gameobject.name;
-        }
+            this.gameobject.addScript(v.scriptName);
+        })
+
+    }
+
+    /**
+     * 销毁
+     */
+    destroy()
+    {
+        feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
+
+        this.gameobject = null;
+        super.destroy();
+    }
+
+    private update()
+    {
+        this.label = this.gameobject.name;
     }
 }

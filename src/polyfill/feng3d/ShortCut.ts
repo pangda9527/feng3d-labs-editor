@@ -1,25 +1,22 @@
-namespace feng3d
+/**
+ * (快捷键)状态列表
+ */
+export var shortCutStates = {
+    disableScroll: "禁止滚动",
+    splitGroupDraging: "正在拖拽分割界面",
+    draging: "正在拖拽中"
+};
+
+/**
+ * (快捷键)状态列表
+ */
+export type ShortCutStates = typeof shortCutStates;
+
+export interface ShortCut
 {
-    /**
-     * (快捷键)状态列表
-     */
-    export var shortCutStates = {
-        disableScroll: "禁止滚动",
-        splitGroupDraging: "正在拖拽分割界面",
-        draging: "正在拖拽中"
-    };
+    activityState<K extends keyof ShortCutStates>(state: K): void;
 
-    /**
-     * (快捷键)状态列表
-     */
-    export type ShortCutStates = typeof shortCutStates;
+    deactivityState<K extends keyof ShortCutStates>(state: K): void;
 
-    export interface ShortCut
-    {
-        activityState<K extends keyof ShortCutStates>(state: K): void;
-
-        deactivityState<K extends keyof ShortCutStates>(state: K): void;
-
-        getState<K extends keyof ShortCutStates>(state: K): boolean
-    }
+    getState<K extends keyof ShortCutStates>(state: K): boolean
 }

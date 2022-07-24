@@ -1,154 +1,152 @@
-namespace editor
+
+@feng3d.OAVComponent()
+export class OAVCubeMap extends OAVBase
 {
-	@feng3d.OAVComponent()
-	export class OAVCubeMap extends OAVBase
+	public px: eui.Image;
+	public py: eui.Image;
+	public pz: eui.Image;
+	public nx: eui.Image;
+	public ny: eui.Image;
+	public nz: eui.Image;
+	public pxGroup: eui.Group;
+	public pxBtn: eui.Button;
+	public pyGroup: eui.Group;
+	public pyBtn: eui.Button;
+	public pzGroup: eui.Group;
+	public pzBtn: eui.Button;
+	public nxGroup: eui.Group;
+	public nxBtn: eui.Button;
+	public nyGroup: eui.Group;
+	public nyBtn: eui.Button;
+	public nzGroup: eui.Group;
+	public nzBtn: eui.Button;
+
+
+	private images: eui.Image[];
+	private btns: eui.Button[];
+
+	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
 	{
-		public px: eui.Image;
-		public py: eui.Image;
-		public pz: eui.Image;
-		public nx: eui.Image;
-		public ny: eui.Image;
-		public nz: eui.Image;
-		public pxGroup: eui.Group;
-		public pxBtn: eui.Button;
-		public pyGroup: eui.Group;
-		public pyBtn: eui.Button;
-		public pzGroup: eui.Group;
-		public pzBtn: eui.Button;
-		public nxGroup: eui.Group;
-		public nxBtn: eui.Button;
-		public nyGroup: eui.Group;
-		public nyBtn: eui.Button;
-		public nzGroup: eui.Group;
-		public nzBtn: eui.Button;
+		super(attributeViewInfo);
+		this.skinName = "OAVCubeMap";
+		this.alpha = 1;
+	}
 
+	initView()
+	{
+		this.images = [this.px, this.py, this.pz, this.nx, this.ny, this.nz];
+		this.btns = [this.pxBtn, this.pyBtn, this.pzBtn, this.nxBtn, this.nyBtn, this.nzBtn];
 
-		private images: eui.Image[];
-		private btns: eui.Button[];
-
-		constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+		// var param: { accepttype: keyof DragData; datatype?: string; } = { accepttype: "image" };
+		for (let i = 0; i < propertys.length; i++)
 		{
-			super(attributeViewInfo);
-			this.skinName = "OAVCubeMap";
-			this.alpha = 1;
+			this.updateImage(i)
+			// drag.register(image,
+			// 	(dragsource) => { },
+			// 	[param.accepttype],
+			// 	(dragSource) =>
+			// 	{
+			// 		this.attributeValue = dragSource[param.accepttype];
+			// 	});
+			this.btns[i].addEventListener(egret.MouseEvent.CLICK, this.onImageClick, this);
+			this.btns[i].enabled = this._attributeViewInfo.editable;
+			// this.btns[i].touchChildren = this.btns[i].touchEnabled = this._attributeViewInfo.editable;
 		}
 
-		initView()
-		{
-			this.images = [this.px, this.py, this.pz, this.nx, this.ny, this.nz];
-			this.btns = [this.pxBtn, this.pyBtn, this.pzBtn, this.nxBtn, this.nyBtn, this.nzBtn];
+		this.addEventListener(egret.Event.RESIZE, this.onResize, this);
+	}
 
-			// var param: { accepttype: keyof DragData; datatype?: string; } = { accepttype: "image" };
-			for (let i = 0; i < propertys.length; i++)
+	private updateImage(i: number)
+	{
+		const image = this.images[i];
+		var textureCube: feng3d.TextureCube = this.space;
+		textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], (img) =>
+		{
+			if (img)
 			{
-				this.updateImage(i)
-				// drag.register(image,
-				// 	(dragsource) => { },
-				// 	[param.accepttype],
-				// 	(dragSource) =>
-				// 	{
-				// 		this.attributeValue = dragSource[param.accepttype];
-				// 	});
-				this.btns[i].addEventListener(egret.MouseEvent.CLICK, this.onImageClick, this);
-				this.btns[i].enabled = this._attributeViewInfo.editable;
-				// this.btns[i].touchChildren = this.btns[i].touchEnabled = this._attributeViewInfo.editable;
+				image.source = feng3d.dataTransform.imageToDataURL(img);
+			} else
+			{
+				image.source = null;
 			}
+		});
+	}
 
-			this.addEventListener(egret.Event.RESIZE, this.onResize, this);
-		}
-
-		private updateImage(i: number)
+	private onImageClick(e: egret.MouseEvent)
+	{
+		var index = this.btns.indexOf(e.currentTarget);
+		if (index != -1)
 		{
-			const image = this.images[i];
 			var textureCube: feng3d.TextureCube = this.space;
-			textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], (img) =>
-			{
-				if (img)
+			var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
+			var menus: MenuItem[] = [{
+				label: `None`, click: () =>
 				{
-					image.source = feng3d.dataTransform.imageToDataURL(img);
-				} else
-				{
-					image.source = null;
+					textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
+					this.updateImage(index);
+					this.dispatchValueChange(index);
 				}
-			});
-		}
-
-		private onImageClick(e: egret.MouseEvent)
-		{
-			var index = this.btns.indexOf(e.currentTarget);
-			if (index != -1)
+			}];
+			texture2ds.forEach(d =>
 			{
-				var textureCube: feng3d.TextureCube = this.space;
-				var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
-				var menus: MenuItem[] = [{
-					label: `None`, click: () =>
+				menus.push({
+					label: d.name, click: () =>
 					{
-						textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
+						textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
 						this.updateImage(index);
 						this.dispatchValueChange(index);
 					}
-				}];
-				texture2ds.forEach(d =>
-				{
-					menus.push({
-						label: d.name, click: () =>
-						{
-							textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
-							this.updateImage(index);
-							this.dispatchValueChange(index);
-						}
-					});
 				});
-				menu.popup(menus);
-			}
-		}
-
-		private dispatchValueChange(index: number)
-		{
-			var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
-			objectViewEvent.space = this._space;
-			objectViewEvent.attributeName = propertys[index];
-			this.dispatchEvent(objectViewEvent);
-
-			//
-			feng3d.objectEmitter.emit(this._space, "propertyValueChanged");
-		}
-
-		dispose()
-		{
-		}
-
-		updateView()
-		{
-		}
-
-		onResize()
-		{
-			var w4 = Math.round(this.width / 4);
-			this.px.width = this.py.width = this.pz.width = this.nx.width = this.ny.width = this.nz.width = w4;
-			this.px.height = this.py.height = this.pz.height = this.nx.height = this.ny.height = this.nz.height = w4;
-			//
-			this.pxGroup.width = this.pyGroup.width = this.pzGroup.width = this.nxGroup.width = this.nyGroup.width = this.nzGroup.width = w4;
-			this.pxGroup.height = this.pyGroup.height = this.pzGroup.height = this.nxGroup.height = this.nyGroup.height = this.nzGroup.height = w4;
-			//
-			this.pxGroup.x = w4 * 2;
-			this.pxGroup.y = w4;
-			//
-			this.pyGroup.x = w4;
-			//
-			this.pzGroup.x = w4;
-			this.pzGroup.y = w4;
-			//
-			this.nxGroup.y = w4;
-			//
-			this.nyGroup.x = w4;
-			this.nyGroup.y = w4 * 2;
-			//
-			this.nzGroup.x = w4 * 3;
-			this.nzGroup.y = w4;
-			//
-			this.height = w4 * 3;
+			});
+			menu.popup(menus);
 		}
 	}
-	var propertys = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
+
+	private dispatchValueChange(index: number)
+	{
+		var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+		objectViewEvent.space = this._space;
+		objectViewEvent.attributeName = propertys[index];
+		this.dispatchEvent(objectViewEvent);
+
+		//
+		feng3d.objectEmitter.emit(this._space, "propertyValueChanged");
+	}
+
+	dispose()
+	{
+	}
+
+	updateView()
+	{
+	}
+
+	onResize()
+	{
+		var w4 = Math.round(this.width / 4);
+		this.px.width = this.py.width = this.pz.width = this.nx.width = this.ny.width = this.nz.width = w4;
+		this.px.height = this.py.height = this.pz.height = this.nx.height = this.ny.height = this.nz.height = w4;
+		//
+		this.pxGroup.width = this.pyGroup.width = this.pzGroup.width = this.nxGroup.width = this.nyGroup.width = this.nzGroup.width = w4;
+		this.pxGroup.height = this.pyGroup.height = this.pzGroup.height = this.nxGroup.height = this.nyGroup.height = this.nzGroup.height = w4;
+		//
+		this.pxGroup.x = w4 * 2;
+		this.pxGroup.y = w4;
+		//
+		this.pyGroup.x = w4;
+		//
+		this.pzGroup.x = w4;
+		this.pzGroup.y = w4;
+		//
+		this.nxGroup.y = w4;
+		//
+		this.nyGroup.x = w4;
+		this.nyGroup.y = w4 * 2;
+		//
+		this.nzGroup.x = w4 * 3;
+		this.nzGroup.y = w4;
+		//
+		this.height = w4 * 3;
+	}
 }
+var propertys = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];

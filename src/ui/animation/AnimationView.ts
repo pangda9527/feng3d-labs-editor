@@ -1,51 +1,49 @@
-namespace editor
+
+/**
+ * 动画面板
+ */
+export class AnimationView extends eui.Component implements ModuleView
 {
-    /**
-     * 动画面板
-     */
-    export class AnimationView extends eui.Component implements ModuleView
+    static moduleName = "Animation";
+
+    moduleName: string;
+
+    constructor()
     {
-        static moduleName = "Animation";
+        super();
+        this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
+        this.skinName = "AnimationView";
+        this.moduleName = AnimationView.moduleName;
+    }
 
-        moduleName: string;
+    private onComplete(): void
+    {
+        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
+        this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
-        constructor()
+        if (this.stage)
         {
-            super();
-            this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-            this.skinName = "AnimationView";
-            this.moduleName = AnimationView.moduleName;
+            this.onAddedToStage();
         }
+    }
 
-        private onComplete(): void
-        {
-            this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
-            this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
+    private onAddedToStage()
+    {
 
-            if (this.stage)
-            {
-                this.onAddedToStage();
-            }
-        }
+        //
+        this.updateView();
+    }
 
-        private onAddedToStage()
-        {
-
-            //
-            this.updateView();
-        }
-
-        private onRemovedFromStage()
-        {
-
-        }
-
-        private updateView()
-        {
-
-        }
+    private onRemovedFromStage()
+    {
 
     }
 
-    Modules.moduleViewCls[AnimationView.moduleName] = AnimationView;
+    private updateView()
+    {
+
+    }
+
 }
+
+Modules.moduleViewCls[AnimationView.moduleName] = AnimationView;

@@ -1,178 +1,176 @@
-namespace editor
+
+/**
+ * 挑选（拾取）OAV界面
+ */
+@feng3d.OAVComponent()
+export class OAVPick extends OAVBase
 {
-	/**
-	 * 挑选（拾取）OAV界面
-	 */
-    @feng3d.OAVComponent()
-    export class OAVPick extends OAVBase
+    public labelLab: eui.Label;
+    public text: eui.Label;
+    public pickBtn: eui.Button;
+
+    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
     {
-        public labelLab: eui.Label;
-        public text: eui.Label;
-        public pickBtn: eui.Button;
+        super(attributeViewInfo);
 
-        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+        this.skinName = "OAVPick";
+    }
+
+    initView()
+    {
+        this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+
+        if (this._attributeViewInfo.editable)
         {
-            super(attributeViewInfo);
+            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
-            this.skinName = "OAVPick";
-        }
-
-        initView()
-        {
-            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-
-            if (this._attributeViewInfo.editable)
-            {
-                this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
-
-                var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
-                drag.register(this,
-                    (dragsource) =>
-                    {
-                        if (param.datatype) dragsource.addDragData(<any>param.datatype, this.attributeValue);
-                    },
-                    [param.accepttype],
-                    (dragSource) =>
-                    {
-                        this.attributeValue = dragSource.getDragData(param.accepttype)[0];
-                    });
-            }
-
-            feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
-        }
-
-        dispose()
-        {
-            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
-
-            drag.unregister(this);
-            feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
-        }
-
-        private onPickBtnClick()
-        {
             var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
-            if (param.accepttype)
-            {
-                if (param.accepttype == "texture2d")
+            drag.register(this,
+                (dragsource) =>
                 {
-                    var menus: MenuItem[] = [];
-                    var texture2ds = editorRS.getLoadedAssetDatasByType(feng3d.Texture2D);
-                    texture2ds.forEach(item =>
-                    {
-                        menus.push({
-                            label: item.name, click: () =>
-                            {
-                                this.attributeValue = item;
-                            }
-                        });
-                    });
-                    menu.popup(menus);
-                }
-                else if (param.accepttype == "texturecube")
+                    if (param.datatype) dragsource.addDragData(<any>param.datatype, this.attributeValue);
+                },
+                [param.accepttype],
+                (dragSource) =>
                 {
-                    var menus: MenuItem[] = [];
-                    var textureCubes = editorRS.getLoadedAssetDatasByType(feng3d.TextureCube);
-                    textureCubes.forEach(item =>
-                    {
-                        menus.push({
-                            label: item.name, click: () =>
-                            {
-                                this.attributeValue = item;
-                            }
-                        });
-                    });
-                    menu.popup(menus);
-                } else if (param.accepttype == "audio")
-                {
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
-
-                    var audioFiles = editorRS.getAssetsByType(feng3d.AudioAsset);
-                    audioFiles.forEach(item =>
-                    {
-                        menus.push({
-                            label: item.fileName, click: () =>
-                            {
-                                this.attributeValue = item.assetPath;
-                            }
-                        });
-                    }, []);
-                    menu.popup(menus);
-                } else if (param.accepttype == "file_script")
-                {
-                    var scriptFiles = editorRS.getAssetsByType(feng3d.ScriptAsset);
-
-                    var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
-                    scriptFiles.forEach(element =>
-                    {
-                        menus.push({
-                            label: element.scriptName,
-                            click: () =>
-                            {
-                                this.attributeValue = element.scriptName;
-                            }
-                        });
-                    });
-                    menu.popup(menus);
-                } else if (param.accepttype == "material")
-                {
-                    var assets = editorRS.getLoadedAssetDatasByType(feng3d.Material);
-                    var menus: MenuItem[] = [];
-                    assets.forEach(element =>
-                    {
-                        menus.push({
-                            label: element.name,
-                            click: () =>
-                            {
-                                this.attributeValue = element;
-                            }
-                        });
-                    });
-                    menu.popup(menus);
-                } else if (param.accepttype == "geometry")
-                {
-                    var geometrys = editorRS.getLoadedAssetDatasByType(feng3d.Geometry);
-                    var menus: MenuItem[] = [];
-                    geometrys.forEach(element =>
-                    {
-                        menus.push({
-                            label: element.name,
-                            click: () =>
-                            {
-                                this.attributeValue = element;
-                            }
-                        });
-                    });
-                    menu.popup(menus);
-                }
-            }
+                    this.attributeValue = dragSource.getDragData(param.accepttype)[0];
+                });
         }
 
-        /**
-         * 更新界面
-         */
-        updateView(): void
+        feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+    }
+
+    dispose()
+    {
+        this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
+
+        drag.unregister(this);
+        feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+    }
+
+    private onPickBtnClick()
+    {
+        var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+        if (param.accepttype)
         {
-            if (this.attributeValue === undefined)
+            if (param.accepttype == "texture2d")
             {
-                this.text.text = String(this.attributeValue);
-            } else if (!(this.attributeValue instanceof Object))
+                var menus: MenuItem[] = [];
+                var texture2ds = editorRS.getLoadedAssetDatasByType(feng3d.Texture2D);
+                texture2ds.forEach(item =>
+                {
+                    menus.push({
+                        label: item.name, click: () =>
+                        {
+                            this.attributeValue = item;
+                        }
+                    });
+                });
+                menu.popup(menus);
+            }
+            else if (param.accepttype == "texturecube")
             {
-                this.text.text = String(this.attributeValue);
-            } else
+                var menus: MenuItem[] = [];
+                var textureCubes = editorRS.getLoadedAssetDatasByType(feng3d.TextureCube);
+                textureCubes.forEach(item =>
+                {
+                    menus.push({
+                        label: item.name, click: () =>
+                        {
+                            this.attributeValue = item;
+                        }
+                    });
+                });
+                menu.popup(menus);
+            } else if (param.accepttype == "audio")
             {
-                this.text.text = this.attributeValue["name"] || "";
-                this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+                var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+
+                var audioFiles = editorRS.getAssetsByType(feng3d.AudioAsset);
+                audioFiles.forEach(item =>
+                {
+                    menus.push({
+                        label: item.fileName, click: () =>
+                        {
+                            this.attributeValue = item.assetPath;
+                        }
+                    });
+                }, []);
+                menu.popup(menus);
+            } else if (param.accepttype == "file_script")
+            {
+                var scriptFiles = editorRS.getAssetsByType(feng3d.ScriptAsset);
+
+                var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
+                scriptFiles.forEach(element =>
+                {
+                    menus.push({
+                        label: element.scriptName,
+                        click: () =>
+                        {
+                            this.attributeValue = element.scriptName;
+                        }
+                    });
+                });
+                menu.popup(menus);
+            } else if (param.accepttype == "material")
+            {
+                var assets = editorRS.getLoadedAssetDatasByType(feng3d.Material);
+                var menus: MenuItem[] = [];
+                assets.forEach(element =>
+                {
+                    menus.push({
+                        label: element.name,
+                        click: () =>
+                        {
+                            this.attributeValue = element;
+                        }
+                    });
+                });
+                menu.popup(menus);
+            } else if (param.accepttype == "geometry")
+            {
+                var geometrys = editorRS.getLoadedAssetDatasByType(feng3d.Geometry);
+                var menus: MenuItem[] = [];
+                geometrys.forEach(element =>
+                {
+                    menus.push({
+                        label: element.name,
+                        click: () =>
+                        {
+                            this.attributeValue = element;
+                        }
+                    });
+                });
+                menu.popup(menus);
             }
         }
+    }
 
-        private onDoubleClick()
+    /**
+     * 更新界面
+     */
+    updateView(): void
+    {
+        if (this.attributeValue === undefined)
         {
-            if (this.attributeValue && typeof this.attributeValue == "object")
-            {
-                editorData.selectObject(this.attributeValue);
-            }
+            this.text.text = String(this.attributeValue);
+        } else if (!(this.attributeValue instanceof Object))
+        {
+            this.text.text = String(this.attributeValue);
+        } else
+        {
+            this.text.text = this.attributeValue["name"] || "";
+            this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        }
+    }
+
+    private onDoubleClick()
+    {
+        if (this.attributeValue && typeof this.attributeValue == "object")
+        {
+            editorData.selectObject(this.attributeValue);
         }
     }
 }

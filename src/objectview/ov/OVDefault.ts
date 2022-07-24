@@ -1,8 +1,8 @@
-namespace feng3d
+declare global
 {
-	export interface IObjectView extends eui.Component { }
-	export interface IObjectBlockView extends eui.Component { }
-	export interface IObjectAttributeView extends eui.Component { }
+	export interface MixinsIObjectView extends eui.Component { }
+	export interface MixinsIObjectBlockView extends eui.Component { }
+	export interface MixinsIObjectAttributeView extends eui.Component { }
 }
 
 namespace editor

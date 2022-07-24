@@ -1,35 +1,33 @@
-namespace editor
+
+@feng3d.OAVComponent()
+export class OAVFunction extends OAVBase
 {
-    @feng3d.OAVComponent()
-    export class OAVFunction extends OAVBase
+    public labelLab: eui.Label;
+    public button: eui.Button;
+
+    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
     {
-        public labelLab: eui.Label;
-        public button: eui.Button;
+        super(attributeViewInfo);
+        this.skinName = "OAVFunction";
+    }
 
-        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
-        {
-            super(attributeViewInfo);
-            this.skinName = "OAVFunction";
-        }
+    initView()
+    {
+        this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
+    }
 
-        initView()
-        {
-            this.button.addEventListener(egret.MouseEvent.CLICK, this.click, this);
-        }
+    dispose()
+    {
+        this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
+    }
 
-        dispose()
-        {
-            this.button.removeEventListener(egret.MouseEvent.CLICK, this.click, this);
-        }
+    updateView()
+    {
 
-        updateView()
-        {
+    }
 
-        }
-
-        protected click(event: egret.Event)
-        {
-            this._space[this._attributeName]();
-        }
+    protected click(event: egret.Event)
+    {
+        this._space[this._attributeName]();
     }
 }

@@ -1,30 +1,29 @@
-namespace editor
+
+export var assetFileTemplates: AssetFileTemplates;
+
+export class AssetFileTemplates
 {
-    export var assetFileTemplates: AssetFileTemplates;
-
-    export class AssetFileTemplates
+    /**
+     * 
+     * @param scriptName 脚本名称（类名）
+     */
+    getNewScript(scriptName)
     {
-        /**
-         * 
-         * @param scriptName 脚本名称（类名）
-         */
-        getNewScript(scriptName)
-        {
-            return scriptTemplate.replace("NewScript", scriptName);
-        }
-        /**
-         * 
-         * @param shadername shader名称
-         */
-        getNewShader(shadername: string)
-        {
-            return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
-        }
+        return scriptTemplate.replace("NewScript", scriptName);
     }
+    /**
+     * 
+     * @param shadername shader名称
+     */
+    getNewShader(shadername: string)
+    {
+        return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
+    }
+}
 
-    assetFileTemplates = new AssetFileTemplates();
+assetFileTemplates = new AssetFileTemplates();
 
-    var scriptTemplate = `
+var scriptTemplate = `
 class NewScript extends feng3d.Script
 {
 
@@ -60,7 +59,7 @@ class NewScript extends feng3d.Script
     }
 }`;
 
-    var shaderTemplate = `
+var shaderTemplate = `
 class NewShaderUniforms
 {
     /** 
@@ -108,4 +107,3 @@ interface MaterialRawMap
 {
     NewShader: feng3d.gPartial<NewShaderMaterial>;
 }`;
-}
