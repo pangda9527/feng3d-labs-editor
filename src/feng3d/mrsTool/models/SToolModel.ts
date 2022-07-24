@@ -1,14 +1,17 @@
+import { Color4, Component, CylinderGeometry, GameObject, Material, RegisterComponent, Renderable, RenderMode, SegmentGeometry, serialization, Vector3, watcher } from 'feng3d';
+import { CoordinateCube } from './MToolModel';
+
 declare global
 {
-    export interface MixinsComponentMap { SToolModel: editor.SToolModel }
-    export interface MixinsComponentMap { CoordinateCube: editor.CoordinateCube }
-    export interface MixinsComponentMap { CoordinateScaleCube: editor.CoordinateScaleCube }
+    export interface MixinsComponentMap { SToolModel: SToolModel }
+    export interface MixinsComponentMap { CoordinateCube: CoordinateCube }
+    export interface MixinsComponentMap { CoordinateScaleCube: CoordinateScaleCube }
 }
 /**
  * 缩放工具模型组件
  */
-@feng3d.RegisterComponent()
-export class SToolModel extends feng3d.Component
+@RegisterComponent()
+export class SToolModel extends Component
 {
     xCube: CoordinateScaleCube;
     yCube: CoordinateScaleCube;
@@ -24,38 +27,38 @@ export class SToolModel extends feng3d.Component
 
     private initModels()
     {
-        this.xCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
+        this.xCube = serialization.setValue(new GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
         this.xCube.color.setTo(1, 0, 0, 1);
         this.xCube.update();
         this.xCube.transform.rz = -90;
         this.gameObject.addChild(this.xCube.gameObject);
 
-        this.yCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
+        this.yCube = serialization.setValue(new GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
         this.yCube.color.setTo(0, 1, 0, 1);
         this.yCube.update();
         this.gameObject.addChild(this.yCube.gameObject);
 
-        this.zCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
+        this.zCube = serialization.setValue(new GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
         this.zCube.color.setTo(0, 0, 1, 1);
         this.zCube.update();
         this.zCube.transform.rx = 90;
         this.gameObject.addChild(this.zCube.gameObject);
 
-        this.oCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
-        this.oCube.gameObject.transform.scale = new feng3d.Vector3(1.2, 1.2, 1.2);
+        this.oCube = serialization.setValue(new GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+        this.oCube.gameObject.transform.scale = new Vector3(1.2, 1.2, 1.2);
         this.gameObject.addChild(this.oCube.gameObject);
     }
 }
 
-@feng3d.RegisterComponent()
-export class CoordinateScaleCube extends feng3d.Component
+@RegisterComponent()
+export class CoordinateScaleCube extends Component
 {
     private isinit: boolean;
     private coordinateCube: CoordinateCube
-    private segmentGeometry: feng3d.SegmentGeometry;
+    private segmentGeometry: SegmentGeometry;
 
-    readonly color = new feng3d.Color4(1, 0, 0, 0.99)
-    private selectedColor = new feng3d.Color4(1, 1, 0, 0.99);
+    readonly color = new Color4(1, 0, 0, 0.99)
+    private selectedColor = new Color4(1, 1, 0, 0.99);
     private length = 100;
     //
     selected = false;
@@ -65,25 +68,25 @@ export class CoordinateScaleCube extends feng3d.Component
     init()
     {
         super.init();
-        feng3d.watcher.watch(<CoordinateScaleCube>this, "selected", this.update, this);
-        feng3d.watcher.watch(<CoordinateScaleCube>this, "scaleValue", this.update, this);
+        watcher.watch(<CoordinateScaleCube>this, "selected", this.update, this);
+        watcher.watch(<CoordinateScaleCube>this, "scaleValue", this.update, this);
 
-        var xLine = new feng3d.GameObject();
-        var model = xLine.addComponent(feng3d.Renderable);
-        var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
-            shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
-            uniforms: { u_segmentColor: new feng3d.Color4(1, 1, 1, 0.99) },
+        var xLine = new GameObject();
+        var model = xLine.addComponent(Renderable);
+        var material = model.material = serialization.setValue(new Material(), {
+            shaderName: "segment", renderParams: { renderMode: RenderMode.LINES },
+            uniforms: { u_segmentColor: new Color4(1, 1, 1, 0.99) },
         });
         material.renderParams.enableBlend = true;
-        this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
+        this.segmentGeometry = model.geometry = new SegmentGeometry();
         this.gameObject.addChild(xLine);
-        this.coordinateCube = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "coordinateCube" }).addComponent(CoordinateCube);
+        this.coordinateCube = serialization.setValue(new GameObject(), { name: "coordinateCube" }).addComponent(CoordinateCube);
         this.gameObject.addChild(this.coordinateCube.gameObject);
 
-        var mouseHit = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "hit" });
-        model = mouseHit.addComponent(feng3d.Renderable);
-        model.geometry = feng3d.serialization.setValue(new feng3d.CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
-        model.material = new feng3d.Material();
+        var mouseHit = serialization.setValue(new GameObject(), { name: "hit" });
+        model = mouseHit.addComponent(Renderable);
+        model.geometry = serialization.setValue(new CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
+        model.material = new Material();
         mouseHit.transform.y = 4 + (this.length - 4) / 2;
         mouseHit.activeSelf = false;
         mouseHit.mouseEnabled = true;
@@ -101,7 +104,7 @@ export class CoordinateScaleCube extends feng3d.Component
         this.coordinateCube.selectedColor = this.selectedColor;
         this.coordinateCube.update();
 
-        this.segmentGeometry.segments = [{ start: new feng3d.Vector3(), end: new feng3d.Vector3(0, this.scaleValue * this.length, 0), startColor: this.color, endColor: this.color }];
+        this.segmentGeometry.segments = [{ start: new Vector3(), end: new Vector3(0, this.scaleValue * this.length, 0), startColor: this.color, endColor: this.color }];
 
         //
         this.coordinateCube.transform.y = this.length * this.scaleValue;

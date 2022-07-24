@@ -1,3 +1,6 @@
+import { Constructor } from 'feng3d';
+import { Message } from './ui/components/Message';
+import { ModuleView } from './ui/components/TabView';
 
 export var modules: Modules;
 
@@ -43,7 +46,7 @@ export class Modules
     /**
      * 模块界面类定义
      */
-    static moduleViewCls: { [name: string]: feng3d.Constructor<ModuleView> } = {};
+    static moduleViewCls: { [name: string]: Constructor<ModuleView> } = {};
 }
 
 modules = new Modules();

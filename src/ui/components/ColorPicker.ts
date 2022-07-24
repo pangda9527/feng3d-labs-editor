@@ -1,3 +1,6 @@
+import { Color3, Color4 } from 'feng3d';
+import { ColorPickerView, colorPickerView } from './ColorPickerView';
+import { popupview } from './Popupview';
 
 export class ColorPicker extends eui.Component implements eui.UIComponent
 {
@@ -12,7 +15,7 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
         this._value = v;
         if (this.picker)
         {
-            if (this._value instanceof feng3d.Color3)
+            if (this._value instanceof Color3)
             {
                 this.picker.fillColor = this._value.toInt();
             } else 
@@ -21,7 +24,7 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
             }
         }
     }
-    private _value: feng3d.Color3 | feng3d.Color4 = new feng3d.Color3();
+    private _value: Color3 | Color4 = new Color3();
 
     constructor()
     {
@@ -53,7 +56,7 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
 
     private onClick()
     {
-        if (!colorPickerView) colorPickerView = new editor.ColorPickerView();
+        if (!colorPickerView) colorPickerView = new ColorPickerView();
         colorPickerView.color = this.value;
         var pos = this.localToGlobal(0, 0);
         // pos.x = pos.x - colorPickerView.width;

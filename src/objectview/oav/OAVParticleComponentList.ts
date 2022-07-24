@@ -1,13 +1,16 @@
+import { OAVComponent, ParticleSystem, AttributeViewInfo, ParticleModule } from 'feng3d';
+import { ParticleComponentView } from '../../ui/components/ParticleComponentView';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVParticleComponentList extends OAVBase
 {
-    protected _space: feng3d.ParticleSystem;
+    protected _space: ParticleSystem;
 
     //
     group: eui.Group;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OAVParticleComponentList";
@@ -77,7 +80,7 @@ export class OAVParticleComponentList extends OAVBase
         }
     }
 
-    private addComponentView(component: feng3d.ParticleModule)
+    private addComponentView(component: ParticleModule)
     {
         var o: Object;
         var displayObject = new ParticleComponentView(component);
@@ -85,7 +88,7 @@ export class OAVParticleComponentList extends OAVBase
         this.group.addChild(displayObject);
     }
 
-    private removedComponentView(component: feng3d.ParticleModule)
+    private removedComponentView(component: ParticleModule)
     {
         for (var i = this.group.numChildren - 1; i >= 0; i--)
         {

@@ -1,11 +1,14 @@
+import { OAVComponent, IObjectView, AttributeViewInfo, classUtils, objectview, watcher } from 'feng3d';
+import { Accordion } from '../../ui/components/Accordion';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVAccordionObjectView extends OAVBase
 {
-    componentView: feng3d.IObjectView;
+    componentView: IObjectView;
 
     //
-    public accordion: editor.Accordion;
+    public accordion: Accordion;
 
     //
     public enabledCB: eui.CheckBox;
@@ -13,7 +16,7 @@ export class OAVAccordionObjectView extends OAVBase
     /**
      * 对象界面数据
      */
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "ParticleComponentView";
@@ -31,15 +34,15 @@ export class OAVAccordionObjectView extends OAVBase
 
     initView()
     {
-        var componentName = feng3d.classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
+        var componentName = classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
         this.accordion.titleName = componentName;
-        this.componentView = feng3d.objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
+        this.componentView = objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
         this.accordion.addContent(this.componentView);
 
         this.enabledCB = this.accordion["enabledCB"];
 
         this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-        feng3d.watcher.watch(this.attributeValue, "enabled", this.updateEnableCB, this);
+        watcher.watch(this.attributeValue, "enabled", this.updateEnableCB, this);
 
         this.updateView();
     }
@@ -47,7 +50,7 @@ export class OAVAccordionObjectView extends OAVBase
     dispose()
     {
         this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-        feng3d.watcher.unwatch(this.attributeValue, "enabled", this.updateEnableCB, this);
+        watcher.unwatch(this.attributeValue, "enabled", this.updateEnableCB, this);
     }
 
     private updateEnableCB()

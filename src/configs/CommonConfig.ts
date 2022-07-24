@@ -1,3 +1,20 @@
+import { createNodeMenu, GameObject, getComponentType, globalEmitter, loader, MenuItem, View } from 'feng3d';
+import { editorRS } from '../assets/EditorRS';
+import { nativeAPI } from '../assets/NativeRequire';
+import { editorcache } from '../caches/Editorcache';
+import { editorData } from '../Editor';
+import { hierarchy } from '../feng3d/hierarchy/Hierarchy';
+import { editorui } from '../global/editorui';
+import { ShortCutSetting } from '../shortcut/ShortCutSetting';
+import { AnimationView } from '../ui/animation/AnimationView';
+import { editorAsset } from '../ui/assets/EditorAsset';
+import { ProjectView } from '../ui/assets/ProjectView';
+import { popupview } from '../ui/components/Popupview';
+import { TabView } from '../ui/components/TabView';
+import { HierarchyView } from '../ui/hierarchy/HierarchyView';
+import { InspectorView } from '../ui/inspector/InspectorView';
+import { SceneView } from '../ui/SceneView';
+import { viewLayoutConfig } from './ViewLayoutConfig';
 
 /**
  * 菜单配置
@@ -27,7 +44,7 @@ export class MenuConfig
                         label: "新建场景",
                         click: () =>
                         {
-                            editorData.gameScene = feng3d.View.createNewScene();
+                            editorData.gameScene = View.createNewScene();
                         },
                     },
                     {
@@ -36,7 +53,7 @@ export class MenuConfig
                         {
                             alert("未实现！");
                             //
-                            // editorData.gameScene = feng3d.View.createNewScene();
+                            // editorData.gameScene = View.createNewScene();
                         },
                     },
                     {
@@ -122,7 +139,7 @@ export class MenuConfig
                     {
                         label: "导出项目", click: () =>
                         {
-                            editorRS.exportProjectToJSZip(`${editorcache.projectname}.feng3d.zip`);
+                            editorRS.exportProjectToJSZip(`${editorcache.projectname}.zip`);
                         }
                     },
                     {
@@ -131,31 +148,31 @@ export class MenuConfig
                             {
                                 label: "地形", click: () =>
                                 {
-                                    openDownloadProject("terrain.feng3d.zip");
+                                    openDownloadProject("terrain.zip");
                                 },
                             },
                             {
                                 label: "自定义材质", click: () =>
                                 {
-                                    openDownloadProject("customshader.feng3d.zip");
+                                    openDownloadProject("customshader.zip");
                                 },
                             },
                             {
                                 label: "水", click: () =>
                                 {
-                                    openDownloadProject("water.feng3d.zip");
+                                    openDownloadProject("water.zip");
                                 },
                             },
                             {
                                 label: "灯光", click: () =>
                                 {
-                                    openDownloadProject("light.feng3d.zip");
+                                    openDownloadProject("light.zip");
                                 },
                             },
                             {
                                 label: "声音", click: () =>
                                 {
-                                    openDownloadProject("audio.feng3d.zip");
+                                    openDownloadProject("audio.zip");
                                 },
                             },
                         ],
@@ -166,25 +183,25 @@ export class MenuConfig
                             {
                                 label: "地形", click: () =>
                                 {
-                                    downloadProject("terrain.feng3d.zip");
+                                    downloadProject("terrain.zip");
                                 },
                             },
                             {
                                 label: "自定义材质", click: () =>
                                 {
-                                    downloadProject("customshader.feng3d.zip");
+                                    downloadProject("customshader.zip");
                                 },
                             },
                             {
                                 label: "水", click: () =>
                                 {
-                                    downloadProject("water.feng3d.zip");
+                                    downloadProject("water.zip");
                                 },
                             },
                             {
                                 label: "灯光", click: () =>
                                 {
-                                    downloadProject("light.feng3d.zip");
+                                    downloadProject("light.zip");
                                 },
                             },
                         ],
@@ -208,7 +225,7 @@ export class MenuConfig
                             {
                                 editorAsset.runProjectScript(() =>
                                 {
-                                    editorData.gameScene = feng3d.View.createNewScene()
+                                    editorData.gameScene = View.createNewScene()
                                     editorui.assetview.invalidateAssettree();
                                     console.log("清空项目完成!");
                                 });
@@ -231,7 +248,7 @@ export class MenuConfig
                     label: "编译脚本",
                     click: () =>
                     {
-                        feng3d.globalEmitter.emit("script.compile");
+                        globalEmitter.emit("script.compile");
                     },
                 },],
             },
@@ -253,7 +270,7 @@ export class MenuConfig
                         label: "文档",
                         click: () =>
                         {
-                            window.open("http://feng3d.com");
+                            window.open("http://com");
                         },
                     },
                 ],
@@ -277,7 +294,7 @@ export class MenuConfig
                         label: v,
                         click: () =>
                         {
-                            feng3d.globalEmitter.emit("viewLayout.reset", viewLayoutConfig[v]);
+                            globalEmitter.emit("viewLayout.reset", viewLayoutConfig[v]);
                         },
                     };
                 }),
@@ -316,7 +333,7 @@ export class MenuConfig
     {
         var createObjectMenu: MenuItem[] = [];
         //
-        feng3d.createNodeMenu.forEach((item) =>
+        createNodeMenu.forEach((item) =>
         {
             let submenu = createObjectMenu;
             const paths = item.path.split("/");
@@ -388,12 +405,12 @@ export class MenuConfig
      * 获取创建游戏对象组件菜单
      * @param gameobject 游戏对象
      */
-    getCreateComponentMenu(gameobject: feng3d.GameObject)
+    getCreateComponentMenu(gameobject: GameObject)
     {
         var menu: MenuItem[] = [];
 
         // 处理 由 AddComponentMenu 添加的菜单
-        feng3d.menuConfig.component.forEach(item =>
+        menuConfig.component.forEach(item =>
         {
             var paths = item.path.split("/");
             var currentmenu = menu;
@@ -415,7 +432,7 @@ export class MenuConfig
             });
             currentMenuItem.click = () =>
             {
-                const componentClass = feng3d.getComponentType(item.type);
+                const componentClass = getComponentType(item.type);
                 gameobject.addComponent(componentClass);
             }
         });
@@ -443,7 +460,7 @@ function openDownloadProject(projectname: string, callback?: () => void)
 function downloadProject(projectname: string, callback?: () => void)
 {
     var path = "projects/" + projectname;
-    feng3d.loader.loadBinary(path, (content) =>
+    loader.loadBinary(path, (content) =>
     {
         editorRS.importProject(<any>content, () =>
         {

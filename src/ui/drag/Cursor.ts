@@ -1,3 +1,4 @@
+import { MapUtils } from 'feng3d';
 
 class Cursor
 {
@@ -17,7 +18,7 @@ class Cursor
 
     private update()
     {
-        var v = feng3d.MapUtils.getValues(this.o).reverse()[0];
+        var v = MapUtils.getValues(this.o).reverse()[0];
         document.body.style.cursor = v || "auto";
     }
 }

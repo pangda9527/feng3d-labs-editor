@@ -1,3 +1,4 @@
+import { TreeNode } from './TreeNode';
 
 export class TreeItemRenderer extends eui.ItemRenderer
 {

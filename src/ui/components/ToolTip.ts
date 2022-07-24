@@ -1,3 +1,6 @@
+import { windowEventProxy } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { TipString } from './tipviews/TipString';
 
 export var toolTip: ToolTip;
 
@@ -47,8 +50,8 @@ export class ToolTip
         this.tipView = new tipviewcls();
         editorui.tooltipLayer.addChild(this.tipView);
         this.tipView.value = tip;
-        this.tipView.x = feng3d.windowEventProxy.clientX;
-        this.tipView.y = feng3d.windowEventProxy.clientY - this.tipView.height;
+        this.tipView.x = windowEventProxy.clientX;
+        this.tipView.y = windowEventProxy.clientY - this.tipView.height;
 
         //
         displayObject.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);

@@ -1,8 +1,9 @@
+import { Behaviour, RunEnvironment } from 'feng3d';
 
 /**
  * 编辑器脚本
  */
-export class EditorScript extends feng3d.Behaviour
+export class EditorScript extends Behaviour
 {
-    flag = feng3d.RunEnvironment.editor;
+    flag = RunEnvironment.editor;
 }

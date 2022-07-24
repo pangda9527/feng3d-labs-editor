@@ -1,11 +1,13 @@
+import { ParticleModule, IObjectView, classUtils, objectview, watcher } from 'feng3d';
+import { Accordion } from './Accordion';
 
 export class ParticleComponentView extends eui.Component
 {
-	component: feng3d.ParticleModule;
-	componentView: feng3d.IObjectView;
+	component: ParticleModule;
+	componentView: IObjectView;
 
 	//
-	public accordion: editor.Accordion;
+	public accordion: Accordion;
 
 	//
 	public enabledCB: eui.CheckBox;
@@ -13,7 +15,7 @@ export class ParticleComponentView extends eui.Component
 	/**
 	 * 对象界面数据
 	 */
-	constructor(component: feng3d.ParticleModule)
+	constructor(component: ParticleModule)
 	{
 		super();
 		this.component = component;
@@ -34,9 +36,9 @@ export class ParticleComponentView extends eui.Component
 
 	private onComplete()
 	{
-		var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
+		var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
 		this.accordion.titleName = componentName;
-		this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
 		this.accordion.addContent(this.componentView);
 
 		this.enabledCB = this.accordion["enabledCB"];
@@ -53,13 +55,13 @@ export class ParticleComponentView extends eui.Component
 		this.updateView();
 
 		this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+		watcher.watch(this.component, "enabled", this.updateEnableCB, this);
 	}
 
 	private onRemovedFromStage()
 	{
 		this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
 	}
 
 	private updateEnableCB()

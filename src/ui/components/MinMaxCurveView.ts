@@ -1,11 +1,16 @@
+import { watch, MinMaxCurve, MinMaxCurveMode, ImageUtil, Color4, MenuItem, serialization } from 'feng3d';
+import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
+import { menu } from './Menu';
+import { MinMaxCurveEditor, minMaxCurveEditor } from './MinMaxCurveEditor';
+import { popupview } from './Popupview';
 
 /**
  * 最大最小曲线界面
  */
 export class MinMaxCurveView extends eui.Component
 {
-    @feng3d.watch("_onMinMaxCurveChanged")
-    minMaxCurve = new feng3d.MinMaxCurve();
+    @watch("_onMinMaxCurveChanged")
+    minMaxCurve = new MinMaxCurve();
 
     public constantGroup: eui.Group;
     public constantTextInput: eui.TextInput;
@@ -48,7 +53,7 @@ export class MinMaxCurveView extends eui.Component
         this.constantGroup.visible = false;
         this.curveGroup.visible = false;
         this.randomBetweenTwoConstantsGroup.visible = false;
-        if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant)
+        if (this.minMaxCurve.mode == MinMaxCurveMode.Constant)
         {
             this.constantGroup.visible = true;
 
@@ -56,7 +61,7 @@ export class MinMaxCurveView extends eui.Component
                 space: this.minMaxCurve, attribute: "constant", textInput: this.constantTextInput, editable: true,
                 controller: this.constantTextInput,
             }));
-        } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
+        } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoConstants)
         {
             this.randomBetweenTwoConstantsGroup.visible = true;
 
@@ -71,13 +76,13 @@ export class MinMaxCurveView extends eui.Component
         } else
         {
             this.curveGroup.visible = true;
-            var imageUtil = new feng3d.ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, feng3d.Color4.fromUnit(0xff565656));
-            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
+            var imageUtil = new ImageUtil(this.curveGroup.width - 2, this.curveGroup.height - 2, Color4.fromUnit(0xff565656));
+            if (this.minMaxCurve.mode == MinMaxCurveMode.Curve)
             {
-                imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
-            } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                imageUtil.drawCurve(this.minMaxCurve.curve, this.minMaxCurve.between0And1, new Color4(1, 0, 0));
+            } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves)
             {
-                imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, new feng3d.Color4(1, 0, 0));
+                imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, new Color4(1, 0, 0));
             }
             this.curveImage.source = imageUtil.toDataURL();
         }
@@ -98,14 +103,14 @@ export class MinMaxCurveView extends eui.Component
         switch (e.currentTarget)
         {
             case this.modeBtn:
-                menu.popupEnum(feng3d.MinMaxCurveMode, this.minMaxCurve.mode, (v) =>
+                menu.popupEnum(MinMaxCurveMode, this.minMaxCurve.mode, (v) =>
                 {
                     this.minMaxCurve.mode = v;
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 });
                 break;
             case this.curveGroup:
-                minMaxCurveEditor = minMaxCurveEditor || new editor.MinMaxCurveEditor();
+                minMaxCurveEditor = minMaxCurveEditor || new MinMaxCurveEditor();
                 minMaxCurveEditor.minMaxCurve = this.minMaxCurve;
 
                 var pos = this.localToGlobal(0, 0);
@@ -131,13 +136,13 @@ export class MinMaxCurveView extends eui.Component
 
     private _onRightClick()
     {
-        if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Constant || this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoConstants)
+        if (this.minMaxCurve.mode == MinMaxCurveMode.Constant || this.minMaxCurve.mode == MinMaxCurveMode.TwoConstants)
             return;
 
         var menus: MenuItem[] = [{
             label: "Copy", click: () =>
             {
-                copyCurve = feng3d.serialization.clone(this.minMaxCurve);
+                copyCurve = serialization.clone(this.minMaxCurve);
             }
         }];
         if (copyCurve && this.minMaxCurve.mode == copyCurve.mode && copyCurve.between0And1 == this.minMaxCurve.between0And1)
@@ -145,13 +150,13 @@ export class MinMaxCurveView extends eui.Component
             menus.push({
                 label: "Paste", click: () =>
                 {
-                    if (copyCurve.mode == feng3d.MinMaxCurveMode.Curve)
+                    if (copyCurve.mode == MinMaxCurveMode.Curve)
                     {
-                        this.minMaxCurve.curve = feng3d.serialization.clone(copyCurve.curve);
-                    } else if (copyCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                        this.minMaxCurve.curve = serialization.clone(copyCurve.curve);
+                    } else if (copyCurve.mode == MinMaxCurveMode.TwoCurves)
                     {
-                        this.minMaxCurve.curveMin = feng3d.serialization.clone(copyCurve.curveMin);
-                        this.minMaxCurve.curveMax = feng3d.serialization.clone(copyCurve.curveMax);
+                        this.minMaxCurve.curveMin = serialization.clone(copyCurve.curveMin);
+                        this.minMaxCurve.curveMax = serialization.clone(copyCurve.curveMax);
                     }
                     this.minMaxCurve.curveMultiplier = copyCurve.curveMultiplier;
 
@@ -164,4 +169,4 @@ export class MinMaxCurveView extends eui.Component
     }
 }
 
-var copyCurve: feng3d.MinMaxCurve;
+var copyCurve: MinMaxCurve;

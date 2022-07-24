@@ -1,5 +1,8 @@
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { ComboBox } from '../../ui/components/ComboBox';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVEnum extends OAVBase
 {
     public labelLab: eui.Label;
@@ -7,7 +10,7 @@ export class OAVEnum extends OAVBase
 
     private list: { label: string, value: number }[];
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OAVEnum";

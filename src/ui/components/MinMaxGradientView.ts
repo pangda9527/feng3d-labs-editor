@@ -1,3 +1,8 @@
+import { watch, MinMaxGradient, MinMaxGradientMode, ImageUtil, Color4, MenuItem, serialization, Gradient } from 'feng3d';
+import { ColorPickerView, colorPickerView } from './ColorPickerView';
+import { GradientEditor, gradientEditor } from './GradientEditor';
+import { menu } from './Menu';
+import { popupview } from './Popupview';
 
 /**
  * 最大最小颜色渐变界面
@@ -5,8 +10,8 @@
 export class MinMaxGradientView extends eui.Component
 {
     //
-    @feng3d.watch("_onMinMaxGradientChanged")
-    minMaxGradient = new feng3d.MinMaxGradient();
+    @watch("_onMinMaxGradientChanged")
+    minMaxGradient = new MinMaxGradient();
 
     public colorGroup0: eui.Group;
     public colorImage0: eui.Image;
@@ -62,38 +67,38 @@ export class MinMaxGradientView extends eui.Component
         //
         if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0)
         {
-            if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Color)
+            if (this.minMaxGradient.mode == MinMaxGradientMode.Color)
             {
                 var color = this.minMaxGradient.getValue(0);
-                this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(color).toDataURL();
+                this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(color).toDataURL();
                 //
                 if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
             }
-            else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.Gradient)
+            else if (this.minMaxGradient.mode == MinMaxGradientMode.Gradient)
             {
-                this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
+                this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                 //
                 if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
             }
-            else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.TwoColors)
+            else if (this.minMaxGradient.mode == MinMaxGradientMode.TwoColors)
             {
-                this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.colorMin).toDataURL();
+                this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.colorMin).toDataURL();
                 //
-                this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(this.minMaxGradient.colorMax).toDataURL();
+                this.colorImage1.source = new ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawColorRect(this.minMaxGradient.colorMax).toDataURL();
                 //
                 if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
             }
-            else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.TwoGradients)
+            else if (this.minMaxGradient.mode == MinMaxGradientMode.TwoGradients)
             {
-                this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradientMin).toDataURL();
+                this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradientMin).toDataURL();
                 //
-                this.colorImage1.source = new feng3d.ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(this.minMaxGradient.gradientMax).toDataURL();
+                this.colorImage1.source = new ImageUtil(this.colorGroup1.width, this.colorGroup1.height).drawMinMaxGradient(this.minMaxGradient.gradientMax).toDataURL();
                 //
                 if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
             }
-            else if (this.minMaxGradient.mode == feng3d.MinMaxGradientMode.RandomColor)
+            else if (this.minMaxGradient.mode == MinMaxGradientMode.RandomColor)
             {
-                this.colorImage0.source = new feng3d.ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
+                this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                 //
                 if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
             }
@@ -120,24 +125,24 @@ export class MinMaxGradientView extends eui.Component
                 this.activeColorGroup = this.colorGroup0;
                 switch (this.minMaxGradient.mode)
                 {
-                    case feng3d.MinMaxGradientMode.Color:
-                        view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                    case MinMaxGradientMode.Color:
+                        view = colorPickerView = colorPickerView || new ColorPickerView();
                         colorPickerView.color = this.minMaxGradient.color;
                         break;
-                    case feng3d.MinMaxGradientMode.Gradient:
-                        view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                    case MinMaxGradientMode.Gradient:
+                        view = gradientEditor = gradientEditor || new GradientEditor();
                         gradientEditor.gradient = this.minMaxGradient.gradient;
                         break;
-                    case feng3d.MinMaxGradientMode.TwoColors:
-                        view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                    case MinMaxGradientMode.TwoColors:
+                        view = colorPickerView = colorPickerView || new ColorPickerView();
                         colorPickerView.color = this.minMaxGradient.colorMin;
                         break;
-                    case feng3d.MinMaxGradientMode.TwoGradients:
-                        view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                    case MinMaxGradientMode.TwoGradients:
+                        view = gradientEditor = gradientEditor || new GradientEditor();
                         gradientEditor.gradient = this.minMaxGradient.gradientMin;
                         break;
-                    case feng3d.MinMaxGradientMode.RandomColor:
-                        view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                    case MinMaxGradientMode.RandomColor:
+                        view = gradientEditor = gradientEditor || new GradientEditor();
                         gradientEditor.gradient = this.minMaxGradient.gradient;
                         break;
                 }
@@ -146,18 +151,18 @@ export class MinMaxGradientView extends eui.Component
                 this.activeColorGroup = this.colorGroup1;
                 switch (this.minMaxGradient.mode)
                 {
-                    case feng3d.MinMaxGradientMode.TwoColors:
-                        view = colorPickerView = colorPickerView || new editor.ColorPickerView();
+                    case MinMaxGradientMode.TwoColors:
+                        view = colorPickerView = colorPickerView || new ColorPickerView();
                         colorPickerView.color = this.minMaxGradient.colorMax;
                         break;
-                    case feng3d.MinMaxGradientMode.TwoGradients:
-                        view = gradientEditor = gradientEditor || new editor.GradientEditor();
+                    case MinMaxGradientMode.TwoGradients:
+                        view = gradientEditor = gradientEditor || new GradientEditor();
                         gradientEditor.gradient = this.minMaxGradient.gradientMax;
                         break;
                 }
                 break;
             case this.modeBtn:
-                menu.popupEnum(feng3d.MinMaxGradientMode, this.minMaxGradient.mode, (v) =>
+                menu.popupEnum(MinMaxGradientMode, this.minMaxGradient.mode, (v) =>
                 {
                     this.minMaxGradient.mode = v;
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -186,19 +191,19 @@ export class MinMaxGradientView extends eui.Component
         {
             switch (this.minMaxGradient.mode)
             {
-                case feng3d.MinMaxGradientMode.Color:
-                    this.minMaxGradient.color = (<feng3d.Color4>colorPickerView.color).clone();
+                case MinMaxGradientMode.Color:
+                    this.minMaxGradient.color = (<Color4>colorPickerView.color).clone();
                     break;
-                case feng3d.MinMaxGradientMode.Gradient:
+                case MinMaxGradientMode.Gradient:
                     this.minMaxGradient.gradient = gradientEditor.gradient;
                     break;
-                case feng3d.MinMaxGradientMode.TwoColors:
-                    this.minMaxGradient.colorMin = (<feng3d.Color4>colorPickerView.color).clone();
+                case MinMaxGradientMode.TwoColors:
+                    this.minMaxGradient.colorMin = (<Color4>colorPickerView.color).clone();
                     break;
-                case feng3d.MinMaxGradientMode.TwoGradients:
+                case MinMaxGradientMode.TwoGradients:
                     this.minMaxGradient.gradientMin = gradientEditor.gradient;
                     break;
-                case feng3d.MinMaxGradientMode.RandomColor:
+                case MinMaxGradientMode.RandomColor:
                     this.minMaxGradient.gradient = gradientEditor.gradient;
                     break;
             }
@@ -206,10 +211,10 @@ export class MinMaxGradientView extends eui.Component
         {
             switch (this.minMaxGradient.mode)
             {
-                case feng3d.MinMaxGradientMode.TwoColors:
-                    this.minMaxGradient.colorMax = (<feng3d.Color4>colorPickerView.color).clone();
+                case MinMaxGradientMode.TwoColors:
+                    this.minMaxGradient.colorMax = (<Color4>colorPickerView.color).clone();
                     break;
-                case feng3d.MinMaxGradientMode.TwoGradients:
+                case MinMaxGradientMode.TwoGradients:
                     this.minMaxGradient.gradientMax = gradientEditor.gradient;
                     break;
             }
@@ -229,25 +234,25 @@ export class MinMaxGradientView extends eui.Component
             {
                 if (target == this.colorGroup0)
                 {
-                    if (mode == feng3d.MinMaxGradientMode.Color)
+                    if (mode == MinMaxGradientMode.Color)
                         copyColor = this.minMaxGradient.color.clone();
-                    else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                    else if (mode == MinMaxGradientMode.TwoColors)
                         copyColor = this.minMaxGradient.colorMin.clone();
-                    else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                        copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradientMin);
+                    else if (mode == MinMaxGradientMode.TwoGradients)
+                        copyGradient = serialization.clone(this.minMaxGradient.gradientMin);
                     else
-                        copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradient);
+                        copyGradient = serialization.clone(this.minMaxGradient.gradient);
                 } else if (target == this.colorGroup1)
                 {
-                    if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                    if (mode == MinMaxGradientMode.TwoColors)
                         copyColor = this.minMaxGradient.colorMax.clone();
                     else
-                        copyGradient = feng3d.serialization.clone(this.minMaxGradient.gradientMax);
+                        copyGradient = serialization.clone(this.minMaxGradient.gradientMax);
                 }
             }
         }];
-        if ((copyGradient != null && (mode == feng3d.MinMaxGradientMode.Gradient || mode == feng3d.MinMaxGradientMode.TwoGradients || mode == feng3d.MinMaxGradientMode.RandomColor))
-            || (copyColor != null && (mode == feng3d.MinMaxGradientMode.Color || mode == feng3d.MinMaxGradientMode.TwoColors))
+        if ((copyGradient != null && (mode == MinMaxGradientMode.Gradient || mode == MinMaxGradientMode.TwoGradients || mode == MinMaxGradientMode.RandomColor))
+            || (copyColor != null && (mode == MinMaxGradientMode.Color || mode == MinMaxGradientMode.TwoColors))
         )
         {
             menus.push({
@@ -255,20 +260,20 @@ export class MinMaxGradientView extends eui.Component
                 {
                     if (target == this.colorGroup0)
                     {
-                        if (mode == feng3d.MinMaxGradientMode.Color)
+                        if (mode == MinMaxGradientMode.Color)
                             this.minMaxGradient.color.copy(copyColor);
-                        else if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                        else if (mode == MinMaxGradientMode.TwoColors)
                             this.minMaxGradient.colorMin.copy(copyColor);
-                        else if (mode == feng3d.MinMaxGradientMode.TwoGradients)
-                            this.minMaxGradient.gradientMin = feng3d.serialization.clone(copyGradient);
+                        else if (mode == MinMaxGradientMode.TwoGradients)
+                            this.minMaxGradient.gradientMin = serialization.clone(copyGradient);
                         else
-                            this.minMaxGradient.gradient = feng3d.serialization.clone(copyGradient);
+                            this.minMaxGradient.gradient = serialization.clone(copyGradient);
                     } else if (target == this.colorGroup1)
                     {
-                        if (mode == feng3d.MinMaxGradientMode.TwoColors)
+                        if (mode == MinMaxGradientMode.TwoColors)
                             this.minMaxGradient.colorMax.copy(copyColor);
                         else
-                            this.minMaxGradient.gradientMax = feng3d.serialization.clone(copyGradient);
+                            this.minMaxGradient.gradientMax = serialization.clone(copyGradient);
                     }
 
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -281,6 +286,6 @@ export class MinMaxGradientView extends eui.Component
 
 }
 
-var copyGradient: feng3d.Gradient;
-var copyColor: feng3d.Color4;
+var copyGradient: Gradient;
+var copyColor: Color4;
 

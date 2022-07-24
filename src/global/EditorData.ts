@@ -1,3 +1,5 @@
+import { Scene, ArrayUtils, globalEmitter, shortcut, GameObject, Box3, TextAsset } from 'feng3d';
+import { AssetNode } from '../ui/assets/AssetNode';
 
 
 /**
@@ -32,7 +34,7 @@ export class EditorData
     /**
      * 游戏运行时的场景
      */
-    gameScene: feng3d.Scene;
+    gameScene: Scene;
 
     /**
      * 选中对象，游戏对象与资源文件列表
@@ -48,7 +50,7 @@ export class EditorData
         v = v.filter(v => !!v);
         if (!v) v = [];
         if (v == this._selectedObjects) return;
-        if (v.length == this.selectedObjects.length && feng3d.ArrayUtils.unique(v.concat(this._selectedObjects)).length == v.length) return;
+        if (v.length == this.selectedObjects.length && ArrayUtils.unique(v.concat(this._selectedObjects)).length == v.length) return;
 
         this._selectedObjects = v;
 
@@ -57,7 +59,7 @@ export class EditorData
         this._transformGameObjectInvalid = true;
         this._transformBoxInvalid = true;
 
-        feng3d.globalEmitter.emit("editor.selectedObjectsChanged");
+        globalEmitter.emit("editor.selectedObjectsChanged");
     }
     private _selectedObjects = [];
 
@@ -80,7 +82,7 @@ export class EditorData
     {
         var selecteds = this.selectedObjects.concat();
 
-        var isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+        var isAdd = shortcut.keyState.getKeyState("ctrl");
         if (!isAdd) selecteds.length = 0;
         //
         var index = selecteds.indexOf(object);
@@ -95,13 +97,13 @@ export class EditorData
      * 该方法会处理 按ctrl键附加选中对象操作
      * @param objs 选中的对象
      */
-    selectMultiObject(objs: (feng3d.GameObject | AssetNode)[], isAdd?: boolean)
+    selectMultiObject(objs: (GameObject | AssetNode)[], isAdd?: boolean)
     {
         var selecteds = this.selectedObjects.concat();
 
         if (isAdd === undefined)
         {
-            isAdd = feng3d.shortcut.keyState.getKeyState("ctrl");
+            isAdd = shortcut.keyState.getKeyState("ctrl");
         }
         if (!isAdd) selecteds.length = 0;
         //
@@ -126,7 +128,7 @@ export class EditorData
     {
         if (this._toolType == v) return;
         this._toolType = v;
-        feng3d.globalEmitter.emit("editor.toolTypeChanged");
+        globalEmitter.emit("editor.toolTypeChanged");
     }
 
     private _toolType = MRSToolType.MOVE;
@@ -141,14 +143,14 @@ export class EditorData
             this._selectedGameObjects.length = 0;
             this.selectedObjects.forEach(v =>
             {
-                if (v instanceof feng3d.GameObject) this._selectedGameObjects.push(v);
+                if (v instanceof GameObject) this._selectedGameObjects.push(v);
             });
 
             this._selectedGameObjectsInvalid = false;
         }
         return this._selectedGameObjects;
     }
-    private _selectedGameObjects: feng3d.GameObject[] = [];
+    private _selectedGameObjects: GameObject[] = [];
     private _selectedGameObjectsInvalid = true;
 
     /**
@@ -163,7 +165,7 @@ export class EditorData
         if (this._isBaryCenter == v) return;
         this._isBaryCenter = v;
         this._transformBoxInvalid = true;
-        feng3d.globalEmitter.emit("editor.isBaryCenterChanged");
+        globalEmitter.emit("editor.isBaryCenterChanged");
     }
     private _isBaryCenter = true;
 
@@ -178,7 +180,7 @@ export class EditorData
     {
         if (this._isWoldCoordinate == v) return;
         this._isWoldCoordinate = v;
-        feng3d.globalEmitter.emit("editor.isWoldCoordinateChanged");
+        globalEmitter.emit("editor.isWoldCoordinateChanged");
     }
     private _isWoldCoordinate = false;
 
@@ -198,7 +200,7 @@ export class EditorData
         }
         return this._transformGameObject;
     }
-    private _transformGameObject: feng3d.GameObject;
+    private _transformGameObject: GameObject;
     private _transformGameObjectInvalid = true;
 
     get transformBox()
@@ -229,7 +231,7 @@ export class EditorData
         }
         return this._transformBox;
     }
-    private _transformBox: feng3d.Box3;
+    private _transformBox: Box3;
     private _transformBoxInvalid = true;
 
     /**
@@ -254,7 +256,7 @@ export class EditorData
     /**
      * 编辑器打开的脚本
      */
-    openScript: feng3d.TextAsset;
+    openScript: TextAsset;
 
     /**
      * 历史记录undo列表

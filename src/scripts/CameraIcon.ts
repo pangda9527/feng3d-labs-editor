@@ -1,21 +1,25 @@
+import { RegisterComponent, Camera, watcher, GameObject, BillboardComponent, MeshRenderer, Material, TextureUniforms, Texture2D, TextureFormat, PlaneGeometry, HideFlags, SegmentUniforms, Color4, RenderMode, SegmentGeometry, PointUniforms, PointGeometry, PointInfo, Segment, PerspectiveLens, OrthographicLens, Vector3, shortcut, ticker } from 'feng3d';
+import { editorData } from '../Editor';
+import { EditorScript } from './EditorScript';
+
 declare global
 {
-    export interface MixinsComponentMap { CameraIcon: editor.CameraIcon; }
+    export interface MixinsComponentMap { CameraIcon: CameraIcon; }
 }
 
-@feng3d.RegisterComponent()
+@RegisterComponent()
 export class CameraIcon extends EditorScript
 {
-    camera: feng3d.Camera;
+    camera: Camera;
 
     get editorCamera() { return this._editorCamera; }
     set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-    private _editorCamera: feng3d.Camera;
+    private _editorCamera: Camera;
 
     init()
     {
         super.init();
-        feng3d.watcher.watch(<CameraIcon>this, "camera", this.onCameraChanged, this);
+        watcher.watch(<CameraIcon>this, "camera", this.onCameraChanged, this);
         this.initicon()
         this.on("mousedown", this.onMousedown, this);
     }
@@ -26,20 +30,20 @@ export class CameraIcon extends EditorScript
         if (this._lightIcon) return;
 
         {
-            const lightIcon = this._lightIcon = new feng3d.GameObject();
+            const lightIcon = this._lightIcon = new GameObject();
             lightIcon.name = "CameraIcon";
-            const billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
+            const billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = this.editorCamera;
-            const meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            const meshRenderer = lightIcon.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "texture";
-            const uniforms = material.uniforms as feng3d.TextureUniforms;
-            uniforms.s_texture = new feng3d.Texture2D();
+            const uniforms = material.uniforms as TextureUniforms;
+            uniforms.s_texture = new Texture2D();
             uniforms.s_texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/camera.png") };
-            uniforms.s_texture.format = feng3d.TextureFormat.RGBA;
+            uniforms.s_texture.format = TextureFormat.RGBA;
             material.renderParams.enableBlend = true;
             material.renderParams.depthMask = false;
-            const geometry = meshRenderer.geometry = new feng3d.PlaneGeometry();
+            const geometry = meshRenderer.geometry = new PlaneGeometry();
             geometry.width = 1;
             geometry.height = 1;
             geometry.segmentsW = 1;
@@ -50,36 +54,36 @@ export class CameraIcon extends EditorScript
 
         //
         {
-            const lightLines = this._lightLines = new feng3d.GameObject();
+            const lightLines = this._lightLines = new GameObject();
             lightLines.name = "Lines";
             lightLines.mouseEnabled = false;
-            lightLines.hideFlags = feng3d.HideFlags.Hide;
-            const meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            lightLines.hideFlags = HideFlags.Hide;
+            const meshRenderer = lightLines.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "segment";
-            const uniforms = material.uniforms as feng3d.SegmentUniforms;
-            uniforms.u_segmentColor = new feng3d.Color4(1, 1, 1, 0.5);
+            const uniforms = material.uniforms as SegmentUniforms;
+            uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
-            material.renderParams.renderMode = feng3d.RenderMode.LINES;
-            meshRenderer.geometry = new feng3d.SegmentGeometry();
+            material.renderParams.renderMode = RenderMode.LINES;
+            meshRenderer.geometry = new SegmentGeometry();
             this._segmentGeometry = meshRenderer.geometry;
             this.gameObject.addChild(lightLines);
         }
 
         //
         {
-            const lightpoints = this._lightpoints = new feng3d.GameObject();
+            const lightpoints = this._lightpoints = new GameObject();
             lightpoints.name = "points";
             lightpoints.mouseEnabled = false;
-            lightpoints.hideFlags = feng3d.HideFlags.Hide;
-            const meshRenderer = lightpoints.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            lightpoints.hideFlags = HideFlags.Hide;
+            const meshRenderer = lightpoints.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "point";
-            const uniforms = material.uniforms as feng3d.PointUniforms;
+            const uniforms = material.uniforms as PointUniforms;
             uniforms.u_PointSize = 5;
             material.renderParams.enableBlend = true;
-            material.renderParams.renderMode = feng3d.RenderMode.POINTS;
-            meshRenderer.geometry = new feng3d.PointGeometry();
+            material.renderParams.renderMode = RenderMode.POINTS;
+            meshRenderer.geometry = new PointGeometry();
             this._pointGeometry = meshRenderer.geometry;
             this.gameObject.addChild(lightpoints);
         }
@@ -96,13 +100,13 @@ export class CameraIcon extends EditorScript
             if (this._lensChanged)
             {
                 //
-                var points: feng3d.PointInfo[] = [];
-                var segments: Partial<feng3d.Segment>[] = [];
+                var points: PointInfo[] = [];
+                var segments: Partial<Segment>[] = [];
                 var lens = this.camera.lens;
                 var near = lens.near;
                 var far = lens.far;
                 var aspect = lens.aspect;
-                if (lens instanceof feng3d.PerspectiveLens)
+                if (lens instanceof PerspectiveLens)
                 {
                     var fov = lens.fov;
                     var tan = Math.tan(fov * Math.PI / 360);
@@ -116,7 +120,7 @@ export class CameraIcon extends EditorScript
                     var farTop = tan * far;
                     var farBottom = -tan * far;
                     //
-                } else if (lens instanceof feng3d.OrthographicLens)
+                } else if (lens instanceof OrthographicLens)
                 {
                     var size = lens.size;
                     //
@@ -129,22 +133,22 @@ export class CameraIcon extends EditorScript
                     var farTop = size;
                     var farBottom = -size;
                 }
-                points.push({ position: new feng3d.Vector3(0, farBottom, far) }, { position: new feng3d.Vector3(0, farTop, far) }, { position: new feng3d.Vector3(farLeft, 0, far) }, { position: new feng3d.Vector3(farRight, 0, far) });
+                points.push({ position: new Vector3(0, farBottom, far) }, { position: new Vector3(0, farTop, far) }, { position: new Vector3(farLeft, 0, far) }, { position: new Vector3(farRight, 0, far) });
                 segments.push(
-                    { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearRight, nearBottom, near) },
-                    { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(nearLeft, nearTop, near) },
-                    { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
-                    { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(nearRight, nearTop, near) },
+                    { start: new Vector3(nearLeft, nearBottom, near), end: new Vector3(nearRight, nearBottom, near) },
+                    { start: new Vector3(nearLeft, nearBottom, near), end: new Vector3(nearLeft, nearTop, near) },
+                    { start: new Vector3(nearLeft, nearTop, near), end: new Vector3(nearRight, nearTop, near) },
+                    { start: new Vector3(nearRight, nearBottom, near), end: new Vector3(nearRight, nearTop, near) },
                     //
-                    { start: new feng3d.Vector3(nearLeft, nearBottom, near), end: new feng3d.Vector3(farLeft, farBottom, far) },
-                    { start: new feng3d.Vector3(nearLeft, nearTop, near), end: new feng3d.Vector3(farLeft, farTop, far) },
-                    { start: new feng3d.Vector3(nearRight, nearBottom, near), end: new feng3d.Vector3(farRight, farBottom, far) },
-                    { start: new feng3d.Vector3(nearRight, nearTop, near), end: new feng3d.Vector3(farRight, farTop, far) },
+                    { start: new Vector3(nearLeft, nearBottom, near), end: new Vector3(farLeft, farBottom, far) },
+                    { start: new Vector3(nearLeft, nearTop, near), end: new Vector3(farLeft, farTop, far) },
+                    { start: new Vector3(nearRight, nearBottom, near), end: new Vector3(farRight, farBottom, far) },
+                    { start: new Vector3(nearRight, nearTop, near), end: new Vector3(farRight, farTop, far) },
                     //
-                    { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farRight, farBottom, far) },
-                    { start: new feng3d.Vector3(farLeft, farBottom, far), end: new feng3d.Vector3(farLeft, farTop, far) },
-                    { start: new feng3d.Vector3(farLeft, farTop, far), end: new feng3d.Vector3(farRight, farTop, far) },
-                    { start: new feng3d.Vector3(farRight, farBottom, far), end: new feng3d.Vector3(farRight, farTop, far) },
+                    { start: new Vector3(farLeft, farBottom, far), end: new Vector3(farRight, farBottom, far) },
+                    { start: new Vector3(farLeft, farBottom, far), end: new Vector3(farLeft, farTop, far) },
+                    { start: new Vector3(farLeft, farTop, far), end: new Vector3(farRight, farTop, far) },
+                    { start: new Vector3(farRight, farBottom, far), end: new Vector3(farRight, farTop, far) },
                 );
                 this._pointGeometry.points = points;
                 this._segmentGeometry.segments.length = 0;
@@ -179,14 +183,14 @@ export class CameraIcon extends EditorScript
     }
 
     //
-    private _lightIcon: feng3d.GameObject;
-    private _lightLines: feng3d.GameObject;
-    private _lightpoints: feng3d.GameObject;
-    private _segmentGeometry: feng3d.SegmentGeometry;
-    private _pointGeometry: feng3d.PointGeometry;
+    private _lightIcon: GameObject;
+    private _lightLines: GameObject;
+    private _lightpoints: GameObject;
+    private _segmentGeometry: SegmentGeometry;
+    private _pointGeometry: PointGeometry;
     private _lensChanged = true;
 
-    private onCameraChanged(newValue: feng3d.Camera, oldValue: feng3d.Camera)
+    private onCameraChanged(newValue: Camera, oldValue: Camera)
     {
         if (oldValue)
         {
@@ -215,10 +219,10 @@ export class CameraIcon extends EditorScript
     {
         editorData.selectObject(this.camera.gameObject);
         // 防止再次调用鼠标拾取
-        feng3d.shortcut.activityState("selectInvalid");
-        feng3d.ticker.once(100, () =>
+        shortcut.activityState("selectInvalid");
+        ticker.once(100, () =>
         {
-            feng3d.shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState("selectInvalid");
         });
     }
 }

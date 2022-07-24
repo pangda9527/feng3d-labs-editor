@@ -1,12 +1,14 @@
+import { watch, MinMaxCurveVector3 } from 'feng3d';
+import { MinMaxCurveView } from './MinMaxCurveView';
 
 export class MinMaxCurveVector3View extends eui.Component
 {
-    @feng3d.watch("_onMinMaxCurveVector3Changed")
-    minMaxCurveVector3 = new feng3d.MinMaxCurveVector3();
+    @watch("_onMinMaxCurveVector3Changed")
+    minMaxCurveVector3 = new MinMaxCurveVector3();
 
-    public xMinMaxCurveView: editor.MinMaxCurveView;
-    public yMinMaxCurveView: editor.MinMaxCurveView;
-    public zMinMaxCurveView: editor.MinMaxCurveView;
+    public xMinMaxCurveView: MinMaxCurveView;
+    public yMinMaxCurveView: MinMaxCurveView;
+    public zMinMaxCurveView: MinMaxCurveView;
 
     constructor()
     {

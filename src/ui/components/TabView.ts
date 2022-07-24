@@ -1,3 +1,14 @@
+import { globalEmitter, Vector2, mathUtil } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { modules } from '../../Modules';
+import { ProjectView } from '../assets/ProjectView';
+import { drag } from '../drag/Drag';
+import { HierarchyView } from '../hierarchy/HierarchyView';
+import { InspectorView } from '../inspector/InspectorView';
+import { SceneView } from '../SceneView';
+import { menu } from './Menu';
+import { SplitGroup } from './SplitGroup';
+import { WindowView } from './WindowView';
 
 export interface ModuleView extends eui.Component
 {
@@ -146,7 +157,7 @@ export class TabView extends eui.Group
 					let moduleView = v.tabView.removeModule(v.moduleName);
 					this.addModule(moduleView);
 				}
-				feng3d.globalEmitter.emit("viewLayout.changed");
+				globalEmitter.emit("viewLayout.changed");
 			});
 
 		});
@@ -160,7 +171,7 @@ export class TabView extends eui.Group
 
 				var rect = this.getGlobalBounds();
 				var center = rect.center;
-				var mouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+				var mouse = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
 				var sub = mouse.sub(center);
 				sub.x = sub.x / rect.width;
 				sub.y = sub.y / rect.height;
@@ -171,7 +182,7 @@ export class TabView extends eui.Group
 				{
 					this.addModuleToLeft(moduleView, sub.y < 0 ? 8 : 2);
 				}
-				feng3d.globalEmitter.emit("viewLayout.changed");
+				globalEmitter.emit("viewLayout.changed");
 			});
 
 		});
@@ -340,7 +351,7 @@ export class TabView extends eui.Group
 	{
 		var moduleNames = this._moduleViews.map(v => v.moduleName);
 		// 设置默认显示模块名称
-		this._showModuleIndex = feng3d.mathUtil.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
+		this._showModuleIndex = mathUtil.clamp(this._showModuleIndex, 0, this._moduleViews.length - 1);
 
 		this._tabButtons.forEach(v =>
 		{

@@ -1,14 +1,18 @@
+import { OAVComponent, AttributeViewInfo, watcher } from 'feng3d';
+import { editorData } from '../../Editor';
+import { DragDataMap, drag } from '../../ui/drag/Drag';
+import { OAVBase } from './OAVBase';
 
 /**
  * 默认对象属性界面
  */
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVDefault extends OAVBase
 {
 	public labelLab: eui.Label;
 	public text: eui.TextInput;
 
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
 
@@ -42,7 +46,7 @@ export class OAVDefault extends OAVBase
 		this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
 		if (this._attributeViewInfo.editable)
-			feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+			watcher.watch(this.space, this.attributeName, this.updateView, this);
 	}
 
 	dispose()
@@ -50,7 +54,7 @@ export class OAVDefault extends OAVBase
 		drag.unregister(this);
 
 		if (this._attributeViewInfo.editable)
-			feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+			watcher.unwatch(this.space, this.attributeName, this.updateView, this);
 
 		this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 		this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);

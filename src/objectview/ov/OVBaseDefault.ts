@@ -1,16 +1,17 @@
+import { OVComponent, IObjectView, ObjectViewInfo } from 'feng3d';
 
 /**
  * 默认基础对象界面
  */
-@feng3d.OVComponent()
-export class OVBaseDefault extends eui.Component implements feng3d.IObjectView
+@OVComponent()
+export class OVBaseDefault extends eui.Component implements IObjectView
 {
 	public label: eui.Label;
 	public image: eui.Image;
 	//
 	private _space: Object;
 
-	constructor(objectViewInfo: feng3d.ObjectViewInfo)
+	constructor(objectViewInfo: ObjectViewInfo)
 	{
 		super();
 		this._space = objectViewInfo.owner;

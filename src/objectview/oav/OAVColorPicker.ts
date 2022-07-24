@@ -1,18 +1,21 @@
+import { Color3, Color4, OAVComponent, AttributeViewInfo } from 'feng3d';
+import { ColorPicker } from '../../ui/components/ColorPicker';
+import { OAVBase } from './OAVBase';
 
 export interface OAVColorPicker
 {
-    get attributeValue(): feng3d.Color3 | feng3d.Color4;
+    get attributeValue(): Color3 | Color4;
     set attributeValue(v);
 }
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVColorPicker extends OAVBase
 {
     public labelLab: eui.Label;
-    public colorPicker: editor.ColorPicker;
+    public colorPicker: ColorPicker;
     public input: eui.TextInput;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 
@@ -70,14 +73,14 @@ export class OAVColorPicker extends OAVBase
         if (this._textfocusintxt)
         {
             var text = this.input.text;
-            if (this.attributeValue instanceof feng3d.Color3)
+            if (this.attributeValue instanceof Color3)
             {
-                this.colorPicker.value = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = new feng3d.Color3().fromUnit(Number("0x" + text.substr(1)));
+                this.colorPicker.value = new Color3().fromUnit(Number("0x" + text.substr(1)));
+                this.attributeValue = new Color3().fromUnit(Number("0x" + text.substr(1)));
             } else
             {
-                this.colorPicker.value = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = new feng3d.Color4().fromUnit(Number("0x" + text.substr(1)));
+                this.colorPicker.value = new Color4().fromUnit(Number("0x" + text.substr(1)));
+                this.attributeValue = new Color4().fromUnit(Number("0x" + text.substr(1)));
             }
         }
     }

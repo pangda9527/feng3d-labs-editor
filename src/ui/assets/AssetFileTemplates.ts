@@ -24,15 +24,15 @@ export class AssetFileTemplates
 assetFileTemplates = new AssetFileTemplates();
 
 var scriptTemplate = `
-class NewScript extends feng3d.Script
+class NewScript extends Script
 {
 
     /** 
      * 测试属性 
      */
-    @feng3d.serialize
-    @feng3d.oav()
-    t_attr = new feng3d.Color4();
+    @serialize
+    @oav()
+    t_attr = new Color4();
 
     /**
      * 初始化时调用
@@ -65,12 +65,12 @@ class NewShaderUniforms
     /** 
      * 颜色 
      */
-    @feng3d.serialize
-    @feng3d.oav()
-    u_color = new feng3d.Color4();
+    @serialize
+    @oav()
+    u_color = new Color4();
 }
 
-feng3d.shaderConfig.shaders["NewShader"] = {
+shaderConfig.shaders["NewShader"] = {
     cls: NewShaderUniforms,
     vertex: \`
     
@@ -97,13 +97,13 @@ feng3d.shaderConfig.shaders["NewShader"] = {
     \`,
 };
 
-type NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };
+type NewShaderMaterial = Material & { uniforms: NewShaderUniforms; };
 interface MaterialFactory
 {
-    create(shader: "NewShader", raw?: feng3d.gPartial<NewShaderMaterial>): NewShaderMaterial;
+    create(shader: "NewShader", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;
 }
 
 interface MaterialRawMap
 {
-    NewShader: feng3d.gPartial<NewShaderMaterial>;
+    NewShader: gPartial<NewShaderMaterial>;
 }`;

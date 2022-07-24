@@ -1,3 +1,4 @@
+import { editorui } from '../global/editorui';
 
 export class MainView extends eui.Component implements eui.UIComponent
 {

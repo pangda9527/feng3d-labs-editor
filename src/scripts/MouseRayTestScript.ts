@@ -1,3 +1,5 @@
+import { windowEventProxy, serialization, GameObject, Renderable, Material, SphereGeometry } from 'feng3d';
+import { EditorScript } from './EditorScript';
 
 export class MouseRayTestScript extends EditorScript
 {
@@ -5,17 +7,17 @@ export class MouseRayTestScript extends EditorScript
     {
         super.init();
 
-        feng3d.windowEventProxy.on("click", this.onclick, this);
+        windowEventProxy.on("click", this.onclick, this);
     }
 
     private onclick()
     {
         var mouseRay3D = this.gameObject.scene.mouseRay3D;
 
-        var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "test" });
-        var model = gameobject.addComponent(feng3d.Renderable);
-        model.material = new feng3d.Material();
-        model.geometry = feng3d.serialization.setValue(new feng3d.SphereGeometry(), { radius: 10 });
+        var gameobject = serialization.setValue(new GameObject(), { name: "test" });
+        var model = gameobject.addComponent(Renderable);
+        model.material = new Material();
+        model.geometry = serialization.setValue(new SphereGeometry(), { radius: 10 });
         gameobject.mouseEnabled = false;
         this.gameObject.addChild(gameobject);
 
@@ -53,6 +55,6 @@ export class MouseRayTestScript extends EditorScript
      */
     dispose()
     {
-        feng3d.windowEventProxy.off("click", this.onclick, this);
+        windowEventProxy.off("click", this.onclick, this);
     }
 }

@@ -1,3 +1,5 @@
+import { globalEmitter, IEvent, ticker } from 'feng3d';
+import { editorui } from '../../global/editorui';
 
 enum MessageType
 {
@@ -21,20 +23,20 @@ export class Message
 
     constructor()
     {
-        feng3d.globalEmitter.on("message", this._onMessage, this);
-        feng3d.globalEmitter.on("message.error", this._onErrorMessage, this);
+        globalEmitter.on("message", this._onMessage, this);
+        globalEmitter.on("message.error", this._onErrorMessage, this);
     }
 
-    private _onMessage(event: feng3d.IEvent<string>)
+    private _onMessage(event: IEvent<string>)
     {
         this._messages.push([MessageType.Normal, event.data]);
-        feng3d.ticker.on(this._interval, this._showMessage, this);
+        ticker.on(this._interval, this._showMessage, this);
     }
 
-    private _onErrorMessage(event: feng3d.IEvent<string>)
+    private _onErrorMessage(event: IEvent<string>)
     {
         this._messages.push([MessageType.Error, event.data]);
-        feng3d.ticker.on(this._interval, this._showMessage, this);
+        ticker.on(this._interval, this._showMessage, this);
     }
 
     private _getMessageItem(message: [MessageType, string])

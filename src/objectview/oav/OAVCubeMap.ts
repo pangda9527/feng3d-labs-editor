@@ -1,5 +1,9 @@
+import { OAVComponent, AttributeViewInfo, TextureCube, dataTransform, rs, Texture2D, MenuItem, objectEmitter } from 'feng3d';
+import { menu } from '../../ui/components/Menu';
+import { ObjectViewEvent } from '../events/ObjectViewEvent';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVCubeMap extends OAVBase
 {
 	public px: eui.Image;
@@ -25,7 +29,7 @@ export class OAVCubeMap extends OAVBase
 	private images: eui.Image[];
 	private btns: eui.Button[];
 
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
 		this.skinName = "OAVCubeMap";
@@ -59,12 +63,12 @@ export class OAVCubeMap extends OAVBase
 	private updateImage(i: number)
 	{
 		const image = this.images[i];
-		var textureCube: feng3d.TextureCube = this.space;
-		textureCube.getTextureImage(feng3d.TextureCube.ImageNames[i], (img) =>
+		var textureCube: TextureCube = this.space;
+		textureCube.getTextureImage(TextureCube.ImageNames[i], (img) =>
 		{
 			if (img)
 			{
-				image.source = feng3d.dataTransform.imageToDataURL(img);
+				image.source = dataTransform.imageToDataURL(img);
 			} else
 			{
 				image.source = null;
@@ -77,12 +81,12 @@ export class OAVCubeMap extends OAVBase
 		var index = this.btns.indexOf(e.currentTarget);
 		if (index != -1)
 		{
-			var textureCube: feng3d.TextureCube = this.space;
-			var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
+			var textureCube: TextureCube = this.space;
+			var texture2ds = rs.getLoadedAssetDatasByType(Texture2D);
 			var menus: MenuItem[] = [{
 				label: `None`, click: () =>
 				{
-					textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], null);
+					textureCube.setTexture2D(TextureCube.ImageNames[index], null);
 					this.updateImage(index);
 					this.dispatchValueChange(index);
 				}
@@ -92,7 +96,7 @@ export class OAVCubeMap extends OAVBase
 				menus.push({
 					label: d.name, click: () =>
 					{
-						textureCube.setTexture2D(feng3d.TextureCube.ImageNames[index], d);
+						textureCube.setTexture2D(TextureCube.ImageNames[index], d);
 						this.updateImage(index);
 						this.dispatchValueChange(index);
 					}
@@ -104,13 +108,13 @@ export class OAVCubeMap extends OAVBase
 
 	private dispatchValueChange(index: number)
 	{
-		var objectViewEvent = new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+		var objectViewEvent = new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
 		objectViewEvent.space = this._space;
 		objectViewEvent.attributeName = propertys[index];
 		this.dispatchEvent(objectViewEvent);
 
 		//
-		feng3d.objectEmitter.emit(this._space, "propertyValueChanged");
+		objectEmitter.emit(this._space, "propertyValueChanged");
 	}
 
 	dispose()

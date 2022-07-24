@@ -1,3 +1,5 @@
+import { Box3, Vector3, Triangle3, mathUtil } from 'feng3d';
+import { NavigationAgent } from '../navigation/Navigation';
 
 /**
  * 重铸导航
@@ -18,11 +20,11 @@ export class Recastnavigation
     /**
      * 包围盒
      */
-    private _aabb: feng3d.Box3;
+    private _aabb: Box3;
     /**
      * 体素尺寸
      */
-    private _voxelSize: feng3d.Vector3;
+    private _voxelSize: Vector3;
     /**
      * X 轴上 体素数量
      */
@@ -51,10 +53,10 @@ export class Recastnavigation
     /**
      * 执行重铸导航
      */
-    doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize?: feng3d.Vector3)
+    doRecastnavigation(mesh: { positions: number[], indices: number[] }, agent = new NavigationAgent(), voxelSize?: Vector3)
     {
-        this._aabb = feng3d.Box3.formPositions(mesh.positions);
-        this._voxelSize = voxelSize || new feng3d.Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
+        this._aabb = Box3.formPositions(mesh.positions);
+        this._voxelSize = voxelSize || new Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
         this._agent = agent;
         // 
         var size = this._aabb.getSize().divide(this._voxelSize).ceil();
@@ -120,7 +122,7 @@ export class Recastnavigation
      */
     private _voxelizationTriangle(p0: number[], p1: number[], p2: number[])
     {
-        var triangle = feng3d.Triangle3.fromPositions(p0.concat(p1).concat(p2));
+        var triangle = Triangle3.fromPositions(p0.concat(p1).concat(p2));
         var normal = triangle.getNormal();
         var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
 
@@ -155,11 +157,11 @@ export class Recastnavigation
      */
     private _applyAgentMaxSlope()
     {
-        var mincos = Math.cos(this._agent.maxSlope * feng3d.mathUtil.DEG2RAD);
+        var mincos = Math.cos(this._agent.maxSlope * mathUtil.DEG2RAD);
 
         this.getVoxels().forEach(v =>
         {
-            var dot = v.normal.dot(feng3d.Vector3.Y_AXIS);
+            var dot = v.normal.dot(Vector3.Y_AXIS);
             if (dot < mincos)
                 v.flag = v.flag | VoxelFlag.DontMaxSlope;
         });
@@ -213,7 +215,7 @@ export class Recastnavigation
         if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }
         // this._getRoundVoxels();
         // 获取周围格子
-        if (voxel.normal.equals(feng3d.Vector3.Z_AXIS))
+        if (voxel.normal.equals(Vector3.Z_AXIS))
         {
 
         }
@@ -243,7 +245,7 @@ export interface Voxel
     x: number;
     y: number;
     z: number;
-    normal: feng3d.Vector3;
+    normal: Vector3;
     triangleId: number;
     flag: VoxelFlag;
 }

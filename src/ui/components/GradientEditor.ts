@@ -1,10 +1,15 @@
+import { watch, Gradient, GradientMode, ImageUtil, Color3, windowEventProxy, Vector2, Rectangle } from 'feng3d';
+import { NumberSliderTextInputBinder } from './binders/NumberSliderTextInputBinder';
+import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
+import { ColorPicker } from './ColorPicker';
+import { ComboBox } from './ComboBox';
 
 export var gradientEditor: GradientEditor;
 
 export class GradientEditor extends eui.Component
 {
-    @feng3d.watch("_onGradientChanged")
-    gradient = new feng3d.Gradient();
+    @watch("_onGradientChanged")
+    gradient = new Gradient();
 
     public modeCB: ComboBox;
     public controllerGroup: eui.Group;
@@ -12,7 +17,7 @@ export class GradientEditor extends eui.Component
     public colorImage: eui.Image;
     public colorLineGroup: eui.Group;
     public colorGroup: eui.Group;
-    public colorPicker: editor.ColorPicker;
+    public colorPicker: ColorPicker;
     public alphaGroup: eui.Group;
     public alphaLabel: eui.Label;
     public alphaSlide: eui.HSlider;
@@ -57,17 +62,17 @@ export class GradientEditor extends eui.Component
         if (!this.stage) return;
 
         var list = [];
-        for (const key in feng3d.GradientMode)
+        for (const key in GradientMode)
         {
             if (isNaN(Number(key)))
-                list.push({ label: key, value: feng3d.GradientMode[key] });
+                list.push({ label: key, value: GradientMode[key] });
         }
         this.modeCB.dataProvider = list;
         this.modeCB.data = list.filter(v => v.value == this.gradient.mode)[0];
         //
         if (this.colorImage.width > 0 && this.colorImage.height > 0)
         {
-            this.colorImage.source = new feng3d.ImageUtil(this.colorImage.width, this.colorImage.height).drawMinMaxGradient(this.gradient).toDataURL();
+            this.colorImage.source = new ImageUtil(this.colorImage.width, this.colorImage.height).drawMinMaxGradient(this.gradient).toDataURL();
         }
         if (!this._alphaSprite)
         {
@@ -140,7 +145,7 @@ export class GradientEditor extends eui.Component
     private _parentGroup: egret.DisplayObjectContainer;
     private _loactionNumberTextInputBinder: NumberTextInputBinder;
     private _alphaNumberSliderTextInputBinder: NumberSliderTextInputBinder;
-    private _selectedValue: { time: number, alpha?: number, color?: feng3d.Color3 };
+    private _selectedValue: { time: number, alpha?: number, color?: Color3 };
 
     private _drawAlphaGraphics(graphics: egret.Graphics, time: number, alpha: number, width: number, height: number, selected: boolean)
     {
@@ -155,7 +160,7 @@ export class GradientEditor extends eui.Component
         graphics.endFill();
     }
 
-    private _drawColorGraphics(graphics: egret.Graphics, time: number, color: feng3d.Color3, width: number, height: number, selected: boolean)
+    private _drawColorGraphics(graphics: egret.Graphics, time: number, color: Color3, width: number, height: number, selected: boolean)
     {
         graphics.beginFill(color.toInt(), 1);
         graphics.lineStyle(1, selected ? 0x0091ff : 0x606060)
@@ -195,7 +200,7 @@ export class GradientEditor extends eui.Component
     {
         if (this._selectedValue && this._selectedValue.color)
         {
-            this._selectedValue.color = new feng3d.Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
+            this._selectedValue.color = new Color3(this.colorPicker.value.r, this.colorPicker.value.g, this.colorPicker.value.b);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
         }
@@ -214,7 +219,7 @@ export class GradientEditor extends eui.Component
     {
         this._onMouseDownLineGroup = e.currentTarget;
         var sp = (<egret.DisplayObject>e.currentTarget).localToGlobal(0, 0);
-        var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+        var localPosX = windowEventProxy.clientX - sp.x;
         var time = localPosX / (<egret.DisplayObject>e.currentTarget).width;
         var newAlphaKey = { time: time, alpha: this.gradient.getAlpha(time) };
         var newColorKey = { time: time, color: this.gradient.getColor(time) };
@@ -271,8 +276,8 @@ export class GradientEditor extends eui.Component
         {
             //
             this.updateView();
-            feng3d.windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
-            feng3d.windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+            windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
+            windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
             this._removedTemp = false;
         }
     }
@@ -282,8 +287,8 @@ export class GradientEditor extends eui.Component
         if (!this._selectedValue) return;
 
         var sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
-        var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        var rect = new feng3d.Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
+        var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        var rect = new Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
         rect.inflate(8, 8);
         if (rect.containsPoint(mousePos))
         {
@@ -323,14 +328,14 @@ export class GradientEditor extends eui.Component
         if (this._selectedValue.color)
         {
             var sp = this.colorLineGroup.localToGlobal(0, 0);
-            var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+            var localPosX = windowEventProxy.clientX - sp.x;
             this._selectedValue.time = localPosX / this.colorLineGroup.width;
             this.gradient.colorKeys.sort((a, b) => a.time - b.time);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
         } else
         {
             var sp = this.alphaLineGroup.localToGlobal(0, 0);
-            var localPosX = feng3d.windowEventProxy.clientX - sp.x;
+            var localPosX = windowEventProxy.clientX - sp.x;
             this._selectedValue.time = localPosX / this.alphaLineGroup.width;
             this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -345,8 +350,8 @@ export class GradientEditor extends eui.Component
             this._selectedValue = null;
         }
         this._onMouseDownLineGroup = null;
-        feng3d.windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
-        feng3d.windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
+        windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
+        windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
     }
 }

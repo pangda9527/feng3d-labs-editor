@@ -1,6 +1,8 @@
 // see https://github.com/sshirokov/ThreeBSP
 // see https://github.com/chandlerprall/ThreeCSG/blob/master/ThreeCSG.js
 
+import { Vector3, Vector2 } from 'feng3d';
+
 
 /**
  * 精度值

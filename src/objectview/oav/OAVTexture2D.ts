@@ -1,15 +1,19 @@
+import { OAVComponent, AttributeViewInfo, watcher, MenuItem, rs, Texture2D } from 'feng3d';
+import { editorData } from '../../Editor';
+import { menu } from '../../ui/components/Menu';
+import { OAVBase } from './OAVBase';
 
 /**
  * 挑选（拾取）OAV界面
  */
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVTexture2D extends OAVBase
 {
     public image: eui.Image;
     public pickBtn: eui.Button;
     public labelLab: eui.Label;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 
@@ -23,7 +27,7 @@ export class OAVTexture2D extends OAVBase
         if (this._attributeViewInfo.editable)
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
-        feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+        watcher.watch(this.space, this.attributeName, this.updateView, this);
     }
 
     dispose()
@@ -31,13 +35,13 @@ export class OAVTexture2D extends OAVBase
         this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
         this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
 
-        feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+        watcher.unwatch(this.space, this.attributeName, this.updateView, this);
     }
 
     private ontxtClick()
     {
         var menus: MenuItem[] = [];
-        var texture2ds = feng3d.rs.getLoadedAssetDatasByType(feng3d.Texture2D);
+        var texture2ds = rs.getLoadedAssetDatasByType(Texture2D);
         texture2ds.forEach(texture2d =>
         {
             menus.push({
@@ -56,7 +60,7 @@ export class OAVTexture2D extends OAVBase
      */
     updateView(): void
     {
-        var texture: feng3d.Texture2D = this.attributeValue;
+        var texture: Texture2D = this.attributeValue;
         this.image.source = texture.dataURL;
     }
 

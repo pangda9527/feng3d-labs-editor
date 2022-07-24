@@ -1,3 +1,8 @@
+import { ReadWriteRS, loader, task, FS, indexedDBFS, ReadWriteFS, rs } from 'feng3d';
+import { editorcache } from '../caches/Editorcache';
+import { NativeFS } from './NativeFS';
+import { supportNative, nativeFS } from './NativeRequire';
+
 var templateurls = [
     ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
     ["resource/template/app.js", "app.js"],

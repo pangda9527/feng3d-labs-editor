@@ -1,3 +1,4 @@
+import { SplitUIComponent } from './SplitUIComponent';
 
 /**
  * 分割组，提供鼠标拖拽改变组内对象分割尺寸

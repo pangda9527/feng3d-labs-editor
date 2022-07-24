@@ -1,3 +1,10 @@
+import { shortcut, MenuItem, GameObject, serialization, menuConfig } from 'feng3d';
+import { editorData } from '../../Editor';
+import { HierarchyNode } from '../../feng3d/hierarchy/HierarchyNode';
+import { menu } from '../components/Menu';
+import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
+import { TreeItemRenderer } from '../components/TreeItemRenderer';
+import { drag, DragData } from '../drag/Drag';
 
 export class HierarchyTreeItemRenderer extends TreeItemRenderer
 {
@@ -45,7 +52,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
 
     private onDoubleClick()
     {
-        feng3d.shortcut.emit("lookToSelectedGameObject");
+        shortcut.emit("lookToSelectedGameObject");
     }
 
     private onrightclick()
@@ -58,7 +65,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                 {
                     label: "复制", click: () =>
                     {
-                        var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+                        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
                         editorData.copyObjects = objects;
                     }
                 },
@@ -67,9 +74,9 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                     {
                         var undoSelectedObjects = editorData.selectedObjects;
                         //
-                        var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+                        var objects: GameObject[] = editorData.copyObjects.filter(v => v instanceof GameObject);
                         if (objects.length == 0) return;
-                        var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
+                        var newGameObjects = objects.map(v => serialization.clone(v));
                         newGameObjects.forEach(v =>
                         {
                             this.data.gameobject.parent.addChild(v);
@@ -93,10 +100,10 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                     {
                         var undoSelectedObjects = editorData.selectedObjects;
                         //
-                        var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+                        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
                         var newGameObjects = objects.map(v =>
                         {
-                            var no = feng3d.serialization.clone(v);
+                            var no = serialization.clone(v);
                             v.parent.addChild(no);
                             return no;
                         });

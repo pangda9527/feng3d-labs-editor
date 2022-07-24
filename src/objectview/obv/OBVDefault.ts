@@ -1,15 +1,16 @@
+import { OBVComponent, IObjectBlockView, IObjectAttributeView, AttributeViewInfo, IObjectView, BlockViewInfo, objectview } from 'feng3d';
 
 /**
  * 默认对象属性块界面
  */
-@feng3d.OBVComponent()
-export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView
+@OBVComponent()
+export class OBVDefault extends eui.Component implements IObjectBlockView
 {
 	private _space: Object;
 	private _blockName: string;
 
-	private attributeViews: feng3d.IObjectAttributeView[];
-	private itemList: feng3d.AttributeViewInfo[];
+	private attributeViews: IObjectAttributeView[];
+	private itemList: AttributeViewInfo[];
 
 	group: eui.Group;
 	titleGroup: eui.Group;
@@ -18,12 +19,12 @@ export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView
 
 	border: eui.Rect;
 
-	objectView: feng3d.IObjectView;
+	objectView: IObjectView;
 
 	/**
 	 * @inheritDoc
 	 */
-	constructor(blockViewInfo: feng3d.BlockViewInfo)
+	constructor(blockViewInfo: BlockViewInfo)
 	{
 		super();
 
@@ -65,7 +66,7 @@ export class OBVDefault extends eui.Component implements feng3d.IObjectBlockView
 		var objectAttributeInfos = this.itemList;
 		for (var i = 0; i < objectAttributeInfos.length; i++)
 		{
-			var displayObject = feng3d.objectview.getAttributeView(objectAttributeInfos[i]);
+			var displayObject = objectview.getAttributeView(objectAttributeInfos[i]);
 			displayObject.percentWidth = 100;
 			displayObject.objectView = this.objectView;
 			displayObject.objectBlockView = this;

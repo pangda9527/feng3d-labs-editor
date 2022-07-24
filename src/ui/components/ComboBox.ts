@@ -1,3 +1,5 @@
+import { editorui } from '../../global/editorui';
+import { maskview } from './Maskview';
 
 
 /**
@@ -86,8 +88,8 @@ export class ComboBox extends eui.Component implements eui.UIComponent
 		this.list.y = rect.bottom;
 		this.list.selectedIndex = this.dataProvider.indexOf(this.data);
 
-		editor.editorui.popupLayer.addChild(this.list);
-		editor.maskview.mask(this.list);
+		editorui.popupLayer.addChild(this.list);
+		maskview.mask(this.list);
 	}
 
 	private onlistChange()

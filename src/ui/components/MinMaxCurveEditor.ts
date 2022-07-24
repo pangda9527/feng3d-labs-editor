@@ -1,10 +1,14 @@
+import { watch, MinMaxCurve, AnimationCurve, Rectangle, AnimationCurveKeyframe, Color4, ImageUtil, watcher, MinMaxCurveMode, mathUtil, Vector2, serialization, WrapMode, gPartial } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
+import { menu } from './Menu';
 
 export var minMaxCurveEditor: MinMaxCurveEditor;
 
 export class MinMaxCurveEditor extends eui.Component
 {
-    @feng3d.watch("_onMinMaxCurveChanged")
-    minMaxCurve = new feng3d.MinMaxCurve();
+    @watch("_onMinMaxCurveChanged")
+    minMaxCurve = new MinMaxCurve();
 
     public viewGroup: eui.Group;
     public curveImage: eui.Image;
@@ -41,24 +45,24 @@ export class MinMaxCurveEditor extends eui.Component
 
 
     //
-    private timeline: feng3d.AnimationCurve;
-    private timeline1: feng3d.AnimationCurve;
-    private curveRect: feng3d.Rectangle;
-    private canvasRect: feng3d.Rectangle;
+    private timeline: AnimationCurve;
+    private timeline1: AnimationCurve;
+    private curveRect: Rectangle;
+    private canvasRect: Rectangle;
 
-    private editKey: feng3d.AnimationCurveKeyframe;
-    private editorControlkey: feng3d.AnimationCurveKeyframe;
+    private editKey: AnimationCurveKeyframe;
+    private editorControlkey: AnimationCurveKeyframe;
     private editing = false;
     private mousedownxy = { x: -1, y: -1 }
-    private selectedKey: feng3d.AnimationCurveKeyframe;
-    private selectTimeline: feng3d.AnimationCurve;
+    private selectedKey: AnimationCurveKeyframe;
+    private selectTimeline: AnimationCurve;
 
-    private curveColor = new feng3d.Color4(1, 0, 0);
-    private backColor = feng3d.Color4.fromUnit24(0x565656);
-    private fillTwoCurvesColor = new feng3d.Color4(1, 1, 1, 0.2);
+    private curveColor = new Color4(1, 0, 0);
+    private backColor = Color4.fromUnit24(0x565656);
+    private fillTwoCurvesColor = new Color4(1, 1, 1, 0.2);
     private range = [1, -1];
 
-    private imageUtil = new feng3d.ImageUtil();
+    private imageUtil = new ImageUtil();
 
     /**
      * 点绘制尺寸
@@ -103,7 +107,7 @@ export class MinMaxCurveEditor extends eui.Component
         this.preWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
         this.postWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
-        feng3d.watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+        watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
         this.updateXYLabels();
         this.updateSampleImages();
@@ -119,12 +123,12 @@ export class MinMaxCurveEditor extends eui.Component
         this.viewGroup.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         editorui.stage.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
 
-        // feng3d.windowEventProxy.off("dblclick", this.ondblclick, this);
+        // windowEventProxy.off("dblclick", this.ondblclick, this);
 
         this.preWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
         this.postWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
-        feng3d.watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+        watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
 
         super.$onRemoveFromStage()
     }
@@ -134,8 +138,8 @@ export class MinMaxCurveEditor extends eui.Component
         if (!this.stage) return;
 
         // 曲线绘制区域
-        this.curveRect = new feng3d.Rectangle(this.curveGroup.x, this.curveGroup.y, this.curveGroup.width, this.curveGroup.height);
-        this.canvasRect = new feng3d.Rectangle(0, 0, this.viewGroup.width, this.viewGroup.height);
+        this.curveRect = new Rectangle(this.curveGroup.x, this.curveGroup.y, this.curveGroup.width, this.curveGroup.height);
+        this.canvasRect = new Rectangle(0, 0, this.viewGroup.width, this.viewGroup.height);
 
         if (this.curveGroup.width < 10 || this.curveGroup.height < 10) return;
 
@@ -145,12 +149,12 @@ export class MinMaxCurveEditor extends eui.Component
         this.timeline = this.minMaxCurve.curve;
         this.timeline1 = this.minMaxCurve.curveMax;
 
-        if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
+        if (this.minMaxCurve.mode == MinMaxCurveMode.Curve)
         {
             this.imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
 
             this.drawCurveKeys(this.timeline);
-        } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
+        } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves)
         {
             this.imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
 
@@ -167,10 +171,10 @@ export class MinMaxCurveEditor extends eui.Component
 
     private updateXYLabels()
     {
-        this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * feng3d.mathUtil.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
-        this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * feng3d.mathUtil.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
-        this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * feng3d.mathUtil.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
-        this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * feng3d.mathUtil.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
+        this.yLabels[0].text = (this.minMaxCurve.curveMultiplier * mathUtil.mapLinear(0, 1, 0, this.range[0], this.range[1])).toString();
+        this.yLabels[1].text = (this.minMaxCurve.curveMultiplier * mathUtil.mapLinear(0.25, 1, 0, this.range[0], this.range[1])).toString();
+        this.yLabels[2].text = (this.minMaxCurve.curveMultiplier * mathUtil.mapLinear(0.5, 1, 0, this.range[0], this.range[1])).toString();
+        this.yLabels[3].text = (this.minMaxCurve.curveMultiplier * mathUtil.mapLinear(0.75, 1, 0, this.range[0], this.range[1])).toString();
 
         // for (let i = 0; i <= 10; i++)
         // {
@@ -186,24 +190,24 @@ export class MinMaxCurveEditor extends eui.Component
         for (let i = 0; i < this.sampleImages.length; i++)
         {
             const element = this.sampleImages[i];
-            if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve && curves[i])
+            if (this.minMaxCurve.mode == MinMaxCurveMode.Curve && curves[i])
             {
-                var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
-                if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
-                var curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), curves[i]);
-                imageUtil.drawCurve(curve, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
+                var imageUtil = new ImageUtil(element.width, element.height, this.backColor);
+                if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new Vector2(0, element.height / 2), new Vector2(element.width, element.height / 2), Color4.BLACK);
+                var curve = serialization.setValue(new AnimationCurve(), curves[i]);
+                imageUtil.drawCurve(curve, this.minMaxCurve.between0And1, Color4.WHITE);
 
                 element.source = imageUtil.toDataURL();
                 this.samplesGroup.addChild(element);
-            } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves && doubleCurves[i])
+            } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves && doubleCurves[i])
             {
-                var imageUtil = new feng3d.ImageUtil(element.width, element.height, this.backColor);
-                if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new feng3d.Vector2(0, element.height / 2), new feng3d.Vector2(element.width, element.height / 2), feng3d.Color4.BLACK);
+                var imageUtil = new ImageUtil(element.width, element.height, this.backColor);
+                if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new Vector2(0, element.height / 2), new Vector2(element.width, element.height / 2), Color4.BLACK);
 
-                var curveMin = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve);
-                var curveMax = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curveMax);
+                var curveMin = serialization.setValue(new AnimationCurve(), doubleCurves[i].curve);
+                var curveMax = serialization.setValue(new AnimationCurve(), doubleCurves[i].curveMax);
 
-                imageUtil.drawBetweenTwoCurves(curveMin, curveMax, this.minMaxCurve.between0And1, feng3d.Color4.WHITE);
+                imageUtil.drawBetweenTwoCurves(curveMin, curveMax, this.minMaxCurve.between0And1, Color4.WHITE);
 
                 element.source = imageUtil.toDataURL();
                 this.samplesGroup.addChild(element);
@@ -224,13 +228,13 @@ export class MinMaxCurveEditor extends eui.Component
             {
                 var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
                 var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
-                if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.Curve)
+                if (this.minMaxCurve.mode == MinMaxCurveMode.Curve)
                 {
-                    this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), curves[i]);
-                } else if (this.minMaxCurve.mode == feng3d.MinMaxCurveMode.TwoCurves)
+                    this.minMaxCurve.curve = serialization.setValue(new AnimationCurve(), curves[i]);
+                } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves)
                 {
-                    this.minMaxCurve.curve = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curve);
-                    this.minMaxCurve.curveMax = feng3d.serialization.setValue(new feng3d.AnimationCurve(), doubleCurves[i].curveMax);
+                    this.minMaxCurve.curve = serialization.setValue(new AnimationCurve(), doubleCurves[i].curve);
+                    this.minMaxCurve.curveMax = serialization.setValue(new AnimationCurve(), doubleCurves[i].curveMax);
                 }
                 this.selectedKey = null;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -244,9 +248,9 @@ export class MinMaxCurveEditor extends eui.Component
      * 绘制曲线关键点
      * @param animationCurve 
      */
-    private drawCurveKeys(animationCurve: feng3d.AnimationCurve)
+    private drawCurveKeys(animationCurve: AnimationCurve)
     {
-        var c = new feng3d.Color4(1, 0, 0);
+        var c = new Color4(1, 0, 0);
         animationCurve.keys.forEach(key =>
         {
             var pos = this.curveToUIPos(key.time, key.value);
@@ -261,9 +265,9 @@ export class MinMaxCurveEditor extends eui.Component
      */
     private curveToUIPos(time: number, value: number)
     {
-        var x = feng3d.mathUtil.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
-        var y = feng3d.mathUtil.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
-        return new feng3d.Vector2(x, y);
+        var x = mathUtil.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
+        var y = mathUtil.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
+        return new Vector2(x, y);
     }
 
     /**
@@ -273,29 +277,29 @@ export class MinMaxCurveEditor extends eui.Component
      */
     private uiToCurvePos(x: number, y: number)
     {
-        var time = feng3d.mathUtil.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
-        var value = feng3d.mathUtil.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
+        var time = mathUtil.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
+        var value = mathUtil.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
         return { time: time, value: value };
     }
 
-    private getKeyUIPos(key: feng3d.AnimationCurveKeyframe)
+    private getKeyUIPos(key: AnimationCurveKeyframe)
     {
         return this.curveToUIPos(key.time, key.value);
     }
 
-    private getKeyLeftControlUIPos(key: feng3d.AnimationCurveKeyframe)
+    private getKeyLeftControlUIPos(key: AnimationCurveKeyframe)
     {
         var current = this.curveToUIPos(key.time, key.value);
         var currenttan = key.inTangent * this.curveRect.height / this.curveRect.width;
-        var lcp = new feng3d.Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
+        var lcp = new Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
         return lcp;
     }
 
-    private getKeyRightControlUIPos(key: feng3d.AnimationCurveKeyframe)
+    private getKeyRightControlUIPos(key: AnimationCurveKeyframe)
     {
         var current = this.curveToUIPos(key.time, key.value);
         var currenttan = key.outTangent * this.curveRect.height / this.curveRect.width;
-        var rcp = new feng3d.Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
+        var rcp = new Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
         return rcp;
     }
 
@@ -312,7 +316,7 @@ export class MinMaxCurveEditor extends eui.Component
         if (i == -1) return;
 
         var n = this.selectTimeline.keys.length;
-        var c = new feng3d.Color4();
+        var c = new Color4();
 
         var current = this.getKeyUIPos(key);
         this.imageUtil.drawPoint(current.x, current.y, c, this.pointSize);
@@ -324,13 +328,13 @@ export class MinMaxCurveEditor extends eui.Component
             {
                 var lcp = this.getKeyLeftControlUIPos(key);
                 this.imageUtil.drawPoint(lcp.x, lcp.y, c, this.pointSize);
-                this.imageUtil.drawLine(current, lcp, new feng3d.Color4());
+                this.imageUtil.drawLine(current, lcp, new Color4());
             }
             if (i < n - 1)
             {
                 var rcp = this.getKeyRightControlUIPos(key);
                 this.imageUtil.drawPoint(rcp.x, rcp.y, c, this.pointSize);
-                this.imageUtil.drawLine(current, rcp, new feng3d.Color4());
+                this.imageUtil.drawLine(current, rcp, new Color4());
             }
         }
     }
@@ -373,16 +377,16 @@ export class MinMaxCurveEditor extends eui.Component
     private drawGrid(segmentW = 10, segmentH = 2)
     {
         //
-        var lines: { start: feng3d.Vector2, end: feng3d.Vector2, color: feng3d.Color4 }[] = [];
-        var c0 = feng3d.Color4.fromUnit24(0x494949);
-        var c1 = feng3d.Color4.fromUnit24(0x4f4f4f);
+        var lines: { start: Vector2, end: Vector2, color: Color4 }[] = [];
+        var c0 = Color4.fromUnit24(0x494949);
+        var c1 = Color4.fromUnit24(0x4f4f4f);
         for (var i = 0; i <= segmentW; i++)
         {
-            lines.push({ start: new feng3d.Vector2(i / segmentW, 0), end: new feng3d.Vector2(i / segmentW, 1), color: i % 2 == 0 ? c0 : c1 });
+            lines.push({ start: new Vector2(i / segmentW, 0), end: new Vector2(i / segmentW, 1), color: i % 2 == 0 ? c0 : c1 });
         }
         for (var i = 0; i <= segmentH; i++)
         {
-            lines.push({ start: new feng3d.Vector2(0, i / segmentH), end: new feng3d.Vector2(1, i / segmentH), color: i % 2 == 0 ? c0 : c1 });
+            lines.push({ start: new Vector2(0, i / segmentH), end: new Vector2(1, i / segmentH), color: i % 2 == 0 ? c0 : c1 });
         }
         lines.forEach(v =>
         {
@@ -464,8 +468,8 @@ export class MinMaxCurveEditor extends eui.Component
 
         if (this.editKey)
         {
-            curvePos.time = feng3d.mathUtil.clamp(curvePos.time, 0, 1);
-            curvePos.value = feng3d.mathUtil.clamp(curvePos.value, this.range[0], this.range[1]);
+            curvePos.time = mathUtil.clamp(curvePos.time, 0, 1);
+            curvePos.value = mathUtil.clamp(curvePos.value, this.range[0], this.range[1]);
 
             //
             this.editKey.time = curvePos.time;
@@ -505,7 +509,7 @@ export class MinMaxCurveEditor extends eui.Component
         editorui.stage.removeEventListener(egret.MouseEvent.MOUSE_UP, this.onMouseUp, this);
     }
 
-    private findControlKey(key: feng3d.AnimationCurveKeyframe, x: number, y: number, radius: number)
+    private findControlKey(key: AnimationCurveKeyframe, x: number, y: number, radius: number)
     {
         var lcp = this.getKeyLeftControlUIPos(key);
 
@@ -587,7 +591,7 @@ export class MinMaxCurveEditor extends eui.Component
 
         var selectTimeline = this.selectTimeline;
         if (!selectTimeline) return;
-        menu.popupEnum(feng3d.WrapMode, selectTimeline.preWrapMode, (v) =>
+        menu.popupEnum(WrapMode, selectTimeline.preWrapMode, (v) =>
         {
             selectTimeline.preWrapMode = v;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -600,7 +604,7 @@ export class MinMaxCurveEditor extends eui.Component
 
         var selectTimeline = this.selectTimeline;
         if (!selectTimeline) return;
-        menu.popupEnum(feng3d.WrapMode, selectTimeline.postWrapMode, (v) =>
+        menu.popupEnum(WrapMode, selectTimeline.postWrapMode, (v) =>
         {
             selectTimeline.postWrapMode = v;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -608,7 +612,7 @@ export class MinMaxCurveEditor extends eui.Component
     }
 }
 
-var particleCurves: feng3d.gPartial<feng3d.AnimationCurve>[] = [
+var particleCurves: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
     { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
@@ -618,7 +622,7 @@ var particleCurves: feng3d.gPartial<feng3d.AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
     { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
 ];
-var particleCurvesSingend: feng3d.gPartial<feng3d.AnimationCurve>[] = [
+var particleCurvesSingend: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
     { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
@@ -629,7 +633,7 @@ var particleCurvesSingend: feng3d.gPartial<feng3d.AnimationCurve>[] = [
     { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
 ];
 
-var particleDoubleCurves: feng3d.gPartial<feng3d.MinMaxCurve>[] = [{
+var particleDoubleCurves: gPartial<MinMaxCurve>[] = [{
     curveMin: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
 },
@@ -663,7 +667,7 @@ var particleDoubleCurves: feng3d.gPartial<feng3d.MinMaxCurve>[] = [{
 },
 ];
 
-var particleDoubleCurvesSingend: feng3d.gPartial<feng3d.MinMaxCurve>[] = [
+var particleDoubleCurvesSingend: gPartial<MinMaxCurve>[] = [
     {
         curve: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
         curveMax: { keys: [{ time: 0, value: -1, inTangent: 0, outTangent: 0 }, { time: 1, value: -1, inTangent: 0, outTangent: 0 }] }

@@ -1,8 +1,17 @@
+import { Camera, Component, GameObject, globalEmitter, HideFlags, RegisterComponent, Renderable, serialization, ticker } from 'feng3d';
+import { editorData } from '../../Editor';
+import { MRSToolType } from '../../global/EditorData';
+import { MRSToolBase } from './MRSToolBase';
+import { MRSToolTarget } from './MRSToolTarget';
+import { MTool } from './MTool';
+import { RTool } from './RTool';
+import { STool } from './STool';
+
 declare global
 {
     export interface MixinsComponentMap
     {
-        MRSTool: editor.MRSTool
+        MRSTool: MRSTool
     }
 }
 
@@ -10,9 +19,9 @@ declare global
 /**
  * 设置永久可见
  */
-function setAwaysVisible(component: feng3d.Component)
+function setAwaysVisible(component: Component)
 {
-    var models = component.getComponentsInChildren(feng3d.Renderable);
+    var models = component.getComponentsInChildren(Renderable);
     models.forEach(element =>
     {
         if (element.material)
@@ -25,8 +34,8 @@ function setAwaysVisible(component: feng3d.Component)
 /**
  * 位移旋转缩放工具
  */
-@feng3d.RegisterComponent()
-export class MRSTool extends feng3d.Component
+@RegisterComponent()
+export class MRSTool extends Component
 {
     private mTool: MTool;
     private rTool: RTool;
@@ -34,22 +43,22 @@ export class MRSTool extends feng3d.Component
 
     private _currentTool: MRSToolBase;
 
-    private mrsToolObject: feng3d.GameObject;
+    private mrsToolObject: GameObject;
     private mrsToolTarget = new MRSToolTarget();
 
     get editorCamera() { return this._editorCamera; }
     set editorCamera(v) { this._editorCamera = v; this.invalidate(); }
-    private _editorCamera: feng3d.Camera;
+    private _editorCamera: Camera;
 
     init()
     {
         super.init();
 
-        this.mrsToolObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MRSTool" });
+        this.mrsToolObject = serialization.setValue(new GameObject(), { name: "MRSTool" });
 
-        this.mTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "MTool" }).addComponent(MTool);
-        this.rTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "RTool" }).addComponent(RTool);
-        this.sTool = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "STool" }).addComponent(STool);
+        this.mTool = serialization.setValue(new GameObject(), { name: "MTool" }).addComponent(MTool);
+        this.rTool = serialization.setValue(new GameObject(), { name: "RTool" }).addComponent(RTool);
+        this.sTool = serialization.setValue(new GameObject(), { name: "STool" }).addComponent(STool);
 
         this.mTool.mrsToolTarget = this.mrsToolTarget;
         this.rTool.mrsToolTarget = this.mrsToolTarget;
@@ -61,8 +70,8 @@ export class MRSTool extends feng3d.Component
         //
         this.currentTool = this.mTool;
         //
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        feng3d.globalEmitter.on("editor.toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.on("selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.on("toolTypeChanged", this.onToolTypeChange, this);
     }
 
     dispose()
@@ -80,15 +89,15 @@ export class MRSTool extends feng3d.Component
         this.sTool.dispose();
         this.sTool = null;
         //
-        feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        feng3d.globalEmitter.off("editor.toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.off("selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.off("toolTypeChanged", this.onToolTypeChange, this);
 
         super.dispose();
     }
 
     private invalidate()
     {
-        feng3d.ticker.nextframe(this.update, this);
+        ticker.nextframe(this.update, this);
     }
 
     private update()
@@ -100,7 +109,7 @@ export class MRSTool extends feng3d.Component
 
     private onSelectedGameObjectChange()
     {
-        var objects = editorData.selectedGameObjects.filter(v => !(v.hideFlags & feng3d.HideFlags.DontTransform));
+        var objects = editorData.selectedGameObjects.filter(v => !(v.hideFlags & HideFlags.DontTransform));
 
         //筛选出 工具控制的对象
         if (objects.length > 0)

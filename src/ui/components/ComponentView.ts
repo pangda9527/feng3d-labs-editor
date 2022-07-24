@@ -1,26 +1,29 @@
+import { AudioListener, AudioSource, Behaviour, Camera, classUtils, Components, DirectionalLight, FPSController, globalEmitter, IObjectView, MenuItem, objectview, PointLight, Renderable, ScriptComponent, SpotLight, Terrain, Transform, watcher, Water } from 'feng3d';
+import { Accordion } from './Accordion';
+import { menu } from './Menu';
 
 export const componentIconMap = new Map<any, string>();
 
-componentIconMap.set(feng3d.Transform, "Transform_png");
-componentIconMap.set(feng3d.Water, "Water_png");
-componentIconMap.set(feng3d.Renderable, "Model_png");
-componentIconMap.set(feng3d.ScriptComponent, "ScriptComponent_png");
-componentIconMap.set(feng3d.Camera, "Camera_png");
-componentIconMap.set(feng3d.AudioSource, "AudioSource_png");
-componentIconMap.set(feng3d.AudioListener, "AudioListener_png");
-componentIconMap.set(feng3d.SpotLight, "SpotLight_png");
-componentIconMap.set(feng3d.PointLight, "PointLight_png");
-componentIconMap.set(feng3d.DirectionalLight, "DirectionalLight_png");
-componentIconMap.set(feng3d.FPSController, "FPSController_png");
-componentIconMap.set(feng3d.Terrain, "Terrain_png");
+componentIconMap.set(Transform, "Transform_png");
+componentIconMap.set(Water, "Water_png");
+componentIconMap.set(Renderable, "Model_png");
+componentIconMap.set(ScriptComponent, "ScriptComponent_png");
+componentIconMap.set(Camera, "Camera_png");
+componentIconMap.set(AudioSource, "AudioSource_png");
+componentIconMap.set(AudioListener, "AudioListener_png");
+componentIconMap.set(SpotLight, "SpotLight_png");
+componentIconMap.set(PointLight, "PointLight_png");
+componentIconMap.set(DirectionalLight, "DirectionalLight_png");
+componentIconMap.set(FPSController, "FPSController_png");
+componentIconMap.set(Terrain, "Terrain_png");
 
 export class ComponentView extends eui.Component
 {
-	component: feng3d.Components;
-	componentView: feng3d.IObjectView;
+	component: Components;
+	componentView: IObjectView;
 
 	//
-	public accordion: editor.Accordion;
+	public accordion: Accordion;
 
 	//
 	public enabledCB: eui.CheckBox;
@@ -28,12 +31,12 @@ export class ComponentView extends eui.Component
 	public helpBtn: eui.Button;
 	public operationBtn: eui.Button;
 
-	scriptView: feng3d.IObjectView;
+	scriptView: IObjectView;
 
 	/**
 	 * 对象界面数据
 	 */
-	constructor(component: feng3d.Components)
+	constructor(component: Components)
 	{
 		super();
 		this.component = component;
@@ -55,9 +58,9 @@ export class ComponentView extends eui.Component
 
 	private onComplete()
 	{
-		var componentName = feng3d.classUtils.getQualifiedClassName(this.component).split(".").pop();
+		var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
 		this.accordion.titleName = componentName;
-		this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
 		this.accordion.addContent(this.componentView);
 
 		this.enabledCB = this.accordion["enabledCB"];
@@ -90,35 +93,35 @@ export class ComponentView extends eui.Component
 		this.updateView();
 
 		this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		if (this.component instanceof feng3d.Behaviour)
-			feng3d.watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+		if (this.component instanceof Behaviour)
+			watcher.watch(this.component, "enabled", this.updateEnableCB, this);
 
 		this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 		this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-		feng3d.globalEmitter.on("asset.scriptChanged", this.onScriptChanged, this);
+		globalEmitter.on("asset.scriptChanged", this.onScriptChanged, this);
 	}
 
 	private onRemovedFromStage()
 	{
 		this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		if (this.component instanceof feng3d.Behaviour)
-			feng3d.watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		if (this.component instanceof Behaviour)
+			watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
 
 		this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 		this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-		feng3d.globalEmitter.off("asset.scriptChanged", this.onScriptChanged, this);
+		globalEmitter.off("asset.scriptChanged", this.onScriptChanged, this);
 	}
 
 	private onRefreshView()
 	{
 		this.accordion.removeContent(this.componentView);
-		this.componentView = feng3d.objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
 		this.accordion.addContent(this.componentView);
 	}
 
 	private updateEnableCB()
 	{
-		if (this.component instanceof feng3d.Behaviour)
+		if (this.component instanceof Behaviour)
 		{
 			this.enabledCB.selected = this.component.enabled;
 			this.enabledCB.visible = true;
@@ -131,7 +134,7 @@ export class ComponentView extends eui.Component
 
 	private onEnableCBChange()
 	{
-		if (this.component instanceof feng3d.Behaviour)
+		if (this.component instanceof Behaviour)
 		{
 			this.component.enabled = this.enabledCB.selected;
 		}
@@ -140,13 +143,13 @@ export class ComponentView extends eui.Component
 	private initScriptView()
 	{
 		// 初始化Script属性界面
-		if (this.component instanceof feng3d.ScriptComponent)
+		if (this.component instanceof ScriptComponent)
 		{
-			feng3d.watcher.watch(this.component, "scriptName", this.onScriptChanged, this);
+			watcher.watch(this.component, "scriptName", this.onScriptChanged, this);
 			var component = this.component;
 			if (component.scriptInstance)
 			{
-				this.scriptView = feng3d.objectview.getObjectView(component.scriptInstance, { autocreate: false });
+				this.scriptView = objectview.getObjectView(component.scriptInstance, { autocreate: false });
 				this.accordion.addContent(this.scriptView);
 			}
 		}
@@ -155,9 +158,9 @@ export class ComponentView extends eui.Component
 	private removeScriptView()
 	{
 		// 移除Script属性界面
-		if (this.component instanceof feng3d.ScriptComponent)
+		if (this.component instanceof ScriptComponent)
 		{
-			feng3d.watcher.unwatch(this.component, "scriptName", this.onScriptChanged, this);
+			watcher.unwatch(this.component, "scriptName", this.onScriptChanged, this);
 		}
 		if (this.scriptView)
 		{
@@ -170,7 +173,7 @@ export class ComponentView extends eui.Component
 	{
 		var menus: MenuItem[] = [];
 
-		if (!(this.component instanceof feng3d.Transform))
+		if (!(this.component instanceof Transform))
 		{
 			menus.push({
 				label: "移除组件",
@@ -186,7 +189,7 @@ export class ComponentView extends eui.Component
 
 	private onHelpBtnClick()
 	{
-		window.open(`http://feng3d.gitee.io/#/script`);
+		window.open(`http://gitee.io/#/script`);
 	}
 
 	private onScriptChanged()

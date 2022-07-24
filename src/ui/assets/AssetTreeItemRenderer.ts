@@ -1,3 +1,9 @@
+import { watcher } from 'feng3d';
+import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
+import { TreeItemRenderer } from '../components/TreeItemRenderer';
+import { drag } from '../drag/Drag';
+import { AssetNode } from './AssetNode';
+import { editorAsset } from './EditorAsset';
 
 export class AssetTreeItemRenderer extends TreeItemRenderer
 {
@@ -20,7 +26,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
 
         MouseOnDisableScroll.register(this);
 
-        feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
+        watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
         this.showFloderChanged();
     }
 
@@ -32,7 +38,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
 
         MouseOnDisableScroll.unRegister(this);
 
-        feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
+        watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
     }
 
     dataChanged()

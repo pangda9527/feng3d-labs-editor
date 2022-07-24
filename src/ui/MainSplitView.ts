@@ -1,3 +1,9 @@
+import { globalEmitter, IEvent } from 'feng3d';
+import { editorcache } from '../caches/Editorcache';
+import { viewLayoutConfig } from '../configs/ViewLayoutConfig';
+import { modules } from '../Modules';
+import { SplitGroup } from './components/SplitGroup';
+import { TabView } from './components/TabView';
 
 /**
  * 主分割界面
@@ -29,16 +35,16 @@ export class MainSplitView extends eui.Component implements eui.UIComponent
 
     private onAddedToStage()
     {
-        feng3d.globalEmitter.on("viewLayout.changed", this._saveViewLayout, this);
-        feng3d.globalEmitter.on("viewLayout.reset", this._resetLayout, this);
+        globalEmitter.on("viewLayout.changed", this._saveViewLayout, this);
+        globalEmitter.on("viewLayout.reset", this._resetLayout, this);
 
         this._initViewLayout();
     }
 
     private onRemovedFromStage()
     {
-        feng3d.globalEmitter.off("viewLayout.changed", this._saveViewLayout, this);
-        feng3d.globalEmitter.off("viewLayout.reset", this._resetLayout, this);
+        globalEmitter.off("viewLayout.changed", this._saveViewLayout, this);
+        globalEmitter.off("viewLayout.reset", this._resetLayout, this);
     }
 
     private _initViewLayout()
@@ -61,7 +67,7 @@ export class MainSplitView extends eui.Component implements eui.UIComponent
         editorcache.viewLayout = data;
     }
 
-    private _resetLayout(event: feng3d.IEvent<Object>)
+    private _resetLayout(event: IEvent<Object>)
     {
         editorcache.viewLayout = event.data || viewLayoutConfig.Default;
 

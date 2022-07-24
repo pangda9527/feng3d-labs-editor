@@ -1,3 +1,7 @@
+import { GameObject, gPartial, watcher } from 'feng3d';
+import { TreeNode } from '../../ui/components/TreeNode';
+import { DragData } from '../../ui/drag/Drag';
+import { hierarchy } from './Hierarchy';
 
 export class HierarchyNode extends TreeNode
 {
@@ -6,7 +10,7 @@ export class HierarchyNode extends TreeNode
     /**
      * 游戏对象
      */
-    gameobject: feng3d.GameObject;
+    gameobject: GameObject;
     /** 
      * 父结点
      */
@@ -16,11 +20,11 @@ export class HierarchyNode extends TreeNode
      */
     children: HierarchyNode[] = [];
 
-    constructor(obj: feng3d.gPartial<HierarchyNode>)
+    constructor(obj: gPartial<HierarchyNode>)
     {
         super(obj);
 
-        feng3d.watcher.watch(this.gameobject, "name", this.update, this);
+        watcher.watch(this.gameobject, "name", this.update, this);
 
         this.update();
     }
@@ -70,7 +74,7 @@ export class HierarchyNode extends TreeNode
      */
     destroy()
     {
-        feng3d.watcher.unwatch(this.gameobject, "name", this.update, this);
+        watcher.unwatch(this.gameobject, "name", this.update, this);
 
         this.gameobject = null;
         super.destroy();

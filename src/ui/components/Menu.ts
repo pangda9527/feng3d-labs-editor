@@ -1,3 +1,6 @@
+import { windowEventProxy } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { maskview } from './Maskview';
 
 /**
  * 菜单
@@ -46,9 +49,9 @@ export class Menu
 [{
 label: "Rendering",
 submenu: [
-    { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-    { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
-    { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
+    { label: "Camera", click: () => { gameobject.addComponent(Camera); } },
+    { label: "PointLight", click: () => { gameobject.addComponent(PointLight); } },
+    { label: "DirectionalLight", click: () => { gameobject.addComponent(DirectionalLight); } },
 ]
 }]
 ```
@@ -57,9 +60,9 @@ submenu: [
 [{
 label: "Rendering",
 submenu: [
-    { label: "DirectionalLight", click: () => { gameobject.addComponent(feng3d.DirectionalLight); } },
-    { label: "Camera", click: () => { gameobject.addComponent(feng3d.Camera); } },
-    { label: "PointLight", click: () => { gameobject.addComponent(feng3d.PointLight); } },
+    { label: "DirectionalLight", click: () => { gameobject.addComponent(DirectionalLight); } },
+    { label: "Camera", click: () => { gameobject.addComponent(Camera); } },
+    { label: "PointLight", click: () => { gameobject.addComponent(PointLight); } },
 ]
 }]
 ```
@@ -179,8 +182,8 @@ class MenuUI extends eui.List
 
         if (!menuItemRendererRect)
         {
-            menuUI.x = feng3d.windowEventProxy.clientX;
-            menuUI.y = feng3d.windowEventProxy.clientY;
+            menuUI.x = windowEventProxy.clientX;
+            menuUI.y = windowEventProxy.clientY;
 
             if (menuUI.x + menuUI.width > editorui.popupLayer.stage.stageWidth - 10)
                 menuUI.x = editorui.popupLayer.stage.stageWidth - menuUI.width - 10;

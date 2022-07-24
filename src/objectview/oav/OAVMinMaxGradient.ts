@@ -1,11 +1,14 @@
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { MinMaxGradientView } from '../../ui/components/MinMaxGradientView';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVMinMaxGradient extends OAVBase
 {
     public labelLab: eui.Label;
-    public minMaxGradientView: editor.MinMaxGradientView;
+    public minMaxGradientView: MinMaxGradientView;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 

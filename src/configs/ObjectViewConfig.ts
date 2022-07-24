@@ -1,3 +1,4 @@
+import { objectview } from 'feng3d';
 
 //
 objectview.defaultBaseObjectViewClass = "OVBaseDefault";

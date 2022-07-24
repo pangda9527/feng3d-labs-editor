@@ -1,3 +1,7 @@
+import feng3d = require('feng3d');
+import { editorRS } from '../assets/EditorRS';
+import { editorData } from '../Editor';
+import { loadjs } from './load';
 
 export class ThreejsLoader
 {

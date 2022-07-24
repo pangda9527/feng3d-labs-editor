@@ -1,5 +1,8 @@
+import { OAVComponent, AttributeViewInfo, lazy } from 'feng3d';
+import { OAVBase } from './OAVBase';
+import { OAVDefault } from './OAVDefault';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVArray extends OAVBase
 {
     public group: eui.Group;
@@ -10,7 +13,7 @@ export class OAVArray extends OAVBase
 
     private attributeViews: eui.Component[];
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OAVArray";
@@ -101,7 +104,7 @@ export class OAVArray extends OAVBase
             for (var i = 0; i < size; i++)
             {
                 if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
-                    attributeValue[i] = feng3d.lazy.getvalue((<any>this._attributeViewInfo.componentParam).defaultItem);
+                    attributeValue[i] = lazy.getvalue((<any>this._attributeViewInfo.componentParam).defaultItem);
 
                 if (attributeViews[i] == null)
                 {
@@ -120,7 +123,7 @@ export class OAVArrayItem extends OAVDefault
 {
     constructor(arr: any[], index: number, componentParam: Object)
     {
-        var attributeViewInfo: feng3d.AttributeViewInfo = {
+        var attributeViewInfo: AttributeViewInfo = {
             name: index + "",
             editable: true,
             componentParam: componentParam,

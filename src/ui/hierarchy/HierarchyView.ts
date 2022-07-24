@@ -1,3 +1,12 @@
+import { watcher, ticker, menuConfig } from 'feng3d';
+import { editorData } from '../../Editor';
+import { hierarchy } from '../../feng3d/hierarchy/Hierarchy';
+import { HierarchyNode } from '../../feng3d/hierarchy/HierarchyNode';
+import { Modules } from '../../Modules';
+import { menu } from '../components/Menu';
+import { ModuleView } from '../components/TabView';
+import { drag, DragData } from '../drag/Drag';
+import { HierarchyTreeItemRenderer } from './HierarchyTreeItemRenderer';
 
 export class HierarchyView extends eui.Component implements ModuleView
 {
@@ -51,7 +60,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 		this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 		this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-		feng3d.watcher.watch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+		watcher.watch(hierarchy, "rootnode", this.onRootNodeChanged, this);
 		this.onRootNode(hierarchy.rootnode);
 
 		this.invalidHierarchy();
@@ -64,7 +73,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 		this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 		this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-		feng3d.watcher.unwatch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+		watcher.unwatch(hierarchy, "rootnode", this.onRootNodeChanged, this);
 		this.offRootNode(hierarchy.rootnode);
 	}
 
@@ -97,7 +106,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 
 	private invalidHierarchy()
 	{
-		feng3d.ticker.nextframe(this.updateHierarchyTree, this);
+		ticker.nextframe(this.updateHierarchyTree, this);
 	}
 
 	private updateHierarchyTree()

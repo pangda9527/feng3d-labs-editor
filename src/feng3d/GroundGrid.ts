@@ -1,15 +1,17 @@
+import { RegisterComponent, Component, oav, Camera, SegmentGeometry, serialization, GameObject, Renderable, Material, Color4, Segment, Vector3 } from 'feng3d';
+
 declare global
 {
-    export interface MixinsComponentMap { GroundGrid: editor.GroundGrid }
+    export interface MixinsComponentMap { GroundGrid: GroundGrid }
 }
 
 /**
  * 地面网格
  */
-@feng3d.RegisterComponent()
-export class GroundGrid extends feng3d.Component
+@RegisterComponent()
+export class GroundGrid extends Component
 {
-    @feng3d.oav()
+    @oav()
     private num = 100;
 
     get editorCamera() { return this._editorCamera; }
@@ -27,21 +29,21 @@ export class GroundGrid extends feng3d.Component
             this.update();
         }
     }
-    private _editorCamera: feng3d.Camera;
-    private segmentGeometry: feng3d.SegmentGeometry;
+    private _editorCamera: Camera;
+    private segmentGeometry: SegmentGeometry;
 
     init()
     {
         super.init();
 
-        var groundGridObject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "GroundGrid" });
+        var groundGridObject = serialization.setValue(new GameObject(), { name: "GroundGrid" });
         groundGridObject.mouseEnabled = false;
 
         this._gameObject.addChild(groundGridObject);
 
-        var model = groundGridObject.addComponent(feng3d.Renderable);
-        this.segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
-        model.material = feng3d.Material.getDefault("Segment-Material");
+        var model = groundGridObject.addComponent(Renderable);
+        this.segmentGeometry = model.geometry = new SegmentGeometry();
+        model.material = Material.getDefault("Segment-Material");
     }
 
     update()
@@ -61,18 +63,18 @@ export class GroundGrid extends feng3d.Component
 
         var halfNum = this.num / 2;
 
-        var xcolor = new feng3d.Color4(1, 0, 0, 0.5);
-        var zcolor = new feng3d.Color4(0, 0, 1, 0.5);
-        var color: feng3d.Color4;
-        var segments: feng3d.Segment[] = [];
+        var xcolor = new Color4(1, 0, 0, 0.5);
+        var zcolor = new Color4(0, 0, 1, 0.5);
+        var color: Color4;
+        var segments: Segment[] = [];
         for (var i = -halfNum; i <= halfNum; i++)
         {
-            var color0 = new feng3d.Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
+            var color0 = new Color4().fromUnit((i % 10) == 0 ? 0x888888 : 0x777777);
             color0.a = ((i % 10) == 0) ? 0.5 : 0.1;
             color = (i * step + startZ == 0) ? xcolor : color0;
-            segments.push({ start: new feng3d.Vector3(-halfNum * step + startX, 0, i * step + startZ), end: new feng3d.Vector3(halfNum * step + startX, 0, i * step + startZ), startColor: color, endColor: color });
+            segments.push({ start: new Vector3(-halfNum * step + startX, 0, i * step + startZ), end: new Vector3(halfNum * step + startX, 0, i * step + startZ), startColor: color, endColor: color });
             color = (i * step + startX == 0) ? zcolor : color0;
-            segments.push({ start: new feng3d.Vector3(i * step + startX, 0, -halfNum * step + startZ), end: new feng3d.Vector3(i * step + startX, 0, halfNum * step + startZ), startColor: color, endColor: color });
+            segments.push({ start: new Vector3(i * step + startX, 0, -halfNum * step + startZ), end: new Vector3(i * step + startX, 0, halfNum * step + startZ), startColor: color, endColor: color });
         }
         this.segmentGeometry.segments = segments;
     }

@@ -1,3 +1,4 @@
+import { shortcut, windowEventProxy } from 'feng3d';
 
 /**
  * 给显示对象注册禁止 Scroll 滚动功能
@@ -20,15 +21,15 @@ export class MouseOnDisableScroll
 
     private static onMouseDown(e: egret.MouseEvent)
     {
-        feng3d.shortcut.activityState("disableScroll");
+        shortcut.activityState("disableScroll");
         //
-        feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.on("mouseup", this.onStageMouseUp, this);
     }
 
     private static onStageMouseUp()
     {
-        feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.off("mouseup", this.onStageMouseUp, this);
 
-        feng3d.shortcut.deactivityState("disableScroll");
+        shortcut.deactivityState("disableScroll");
     }
 }

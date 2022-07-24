@@ -1,3 +1,4 @@
+import { View, Scene, Camera, GameObject, Geometry, Material, PerspectiveLens, serialization, Texture2D, TextureCube, Vector3, Renderable, GeometryLike } from 'feng3d';
 
 export var feng3dScreenShot: Feng3dScreenShot;
 
@@ -6,22 +7,22 @@ export var feng3dScreenShot: Feng3dScreenShot;
  */
 export class Feng3dScreenShot
 {
-    view: feng3d.View;
+    view: View;
 
-    scene: feng3d.Scene;
+    scene: Scene;
 
-    camera: feng3d.Camera;
+    camera: Camera;
 
-    container: feng3d.GameObject;
+    container: GameObject;
 
-    defaultGeometry = feng3d.Geometry.getDefault("Sphere");
+    defaultGeometry = Geometry.getDefault("Sphere");
 
-    defaultMaterial = feng3d.Material.getDefault("Default-Material");
+    defaultMaterial = Material.getDefault("Default-Material");
 
     constructor()
     {
         // 初始化3d
-        var view = this.view = new feng3d.View();
+        var view = this.view = new View();
         view.canvas.style.visibility = "hidden";
         view.setSize(64, 64);
         //
@@ -30,15 +31,15 @@ export class Feng3dScreenShot
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
         //
         var camera = this.camera = view.camera;
-        camera.lens = new feng3d.PerspectiveLens(45);
+        camera.lens = new PerspectiveLens(45);
         //
-        var light = feng3d.serialization.setValue(new feng3d.GameObject(), {
+        var light = serialization.setValue(new GameObject(), {
             name: "DirectionalLight",
-            components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
+            components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "DirectionalLight" },]
         });
         scene.gameObject.addChild(light);
 
-        this.container = new feng3d.GameObject();
+        this.container = new GameObject();
         this.container.name = "渲染截图容器";
         scene.gameObject.addChild(this.container);
 
@@ -49,7 +50,7 @@ export class Feng3dScreenShot
      * 绘制贴图
      * @param texture 贴图
      */
-    drawTexture(texture: feng3d.Texture2D)
+    drawTexture(texture: Texture2D)
     {
         var image: ImageData | HTMLImageElement = <any>texture.activePixels;
 
@@ -79,7 +80,7 @@ export class Feng3dScreenShot
      * 绘制立方体贴图
      * @param textureCube 立方体贴图
      */
-    drawTextureCube(textureCube: feng3d.TextureCube)
+    drawTextureCube(textureCube: TextureCube)
     {
         var pixels = textureCube["_pixels"];
 
@@ -136,9 +137,9 @@ export class Feng3dScreenShot
      * 绘制材质
      * @param material 材质
      */
-    drawMaterial(material: feng3d.Material, cameraRotation = new feng3d.Vector3(20, -90, 0))
+    drawMaterial(material: Material, cameraRotation = new Vector3(20, -90, 0))
     {
-        var mode = this.materialObject.getComponent(feng3d.Renderable);
+        var mode = this.materialObject.getComponent(Renderable);
         mode.geometry = this.defaultGeometry;
         mode.material = material;
 
@@ -152,9 +153,9 @@ export class Feng3dScreenShot
      * 绘制材质
      * @param geometry 材质
      */
-    drawGeometry(geometry: feng3d.GeometryLike, cameraRotation = new feng3d.Vector3(-20, 120, 0))
+    drawGeometry(geometry: GeometryLike, cameraRotation = new Vector3(-20, 120, 0))
     {
-        var model = this.geometryObject.getComponent(feng3d.Renderable);
+        var model = this.geometryObject.getComponent(Renderable);
         model.geometry = geometry;
         model.material = this.defaultMaterial;
 
@@ -167,7 +168,7 @@ export class Feng3dScreenShot
      * 绘制游戏对象
      * @param gameObject 游戏对象
      */
-    drawGameObject(gameObject: feng3d.GameObject, cameraRotation = new feng3d.Vector3(20, -120, 0))
+    drawGameObject(gameObject: GameObject, cameraRotation = new Vector3(20, -120, 0))
     {
         cameraRotation && (this.camera.transform.rotation = cameraRotation);
         this._drawGameObject(gameObject);
@@ -185,7 +186,7 @@ export class Feng3dScreenShot
         return dataUrl;
     }
 
-    updateCameraPosition(gameObject: feng3d.GameObject)
+    updateCameraPosition(gameObject: GameObject)
     {
         //
         var bounds = gameObject.boundingBox.worldBounds;
@@ -194,7 +195,7 @@ export class Feng3dScreenShot
         size = Math.max(size, 1);
         var lookDistance = size;
         var lens = this.camera.lens;
-        if (lens instanceof feng3d.PerspectiveLens)
+        if (lens instanceof PerspectiveLens)
         {
             lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
         }
@@ -210,10 +211,10 @@ export class Feng3dScreenShot
         this.camera.transform.position = localLookPos;
     }
 
-    private materialObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshRenderer" }] });
-    private geometryObject = feng3d.serialization.setValue(new feng3d.GameObject(), { components: [{ __class__: "feng3d.MeshRenderer", }, { __class__: "feng3d.WireframeComponent", }] });
+    private materialObject = serialization.setValue(new GameObject(), { components: [{ __class__: "MeshRenderer" }] });
+    private geometryObject = serialization.setValue(new GameObject(), { components: [{ __class__: "MeshRenderer", }, { __class__: "WireframeComponent", }] });
 
-    private _drawGameObject(gameObject: feng3d.GameObject)
+    private _drawGameObject(gameObject: GameObject)
     {
         this.container.removeChildren();
         //

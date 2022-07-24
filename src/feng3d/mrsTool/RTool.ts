@@ -1,6 +1,11 @@
+import { RegisterComponent, Vector3, Vector2, GameObject, IEvent, shortcut, Plane, windowEventProxy, mathUtil } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { RToolModel, CoordinateRotationAxis } from './models/RToolModel';
+import { MRSToolBase } from './MRSToolBase';
+
 declare global
 {
-    export interface ComponentMap { RTool: editor.RTool }
+    export interface ComponentMap { RTool: RTool }
 }
 
 export interface RTool
@@ -9,17 +14,17 @@ export interface RTool
     set toolModel(v);
 }
 
-@feng3d.RegisterComponent()
+@RegisterComponent()
 export class RTool extends MRSToolBase
 {
-    private startPlanePos: feng3d.Vector3;
-    private stepPlaneCross: feng3d.Vector3;
-    private startMousePos: feng3d.Vector2;
+    private startPlanePos: Vector3;
+    private stepPlaneCross: Vector3;
+    private startMousePos: Vector2;
 
     init()
     {
         super.init();
-        this.toolModel = new feng3d.GameObject().addComponent(RToolModel);
+        this.toolModel = new GameObject().addComponent(RToolModel);
     }
     protected onAddedToScene()
     {
@@ -43,10 +48,10 @@ export class RTool extends MRSToolBase
         this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
     }
 
-    protected onItemMouseDown(event: feng3d.IEvent<any>)
+    protected onItemMouseDown(event: IEvent<any>)
     {
-        if (!feng3d.shortcut.getState("mouseInView3D")) return;
-        if (feng3d.shortcut.keyState.getKeyState("alt")) return;
+        if (!shortcut.getState("mouseInView3D")) return;
+        if (shortcut.keyState.getKeyState("alt")) return;
         if (!this.editorCamera) return;
 
         super.onItemMouseDown(event);
@@ -61,7 +66,7 @@ export class RTool extends MRSToolBase
         var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
         var cameraDir = cameraSceneTransform.getAxisZ();
         var cameraPos = cameraSceneTransform.getPosition();
-        this.movePlane3D = new feng3d.Plane();
+        this.movePlane3D = new Plane();
         switch (event.currentTarget)
         {
             case this.toolModel.xAxis:
@@ -89,11 +94,11 @@ export class RTool extends MRSToolBase
         this.startPlanePos = this.getMousePlaneCross();
         this.stepPlaneCross = this.startPlanePos.clone();
         //
-        this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+        this.startMousePos = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
         this.startSceneTransform = globalMatrix.clone();
         this.mrsToolTarget.startRotate();
         //
-        feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on("mousemove", this.onMouseMove, this);
     }
 
     private onMouseMove()
@@ -114,8 +119,8 @@ export class RTool extends MRSToolBase
                 endDir.normalize();
                 //计算夹角
                 var cosValue = startDir.dot(endDir);
-                cosValue = feng3d.mathUtil.clamp(cosValue, -1, 1);
-                var angle = Math.acos(cosValue) * feng3d.mathUtil.RAD2DEG;
+                cosValue = mathUtil.clamp(cosValue, -1, 1);
+                var angle = Math.acos(cosValue) * mathUtil.RAD2DEG;
                 //计算是否顺时针
                 var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                 sign = sign > 0 ? 1 : -1;
@@ -131,7 +136,7 @@ export class RTool extends MRSToolBase
                 }
                 break;
             case this.toolModel.freeAxis:
-                var endPoint = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+                var endPoint = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
                 var offset = endPoint.subTo(this.startMousePos);
                 var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
                 var right = cameraSceneTransform.getAxisX();
@@ -147,7 +152,7 @@ export class RTool extends MRSToolBase
     protected onMouseUp()
     {
         super.onMouseUp();
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off("mousemove", this.onMouseMove, this);
 
         if (this.selectedItem instanceof CoordinateRotationAxis)
         {

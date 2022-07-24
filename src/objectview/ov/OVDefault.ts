@@ -1,3 +1,5 @@
+import { OVComponent, IObjectView, ObjectViewInfo, IObjectBlockView, objectview } from 'feng3d';
+
 declare global
 {
 	export interface MixinsIObjectView extends eui.Component { }
@@ -10,19 +12,19 @@ namespace editor
 	/**
 	 * 默认使用块的对象界面
 	 */
-	@feng3d.OVComponent()
-	export class OVDefault extends eui.Component implements feng3d.IObjectView
+	@OVComponent()
+	export class OVDefault extends eui.Component implements IObjectView
 	{
 		private _space: Object;
-		private _objectViewInfo: feng3d.ObjectViewInfo;
-		private blockViews: feng3d.IObjectBlockView[];
+		private _objectViewInfo: ObjectViewInfo;
+		private blockViews: IObjectBlockView[];
 
 		group: eui.Group;
 
 		/**
 		 * 对象界面数据
 		 */
-		constructor(objectViewInfo: feng3d.ObjectViewInfo)
+		constructor(objectViewInfo: ObjectViewInfo)
 		{
 			super();
 
@@ -51,7 +53,7 @@ namespace editor
 			var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
 			for (var i = 0; i < objectBlockInfos.length; i++)
 			{
-				var displayObject = feng3d.objectview.getBlockView(objectBlockInfos[i]);
+				var displayObject = objectview.getBlockView(objectBlockInfos[i]);
 				displayObject.percentWidth = 100;
 				displayObject.objectView = this;
 				this.group.addChild(displayObject);

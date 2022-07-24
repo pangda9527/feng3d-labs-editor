@@ -1,3 +1,4 @@
+import { NumberTextInputBinder } from './NumberTextInputBinder';
 
 export class NumberSliderTextInputBinder extends NumberTextInputBinder
 {

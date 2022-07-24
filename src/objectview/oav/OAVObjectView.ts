@@ -1,12 +1,14 @@
+import { OAVComponent, IObjectView, AttributeViewInfo, Feng3dObject, HideFlags, objectview, EventEmitter, IEvent } from 'feng3d';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVObjectView extends OAVBase
 {
 	group: eui.Group;
 	//
-	views: feng3d.IObjectView[];
+	views: IObjectView[];
 
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
 		this.skinName = "OVDefault";
@@ -26,12 +28,12 @@ export class OAVObjectView extends OAVBase
 		arr.forEach(element =>
 		{
 			var editable = true;
-			if (element instanceof feng3d.Feng3dObject) editable = editable && !Boolean(element.hideFlags & feng3d.HideFlags.NotEditable);
-			var view = feng3d.objectview.getObjectView(element, { editable: editable });
+			if (element instanceof Feng3dObject) editable = editable && !Boolean(element.hideFlags & HideFlags.NotEditable);
+			var view = objectview.getObjectView(element, { editable: editable });
 			view.percentWidth = 100;
 			this.group.addChild(view);
 			this.views.push(view);
-			if (element instanceof feng3d.EventEmitter)
+			if (element instanceof EventEmitter)
 			{
 				element.on("refreshView", this.onRefreshView, this);
 			}
@@ -50,7 +52,7 @@ export class OAVObjectView extends OAVBase
 		this.views.forEach(element =>
 		{
 			this.group.removeChild(element);
-			if (element.space instanceof feng3d.EventEmitter)
+			if (element.space instanceof EventEmitter)
 			{
 				element.space.on("refreshView", this.onRefreshView, this);
 			}
@@ -58,7 +60,7 @@ export class OAVObjectView extends OAVBase
 		this.views.length = 0;
 	}
 
-	private onRefreshView(event: feng3d.IEvent<any>)
+	private onRefreshView(event: IEvent<any>)
 	{
 		this.dispose();
 		this.initView();

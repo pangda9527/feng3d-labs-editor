@@ -1,3 +1,7 @@
+import { GameObject, AnimationClip, Material, Geometry, GameObjectAsset, ScriptAsset, AudioAsset, Texture2D, TextureCube, windowEventProxy, shortcut } from 'feng3d';
+import { hierarchy } from '../../feng3d/hierarchy/Hierarchy';
+import { shortCutStates } from '../../polyfill/feng3d/ShortCut';
+import { AssetNode } from '../assets/AssetNode';
 
 export var drag: Drag;
 
@@ -89,16 +93,16 @@ export class DragData
  */
 export interface DragDataMap
 {
-	gameobject: feng3d.GameObject;
-	animationclip: feng3d.AnimationClip;
-	material: feng3d.Material;
-	geometry: feng3d.Geometry;
+	gameobject: GameObject;
+	animationclip: AnimationClip;
+	material: Material;
+	geometry: Geometry;
 	//
-	file_gameobject: feng3d.GameObjectAsset;
+	file_gameobject: GameObjectAsset;
 	/**
 	 * 脚本路径
 	 */
-	file_script: feng3d.ScriptAsset;
+	file_script: ScriptAsset;
 	/**
 	 * 文件
 	 */
@@ -106,15 +110,15 @@ export interface DragDataMap
 	/**
 	 * 声音路径
 	 */
-	audio: feng3d.AudioAsset;
+	audio: AudioAsset;
 	/**
 	 * 纹理
 	 */
-	texture2d: feng3d.Texture2D;
+	texture2d: Texture2D;
 	/**
 	 * 立方体纹理
 	 */
-	texturecube: feng3d.TextureCube;
+	texturecube: TextureCube;
 }
 
 interface DragItem
@@ -176,8 +180,8 @@ var mouseDownPosY = 0;
 
 function onItemMouseDown(event: egret.TouchEvent): void
 {
-	mouseDownPosX = feng3d.windowEventProxy.clientX;
-	mouseDownPosY = feng3d.windowEventProxy.clientY;
+	mouseDownPosX = windowEventProxy.clientX;
+	mouseDownPosY = windowEventProxy.clientY;
 
 	if (dragitem)
 		return;
@@ -195,7 +199,7 @@ function onItemMouseDown(event: egret.TouchEvent): void
 		stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
 		stage.addEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
 		//
-		feng3d.shortcut.activityState(feng3d.shortCutStates.draging);
+		shortcut.activityState(shortCutStates.draging);
 	}
 }
 
@@ -219,7 +223,7 @@ function onMouseUp(event: egret.MouseEvent)
 	dragitem = null;
 	draging = false;
 	//
-	feng3d.shortcut.deactivityState(feng3d.shortCutStates.draging);
+	shortcut.deactivityState(shortCutStates.draging);
 }
 
 function onMouseMove(event: egret.MouseEvent)
@@ -228,8 +232,8 @@ function onMouseMove(event: egret.MouseEvent)
 
 	if (!draging)
 	{
-		if (Math.abs(mouseDownPosX - feng3d.windowEventProxy.clientX) +
-			Math.abs(mouseDownPosY - feng3d.windowEventProxy.clientY) > 5)
+		if (Math.abs(mouseDownPosX - windowEventProxy.clientX) +
+			Math.abs(mouseDownPosY - windowEventProxy.clientY) > 5)
 		{
 			draging = true;
 		}

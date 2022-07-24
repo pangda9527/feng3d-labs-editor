@@ -1,11 +1,14 @@
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { MinMaxCurveVector3View } from '../../ui/components/MinMaxCurveVector3View';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVMinMaxCurveVector3 extends OAVBase
 {
     public labelLab: eui.Label;
-    public minMaxCurveVector3View: editor.MinMaxCurveVector3View;
+    public minMaxCurveVector3View: MinMaxCurveVector3View;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 

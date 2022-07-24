@@ -1,3 +1,4 @@
+import { watch } from 'feng3d';
 
 /**
  * String 提示框
@@ -13,7 +14,7 @@ export class TipString extends eui.Component implements eui.UIComponent
         this.touchChildren = this.touchEnabled = false;
     }
 
-    @feng3d.watch("valuechanged")
+    @watch("valuechanged")
     value = "";
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)

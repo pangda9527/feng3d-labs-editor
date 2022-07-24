@@ -1,3 +1,5 @@
+import { classUtils } from 'feng3d';
+import { AssetNode } from '../assets/AssetNode';
 
 export var inspectorMultiObject: InspectorMultiObject;
 
@@ -29,7 +31,7 @@ export class InspectorMultiObject
         var data: { [type: string]: any[] } = {};
         objects.forEach(element =>
         {
-            var type = feng3d.classUtils.getQualifiedClassName(element);
+            var type = classUtils.getQualifiedClassName(element);
             var list = data[type] = data[type] || [];
             list.push(element);
         });

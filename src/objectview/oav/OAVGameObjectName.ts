@@ -1,17 +1,19 @@
+import { GameObject, OAVComponent, AttributeViewInfo } from 'feng3d';
+import { OAVBase } from './OAVBase';
 
 export interface OAVGameObjectName
 {
-    get space(): feng3d.GameObject;
+    get space(): GameObject;
 }
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVGameObjectName extends OAVBase
 {
     public nameInput: eui.TextInput;
     public visibleCB: eui.CheckBox;
     public mouseEnabledCB: eui.CheckBox;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OAVGameObjectName";

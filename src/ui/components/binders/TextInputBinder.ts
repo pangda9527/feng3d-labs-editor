@@ -1,15 +1,18 @@
+import { EventEmitter, watcher, ticker } from 'feng3d';
+import { ObjectViewEvent } from '../../../objectview/events/ObjectViewEvent';
+
 declare global
 {
     namespace eui
     {
         export interface Component
         {
-            addBinder(...binders: editor.UIBinder[]): void;
+            addBinder(...binders: UIBinder[]): void;
         }
     }
 }
 
-eui.Component.prototype["addBinder"] = function (...binders: editor.UIBinder[])
+eui.Component.prototype["addBinder"] = function (...binders: UIBinder[])
 {
     this._binders = this._binders || [];
     binders.forEach(v =>
@@ -41,7 +44,7 @@ export interface TextInputBinderEventMap
     valueChanged
 }
 
-export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinderEventMap> extends feng3d.EventEmitter<T> implements UIBinder
+export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinderEventMap> extends EventEmitter<T> implements UIBinder
 {
     space: any;
 
@@ -86,7 +89,7 @@ export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinder
 
     dispose()
     {
-        feng3d.watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
+        watcher.unwatch(this.space, this.attribute, this.onValueChanged, this);
 
         //
         this.textInput.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
@@ -103,13 +106,13 @@ export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinder
             this.textInput.addEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
             this.textInput.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
         }
-        feng3d.watcher.watch(this.space, this.attribute, this.onValueChanged, this);
+        watcher.watch(this.space, this.attribute, this.onValueChanged, this);
         this.textInput.enabled = this.editable;
     }
 
     protected onValueChanged()
     {
-        var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+        var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
         objectViewEvent.space = this.space;
         objectViewEvent.attributeName = this.attribute;
         objectViewEvent.attributeValue = this.space[this.attribute];
@@ -147,6 +150,6 @@ export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinder
 
     protected invalidateView()
     {
-        feng3d.ticker.nextframe(this.updateView, this);
+        ticker.nextframe(this.updateView, this);
     }
 }

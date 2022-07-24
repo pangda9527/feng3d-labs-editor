@@ -1,3 +1,5 @@
+import { View, ticker, Camera, globalEmitter } from 'feng3d';
+import { editorData } from '../Editor';
 
 export class CameraPreview extends eui.Component
 {
@@ -5,7 +7,7 @@ export class CameraPreview extends eui.Component
     //
     private saveParent: egret.DisplayObjectContainer;
     private canvas: HTMLElement;
-    private previewView: feng3d.View;
+    private previewView: View;
 
     get camera()
     {
@@ -15,7 +17,7 @@ export class CameraPreview extends eui.Component
     {
         if (this._camera)
         {
-            feng3d.ticker.offframe(this.onframe, this);
+            ticker.offframe(this.onframe, this);
         }
         this._camera = value;
         this.previewView.camera = this._camera;
@@ -23,11 +25,11 @@ export class CameraPreview extends eui.Component
         this.canvas.style.display = this._camera ? "inline" : "none";
         if (this._camera)
         {
-            feng3d.ticker.onframe(this.onframe, this);
+            ticker.onframe(this.onframe, this);
         }
     }
 
-    private _camera: feng3d.Camera;
+    private _camera: Camera;
 
     constructor()
     {
@@ -48,16 +50,16 @@ export class CameraPreview extends eui.Component
         //
         var canvas = this.canvas = document.createElement("canvas");
         (document.getElementById("CameraPreviewLayer")).appendChild(canvas);
-        this.previewView = new feng3d.View(canvas);
+        this.previewView = new View(canvas);
         this.previewView.mouse3DManager.mouseInput.enable = false;
         this.previewView.stop();
         //
         this.saveParent = this.parent;
-        feng3d.ticker.nextframe(() =>
+        ticker.nextframe(() =>
         {
             this.parent.removeChild(this);
         });
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
 
         this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
@@ -90,7 +92,7 @@ export class CameraPreview extends eui.Component
         {
             for (let i = 0; i < selectedGameObjects.length; i++)
             {
-                var camera = selectedGameObjects[i].getComponent(feng3d.Camera);
+                var camera = selectedGameObjects[i].getComponent(Camera);
                 if (camera)
                 {
                     this.camera = camera;

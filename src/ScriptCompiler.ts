@@ -1,5 +1,11 @@
 /// <reference path="../libs/typescriptServices.d.ts" />
 
+import { globalEmitter, IEvent, ScriptAsset, ticker } from 'feng3d';
+import { editorRS } from './assets/EditorRS';
+import { nativeAPI } from './assets/NativeRequire';
+import { editorData } from './Editor';
+import { editorAsset } from './ui/assets/EditorAsset';
+
 export var scriptCompiler: ScriptCompiler;
 
 export class ScriptCompiler
@@ -8,13 +14,13 @@ export class ScriptCompiler
 
     constructor()
     {
-        feng3d.globalEmitter.on("script.compile", this.onScriptCompile, this);
-        feng3d.globalEmitter.on("script.gettslibs", this.onGettsLibs, this);
+        globalEmitter.on("script.compile", this.onScriptCompile, this);
+        globalEmitter.on("script.gettslibs", this.onGettsLibs, this);
 
-        feng3d.globalEmitter.on("openScript", this.onOpenScript, this);
+        globalEmitter.on("openScript", this.onOpenScript, this);
 
-        feng3d.globalEmitter.on("fs.delete", this.onFileChanged, this);
-        feng3d.globalEmitter.on("fs.write", this.onFileChanged, this);
+        globalEmitter.on("fs.delete", this.onFileChanged, this);
+        globalEmitter.on("fs.write", this.onFileChanged, this);
     }
 
     private onOpenScript(e)
@@ -40,12 +46,12 @@ export class ScriptCompiler
             codeeditoWin = window.open(`codeeditor.html`);
             codeeditoWin.onload = () =>
             {
-                feng3d.globalEmitter.emit("codeeditor.openScript", editorData.openScript);
+                globalEmitter.emit("codeeditor.openScript", editorData.openScript);
             };
         }
     }
 
-    private onGettsLibs(e: feng3d.IEvent<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
+    private onGettsLibs(e: IEvent<{ callback: (tslibs: { path: string; code: string; }[]) => void; }>)
     {
         this.loadtslibs(e.data.callback);
     }
@@ -65,7 +71,7 @@ export class ScriptCompiler
             this.tsconfig = json.parse(str);
             console.log(this.tsconfig);
 
-            var tslist = editorRS.getAssetsByType(feng3d.ScriptAsset);
+            var tslist = editorRS.getAssetsByType(ScriptAsset);
             var files: string[] = this.tsconfig.files;
             files = files.filter(v => v.indexOf("Assets") != 0);
             files = files.concat(tslist.map(v => v.assetPath));
@@ -83,16 +89,16 @@ export class ScriptCompiler
         });
     }
 
-    private onFileChanged(e: feng3d.IEvent<string>)
+    private onFileChanged(e: IEvent<string>)
     {
         if (!e.data) return;
         if (e.data.substr(-3) == ".ts")
         {
-            feng3d.ticker.once(2000, <any>this.onScriptCompile, this);
+            ticker.once(2000, <any>this.onScriptCompile, this);
         }
     }
 
-    private onScriptCompile(e?: feng3d.IEvent<{ onComplete?: () => void; }>)
+    private onScriptCompile(e?: IEvent<{ onComplete?: () => void; }>)
     {
         this.loadtslibs((tslibs) =>
         {
@@ -123,7 +129,7 @@ export class ScriptCompiler
 
             editorAsset.runProjectScript(() =>
             {
-                feng3d.globalEmitter.emit("asset.scriptChanged");
+                globalEmitter.emit("asset.scriptChanged");
             });
         }
         catch (e)
@@ -132,7 +138,7 @@ export class ScriptCompiler
         }
         callback && callback(null);
 
-        feng3d.globalEmitter.emit("message", `编译完成！`)
+        globalEmitter.emit("message", `编译完成！`)
     }
 
     private transpileModule(tslibs: { path: string; code: string; }[])

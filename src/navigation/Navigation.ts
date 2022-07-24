@@ -1,6 +1,9 @@
+import { oav, AddComponentMenu, RegisterComponent, Component, GameObject, PointGeometry, HideFlags, serialization, MeshRenderer, Material, PointUniforms, Color4, RenderMode, Vector3, geometryUtils, Renderable } from 'feng3d';
+import { Recastnavigation, VoxelFlag } from '../recastnavigation/Recastnavigation';
+
 declare global
 {
-    export interface MixinsComponentMap { Navigation: editor.Navigation; }
+    export interface MixinsComponentMap { Navigation: Navigation; }
 }
 
 /**
@@ -11,87 +14,87 @@ export class NavigationAgent
     /**
      * 距离边缘半径
      */
-    @feng3d.oav()
+    @oav()
     radius = 0.5;
 
     /**
      * 允许行走高度
      */
-    @feng3d.oav()
+    @oav()
     height = 2;
 
     /**
      * 允许爬上的阶梯高度
      */
-    @feng3d.oav()
+    @oav()
     stepHeight = 0.4;
 
     /**
      * 允许行走坡度
      */
-    @feng3d.oav()
+    @oav()
     maxSlope = 45;//[0,60]
 }
 
 /**
  * 导航组件，提供生成导航网格功能
  */
-@feng3d.AddComponentMenu("Navigation/Navigation")
-@feng3d.RegisterComponent()
-export class Navigation extends feng3d.Component
+@AddComponentMenu("Navigation/Navigation")
+@RegisterComponent()
+export class Navigation extends Component
 {
-    @feng3d.oav({ component: "OAVObjectView" })
+    @oav({ component: "OAVObjectView" })
     agent = new NavigationAgent();
 
-    private _navobject: feng3d.GameObject;
+    private _navobject: GameObject;
     private _recastnavigation: Recastnavigation;
-    private _allowedVoxelsPointGeometry: feng3d.PointGeometry;
-    private _rejectivedVoxelsPointGeometry: feng3d.PointGeometry;
-    private _debugVoxelsPointGeometry: feng3d.PointGeometry;
+    private _allowedVoxelsPointGeometry: PointGeometry;
+    private _rejectivedVoxelsPointGeometry: PointGeometry;
+    private _debugVoxelsPointGeometry: PointGeometry;
 
     init()
     {
         super.init();
-        this.hideFlags = this.hideFlags | feng3d.HideFlags.DontSaveInBuild;
+        this.hideFlags = this.hideFlags | HideFlags.DontSaveInBuild;
 
-        this._navobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "NavObject", hideFlags: feng3d.HideFlags.DontSave });
+        this._navobject = serialization.setValue(new GameObject(), { name: "NavObject", hideFlags: HideFlags.DontSave });
         {
-            const pointsObject = new feng3d.GameObject();
+            const pointsObject = new GameObject();
             pointsObject.name = "allowedVoxels";
-            const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            const meshRenderer = pointsObject.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "point";
-            const uniforms = material.uniforms as feng3d.PointUniforms;
-            uniforms.u_color = new feng3d.Color4(0, 1, 0);
+            const uniforms = material.uniforms as PointUniforms;
+            uniforms.u_color = new Color4(0, 1, 0);
             uniforms.u_PointSize = 2;
-            material.renderParams.renderMode = feng3d.RenderMode.POINTS;
-            meshRenderer.geometry = this._allowedVoxelsPointGeometry = new feng3d.PointGeometry();
+            material.renderParams.renderMode = RenderMode.POINTS;
+            meshRenderer.geometry = this._allowedVoxelsPointGeometry = new PointGeometry();
             this._navobject.addChild(pointsObject);
         }
         {
-            const pointsObject = new feng3d.GameObject();
+            const pointsObject = new GameObject();
             pointsObject.name = "rejectivedVoxels";
-            const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            const meshRenderer = pointsObject.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "point";
-            const uniforms = material.uniforms as feng3d.PointUniforms;
-            uniforms.u_color = new feng3d.Color4(1, 0, 0);
+            const uniforms = material.uniforms as PointUniforms;
+            uniforms.u_color = new Color4(1, 0, 0);
             uniforms.u_PointSize = 2;
-            material.renderParams.renderMode = feng3d.RenderMode.POINTS;
-            meshRenderer.geometry = this._rejectivedVoxelsPointGeometry = new feng3d.PointGeometry();
+            material.renderParams.renderMode = RenderMode.POINTS;
+            meshRenderer.geometry = this._rejectivedVoxelsPointGeometry = new PointGeometry();
             this._navobject.addChild(pointsObject);
         }
         {
-            const pointsObject = new feng3d.GameObject();
+            const pointsObject = new GameObject();
             pointsObject.name = "debugVoxels";
-            const meshRenderer = pointsObject.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            const meshRenderer = pointsObject.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "point";
-            const uniforms = material.uniforms as feng3d.PointUniforms;
-            uniforms.u_color = new feng3d.Color4(0, 0, 1);
+            const uniforms = material.uniforms as PointUniforms;
+            uniforms.u_color = new Color4(0, 0, 1);
             uniforms.u_PointSize = 2;
-            material.renderParams.renderMode = feng3d.RenderMode.POINTS;
-            meshRenderer.geometry = this._debugVoxelsPointGeometry = new feng3d.PointGeometry();
+            material.renderParams.renderMode = RenderMode.POINTS;
+            meshRenderer.geometry = this._debugVoxelsPointGeometry = new PointGeometry();
             this._navobject.addChild(pointsObject);
         }
     }
@@ -99,7 +102,7 @@ export class Navigation extends feng3d.Component
     /**
      * 清楚oav网格模型
      */
-    @feng3d.oav()
+    @oav()
     clear()
     {
         this._navobject && this._navobject.remove();
@@ -108,7 +111,7 @@ export class Navigation extends feng3d.Component
     /**
      * 计算导航网格数据
      */
-    @feng3d.oav()
+    @oav()
     bake()
     {
         var geometrys = this._getNavGeometrys(this.gameObject.scene.gameObject);
@@ -118,9 +121,9 @@ export class Navigation extends feng3d.Component
             return;
         }
         this.gameObject.scene.gameObject.addChild(this._navobject);
-        this._navobject.transform.position = new feng3d.Vector3();
+        this._navobject.transform.position = new Vector3();
 
-        var geometry = feng3d.geometryUtils.mergeGeometry(geometrys);
+        var geometry = geometryUtils.mergeGeometry(geometrys);
 
         this._recastnavigation = this._recastnavigation || new Recastnavigation();
 
@@ -131,9 +134,9 @@ export class Navigation extends feng3d.Component
         var voxels1 = voxels.filter(v => v.flag != VoxelFlag.Default);
         var voxels2 = voxels.filter(v => !!(v.flag & VoxelFlag.IsContour));
 
-        this._allowedVoxelsPointGeometry.points = voxels0.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
-        this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
-        // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new feng3d.Vector3(v.x, v.y, v.z) } });
+        this._allowedVoxelsPointGeometry.points = voxels0.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
+        this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
+        // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
     }
 
     /**
@@ -141,13 +144,13 @@ export class Navigation extends feng3d.Component
      * @param gameobject 
      * @param geometrys 
      */
-    private _getNavGeometrys(gameobject: feng3d.GameObject, geometrys?: { positions: number[], indices: number[] }[])
+    private _getNavGeometrys(gameobject: GameObject, geometrys?: { positions: number[], indices: number[] }[])
     {
         geometrys = geometrys || [];
 
         if (!gameobject.activeSelf)
             return geometrys;
-        var model = gameobject.getComponent(feng3d.Renderable);
+        var model = gameobject.getComponent(Renderable);
         var geometry = model && model.geometry;
         if (geometry)
         {

@@ -1,3 +1,5 @@
+import { ProjectView } from '../ui/assets/ProjectView';
+import { MainView } from '../ui/MainView';
 
 export interface EditorUI
 {

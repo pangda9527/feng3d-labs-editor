@@ -1,3 +1,5 @@
+import { Modules } from '../Modules';
+import { ModuleView } from './components/TabView';
 
 export class NavigationView extends eui.Component implements ModuleView
 {

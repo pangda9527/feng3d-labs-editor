@@ -1,3 +1,6 @@
+import { Canvas, GameObject, GameObjectAsset, globalEmitter, HideFlags, IEvent, Transform2D, watcher } from 'feng3d';
+import { editorData } from '../../Editor';
+import { HierarchyNode } from './HierarchyNode';
 
 export var hierarchy: Hierarchy;
 
@@ -5,12 +8,12 @@ export class Hierarchy
 {
     rootnode: HierarchyNode;
 
-    rootGameObject: feng3d.GameObject;
+    rootGameObject: GameObject;
 
     constructor()
     {
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
-        feng3d.watcher.watch(<Hierarchy>this, "rootGameObject", this.rootGameObjectChanged, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
+        watcher.watch(<Hierarchy>this, "rootGameObject", this.rootGameObjectChanged, this);
     }
 
     /**
@@ -25,13 +28,13 @@ export class Hierarchy
     /**
      * 获取结点
      */
-    getNode(gameObject: feng3d.GameObject)
+    getNode(gameObject: GameObject)
     {
         var node = nodeMap.get(gameObject);
         return node;
     }
 
-    delete(gameobject: feng3d.GameObject)
+    delete(gameobject: GameObject)
     {
         var node = nodeMap.get(gameobject);
         if (node)
@@ -46,9 +49,9 @@ export class Hierarchy
      * 
      * @param gameobject 游戏对象
      */
-    addGameObject(gameobject: feng3d.GameObject)
+    addGameObject(gameobject: GameObject)
     {
-        if (gameobject.getComponent(feng3d.Transform2D))
+        if (gameobject.getComponent(Transform2D))
         {
             this.addUI(gameobject);
             return;
@@ -67,19 +70,19 @@ export class Hierarchy
      * 
      * @param gameobject 
      */
-    addUI(gameobject: feng3d.GameObject)
+    addUI(gameobject: GameObject)
     {
         var selectedNode = this.getSelectedNode();
-        if (selectedNode && selectedNode.gameobject.getComponent(feng3d.Transform2D))
+        if (selectedNode && selectedNode.gameobject.getComponent(Transform2D))
         {
             selectedNode.gameobject.addChild(gameobject);
         }
         else
         {
-            var canvas = this.rootnode.gameobject.getComponentsInChildren(feng3d.Canvas)[0];
+            var canvas = this.rootnode.gameobject.getComponentsInChildren(Canvas)[0];
             if (!canvas)
             {
-                canvas = feng3d.GameObject.createPrimitive("Canvas").getComponent(feng3d.Canvas);
+                canvas = GameObject.createPrimitive("Canvas").getComponent(Canvas);
                 this.rootnode.gameobject.addChild(canvas.gameObject);
             }
             canvas.gameObject.addChild(gameobject);
@@ -87,7 +90,7 @@ export class Hierarchy
         editorData.selectObject(gameobject);
     }
 
-    addGameoObjectFromAsset(gameobjectAsset: feng3d.GameObjectAsset, parent?: feng3d.GameObject)
+    addGameoObjectFromAsset(gameobjectAsset: GameObjectAsset, parent?: GameObject)
     {
         var gameobject = gameobjectAsset.getAssetData();
 
@@ -101,9 +104,9 @@ export class Hierarchy
         return gameobject;
     }
 
-    private _selectedGameObjects: feng3d.GameObject[] = [];
+    private _selectedGameObjects: GameObject[] = [];
 
-    private rootGameObjectChanged(newValue: feng3d.GameObject, oldValue: feng3d.GameObject)
+    private rootGameObjectChanged(newValue: GameObject, oldValue: GameObject)
     {
         if (oldValue)
         {
@@ -136,18 +139,18 @@ export class Hierarchy
         });
     }
 
-    private ongameobjectadded(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+    private ongameobjectadded(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
         this.add(event.data.child);
     }
 
-    private ongameobjectremoved(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+    private ongameobjectremoved(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
         var node = nodeMap.get(event.data.child);
         this.remove(node);
     }
 
-    private init(gameobject: feng3d.GameObject)
+    private init(gameobject: GameObject)
     {
         if (this.rootnode)
             this.rootnode.destroy();
@@ -165,9 +168,9 @@ export class Hierarchy
         });
     }
 
-    private add(gameobject: feng3d.GameObject)
+    private add(gameobject: GameObject)
     {
-        if (gameobject.hideFlags & feng3d.HideFlags.HideInHierarchy)
+        if (gameobject.hideFlags & HideFlags.HideInHierarchy)
             return;
         var node = nodeMap.get(gameobject);
         if (node)
@@ -201,6 +204,6 @@ export class Hierarchy
         node.remove();
     }
 }
-var nodeMap = new Map<feng3d.GameObject, HierarchyNode>();
+var nodeMap = new Map<GameObject, HierarchyNode>();
 
 hierarchy = new Hierarchy();

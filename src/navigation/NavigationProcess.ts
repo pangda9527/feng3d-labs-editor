@@ -1,3 +1,4 @@
+import { Vector3, mathUtil, MapUtils, Segment3, Segment, Color4, Triangle3, SegmentGeometry, GameObject, PointGeometry, serialization, Renderable, Material, RenderMode } from 'feng3d';
 
 export class NavigationProcess
 {
@@ -11,10 +12,10 @@ export class NavigationProcess
 
     checkMaxSlope(maxSlope: number)
     {
-        var up = new feng3d.Vector3(0, 1, 0);
-        var mincos = Math.cos(maxSlope * feng3d.mathUtil.DEG2RAD);
+        var up = new Vector3(0, 1, 0);
+        var mincos = Math.cos(maxSlope * mathUtil.DEG2RAD);
 
-        var keys = feng3d.MapUtils.getKeys(this.data.trianglemap);
+        var keys = MapUtils.getKeys(this.data.trianglemap);
         keys.forEach(element =>
         {
             var normal = this.data.trianglemap.get(element).getNormal();
@@ -48,7 +49,7 @@ export class NavigationProcess
         line0s.forEach(handleLine0);
         trianglemap.forEach(triangle =>
         {
-            if (triangle.getNormal().dot(new feng3d.Vector3(0, 1, 0)) < 0)
+            if (triangle.getNormal().dot(new Vector3(0, 1, 0)) < 0)
                 trianglemap.delete(triangle.index);
         }); //删除面向-y方向的三角形
 
@@ -130,7 +131,7 @@ export class NavigationProcess
              * @param d2 角的第二个点
              * @param distance 距离
              */
-            function getHalfAnglePoint(p0: feng3d.Vector3, d1: feng3d.Vector3, d2: feng3d.Vector3, distance: number)
+            function getHalfAnglePoint(p0: Vector3, d1: Vector3, d2: Vector3, distance: number)
             {
                 //对角线方向
                 var djx = d1.addTo(d2).normalize();
@@ -197,8 +198,8 @@ export class NavigationProcess
         {
             var line0 = new Line0();
             line0.index = line.index;
-            var points = line.points.map((v) => { var point = pointmap.get(v); return new feng3d.Vector3(point.value[0], point.value[1], point.value[2]); })
-            line0.segment = new feng3d.Segment3(points[0], points[1]);
+            var points = line.points.map((v) => { var point = pointmap.get(v); return new Vector3(point.value[0], point.value[1], point.value[2]); })
+            line0.segment = new Segment3(points[0], points[1]);
             //
             var triangle = trianglemap.get(line.triangles[0]);
             if (!triangle)
@@ -242,8 +243,8 @@ export class NavigationProcess
         var linemap = this.data.linemap;
         var trianglemap = this.data.trianglemap;
         //
-        var triangle0s = feng3d.MapUtils.getValues(trianglemap).map(createTriangle);
-        feng3d.MapUtils.getValues(pointmap).forEach(handlePoint);
+        var triangle0s = MapUtils.getValues(trianglemap).map(createTriangle);
+        MapUtils.getValues(pointmap).forEach(handlePoint);
 
         //
         function createTriangle(triangle: Triangle)
@@ -279,12 +280,12 @@ export class NavigationProcess
 
     private debugShowLines1(line0s: Line0[], length: number)
     {
-        var segments: feng3d.Segment[] = [];
+        var segments: Segment[] = [];
         line0s.forEach(element =>
         {
             var p0 = element.segment.p0.addTo(element.segment.p1).scaleNumber(0.5);
             var p1 = p0.addTo(element.direction.clone().normalize(length));
-            segments.push({ start: p0, end: p1, startColor: new feng3d.Color4(1), endColor: new feng3d.Color4(0, 1) });
+            segments.push({ start: p0, end: p1, startColor: new Color4(1), endColor: new Color4(0, 1) });
         });
         segmentGeometry.segments = segments;
     }
@@ -298,7 +299,7 @@ export class NavigationProcess
             var points = element.points.map((pointindex) =>
             {
                 var value = this.data.pointmap.get(pointindex).value;
-                return new feng3d.Vector3(value[0], value[1], value[2]);
+                return new Vector3(value[0], value[1], value[2]);
             });
             segmentGeometry.addSegment({ start: points[0], end: points[1] });
         });
@@ -365,7 +366,7 @@ class Point
      * 设置该点位置
      * @param p 
      */
-    setPoint(p: feng3d.Vector3)
+    setPoint(p: Vector3)
     {
         this.value = [p.x, p.y, p.z];
     }
@@ -375,7 +376,7 @@ class Point
      */
     getPoint()
     {
-        return new feng3d.Vector3(this.value[0], this.value[1], this.value[2]);
+        return new Vector3(this.value[0], this.value[1], this.value[2]);
     }
 
     /**
@@ -450,13 +451,13 @@ class Triangle
 
     getTriangle3D()
     {
-        var points: feng3d.Vector3[] = [];
+        var points: Vector3[] = [];
         this.points.forEach(element =>
         {
             var pointvalue = this.pointmap.get(element).value;
-            points.push(new feng3d.Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
+            points.push(new Vector3(pointvalue[0], pointvalue[1], pointvalue[2]));
         });
-        var triangle3D = new feng3d.Triangle3(points[0], points[1], points[2]);
+        var triangle3D = new Triangle3(points[0], points[1], points[2]);
         return triangle3D;
     }
 
@@ -482,11 +483,11 @@ class Line0
     /**
      * 边所在直线
      */
-    segment: feng3d.Segment3;
+    segment: Segment3;
     /**
      * 可行走区域的内部方向
      */
-    direction: feng3d.Vector3;
+    direction: Vector3;
     /**
      * 左方边索引
      */
@@ -633,11 +634,11 @@ class NavigationData
     }
 }
 
-var segmentGeometry: feng3d.SegmentGeometry;
-var debugSegment: feng3d.GameObject;
+var segmentGeometry: SegmentGeometry;
+var debugSegment: GameObject;
 //
-var pointGeometry: feng3d.PointGeometry;
-var debugPoint: feng3d.GameObject;
+var pointGeometry: PointGeometry;
+var debugPoint: GameObject;
 
 function createSegment()
 {
@@ -645,27 +646,27 @@ function createSegment()
     var parentobject;
     if (!debugSegment)
     {
-        debugSegment = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "segment" });
+        debugSegment = serialization.setValue(new GameObject(), { name: "segment" });
         debugSegment.mouseEnabled = false;
         //初始化材质
-        var model = debugSegment.addComponent(feng3d.Renderable);
-        var material = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
-            shaderName: "segment", renderParams: { renderMode: feng3d.RenderMode.LINES },
-            uniforms: { u_segmentColor: new feng3d.Color4(1.0, 0, 0) },
+        var model = debugSegment.addComponent(Renderable);
+        var material = model.material = serialization.setValue(new Material(), {
+            shaderName: "segment", renderParams: { renderMode: RenderMode.LINES },
+            uniforms: { u_segmentColor: new Color4(1.0, 0, 0) },
         });
-        segmentGeometry = model.geometry = new feng3d.SegmentGeometry();
+        segmentGeometry = model.geometry = new SegmentGeometry();
     }
     parentobject.addChild(debugSegment);
     //
     if (!debugPoint)
     {
-        debugPoint = feng3d.serialization.setValue(new feng3d.GameObject(), { name: "points" });
+        debugPoint = serialization.setValue(new GameObject(), { name: "points" });
         debugPoint.mouseEnabled = false;
-        var model = debugPoint.addComponent(feng3d.Renderable);
-        pointGeometry = model.geometry = new feng3d.PointGeometry();
-        var materialp = model.material = feng3d.serialization.setValue(new feng3d.Material(), {
-            shaderName: "point", renderParams: { renderMode: feng3d.RenderMode.POINTS },
-            uniforms: { u_PointSize: 5, u_color: new feng3d.Color4() },
+        var model = debugPoint.addComponent(Renderable);
+        pointGeometry = model.geometry = new PointGeometry();
+        var materialp = model.material = serialization.setValue(new Material(), {
+            shaderName: "point", renderParams: { renderMode: RenderMode.POINTS },
+            uniforms: { u_PointSize: 5, u_color: new Color4() },
         });
     }
     pointGeometry.points = [];

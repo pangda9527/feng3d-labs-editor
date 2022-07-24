@@ -1,3 +1,4 @@
+import { editorui } from '../../global/editorui';
 
 /**
  * 区域选择框

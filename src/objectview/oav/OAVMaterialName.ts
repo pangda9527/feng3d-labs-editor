@@ -1,9 +1,13 @@
+import { Material, OAVComponent, AttributeViewInfo, globalEmitter, shaderlib } from 'feng3d';
+import { ComboBox } from '../../ui/components/ComboBox';
+import { OAVBase } from './OAVBase';
+
 export interface OAVMaterialName
 {
-    get space(): feng3d.Material;
+    get space(): Material;
 }
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVMaterialName extends OAVBase
 {
     public tileIcon: eui.Image;
@@ -14,7 +18,7 @@ export class OAVMaterialName extends OAVBase
     public group: eui.Group;
     //
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OVMaterial";
@@ -23,7 +27,7 @@ export class OAVMaterialName extends OAVBase
     initView()
     {
         this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-        feng3d.globalEmitter.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
+        globalEmitter.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
 
         this.shaderComboBox.touchChildren = this.shaderComboBox.touchEnabled = this._attributeViewInfo.editable;
     }
@@ -31,7 +35,7 @@ export class OAVMaterialName extends OAVBase
     dispose()
     {
         this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-        feng3d.globalEmitter.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
+        globalEmitter.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
     }
 
     updateView()
@@ -39,7 +43,7 @@ export class OAVMaterialName extends OAVBase
         var material = this.space;
         this.nameLabel.text = material.shaderName;
 
-        var data = feng3d.shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
+        var data = shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
         var selected = data.reduce((prevalue, item) =>
         {
             if (prevalue) return prevalue;

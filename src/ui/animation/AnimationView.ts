@@ -1,3 +1,5 @@
+import { Modules } from '../../Modules';
+import { ModuleView } from '../components/TabView';
 
 /**
  * 动画面板

@@ -1,3 +1,4 @@
+import { EventEmitter, watch, gPartial } from 'feng3d';
 
 export interface TreeNodeMap
 {
@@ -6,7 +7,7 @@ export interface TreeNodeMap
 	openChanged: TreeNode;
 }
 
-export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventEmitter<T>
+export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<T>
 {
 	/**
 	 * 标签
@@ -29,13 +30,13 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventE
 	/**
 	 * 是否打开
 	 */
-	@feng3d.watch("openChanged")
+	@watch("openChanged")
 	isOpen = false;
 
 	/**
 	 * 是否选中
 	 */
-	@feng3d.watch("selectedChanged")
+	@watch("selectedChanged")
 	selected = false;
 	/** 
 	 * 父结点
@@ -46,7 +47,7 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends feng3d.EventE
 	 */
 	children: TreeNode[];
 
-	constructor(obj?: feng3d.gPartial<TreeNode>)
+	constructor(obj?: gPartial<TreeNode>)
 	{
 		super();
 		if (obj)

@@ -2,6 +2,10 @@
 /**
  * Created by 黑暗之神KDS on 2017/2/17.
  */
+
+import { dataTransform } from 'feng3d';
+import { editorRS } from './EditorRS';
+
 /**
  * 文件对象
  * -- WEB端仅可以操作工程内文件且安全的格式：ks、js、json、xml、html、css等
@@ -214,7 +218,7 @@ export class FileObject
     {
         if (typeof content == "string")
         {
-            var uint8Array = feng3d.dataTransform.stringToArrayBuffer(content);
+            var uint8Array = dataTransform.stringToArrayBuffer(content);
             this.saveFile(uint8Array, onComplete, onError, thisPtr);
             return;
         }

@@ -1,14 +1,16 @@
+import { Transform, Vector3, globalEmitter, ticker, Matrix4x4 } from 'feng3d';
+import { editorData } from '../../Editor';
 
 export class MRSToolTarget
 {
     //
-    private _controllerTargets: feng3d.Transform[];
-    private _startScaleVec: feng3d.Vector3[] = [];
-    private _controllerTool: feng3d.Transform;
-    private _startTransformDic: Map<feng3d.Transform, TransformData>;
+    private _controllerTargets: Transform[];
+    private _startScaleVec: Vector3[] = [];
+    private _controllerTool: Transform;
+    private _startTransformDic: Map<Transform, TransformData>;
 
-    private _position = new feng3d.Vector3();
-    private _rotation = new feng3d.Vector3();
+    private _position = new Vector3();
+    private _rotation = new Vector3();
 
     get controllerTool()
     {
@@ -25,7 +27,7 @@ export class MRSToolTarget
         }
     }
 
-    set controllerTargets(value: feng3d.Transform[])
+    set controllerTargets(value: Transform[])
     {
         if (this._controllerTargets)
         {
@@ -47,16 +49,16 @@ export class MRSToolTarget
 
     constructor()
     {
-        feng3d.globalEmitter.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
-        feng3d.globalEmitter.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
+        globalEmitter.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
+        globalEmitter.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
         //
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
     }
 
     private onSelectedGameObjectChange()
     {
         //筛选出 工具控制的对象
-        var transforms = <feng3d.Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
+        var transforms = <Transform[]>editorData.selectedGameObjects.reduce((result, item) =>
         {
             result.push(item.transform);
             return result;
@@ -73,7 +75,7 @@ export class MRSToolTarget
 
     private invalidateControllerImage()
     {
-        feng3d.ticker.nextframe(this.updateControllerImage, this);
+        ticker.nextframe(this.updateControllerImage, this);
     }
 
     private updateControllerImage()
@@ -82,7 +84,7 @@ export class MRSToolTarget
             return;
 
         var transform = this._controllerTargets[this._controllerTargets.length - 1];
-        var position = new feng3d.Vector3();
+        var position = new Vector3();
         if (editorData.isBaryCenter)
         {
             position.copy(transform.worldPosition);
@@ -94,7 +96,7 @@ export class MRSToolTarget
             }
             position.scaleNumber(1 / this._controllerTargets.length);
         }
-        var rotation = new feng3d.Vector3();
+        var rotation = new Vector3();
         if (!editorData.isWoldCoordinate)
         {
             rotation = this._controllerTargets[0].rotation;
@@ -113,7 +115,7 @@ export class MRSToolTarget
      */
     startTranslation()
     {
-        this._startTransformDic = new Map<feng3d.Transform, TransformData>();
+        this._startTransformDic = new Map<Transform, TransformData>();
         var objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
         for (var i = 0; i < objects.length; i++)
@@ -123,7 +125,7 @@ export class MRSToolTarget
         }
     }
 
-    translation(addPos: feng3d.Vector3)
+    translation(addPos: Vector3)
     {
         if (!this._controllerTargets)
             return;
@@ -147,7 +149,7 @@ export class MRSToolTarget
 
     startRotate()
     {
-        this._startTransformDic = new Map<feng3d.Transform, TransformData>();
+        this._startTransformDic = new Map<Transform, TransformData>();
         var objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
         for (var i = 0; i < objects.length; i++)
@@ -162,11 +164,11 @@ export class MRSToolTarget
      * @param angle 旋转角度
      * @param normal 旋转轴
      */
-    rotate1(angle: number, normal: feng3d.Vector3)
+    rotate1(angle: number, normal: Vector3)
     {
         var objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        var localnormal: feng3d.Vector3;
+        var localnormal: Vector3;
         var gameobject = objects[0];
         if (!editorData.isWoldCoordinate && editorData.isBaryCenter)
         {
@@ -193,7 +195,7 @@ export class MRSToolTarget
                     var localPivotPoint = this._position;
                     if (gameobject.parent)
                         localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
-                    gameobject.position = feng3d.Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
+                    gameobject.position = Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 }
             }
@@ -207,7 +209,7 @@ export class MRSToolTarget
      * @param angle2 第二方向旋转角度
      * @param normal2 第二方向旋转轴
      */
-    rotate2(angle1: number, normal1: feng3d.Vector3, angle2: number, normal2: feng3d.Vector3)
+    rotate2(angle1: number, normal1: Vector3, angle2: number, normal2: Vector3)
     {
         var objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
@@ -249,8 +251,8 @@ export class MRSToolTarget
                     if (gameobject.parent)
                         localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
                     //
-                    tempPosition = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
-                    gameobject.position = feng3d.Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
+                    tempPosition = Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
+                    gameobject.position = Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
 
                     tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                     gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
@@ -272,7 +274,7 @@ export class MRSToolTarget
         }
     }
 
-    doScale(scale: feng3d.Vector3)
+    doScale(scale: Vector3)
     {
         console.assert(!!scale.length);
         for (var i = 0; i < this._controllerTargets.length; i++)
@@ -289,14 +291,14 @@ export class MRSToolTarget
         this._startScaleVec.length = 0;
     }
 
-    private getTransformData(transform: feng3d.Transform)
+    private getTransformData(transform: Transform)
     {
         return { position: transform.position.clone(), rotation: transform.rotation.clone(), scale: transform.scale.clone() };
     }
 
-    private rotateRotation(rotation: feng3d.Vector3, axis: feng3d.Vector3, angle)
+    private rotateRotation(rotation: Vector3, axis: Vector3, angle)
     {
-        var rotationmatrix = new feng3d.Matrix4x4();
+        var rotationmatrix = new Matrix4x4();
         rotationmatrix.fromRotation(rotation.x, rotation.y, rotation.z);
         rotationmatrix.appendRotation(axis, angle);
         var newrotation = rotationmatrix.toTRS()[1];
@@ -322,5 +324,5 @@ export class MRSToolTarget
 
 interface TransformData
 {
-    position: feng3d.Vector3, rotation: feng3d.Vector3, scale: feng3d.Vector3
+    position: Vector3, rotation: Vector3, scale: Vector3
 }

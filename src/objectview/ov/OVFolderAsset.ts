@@ -1,14 +1,16 @@
+import { OVComponent, IObjectView, FolderAsset, ObjectViewInfo } from 'feng3d';
+import { editorAsset } from '../../ui/assets/EditorAsset';
 
-@feng3d.OVComponent()
-export class OVFolderAsset extends eui.Component implements feng3d.IObjectView
+@OVComponent()
+export class OVFolderAsset extends eui.Component implements IObjectView
 {
-    space: feng3d.FolderAsset;
-    private _objectViewInfo: feng3d.ObjectViewInfo;
+    space: FolderAsset;
+    private _objectViewInfo: ObjectViewInfo;
 
     public nameLabel: eui.Label;
     public openBtn: eui.Button;
 
-    constructor(objectViewInfo: feng3d.ObjectViewInfo)
+    constructor(objectViewInfo: ObjectViewInfo)
     {
         super();
         this.skinName = "OVFolderAsset";

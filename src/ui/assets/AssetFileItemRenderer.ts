@@ -1,3 +1,8 @@
+import { globalEmitter, GameObject, Scene, shortcut, AssetData } from 'feng3d';
+import { editorData } from '../../Editor';
+import { drag } from '../drag/Drag';
+import { AssetNode } from './AssetNode';
+import { editorAsset } from './EditorAsset';
 
 export class AssetFileItemRenderer extends eui.ItemRenderer
 {
@@ -20,7 +25,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
         this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
         this.selectedfilechanged();
     }
 
@@ -31,7 +36,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
         this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
     }
 
     dataChanged()
@@ -80,9 +85,9 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         if (this.data.isDirectory)
         {
             editorAsset.showFloder = this.data;
-        } else if (this.data.asset instanceof feng3d.GameObject)
+        } else if (this.data.asset instanceof GameObject)
         {
-            var scene = this.data.asset.getComponent(feng3d.Scene);
+            var scene = this.data.asset.getComponent(Scene);
             if (scene)
             {
                 editorData.gameScene = scene;
@@ -93,7 +98,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
     private onclick()
     {
         // 处理按下shift键时
-        var isShift = feng3d.shortcut.keyState.getKeyState("shift");
+        var isShift = shortcut.keyState.getKeyState("shift");
         if (isShift)
         {
             var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
@@ -129,7 +134,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
             selected = selectedAssetFile.indexOf(this.data) != -1;
             if (!selected)
             {
-                var assetids = editorData.selectedObjects.map(v => (<feng3d.AssetData>v).assetId);
+                var assetids = editorData.selectedObjects.map(v => (<AssetData>v).assetId);
                 selected = assetids.indexOf(this.data.asset.assetId) != -1;
             }
         }

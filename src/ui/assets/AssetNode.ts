@@ -1,3 +1,9 @@
+import { serialize, FileAsset, AssetType, dataTransform, TextureAsset, TextureCubeAsset, MaterialAsset, GeometryAsset, GameObjectAsset, FolderAsset, globalEmitter, pathUtils } from 'feng3d';
+import { editorRS } from '../../assets/EditorRS';
+import { feng3dScreenShot } from '../../feng3d/Feng3dScreenShot';
+import { TreeNodeMap, TreeNode } from '../components/TreeNode';
+import { DragData } from '../drag/Drag';
+import { editorAsset } from './EditorAsset';
 
 export interface AssetNodeEventMap extends TreeNodeMap
 {
@@ -27,12 +33,12 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     label: string;
 
-    @feng3d.serialize
+    @serialize
     children: AssetNode[] = [];
 
     parent: AssetNode;
 
-    asset: feng3d.FileAsset;
+    asset: FileAsset;
 
     /**
      * 是否已加载
@@ -49,12 +55,12 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      * 
      * @param asset 资源
      */
-    constructor(asset: feng3d.FileAsset)
+    constructor(asset: FileAsset)
     {
         super();
 
         this.asset = asset;
-        this.isDirectory = asset.assetType == feng3d.AssetType.folder;
+        this.isDirectory = asset.assetType == AssetType.folder;
         this.label = asset.fileName;
         // 更新图标
         if (this.isDirectory)
@@ -70,7 +76,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         {
             if (image)
             {
-                this.image = feng3d.dataTransform.imageToDataURL(image);
+                this.image = dataTransform.imageToDataURL(image);
             } else
             {
                 this.updateImage();
@@ -117,55 +123,55 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     updateImage()
     {
-        if (this.asset instanceof feng3d.TextureAsset)
+        if (this.asset instanceof TextureAsset)
         {
             var texture = this.asset.data;
 
             this.image = feng3dScreenShot.drawTexture(texture);
 
-            feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+            dataTransform.dataURLToImage(this.image, (image) =>
             {
                 this.asset.writePreview(image);
             });
 
-        } else if (this.asset instanceof feng3d.TextureCubeAsset)
+        } else if (this.asset instanceof TextureCubeAsset)
         {
             var textureCube = this.asset.data;
             textureCube.onLoadCompleted(() =>
             {
                 this.image = feng3dScreenShot.drawTextureCube(textureCube);
 
-                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writePreview(image);
                 });
             });
-        } else if (this.asset instanceof feng3d.MaterialAsset)
+        } else if (this.asset instanceof MaterialAsset)
         {
             var mat = this.asset;
             mat.data.onLoadCompleted(() =>
             {
                 this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
-                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writePreview(image);
                 });
             });
-        } else if (this.asset instanceof feng3d.GeometryAsset)
+        } else if (this.asset instanceof GeometryAsset)
         {
             this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
 
-            feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+            dataTransform.dataURLToImage(this.image, (image) =>
             {
                 this.asset.writePreview(image);
             });
-        } else if (this.asset instanceof feng3d.GameObjectAsset)
+        } else if (this.asset instanceof GameObjectAsset)
         {
             var gameObject = this.asset.data;
             gameObject.onLoadCompleted(() =>
             {
                 this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
-                feng3d.dataTransform.dataURLToImage(this.image, (image) =>
+                dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writePreview(image);
                 });
@@ -235,28 +241,28 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         var extension = this.asset.assetType;
         switch (extension)
         {
-            case feng3d.AssetType.gameobject:
+            case AssetType.gameobject:
                 dragsource.addDragData("file_gameobject", <any>this.asset);
                 break;
-            case feng3d.AssetType.script:
+            case AssetType.script:
                 dragsource.addDragData("file_script", <any>this.asset);
                 break;
-            case feng3d.AssetType.anim:
+            case AssetType.anim:
                 dragsource.addDragData("animationclip", <any>this.asset.data);
                 break;
-            case feng3d.AssetType.material:
+            case AssetType.material:
                 dragsource.addDragData("material", <any>this.asset.data);
                 break;
-            case feng3d.AssetType.texturecube:
+            case AssetType.texturecube:
                 dragsource.addDragData("texturecube", <any>this.asset.data);
                 break;
-            case feng3d.AssetType.geometry:
+            case AssetType.geometry:
                 dragsource.addDragData("geometry", <any>this.asset.data);
                 break;
-            case feng3d.AssetType.texture:
+            case AssetType.texture:
                 dragsource.addDragData("texture2d", <any>this.asset.data);
                 break;
-            case feng3d.AssetType.audio:
+            case AssetType.audio:
                 dragsource.addDragData("audio", <any>this.asset.data);
                 break;
         }
@@ -270,7 +276,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     acceptDragDrop(dragdata: DragData)
     {
-        if (!(this.asset instanceof feng3d.FolderAsset)) return;
+        if (!(this.asset instanceof FolderAsset)) return;
         var folder = this.asset;
 
         dragdata.getDragData("assetNodes").forEach(v =>
@@ -282,7 +288,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
                     this.addChild(v);
                 } else
                 {
-                    feng3d.globalEmitter.emit("message.error", err.message);
+                    globalEmitter.emit("message.error", err.message);
                 }
             });
         });
@@ -296,8 +302,8 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         var zip = new JSZip();
 
         var path = this.asset.assetPath;
-        if (!feng3d.pathUtils.isDirectory(path))
-            path = feng3d.pathUtils.dirname(path);
+        if (!pathUtils.isDirectory(path))
+            path = pathUtils.dirname(path);
 
         var filename = this.label;
         editorRS.fs.getAllPathsInFolder(path, (err, filepaths) =>

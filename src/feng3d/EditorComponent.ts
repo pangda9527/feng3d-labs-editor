@@ -1,10 +1,16 @@
+import { RegisterComponent, Component, Scene, Camera, IEvent, GameObject, DirectionalLight, PointLight, SpotLight, serialization } from 'feng3d';
+import { CameraIcon } from '../scripts/CameraIcon';
+import { DirectionLightIcon } from '../scripts/DirectionLightIcon';
+import { PointLightIcon } from '../scripts/PointLightIcon';
+import { SpotLightIcon } from '../scripts/SpotLightIcon';
+
 declare global
 {
-    export interface MixinsComponentMap { EditorComponent: editor.EditorComponent }
+    export interface MixinsComponentMap { EditorComponent: EditorComponent }
 }
 
-@feng3d.RegisterComponent()
-export class EditorComponent extends feng3d.Component
+@RegisterComponent()
+export class EditorComponent extends Component
 {
     get scene()
     {
@@ -19,7 +25,7 @@ export class EditorComponent extends feng3d.Component
             this.scene.off("addComponent", this._onAddComponent, this);
             this.scene.off("removeComponent", this._onRemoveComponent, this);
 
-            this.scene.getComponentsInChildren(feng3d.Component).forEach(element =>
+            this.scene.getComponentsInChildren(Component).forEach(element =>
             {
                 this._removeComponent(element);
             });
@@ -27,7 +33,7 @@ export class EditorComponent extends feng3d.Component
         this._scene = v;
         if (this._scene)
         {
-            this.scene.getComponentsInChildren(feng3d.Component).forEach(element =>
+            this.scene.getComponentsInChildren(Component).forEach(element =>
             {
                 this._addComponent(element);
             });
@@ -39,11 +45,11 @@ export class EditorComponent extends feng3d.Component
         }
     }
 
-    private _scene: feng3d.Scene
+    private _scene: Scene
 
     get editorCamera() { return this._editorCamera; }
     set editorCamera(v) { if (this._editorCamera == v) return; this._editorCamera = v; this.update(); }
-    private _editorCamera: feng3d.Camera;
+    private _editorCamera: Camera;
 
     /**
      * 销毁
@@ -54,7 +60,7 @@ export class EditorComponent extends feng3d.Component
         super.dispose();
     }
 
-    private _onAddChild(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+    private _onAddChild(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
         var components = event.data.child.getComponentsInChildren();
         components.forEach(v =>
@@ -63,7 +69,7 @@ export class EditorComponent extends feng3d.Component
         });
     }
 
-    private _onRemoveChild(event: feng3d.IEvent<{ parent: feng3d.GameObject; child: feng3d.GameObject; }>)
+    private _onRemoveChild(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
         var components = event.data.child.getComponentsInChildren();
         components.forEach(v =>
@@ -72,12 +78,12 @@ export class EditorComponent extends feng3d.Component
         });
     }
 
-    private _onAddComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+    private _onAddComponent(event: IEvent<{ gameobject: GameObject; component: Component; }>)
     {
         this._addComponent(event.data.component);
     }
 
-    private _onRemoveComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+    private _onRemoveComponent(event: IEvent<{ gameobject: GameObject; component: Component; }>)
     {
         this._removeComponent(event.data.component);
     }
@@ -102,38 +108,38 @@ export class EditorComponent extends feng3d.Component
         });
     }
 
-    private _addComponent(component: feng3d.Component)
+    private _addComponent(component: Component)
     {
-        if (component instanceof feng3d.DirectionalLight)
+        if (component instanceof DirectionalLight)
         {
-            const gameobject = new feng3d.GameObject();
+            const gameobject = new GameObject();
             gameobject.name = "DirectionLightIcon";
             const directionLightIcon = gameobject.addComponent(DirectionLightIcon);
             directionLightIcon.light = component;
             directionLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(directionLightIcon.gameObject);
             this.directionLightIconMap.set(component, directionLightIcon);
-        } else if (component instanceof feng3d.PointLight)
+        } else if (component instanceof PointLight)
         {
-            const gameobject = new feng3d.GameObject();
+            const gameobject = new GameObject();
             gameobject.name = "PointLightIcon";
             const pointLightIcon = gameobject.addComponent(PointLightIcon);
             pointLightIcon.light = component;
             pointLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(pointLightIcon.gameObject);
             this.pointLightIconMap.set(component, pointLightIcon);
-        } else if (component instanceof feng3d.SpotLight)
+        } else if (component instanceof SpotLight)
         {
-            const gameobject = new feng3d.GameObject();
+            const gameobject = new GameObject();
             gameobject.name = "SpotLightIcon";
             const spotLightIcon = gameobject.addComponent(SpotLightIcon);
             spotLightIcon.light = component;
             spotLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(spotLightIcon.gameObject);
             this.spotLightIconMap.set(component, spotLightIcon);
-        } else if (component instanceof feng3d.Camera)
+        } else if (component instanceof Camera)
         {
-            const gameobject = new feng3d.GameObject();
+            const gameobject = new GameObject();
             gameobject.name = "CameraIcon";
             const cameraIcon = gameobject.addComponent(CameraIcon);
             cameraIcon.camera = component;
@@ -143,30 +149,30 @@ export class EditorComponent extends feng3d.Component
         }
     }
 
-    private _removeComponent(component: feng3d.Component)
+    private _removeComponent(component: Component)
     {
-        if (component instanceof feng3d.DirectionalLight)
+        if (component instanceof DirectionalLight)
         {
-            feng3d.serialization.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
+            serialization.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
             this.directionLightIconMap.delete(component);
-        } else if (component instanceof feng3d.PointLight)
+        } else if (component instanceof PointLight)
         {
-            feng3d.serialization.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
+            serialization.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
             this.pointLightIconMap.delete(component);
-        } else if (component instanceof feng3d.SpotLight)
+        } else if (component instanceof SpotLight)
         {
-            feng3d.serialization.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
+            serialization.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
             this.spotLightIconMap.delete(component);
-        } else if (component instanceof feng3d.Camera)
+        } else if (component instanceof Camera)
         {
-            feng3d.serialization.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
+            serialization.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
             this.cameraIconMap.delete(component);
         }
     }
 
-    private directionLightIconMap = new Map<feng3d.DirectionalLight, DirectionLightIcon>();
-    private pointLightIconMap = new Map<feng3d.PointLight, PointLightIcon>();
-    private spotLightIconMap = new Map<feng3d.SpotLight, SpotLightIcon>();
-    private cameraIconMap = new Map<feng3d.Camera, CameraIcon>();
+    private directionLightIconMap = new Map<DirectionalLight, DirectionLightIcon>();
+    private pointLightIconMap = new Map<PointLight, PointLightIcon>();
+    private spotLightIconMap = new Map<SpotLight, SpotLightIcon>();
+    private cameraIconMap = new Map<Camera, CameraIcon>();
 
 }

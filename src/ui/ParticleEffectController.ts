@@ -1,3 +1,5 @@
+import { ParticleSystem, globalEmitter } from 'feng3d';
+import { editorData } from '../Editor';
 
 /**
  * 粒子特效控制器
@@ -12,7 +14,7 @@ export class ParticleEffectController extends eui.Component
 
     //
     private saveParent: egret.DisplayObjectContainer;
-    private particleSystems: feng3d.ParticleSystem[] = [];
+    private particleSystems: ParticleSystem[] = [];
 
 
     constructor()
@@ -76,7 +78,7 @@ export class ParticleEffectController extends eui.Component
     {
         if (this.saveParent) return;
         this.saveParent = this.parent;
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
         this.onDataChange();
     }
 
@@ -93,7 +95,7 @@ export class ParticleEffectController extends eui.Component
 
     private onDataChange()
     {
-        var particleSystems = editorData.selectedGameObjects.reduce((pv: feng3d.ParticleSystem[], cv) => { var ps = cv.getComponent(feng3d.ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
+        var particleSystems = editorData.selectedGameObjects.reduce((pv: ParticleSystem[], cv) => { var ps = cv.getComponent(ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
         this.particleSystems.forEach(v =>
         {
             v.pause()
@@ -110,7 +112,7 @@ export class ParticleEffectController extends eui.Component
     }
 }
 
-feng3d.globalEmitter.once("editor.selectedObjectsChanged", () =>
+globalEmitter.once("editor.selectedObjectsChanged", () =>
 {
-    feng3d.globalEmitter.emit("editor.addSceneToolView", new ParticleEffectController());
+    globalEmitter.emit("editor.addSceneToolView", new ParticleEffectController());
 });

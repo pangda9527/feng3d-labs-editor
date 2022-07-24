@@ -1,3 +1,8 @@
+import { objectview, mathUtil } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { maskview } from './Maskview';
+import { WindowView } from './WindowView';
+
 /**
  * 弹出一个objectview界面，点击其它区域关闭界面，并且调用关闭回调
  */
@@ -31,7 +36,7 @@ export class Popupview
      */
     popupObject<T>(object: T, param: PopupviewParam<T> = {})
     {
-        var view: eui.Component = feng3d.objectview.getObjectView(object);
+        var view: eui.Component = objectview.getObjectView(object);
         var background = new eui.Rect(param.width || 300, param.height || 300, 0xf0f0f0);
         view.addChildAt(background, 0);
 
@@ -74,8 +79,8 @@ export class Popupview
             y0 = param.y;
         }
 
-        x0 = feng3d.mathUtil.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
-        y0 = feng3d.mathUtil.clamp(y0, 0, editorui.popupLayer.stage.stageHeight - view.height);
+        x0 = mathUtil.clamp(x0, 0, editorui.popupLayer.stage.stageWidth - view.width);
+        y0 = mathUtil.clamp(y0, 0, editorui.popupLayer.stage.stageHeight - view.height);
 
         view.x = x0;
         view.y = y0;
@@ -97,7 +102,7 @@ export class Popupview
      */
     popupObjectWindow<T>(object: T, param: PopupviewParam<T> = {})
     {
-        var view: eui.Component = feng3d.objectview.getObjectView(object);
+        var view: eui.Component = objectview.getObjectView(object);
 
         var window = new WindowView();
         window.contenGroup.addChild(view);

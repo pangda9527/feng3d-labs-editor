@@ -1,3 +1,5 @@
+import { Vector3, TextAsset } from 'feng3d'
+
 export { }
 declare global
 {
@@ -41,7 +43,7 @@ declare global
         /**
          * 使用编辑器打开脚本
          */
-        "codeeditor.openScript": feng3d.TextAsset;
+        "codeeditor.openScript": TextAsset;
 
         /**
          * 脚本编译
@@ -76,7 +78,7 @@ declare global
         /**
          * 打开脚本
          */
-        "openScript": feng3d.TextAsset;
+        "openScript": TextAsset;
 
         /**
          * 在场景窗口添加工具界面

@@ -1,3 +1,6 @@
+import { Vector2, windowEventProxy, IEvent } from 'feng3d';
+import { MouseOnDisableScroll } from '../tools/MouseOnDisableScroll';
+import { TextInputBinder } from './TextInputBinder';
 
 export class NumberTextInputBinder extends TextInputBinder
 {
@@ -52,7 +55,7 @@ export class NumberTextInputBinder extends TextInputBinder
         super.initView();
         if (this.editable)
         {
-            // feng3d.windowEventProxy.on("mousedown", this.onMouseDown, this);
+            // windowEventProxy.on("mousedown", this.onMouseDown, this);
             this.controller && this.controller.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
             MouseOnDisableScroll.register(this.controller);
         }
@@ -61,7 +64,7 @@ export class NumberTextInputBinder extends TextInputBinder
     dispose()
     {
         super.dispose();
-        // feng3d.windowEventProxy.off("mousedown", this.onMouseDown, this);
+        // windowEventProxy.off("mousedown", this.onMouseDown, this);
         this.controller && this.controller.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         MouseOnDisableScroll.unRegister(this.controller);
     }
@@ -81,46 +84,46 @@ export class NumberTextInputBinder extends TextInputBinder
         super.onValueChanged();
     }
 
-    private mouseDownPosition = new feng3d.Vector2();
+    private mouseDownPosition = new Vector2();
     private mouseDownValue = 0;
 
     private onMouseDown(e: egret.MouseEvent)
     {
-        var mousePos = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 
         //
         this.mouseDownPosition = mousePos;
         this.mouseDownValue = this.space[this.attribute];
 
         //
-        feng3d.windowEventProxy.on("mousemove", this.onStageMouseMove, this);
-        feng3d.windowEventProxy.on("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.on("mousemove", this.onStageMouseMove, this);
+        windowEventProxy.on("mouseup", this.onStageMouseUp, this);
     }
 
     private onStageMouseMove()
     {
-        this.space[this.attribute] = this.mouseDownValue + ((feng3d.windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - feng3d.windowEventProxy.clientY)) * this.step * this.stepScale;
+        this.space[this.attribute] = this.mouseDownValue + ((windowEventProxy.clientX - this.mouseDownPosition.x) + (this.mouseDownPosition.y - windowEventProxy.clientY)) * this.step * this.stepScale;
     }
 
     private onStageMouseUp()
     {
-        feng3d.windowEventProxy.off("mousemove", this.onStageMouseMove, this);
-        feng3d.windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.off("mousemove", this.onStageMouseMove, this);
+        windowEventProxy.off("mouseup", this.onStageMouseUp, this);
     }
 
     protected ontxtfocusin()
     {
         super.ontxtfocusin();
-        feng3d.windowEventProxy.on("keydown", this.onWindowKeyDown, this);
+        windowEventProxy.on("keydown", this.onWindowKeyDown, this);
     }
 
     protected ontxtfocusout()
     {
         super.ontxtfocusout();
-        feng3d.windowEventProxy.off("keydown", this.onWindowKeyDown, this);
+        windowEventProxy.off("keydown", this.onWindowKeyDown, this);
     }
 
-    private onWindowKeyDown(event: feng3d.IEvent<KeyboardEvent>)
+    private onWindowKeyDown(event: IEvent<KeyboardEvent>)
     {
         if (event.data.key == "ArrowUp")
         {

@@ -1,3 +1,14 @@
+import { globalEmitter, watcher, ticker, Vector2, shortcut, windowEventProxy, Rectangle } from 'feng3d';
+import { editorData } from '../../Editor';
+import { editorui } from '../../global/editorui';
+import { Modules } from '../../Modules';
+import { AreaSelectRect } from '../components/AreaSelectRect';
+import { ModuleView } from '../components/TabView';
+import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
+import { drag } from '../drag/Drag';
+import { AssetFileItemRenderer } from './AssetFileItemRenderer';
+import { AssetTreeItemRenderer } from './AssetTreeItemRenderer';
+import { editorAsset } from './EditorAsset';
 
 /**
  * 项目模块视图
@@ -87,8 +98,8 @@ export class ProjectView extends eui.Component implements ModuleView
         this.floderpathTxt.touchEnabled = true;
         this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-        feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        feng3d.globalEmitter.on("asset.showAsset", this.onShowAsset, this);
+        globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.on("asset.showAsset", this.onShowAsset, this);
     }
 
     $onRemoveFromStage()
@@ -103,11 +114,11 @@ export class ProjectView extends eui.Component implements ModuleView
 
         MouseOnDisableScroll.unRegister(this.filelist);
 
-        feng3d.watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
+        watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
 
         this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
-        feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        feng3d.globalEmitter.on("asset.showAsset", this.onShowAsset, this);
+        globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.on("asset.showAsset", this.onShowAsset, this);
 
         //
         drag.unregister(this.filelistgroup);
@@ -123,7 +134,7 @@ export class ProjectView extends eui.Component implements ModuleView
         editorAsset.rootFile.on("added", this.invalidateAssettree, this);
         editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
 
-        feng3d.watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
+        watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
     }
 
     private update()
@@ -139,7 +150,7 @@ export class ProjectView extends eui.Component implements ModuleView
     invalidateAssettree()
     {
         this._assettreeInvalid = true;
-        feng3d.ticker.nextframe(this.update, this);
+        ticker.nextframe(this.update, this);
     }
 
     private updateAssetTree()
@@ -254,20 +265,20 @@ export class ProjectView extends eui.Component implements ModuleView
         editorAsset.showFloder = editorAsset.getAssetByID(evt.text);
     }
 
-    private areaSelectStartPosition: feng3d.Vector2;
+    private areaSelectStartPosition: Vector2;
     private onMouseDown(e: egret.MouseEvent)
     {
         if (e.target != this.filelist) return;
-        if (feng3d.shortcut.getState("splitGroupDraging")) return;
+        if (shortcut.getState("splitGroupDraging")) return;
 
-        this.areaSelectStartPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
-        feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        this.areaSelectStartPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on("mouseup", this.onMouseUp, this);
     }
 
     private onMouseMove()
     {
-        var areaSelectEndPosition = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        var areaSelectEndPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
         var rectangle = this.filelist.getGlobalBounds();
         //
         areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
@@ -276,7 +287,7 @@ export class ProjectView extends eui.Component implements ModuleView
         //
         var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
         var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
-        var areaRect = new feng3d.Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+        var areaRect = new Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
         //
         var datas = this.filelist.$indexToRenderer.filter(v =>
         {
@@ -289,8 +300,8 @@ export class ProjectView extends eui.Component implements ModuleView
     private onMouseUp()
     {
         this._areaSelectRect.hide();
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-        feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off("mouseup", this.onMouseUp, this);
     }
 }
 

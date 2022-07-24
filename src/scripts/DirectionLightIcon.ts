@@ -1,23 +1,27 @@
+import { RegisterComponent, DirectionalLight, Camera, watcher, GameObject, BillboardComponent, MeshRenderer, PlaneGeometry, Material, TextureUniforms, Texture2D, TextureFormat, Segment, Vector3, HideFlags, HoldSizeComponent, SegmentUniforms, Color4, RenderMode, SegmentGeometry, shortcut, ticker } from 'feng3d';
+import { editorData } from '../Editor';
+import { EditorScript } from './EditorScript';
+
 declare global
 {
-    export interface MixinsComponentMap { DirectionLightIcon: editor.DirectionLightIcon; }
+    export interface MixinsComponentMap { DirectionLightIcon: DirectionLightIcon; }
 }
 
-@feng3d.RegisterComponent()
+@RegisterComponent()
 export class DirectionLightIcon extends EditorScript
 {
     __class__: "editor.DirectionLightIcon";
 
-    light: feng3d.DirectionalLight;
+    light: DirectionalLight;
 
     get editorCamera() { return this._editorCamera; }
     set editorCamera(v) { this._editorCamera = v; this.initicon(); }
-    private _editorCamera: feng3d.Camera;
+    private _editorCamera: Camera;
 
     init()
     {
         super.init();
-        feng3d.watcher.watch(<DirectionLightIcon>this, "light", this.onLightChanged, this);
+        watcher.watch(<DirectionLightIcon>this, "light", this.onLightChanged, this);
         this.initicon();
         this.on("mousedown", this.onMousedown, this);
     }
@@ -29,23 +33,23 @@ export class DirectionLightIcon extends EditorScript
         var linesize = 20;
 
         {
-            const lightIcon = this._lightIcon = new feng3d.GameObject();
+            const lightIcon = this._lightIcon = new GameObject();
             lightIcon.name = "DirectionLightIcon";
-            const billboardComponent = lightIcon.addComponent(feng3d.BillboardComponent);
+            const billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = this.editorCamera;
-            const meshRenderer = lightIcon.addComponent(feng3d.MeshRenderer);
-            const geometry = meshRenderer.geometry = new feng3d.PlaneGeometry();
+            const meshRenderer = lightIcon.addComponent(MeshRenderer);
+            const geometry = meshRenderer.geometry = new PlaneGeometry();
             geometry.width = 1;
             geometry.height = 1;
             geometry.segmentsH = 1;
             geometry.segmentsW = 1;
             geometry.yUp = false;
-            const material = meshRenderer.material = new feng3d.Material();
+            const material = meshRenderer.material = new Material();
             material.shaderName = "texture";
-            const uniforms = material.uniforms as feng3d.TextureUniforms;
-            const texture = uniforms.s_texture = new feng3d.Texture2D();
+            const uniforms = material.uniforms as TextureUniforms;
+            const texture = uniforms.s_texture = new Texture2D();
             texture.source = { url: editorData.getEditorAssetPath("assets/3d/icons/sun.png") };
-            texture.format = feng3d.TextureFormat.RGBA;
+            texture.format = TextureFormat.RGBA;
             texture.premulAlpha = true;
             material.renderParams.enableBlend = true;
             this._textureMaterial = material;
@@ -54,15 +58,15 @@ export class DirectionLightIcon extends EditorScript
 
         //
         var num = 10;
-        var segments: feng3d.Segment[] = [];
+        var segments: Segment[] = [];
         for (var i = 0; i < num; i++)
         {
             var angle = i * Math.PI * 2 / num;
             var x = Math.sin(angle) * linesize;
             var y = Math.cos(angle) * linesize;
-            const segment = new feng3d.Segment();
-            segment.start = new feng3d.Vector3(x, y, 0);
-            segment.end = new feng3d.Vector3(x, y, linesize * 5);
+            const segment = new Segment();
+            segment.start = new Vector3(x, y, 0);
+            segment.end = new Vector3(x, y, linesize * 5);
             segments.push(segment);
         }
         num = 36;
@@ -74,26 +78,26 @@ export class DirectionLightIcon extends EditorScript
             var angle1 = (i + 1) * Math.PI * 2 / num;
             var x1 = Math.sin(angle1) * linesize;
             var y1 = Math.cos(angle1) * linesize;
-            const segment = new feng3d.Segment();
-            segment.start = new feng3d.Vector3(x, y, 0);
-            segment.end = new feng3d.Vector3(x1, y1, 0);
+            const segment = new Segment();
+            segment.start = new Vector3(x, y, 0);
+            segment.end = new Vector3(x1, y1, 0);
             segments.push(segment);
         }
         {
-            const lightLines = this._lightLines = new feng3d.GameObject();
+            const lightLines = this._lightLines = new GameObject();
             lightLines.name = "Lines";
             lightLines.mouseEnabled = false;
-            lightLines.hideFlags = feng3d.HideFlags.Hide;
-            const holdSizeComponent = lightLines.addComponent(feng3d.HoldSizeComponent);
+            lightLines.hideFlags = HideFlags.Hide;
+            const holdSizeComponent = lightLines.addComponent(HoldSizeComponent);
             holdSizeComponent.camera = this.editorCamera;
             holdSizeComponent.holdSize = 0.005;
-            const meshRenderer = lightLines.addComponent(feng3d.MeshRenderer);
-            const material = meshRenderer.material = new feng3d.Material();
+            const meshRenderer = lightLines.addComponent(MeshRenderer);
+            const material = meshRenderer.material = new Material();
             material.shaderName = "segment";
-            const uniforms = material.uniforms as feng3d.SegmentUniforms;
-            uniforms.u_segmentColor = new feng3d.Color4(163 / 255, 162 / 255, 107 / 255);
-            material.renderParams.renderMode = feng3d.RenderMode.LINES;
-            const geometry = meshRenderer.geometry = new feng3d.SegmentGeometry();
+            const uniforms = material.uniforms as SegmentUniforms;
+            uniforms.u_segmentColor = new Color4(163 / 255, 162 / 255, 107 / 255);
+            material.renderParams.renderMode = RenderMode.LINES;
+            const geometry = meshRenderer.geometry = new SegmentGeometry();
             geometry.segments = segments;
             this.gameObject.addChild(lightLines);
         }
@@ -105,7 +109,7 @@ export class DirectionLightIcon extends EditorScript
     {
         if (!this.light) return;
 
-        (<feng3d.TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
+        (<TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4();
         this._lightLines.activeSelf = editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
     }
 
@@ -121,11 +125,11 @@ export class DirectionLightIcon extends EditorScript
         super.dispose();
     }
 
-    private _lightIcon: feng3d.GameObject;
-    private _lightLines: feng3d.GameObject;
-    private _textureMaterial: feng3d.Material;
+    private _lightIcon: GameObject;
+    private _lightLines: GameObject;
+    private _textureMaterial: Material;
 
-    private onLightChanged(newValue: feng3d.DirectionalLight, oldValue: feng3d.DirectionalLight)
+    private onLightChanged(newValue: DirectionalLight, oldValue: DirectionalLight)
     {
         if (oldValue)
         {
@@ -146,10 +150,10 @@ export class DirectionLightIcon extends EditorScript
     private onMousedown()
     {
         editorData.selectObject(this.light.gameObject);
-        feng3d.shortcut.activityState("selectInvalid");
-        feng3d.ticker.once(100, () =>
+        shortcut.activityState("selectInvalid");
+        ticker.once(100, () =>
         {
-            feng3d.shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState("selectInvalid");
         });
     }
 }

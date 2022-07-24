@@ -1,8 +1,13 @@
+import { RegisterComponent, Vector2, Vector3, GameObject, IEvent, shortcut, Plane, windowEventProxy } from 'feng3d';
+import { editorui } from '../../global/editorui';
+import { SToolModel } from './models/SToolModel';
+import { MRSToolBase } from './MRSToolBase';
+
 declare global
 {
     export interface MixinsComponentMap
     {
-        STool: editor.STool
+        STool: STool
     }
 }
 
@@ -12,20 +17,20 @@ export interface STool
     set toolModel(v: SToolModel);
 }
 
-@feng3d.RegisterComponent()
+@RegisterComponent()
 export class STool extends MRSToolBase
 {
-    private startMousePos: feng3d.Vector2;
+    private startMousePos: Vector2;
     /**
      * 用于判断是否改变了XYZ
      */
-    private changeXYZ = new feng3d.Vector3();
-    private startPlanePos: feng3d.Vector3;
+    private changeXYZ = new Vector3();
+    private startPlanePos: Vector3;
 
     init()
     {
         super.init();
-        this.toolModel = new feng3d.GameObject().addComponent(SToolModel);
+        this.toolModel = new GameObject().addComponent(SToolModel);
     }
 
     protected onAddedToScene()
@@ -48,20 +53,20 @@ export class STool extends MRSToolBase
         this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
     }
 
-    protected onItemMouseDown(event: feng3d.IEvent<any>)
+    protected onItemMouseDown(event: IEvent<any>)
     {
-        if (!feng3d.shortcut.getState("mouseInView3D")) return;
-        if (feng3d.shortcut.keyState.getKeyState("alt")) return;
+        if (!shortcut.getState("mouseInView3D")) return;
+        if (shortcut.keyState.getKeyState("alt")) return;
         if (!this.editorCamera) return;
 
         super.onItemMouseDown(event);
         //全局矩阵
         var globalMatrix = this.transform.localToWorldMatrix;
         //中心与X,Y,Z轴上点坐标
-        var po = globalMatrix.transformPoint3(new feng3d.Vector3(0, 0, 0));
-        var px = globalMatrix.transformPoint3(new feng3d.Vector3(1, 0, 0));
-        var py = globalMatrix.transformPoint3(new feng3d.Vector3(0, 1, 0));
-        var pz = globalMatrix.transformPoint3(new feng3d.Vector3(0, 0, 1));
+        var po = globalMatrix.transformPoint3(new Vector3(0, 0, 0));
+        var px = globalMatrix.transformPoint3(new Vector3(1, 0, 0));
+        var py = globalMatrix.transformPoint3(new Vector3(0, 1, 0));
+        var pz = globalMatrix.transformPoint3(new Vector3(0, 0, 1));
         //
         var ox = px.subTo(po);
         var oy = py.subTo(po);
@@ -69,7 +74,7 @@ export class STool extends MRSToolBase
         //摄像机前方方向
         var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
         var cameraDir = cameraSceneTransform.getAxisZ();
-        this.movePlane3D = new feng3d.Plane();
+        this.movePlane3D = new Plane();
         switch (event.currentTarget)
         {
             case this.toolModel.xCube:
@@ -89,7 +94,7 @@ export class STool extends MRSToolBase
                 break;
             case this.toolModel.oCube:
                 this.selectedItem = this.toolModel.oCube;
-                this.startMousePos = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+                this.startMousePos = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
                 this.changeXYZ.set(1, 1, 1);
                 break;
         }
@@ -98,16 +103,16 @@ export class STool extends MRSToolBase
 
         this.mrsToolTarget.startScale();
         //
-        feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on("mousemove", this.onMouseMove, this);
     }
 
     private onMouseMove()
     {
-        var addPos = new feng3d.Vector3();
-        var addScale = new feng3d.Vector3();
+        var addPos = new Vector3();
+        var addScale = new Vector3();
         if (this.selectedItem == this.toolModel.oCube)
         {
-            var currentMouse = new feng3d.Vector2(editorui.stage.stageX, editorui.stage.stageY);
+            var currentMouse = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
             var distance = currentMouse.x - currentMouse.y - this.startMousePos.x + this.startMousePos.y;
             addPos.set(distance, distance, distance);
             var scale = 1 + (addPos.x + addPos.y) / editorui.stage.stageHeight;
@@ -142,7 +147,7 @@ export class STool extends MRSToolBase
     protected onMouseUp()
     {
         super.onMouseUp()
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off("mousemove", this.onMouseMove, this);
 
         this.mrsToolTarget.stopScale();
         this.startPlanePos = null;

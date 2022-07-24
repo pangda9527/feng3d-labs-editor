@@ -27,6 +27,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
+import { AssetAdapter } from './AssetAdapter';
+import { LoadingUI } from './LoadingUI';
+import { ThemeAdapter } from './ThemeAdapter';
+
 
 export class MainUI extends eui.UILayer
 {

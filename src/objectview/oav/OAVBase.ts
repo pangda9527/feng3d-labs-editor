@@ -1,23 +1,26 @@
+import { IObjectAttributeView, AttributeViewInfo, IObjectView, IObjectBlockView } from 'feng3d';
+import { toolTip } from '../../ui/components/ToolTip';
+import { ObjectViewEvent } from '../events/ObjectViewEvent';
 
-export class OAVBase extends eui.Component implements feng3d.IObjectAttributeView
+export class OAVBase extends eui.Component implements IObjectAttributeView
 {
     protected _space: any;
     protected _attributeName: string;
     protected _attributeType: string;
-    protected _attributeViewInfo: feng3d.AttributeViewInfo;
+    protected _attributeViewInfo: AttributeViewInfo;
     //
     labelLab: eui.Label;
 
     /**
      * 对象属性界面
      */
-    objectView: feng3d.IObjectView;
+    objectView: IObjectView;
     /**
      * 对象属性块界面
      */
-    objectBlockView: feng3d.IObjectBlockView;
+    objectBlockView: IObjectBlockView;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super();
         this._space = attributeViewInfo.owner;
@@ -120,7 +123,7 @@ export class OAVBase extends eui.Component implements feng3d.IObjectAttributeVie
         if (this._space[this._attributeName] != value)
         {
             this._space[this._attributeName] = value;
-            var objectViewEvent = <any>new feng3d.ObjectViewEvent(feng3d.ObjectViewEvent.VALUE_CHANGE, true);
+            var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
             objectViewEvent.space = this._space;
             objectViewEvent.attributeName = this._attributeName;
             objectViewEvent.attributeValue = this.attributeValue;

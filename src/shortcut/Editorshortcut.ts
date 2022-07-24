@@ -1,24 +1,30 @@
+import { shortcut, GameObject, serialization } from 'feng3d';
+import { nativeAPI } from '../assets/NativeRequire';
+import { shortcutConfig } from '../configs/ShortcutConfig';
+import { editorData } from '../Editor';
+import { MRSToolType } from '../global/EditorData';
+import { AssetNode } from '../ui/assets/AssetNode';
 
 export class Editorshortcut
 {
     constructor()
     {
         // 初始化快捷键
-        feng3d.shortcut.addShortCuts(shortcutConfig);
+        shortcut.addShortCuts(shortcutConfig);
 
         //监听命令
-        feng3d.shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
+        shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
         //
-        feng3d.shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
-        feng3d.shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
-        feng3d.shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
+        shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
+        shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
+        shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
         //
-        feng3d.shortcut.on("openDevTools", this.onOpenDevTools, this);
-        feng3d.shortcut.on("refreshWindow", this.onRefreshWindow, this);
+        shortcut.on("openDevTools", this.onOpenDevTools, this);
+        shortcut.on("refreshWindow", this.onRefreshWindow, this);
         // 
-        feng3d.shortcut.on("copy", this.onCopy, this);
-        feng3d.shortcut.on("paste", this.onPaste, this);
-        feng3d.shortcut.on("undo", this.onUndo, this);
+        shortcut.on("copy", this.onCopy, this);
+        shortcut.on("paste", this.onPaste, this);
+        shortcut.on("undo", this.onUndo, this);
     }
 
     private onGameobjectMoveTool()
@@ -45,7 +51,7 @@ export class Editorshortcut
         //删除文件引用计数
         selectedObject.forEach(element =>
         {
-            if (element instanceof feng3d.GameObject)
+            if (element instanceof GameObject)
             {
                 element.remove();
             } else if (element instanceof AssetNode)
@@ -68,7 +74,7 @@ export class Editorshortcut
 
     private onCopy()
     {
-        var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
+        var objects = editorData.selectedObjects.filter(v => v instanceof GameObject);
         editorData.copyObjects = objects;
     }
 
@@ -76,10 +82,10 @@ export class Editorshortcut
     {
         var undoSelectedObjects = editorData.selectedObjects;
         //
-        var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
+        var objects: GameObject[] = editorData.copyObjects.filter(v => v instanceof GameObject);
         if (objects.length == 0) return;
         var parent = objects[0].parent;
-        var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
+        var newGameObjects = objects.map(v => serialization.clone(v));
         newGameObjects.forEach(v =>
         {
             parent.addChild(v);

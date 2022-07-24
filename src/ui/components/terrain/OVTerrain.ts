@@ -1,11 +1,13 @@
+import { OVComponent, IObjectView, ObjectViewInfo } from 'feng3d';
+import { TerrainView } from './TerrainView';
 
-@feng3d.OVComponent()
-export class OVTerrain extends TerrainView implements feng3d.IObjectView
+@OVComponent()
+export class OVTerrain extends TerrainView implements IObjectView
 {
     space: Object;
-    private _objectViewInfo: feng3d.ObjectViewInfo;
+    private _objectViewInfo: ObjectViewInfo;
 
-    constructor(objectViewInfo: feng3d.ObjectViewInfo)
+    constructor(objectViewInfo: ObjectViewInfo)
     {
         super();
         this._objectViewInfo = objectViewInfo;

@@ -1,3 +1,5 @@
+import { windowEventProxy } from 'feng3d';
+
 var defaultTextFiled: egret.TextField;
 function lostFocus(display: egret.DisplayObject)
 {
@@ -62,7 +64,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 		this.nameeditTxt.textDisplay.setFocus();
 		//
 		this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-		feng3d.windowEventProxy.on("keyup", this.onnameeditChanged, this);
+		windowEventProxy.on("keyup", this.onnameeditChanged, this);
 	}
 
 	/**
@@ -71,7 +73,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 	cancelEdit()
 	{
 		this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-		feng3d.windowEventProxy.off("keyup", this.onnameeditChanged, this);
+		windowEventProxy.off("keyup", this.onnameeditChanged, this);
 		//
 		this.nameeditTxt.visible = false;
 		this.nameLabel.visible = true;
@@ -85,7 +87,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 
 	private onnameeditChanged()
 	{
-		if (feng3d.windowEventProxy.key == "Enter" || feng3d.windowEventProxy.key == "Escape")
+		if (windowEventProxy.key == "Enter" || windowEventProxy.key == "Escape")
 		{
 			//拾取焦点
 			var inputUtils: egret.InputController = this.nameeditTxt.textDisplay["inputUtils"];

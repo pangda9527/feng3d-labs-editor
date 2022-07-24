@@ -1,3 +1,15 @@
+import { task, View, serialization } from 'feng3d';
+import { editorRS } from './assets/EditorRS';
+import { editorcache } from './caches/Editorcache';
+import { EditorData } from './global/EditorData';
+import { editorui } from './global/editorui';
+import { modules } from './Modules';
+import { mouseEventEnvironment } from './polyfill/egret/MouseEvent';
+import { Editorshortcut } from './shortcut/Editorshortcut';
+import { editorAsset } from './ui/assets/EditorAsset';
+import { Message } from './ui/components/Message';
+import { MainUI } from './ui/MainUI';
+import { MainView } from './ui/MainView';
 
 //
 export var editorData: EditorData;
@@ -30,7 +42,7 @@ export class Editor extends eui.UILayer
         modules.message = new Message();
 
         //
-        feng3d.task.series([
+        task.series([
             this.initEgret.bind(this),
             editorRS.initproject.bind(editorRS),
             this.init.bind(this),
@@ -88,14 +100,14 @@ export class Editor extends eui.UILayer
                 editorAsset.readScene("default.scene.json", (err, scene) =>
                 {
                     if (err)
-                        editorData.gameScene = feng3d.View.createNewScene();
+                        editorData.gameScene = View.createNewScene();
                     else
                         editorData.gameScene = scene;
 
                     //
                     this.initMainView()
                     new Editorshortcut();
-                    egret.mouseEventEnvironment();
+                    mouseEventEnvironment();
                     callback();
                 });
             });
@@ -103,7 +115,7 @@ export class Editor extends eui.UILayer
 
         window.addEventListener("beforeunload", () =>
         {
-            let obj = feng3d.serialization.serialize(editorData.gameScene.gameObject);
+            let obj = serialization.serialize(editorData.gameScene.gameObject);
             editorRS.fs.writeObject("default.scene.json", obj);
         });
     }

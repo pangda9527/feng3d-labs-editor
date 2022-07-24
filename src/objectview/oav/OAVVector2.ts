@@ -1,8 +1,11 @@
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { NumberTextInputBinder } from '../../ui/components/binders/NumberTextInputBinder';
+import { OAVBase } from './OAVBase';
 
 /**
  * Vector2属性界面
  */
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVVector2 extends OAVBase
 {
     public labelLab: eui.Label;
@@ -36,7 +39,7 @@ export class OAVVector2 extends OAVBase
      */
     maxValue = NaN;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 

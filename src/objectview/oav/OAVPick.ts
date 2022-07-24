@@ -1,15 +1,21 @@
+import { OAVComponent, AttributeViewInfo, watcher, MenuItem, Texture2D, TextureCube, AudioAsset, ScriptAsset, Material, Geometry } from 'feng3d';
+import { editorRS } from '../../assets/EditorRS';
+import { editorData } from '../../Editor';
+import { menu } from '../../ui/components/Menu';
+import { DragDataMap, drag } from '../../ui/drag/Drag';
+import { OAVBase } from './OAVBase';
 
 /**
  * 挑选（拾取）OAV界面
  */
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVPick extends OAVBase
 {
     public labelLab: eui.Label;
     public text: eui.Label;
     public pickBtn: eui.Button;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
 
@@ -37,7 +43,7 @@ export class OAVPick extends OAVBase
                 });
         }
 
-        feng3d.watcher.watch(this.space, this.attributeName, this.updateView, this);
+        watcher.watch(this.space, this.attributeName, this.updateView, this);
     }
 
     dispose()
@@ -46,7 +52,7 @@ export class OAVPick extends OAVBase
         this.pickBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
         drag.unregister(this);
-        feng3d.watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+        watcher.unwatch(this.space, this.attributeName, this.updateView, this);
     }
 
     private onPickBtnClick()
@@ -57,7 +63,7 @@ export class OAVPick extends OAVBase
             if (param.accepttype == "texture2d")
             {
                 var menus: MenuItem[] = [];
-                var texture2ds = editorRS.getLoadedAssetDatasByType(feng3d.Texture2D);
+                var texture2ds = editorRS.getLoadedAssetDatasByType(Texture2D);
                 texture2ds.forEach(item =>
                 {
                     menus.push({
@@ -72,7 +78,7 @@ export class OAVPick extends OAVBase
             else if (param.accepttype == "texturecube")
             {
                 var menus: MenuItem[] = [];
-                var textureCubes = editorRS.getLoadedAssetDatasByType(feng3d.TextureCube);
+                var textureCubes = editorRS.getLoadedAssetDatasByType(TextureCube);
                 textureCubes.forEach(item =>
                 {
                     menus.push({
@@ -87,7 +93,7 @@ export class OAVPick extends OAVBase
             {
                 var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
 
-                var audioFiles = editorRS.getAssetsByType(feng3d.AudioAsset);
+                var audioFiles = editorRS.getAssetsByType(AudioAsset);
                 audioFiles.forEach(item =>
                 {
                     menus.push({
@@ -100,7 +106,7 @@ export class OAVPick extends OAVBase
                 menu.popup(menus);
             } else if (param.accepttype == "file_script")
             {
-                var scriptFiles = editorRS.getAssetsByType(feng3d.ScriptAsset);
+                var scriptFiles = editorRS.getAssetsByType(ScriptAsset);
 
                 var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
                 scriptFiles.forEach(element =>
@@ -116,7 +122,7 @@ export class OAVPick extends OAVBase
                 menu.popup(menus);
             } else if (param.accepttype == "material")
             {
-                var assets = editorRS.getLoadedAssetDatasByType(feng3d.Material);
+                var assets = editorRS.getLoadedAssetDatasByType(Material);
                 var menus: MenuItem[] = [];
                 assets.forEach(element =>
                 {
@@ -131,7 +137,7 @@ export class OAVPick extends OAVBase
                 menu.popup(menus);
             } else if (param.accepttype == "geometry")
             {
-                var geometrys = editorRS.getLoadedAssetDatasByType(feng3d.Geometry);
+                var geometrys = editorRS.getLoadedAssetDatasByType(Geometry);
                 var menus: MenuItem[] = [];
                 geometrys.forEach(element =>
                 {

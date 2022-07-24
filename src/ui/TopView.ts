@@ -1,3 +1,9 @@
+import { globalEmitter, menuConfig, serialization, FSType, FS, Rectangle, MenuItem, windowEventProxy, Vector2 } from 'feng3d';
+import { editorRS } from '../assets/EditorRS';
+import { editorcache } from '../caches/Editorcache';
+import { editorData } from '../Editor';
+import { MRSToolType } from '../global/EditorData';
+import { menu } from './components/Menu';
 
 export class TopView extends eui.Component implements eui.UIComponent
 {
@@ -48,7 +54,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 		this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 		this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-		feng3d.globalEmitter.on("editor.toolTypeChanged", this.updateview, this);
+		globalEmitter.on("editor.toolTypeChanged", this.updateview, this);
 
 		//
 		var menuItems = menuConfig.getMainMenu();
@@ -76,7 +82,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 		this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 		this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-		feng3d.globalEmitter.off("editor.toolTypeChanged", this.updateview, this);
+		globalEmitter.off("editor.toolTypeChanged", this.updateview, this);
 
 		if (runwin) runwin.close();
 		runwin = null;
@@ -84,7 +90,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 
 	private onHelpButtonClick()
 	{
-		window.open("http://feng3d.com");
+		window.open("http://com");
 	}
 
 	private onButtonClick(event: egret.TouchEvent)
@@ -107,9 +113,9 @@ export class TopView extends eui.Component implements eui.UIComponent
 				editorData.isBaryCenter = !editorData.isBaryCenter;
 				break;
 			case this.playBtn:
-				var e = feng3d.globalEmitter.emit("inspector.saveShowData", () =>
+				var e = globalEmitter.emit("inspector.saveShowData", () =>
 				{
-					let obj = feng3d.serialization.serialize(editorData.gameScene.gameObject);
+					let obj = serialization.serialize(editorData.gameScene.gameObject);
 					editorRS.fs.writeObject("default.scene.json", obj, (err) =>
 					{
 						if (err)
@@ -117,10 +123,10 @@ export class TopView extends eui.Component implements eui.UIComponent
 							console.warn(err);
 							return;
 						}
-						if (editorRS.fs.type == feng3d.FSType.indexedDB)
+						if (editorRS.fs.type == FSType.indexedDB)
 						{
 							if (runwin) runwin.close();
-							runwin = window.open(`run.html?fstype=${feng3d.FS.fs.type}&project=${editorcache.projectname}`);
+							runwin = window.open(`run.html?fstype=${FS.fs.type}&project=${editorcache.projectname}`);
 							return;
 						}
 						var path = editorRS.fs.getAbsolutePath("index.html");
@@ -151,7 +157,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 }
 
 var showMenuItem: { menu: egret.DisplayObject, item: TopMenuItemRenderer };
-var items: { item: TopMenuItemRenderer; rect: feng3d.Rectangle; }[]
+var items: { item: TopMenuItemRenderer; rect: Rectangle; }[]
 
 export class TopMenuItemRenderer extends eui.ItemRenderer
 {
@@ -216,7 +222,7 @@ export class TopMenuItemRenderer extends eui.ItemRenderer
 
 		showMenu(this);
 
-		feng3d.windowEventProxy.on("mousemove", onMenuMouseMove);
+		windowEventProxy.on("mousemove", onMenuMouseMove);
 	}
 }
 
@@ -235,7 +241,7 @@ function showMenu(item: TopMenuItemRenderer)
 
 function onMenuMouseMove()
 {
-	var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+	var p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 	var overitem = items.filter(v => v.rect.contains(p.x, p.y))[0];
 	if (!overitem) return;
 	if (showMenuItem.item == overitem.item) return;
@@ -257,7 +263,7 @@ function onRemoveFromeStage()
 {
 	removeMenu();
 
-	feng3d.windowEventProxy.off("mousemove", onMenuMouseMove);
+	windowEventProxy.off("mousemove", onMenuMouseMove);
 }
 
 // 运行窗口

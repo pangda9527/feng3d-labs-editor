@@ -1,12 +1,16 @@
+import { View, Color4, Scene, RunEnvironment, forwardRenderer, Renderable, wireframeRenderer } from 'feng3d';
+import { editorData } from '../Editor';
+import { EditorComponent } from './EditorComponent';
+import { hierarchy } from './hierarchy/Hierarchy';
 
-export class EditorView extends feng3d.View
+export class EditorView extends View
 {
-    wireframeColor = new feng3d.Color4(125 / 255, 176 / 255, 250 / 255);
+    wireframeColor = new Color4(125 / 255, 176 / 255, 250 / 255);
 
     /**
      * 编辑器场景，用于显示只在编辑器中存在的游戏对象，例如灯光Icon，对象操作工具等显示。
      */
-    editorScene: feng3d.Scene;
+    editorScene: Scene;
 
     editorComponent: EditorComponent;
 
@@ -19,12 +23,12 @@ export class EditorView extends feng3d.View
         {
             if (this.scene)
             {
-                this.scene.runEnvironment = feng3d.RunEnvironment.feng3d;
+                this.scene.runEnvironment = RunEnvironment.feng3d;
             }
             this.scene = editorData.gameScene;
             if (this.scene)
             {
-                this.scene.runEnvironment = feng3d.RunEnvironment.editor;
+                this.scene.runEnvironment = RunEnvironment.editor;
                 hierarchy.rootGameObject = this.scene.gameObject;
             }
         }
@@ -45,7 +49,7 @@ export class EditorView extends feng3d.View
             this.editorScene.camera = this.camera;
 
             this.editorScene.update();
-            feng3d.forwardRenderer.draw(this.gl, this.editorScene, this.camera);
+            forwardRenderer.draw(this.gl, this.editorScene, this.camera);
             var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
             if (selectedObject) this.selectedObject = selectedObject;
         }
@@ -53,8 +57,8 @@ export class EditorView extends feng3d.View
         {
             editorData.selectedGameObjects.forEach(element =>
             {
-                if (element.getComponent(feng3d.Renderable))
-                    feng3d.wireframeRenderer.drawGameObject(this.gl, element.getComponent(feng3d.Renderable), this.scene, this.camera, this.wireframeColor);
+                if (element.getComponent(Renderable))
+                    wireframeRenderer.drawGameObject(this.gl, element.getComponent(Renderable), this.scene, this.camera, this.wireframeColor);
             });
         }
     }

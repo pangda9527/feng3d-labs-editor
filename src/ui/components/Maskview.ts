@@ -1,3 +1,5 @@
+import { shortcut, ticker } from 'feng3d';
+import { editorui } from '../../global/editorui';
 
 export var maskview: Maskview;
 
@@ -28,7 +30,7 @@ export class Maskview
             maskReck.addEventListener(egret.MouseEvent.CLICK, removeDisplayObject, null);
             displayObject.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromStage, null);
 
-            feng3d.shortcut.activityState("inModal");
+            shortcut.activityState("inModal");
         }
 
         function removeDisplayObject()
@@ -45,9 +47,9 @@ export class Maskview
             {
                 maskReck.parent.removeChild(maskReck);
             }
-            feng3d.ticker.nextframe(() =>
+            ticker.nextframe(() =>
             {
-                feng3d.shortcut.deactivityState("inModal");
+                shortcut.deactivityState("inModal");
             });
         }
     }

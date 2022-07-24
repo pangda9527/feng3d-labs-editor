@@ -1,11 +1,13 @@
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVFunction extends OAVBase
 {
     public labelLab: eui.Label;
     public button: eui.Button;
 
-    constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
         this.skinName = "OAVFunction";

@@ -1,3 +1,13 @@
+import { IEvent, rs, globalEmitter, Feng3dObject, HideFlags, objectview, FileAsset } from 'feng3d';
+import { editorRS } from '../../assets/EditorRS';
+import { editorData } from '../../Editor';
+import { Modules } from '../../Modules';
+import { ObjectViewEvent } from '../../objectview/events/ObjectViewEvent';
+import { AssetNode } from '../assets/AssetNode';
+import { editorAsset } from '../assets/EditorAsset';
+import { ModuleView } from '../components/TabView';
+import { inspectorMultiObject } from './InspectorMultiObject';
+
 /**
  * 属性面板（检查器）
  */
@@ -58,7 +68,7 @@ export class InspectorView extends eui.Component implements ModuleView
 		this.updateView();
 	}
 
-	private onSaveShowData(event: feng3d.IEvent<() => void>)
+	private onSaveShowData(event: IEvent<() => void>)
 	{
 		this.saveShowData(event.data);
 	}
@@ -113,7 +123,7 @@ export class InspectorView extends eui.Component implements ModuleView
 		{
 			if (this._viewData.assetId)
 			{
-				var feng3dAsset = feng3d.rs.getAssetById(this._viewData.assetId);
+				var feng3dAsset = rs.getAssetById(this._viewData.assetId);
 				if (feng3dAsset)
 				{
 					editorRS.writeAsset(feng3dAsset, (err) =>
@@ -155,10 +165,10 @@ export class InspectorView extends eui.Component implements ModuleView
 		this.backButton.visible = this._historySelectedObject.length > 1;
 
 		this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-		feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+		globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 		//
-		feng3d.globalEmitter.on("inspector.update", this.updateView, this);
-		feng3d.globalEmitter.on("inspector.saveShowData", this.onSaveShowData, this);
+		globalEmitter.on("inspector.update", this.updateView, this);
+		globalEmitter.on("inspector.saveShowData", this.onSaveShowData, this);
 
 		//
 		this.updateView();
@@ -167,10 +177,10 @@ export class InspectorView extends eui.Component implements ModuleView
 	private onRemovedFromStage()
 	{
 		this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-		feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+		globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
 		//
-		feng3d.globalEmitter.off("inspector.update", this.updateView, this);
-		feng3d.globalEmitter.off("inspector.saveShowData", this.onSaveShowData, this);
+		globalEmitter.off("inspector.update", this.updateView, this);
+		globalEmitter.off("inspector.saveShowData", this.onSaveShowData, this);
 	}
 
 	private onSelectedObjectsChanged()
@@ -186,20 +196,20 @@ export class InspectorView extends eui.Component implements ModuleView
 	{
 		this.typeLab.text = `${showdata.constructor["name"]}`;
 		if (this._view)
-			this._view.removeEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+			this._view.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 		var editable = true;
-		if (showdata instanceof feng3d.Feng3dObject) editable = !Boolean(showdata.hideFlags & feng3d.HideFlags.NotEditable);
-		this._view = feng3d.objectview.getObjectView(showdata, { editable: editable });
+		if (showdata instanceof Feng3dObject) editable = !Boolean(showdata.hideFlags & HideFlags.NotEditable);
+		this._view = objectview.getObjectView(showdata, { editable: editable });
 		// this._view.percentWidth = 100;
 		this.group.addChild(this._view);
 		this.group.scrollV = 0;
-		this._view.addEventListener(feng3d.ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
+		this._view.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 	}
 
-	private onValueChanged(e: feng3d.ObjectViewEvent)
+	private onValueChanged(e: ObjectViewEvent)
 	{
 		this._dataChanged = true;
-		if (this._viewData instanceof feng3d.FileAsset)
+		if (this._viewData instanceof FileAsset)
 		{
 			if (this._viewData.assetId)
 			{

@@ -1,3 +1,4 @@
+import { watch, Color3, Color4, ImageUtil, Gradient, windowEventProxy, Vector2, mathUtil } from 'feng3d';
 
 var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
 /**
@@ -18,8 +19,8 @@ export class ColorPickerView extends eui.Component
     public txtColor: eui.TextInput;
 
     //
-    @feng3d.watch("onColorChanged")
-    color: feng3d.Color3 | feng3d.Color4 = new feng3d.Color4(0.2, 0.5, 0);
+    @watch("onColorChanged")
+    color: Color3 | Color4 = new Color4(0.2, 0.5, 0);
 
     public constructor()
     {
@@ -33,7 +34,7 @@ export class ColorPickerView extends eui.Component
 
         var w = this.group1.width - 4;
         var h = this.group1.height - 4;
-        this.image1.source = new feng3d.ImageUtil(w, h).drawMinMaxGradient(new feng3d.Gradient().fromColors(colors), false).toDataURL();
+        this.image1.source = new ImageUtil(w, h).drawMinMaxGradient(new Gradient().fromColors(colors), false).toDataURL();
         this.updateView();
 
         //
@@ -89,8 +90,8 @@ export class ColorPickerView extends eui.Component
 
         this.onMouseMove();
 
-        feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
-        feng3d.windowEventProxy.on("mouseup", this.onMouseUp, this);
+        windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on("mouseup", this.onMouseUp, this);
     }
 
     private onMouseMove()
@@ -99,12 +100,12 @@ export class ColorPickerView extends eui.Component
         if (this._mouseDownGroup == this.group0) image = this.image0;
         else image = this.image1;
 
-        var p = new feng3d.Vector2(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY);
+        var p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
         var start = image.localToGlobal(0, 0);
         var end = image.localToGlobal(image.width, image.height);
 
-        var rw = feng3d.mathUtil.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
-        var rh = feng3d.mathUtil.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
+        var rw = mathUtil.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
+        var rh = mathUtil.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
 
         if (this.group0 == this._mouseDownGroup)
         {
@@ -117,21 +118,21 @@ export class ColorPickerView extends eui.Component
             var basecolor = this.basecolor = getMixColorAtRatio(rh, colors);
             var color = getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
         }
-        if (this.color instanceof feng3d.Color3)
+        if (this.color instanceof Color3)
         {
             this.color = color;
         }
         else
         {
-            this.color = new feng3d.Color4(color.r, color.g, color.b, this.color.a);
+            this.color = new Color4(color.r, color.g, color.b, this.color.a);
         }
     }
 
     private onMouseUp()
     {
         this._mouseDownGroup = null;
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
-        feng3d.windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off("mouseup", this.onMouseUp, this);
     }
 
     private _textfocusintxt: eui.TextInput;
@@ -163,7 +164,7 @@ export class ColorPickerView extends eui.Component
                     color.b = (Number(this.txtB.text) || 0) / 255;
                     break;
                 case this.txtA:
-                    (<feng3d.Color4>color).a = (Number(this.txtA.text) || 0) / 255;
+                    (<Color4>color).a = (Number(this.txtA.text) || 0) / 255;
                     break;
                 case this.txtColor:
                     color.fromUnit(Number("0x" + this.txtColor.text) || 0);
@@ -173,7 +174,7 @@ export class ColorPickerView extends eui.Component
         }
     }
 
-    private onColorChanged(property, oldValue: feng3d.Color4 | feng3d.Color4, newValue: feng3d.Color4 | feng3d.Color4)
+    private onColorChanged(property, oldValue: Color4 | Color4, newValue: Color4 | Color4)
     {
         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
 
@@ -183,7 +184,7 @@ export class ColorPickerView extends eui.Component
         }
     }
 
-    private basecolor: feng3d.Color3;
+    private basecolor: Color3;
     private rw: number;
     private rh: number;
     private ratio: number;
@@ -192,7 +193,7 @@ export class ColorPickerView extends eui.Component
         if (this._textfocusintxt != this.txtR) this.txtR.text = Math.round(this.color.r * 255).toString();
         if (this._textfocusintxt != this.txtG) this.txtG.text = Math.round(this.color.g * 255).toString();
         if (this._textfocusintxt != this.txtB) this.txtB.text = Math.round(this.color.b * 255).toString();
-        if (this._textfocusintxt != this.txtA) this.txtA.text = Math.round((<feng3d.Color4>this.color).a * 255).toString();
+        if (this._textfocusintxt != this.txtA) this.txtA.text = Math.round((<Color4>this.color).a * 255).toString();
         if (this._textfocusintxt != this.txtColor) this.txtColor.text = this.color.toHexString().substr(1);
 
         if (this._mouseDownGroup == null)
@@ -207,7 +208,7 @@ export class ColorPickerView extends eui.Component
         if (this._mouseDownGroup != this.group0)
         {
             //
-            this.image0.source = new feng3d.ImageUtil(this.group0.width - 16, this.group0.height - 16).drawColorPickerRect(this.basecolor.toInt()).toDataURL();
+            this.image0.source = new ImageUtil(this.group0.width - 16, this.group0.height - 16).drawColorPickerRect(this.basecolor.toInt()).toDataURL();
         }
 
         this.pos1.y = this.ratio * (this.group1.height - this.pos1.height);
@@ -216,7 +217,7 @@ export class ColorPickerView extends eui.Component
         this.pos0.y = this.rh * (this.group0.height - this.pos0.height);
 
         //
-        if (this.color instanceof feng3d.Color3)
+        if (this.color instanceof Color3)
         {
             this._groupAParent = this._groupAParent || this.groupA.parent;
             this.groupA.parent && this.groupA.parent.removeChild(this.groupA);
@@ -238,10 +239,10 @@ export class ColorPickerView extends eui.Component
  */
 function getColorPickerRectPosition(color: number)
 {
-    var black = new feng3d.Color3(0, 0, 0);
-    var white = new feng3d.Color3(1, 1, 1);
+    var black = new Color3(0, 0, 0);
+    var white = new Color3(1, 1, 1);
 
-    var c = new feng3d.Color3().fromUnit(color);
+    var c = new Color3().fromUnit(color);
     var max = Math.max(c.r, c.g, c.b);
     if (max != 0)
         c = black.mix(c, 1 / max);
@@ -277,8 +278,8 @@ function getMixColorRatio(color: number, colors: number[], ratios?: number[])
         }
     }
 
-    var colors1 = colors.map(v => new feng3d.Color3().fromUnit(v));
-    var c = new feng3d.Color3().fromUnit(color);
+    var colors1 = colors.map(v => new Color3().fromUnit(v));
+    var c = new Color3().fromUnit(color);
 
     var r = c.r;
     var g = c.g;
@@ -302,13 +303,13 @@ function getMixColorRatio(color: number, colors: number[], ratios?: number[])
             var result = 0;
             if (r1 == 1)
             {
-                result = feng3d.mathUtil.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
+                result = mathUtil.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
             } else if (g1 == 1)
             {
-                result = feng3d.mathUtil.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
+                result = mathUtil.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
             } else if (b1 == 1)
             {
-                result = feng3d.mathUtil.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
+                result = mathUtil.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
             }
             return result;
         }
@@ -323,10 +324,10 @@ function getMixColorRatio(color: number, colors: number[], ratios?: number[])
  */
 function getColorPickerRectAtPosition(color: number, rw: number, rh: number)
 {
-    var leftTop = new feng3d.Color3(1, 1, 1);
-    var rightTop = new feng3d.Color3().fromUnit(color);
-    var leftBottom = new feng3d.Color3(0, 0, 0);
-    var rightBottom = new feng3d.Color3(0, 0, 0);
+    var leftTop = new Color3(1, 1, 1);
+    var rightTop = new Color3().fromUnit(color);
+    var leftBottom = new Color3(0, 0, 0);
+    var rightBottom = new Color3(0, 0, 0);
 
     var top = leftTop.mixTo(rightTop, rw);
     var bottom = leftBottom.mixTo(rightBottom, rw);
@@ -345,13 +346,13 @@ function getMixColorAtRatio(ratio: number, colors: number[], ratios?: number[])
         }
     }
 
-    var colors1 = colors.map(v => new feng3d.Color3().fromUnit(v));
+    var colors1 = colors.map(v => new Color3().fromUnit(v));
 
     for (var i = 0; i < colors1.length - 1; i++)
     {
         if (ratios[i] <= ratio && ratio <= ratios[i + 1])
         {
-            var mix = feng3d.mathUtil.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
+            var mix = mathUtil.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
             var c = colors1[i].mixTo(colors1[i + 1], mix);
             return c;
         }

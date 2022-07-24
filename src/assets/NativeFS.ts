@@ -1,8 +1,11 @@
+import { dataTransform, FSType, globalEmitter, IReadWriteFS } from 'feng3d';
+import { editorcache } from '../caches/Editorcache';
+import { nativeAPI, NativeFSBase } from './NativeRequire';
 
 /**
  * 本地文件系统
  */
-export class NativeFS implements feng3d.IReadWriteFS
+export class NativeFS implements IReadWriteFS
 {
     /**
      * 项目路径
@@ -12,7 +15,7 @@ export class NativeFS implements feng3d.IReadWriteFS
     /**
      * 文件系统类型
      */
-    readonly type = feng3d.FSType.native;
+    readonly type = FSType.native;
 
     fs: NativeFSBase;
 
@@ -42,7 +45,7 @@ export class NativeFS implements feng3d.IReadWriteFS
         this.readArrayBuffer(path, (err, data) =>
         {
             if (err) { callback(err, null); return; }
-            feng3d.dataTransform.arrayBufferToString(data, (content) =>
+            dataTransform.arrayBufferToString(data, (content) =>
             {
                 callback(null, content);
             });
@@ -59,7 +62,7 @@ export class NativeFS implements feng3d.IReadWriteFS
         this.readArrayBuffer(path, (err, buffer) =>
         {
             if (err) { callback(err, null); return; }
-            feng3d.dataTransform.arrayBufferToObject(buffer, (content) =>
+            dataTransform.arrayBufferToObject(buffer, (content) =>
             {
                 callback(null, content);
             });
@@ -173,7 +176,7 @@ export class NativeFS implements feng3d.IReadWriteFS
                 this.fs.deleteFile(realPath, callback);
             }
         });
-        feng3d.globalEmitter.emit("fs.delete", path);
+        globalEmitter.emit("fs.delete", path);
     }
 
     /**
@@ -186,7 +189,7 @@ export class NativeFS implements feng3d.IReadWriteFS
     {
         var realPath = this.getAbsolutePath(path);
         this.fs.writeFile(realPath, arraybuffer, err => { callback && callback(err); });
-        feng3d.globalEmitter.emit("fs.write", path);
+        globalEmitter.emit("fs.write", path);
     }
 
     /**
@@ -197,9 +200,9 @@ export class NativeFS implements feng3d.IReadWriteFS
      */
     writeString(path: string, str: string, callback?: (err: Error) => void)
     {
-        var buffer = feng3d.dataTransform.stringToArrayBuffer(str);
+        var buffer = dataTransform.stringToArrayBuffer(str);
         this.writeArrayBuffer(path, buffer, callback);
-        feng3d.globalEmitter.emit("fs.write", path);
+        globalEmitter.emit("fs.write", path);
     }
 
     /**
@@ -212,7 +215,7 @@ export class NativeFS implements feng3d.IReadWriteFS
     {
         var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
         this.writeString(path, str, callback);
-        feng3d.globalEmitter.emit("fs.write", path);
+        globalEmitter.emit("fs.write", path);
     }
 
     /**
@@ -223,11 +226,11 @@ export class NativeFS implements feng3d.IReadWriteFS
      */
     writeImage(path: string, image: HTMLImageElement, callback?: (err: Error) => void)
     {
-        feng3d.dataTransform.imageToArrayBuffer(image, (buffer) =>
+        dataTransform.imageToArrayBuffer(image, (buffer) =>
         {
             this.writeArrayBuffer(path, buffer, callback);
         });
-        feng3d.globalEmitter.emit("fs.write", path);
+        globalEmitter.emit("fs.write", path);
     }
 
     /**

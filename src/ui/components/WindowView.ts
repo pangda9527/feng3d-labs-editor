@@ -1,3 +1,5 @@
+import { windowEventProxy, Rectangle } from 'feng3d';
+import { cursor } from '../drag/Cursor';
 
 export class WindowView extends eui.Panel
 {
@@ -37,15 +39,15 @@ export class WindowView extends eui.Panel
 
     private onAddedToStage()
     {
-        feng3d.windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on("mousemove", this.onMouseMove, this);
     }
 
     private onRemoveFromStage()
     {
-        feng3d.windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off("mousemove", this.onMouseMove, this);
     }
 
-    private boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new feng3d.Rectangle(), draging: false };
+    private boundDragInfo = { type: -1, startX: 0, startY: 0, stage: null, rect: new Rectangle(), draging: false };
     private onMouseMove()
     {
         if (this.boundDragInfo.draging) return;
@@ -56,9 +58,9 @@ export class WindowView extends eui.Panel
         var stageY = this.stage.stageY;
         var size = 4;
 
-        var leftRect = new feng3d.Rectangle(rect.x, rect.y, size, rect.height);
-        var rightRect = new feng3d.Rectangle(rect.right - size, rect.y, size, rect.height);
-        var bottomRect = new feng3d.Rectangle(rect.x, rect.bottom - size, rect.width, size);
+        var leftRect = new Rectangle(rect.x, rect.y, size, rect.height);
+        var rightRect = new Rectangle(rect.right - size, rect.y, size, rect.height);
+        var bottomRect = new Rectangle(rect.x, rect.bottom - size, rect.width, size);
         this.boundDragInfo.type = -1;
         if (leftRect.contains(stageX, stageY))
         {
@@ -87,10 +89,10 @@ export class WindowView extends eui.Panel
         this.boundDragInfo.startX = e.stageX;
         this.boundDragInfo.startY = e.stageY;
         this.boundDragInfo.stage = this.stage;
-        this.boundDragInfo.rect = new feng3d.Rectangle(this.x, this.y, this.width, this.height);
+        this.boundDragInfo.rect = new Rectangle(this.x, this.y, this.width, this.height);
 
-        feng3d.windowEventProxy.on("mousemove", this.onBoundDrag, this);
-        feng3d.windowEventProxy.on("mouseup", this.onBoundDragEnd, this);
+        windowEventProxy.on("mousemove", this.onBoundDrag, this);
+        windowEventProxy.on("mouseup", this.onBoundDragEnd, this);
     }
 
     private onBoundDrag()
@@ -123,7 +125,7 @@ export class WindowView extends eui.Panel
     private onBoundDragEnd()
     {
         this.boundDragInfo.draging = false;
-        feng3d.windowEventProxy.off("mousemove", this.onBoundDrag, this);
-        feng3d.windowEventProxy.off("mouseup", this.onBoundDragEnd, this);
+        windowEventProxy.off("mousemove", this.onBoundDrag, this);
+        windowEventProxy.off("mouseup", this.onBoundDragEnd, this);
     }
 }

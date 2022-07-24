@@ -1,3 +1,5 @@
+import { shortcutConfig } from '../configs/ShortcutConfig';
+import { Modules } from '../Modules';
 
 /**
  * 快捷键设置界面

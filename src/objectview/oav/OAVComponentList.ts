@@ -1,14 +1,19 @@
+import { OAVComponent, GameObject, AttributeViewInfo, menuConfig, Components, HideFlags, IEvent, Component } from 'feng3d';
+import { ComponentView } from '../../ui/components/ComponentView';
+import { menu } from '../../ui/components/Menu';
+import { drag } from '../../ui/drag/Drag';
+import { OAVBase } from './OAVBase';
 
-@feng3d.OAVComponent()
+@OAVComponent()
 export class OAVComponentList extends OAVBase
 {
-	protected _space: feng3d.GameObject;
+	protected _space: GameObject;
 
 	//
 	group: eui.Group;
 	addComponentButton: eui.Button;
 
-	constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
 		this.skinName = "OAVComponentListSkin";
@@ -89,9 +94,9 @@ export class OAVComponentList extends OAVBase
 		this.addComponentButton.removeEventListener(egret.MouseEvent.CLICK, this.onAddComponentButtonClick, this);
 	}
 
-	private addComponentView(component: feng3d.Components)
+	private addComponentView(component: Components)
 	{
-		if (component.hideFlags & feng3d.HideFlags.HideInInspector)
+		if (component.hideFlags & HideFlags.HideInInspector)
 			return;
 
 		var displayObject = new ComponentView(component);
@@ -112,7 +117,7 @@ export class OAVComponentList extends OAVBase
 		}
 	}
 
-	private removedComponentView(component: feng3d.Components)
+	private removedComponentView(component: Components)
 	{
 		for (var i = this.group.numChildren - 1; i >= 0; i--)
 		{
@@ -124,13 +129,13 @@ export class OAVComponentList extends OAVBase
 		}
 	}
 
-	private onAddCompont(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+	private onAddCompont(event: IEvent<{ gameobject: GameObject; component: Component; }>)
 	{
 		if (event.data.component.gameObject == this.space)
 			this.addComponentView(event.data.component);
 	}
 
-	private onRemoveComponent(event: feng3d.IEvent<{ gameobject: feng3d.GameObject; component: feng3d.Component; }>)
+	private onRemoveComponent(event: IEvent<{ gameobject: GameObject; component: Component; }>)
 	{
 		if (event.data.component.gameObject == this.space)
 			this.removedComponentView(event.data.component);

@@ -1,24 +1,30 @@
+import { RegisterComponent, Component, GameObject, loader, serialization, ticker, mathUtil, Vector3, Rectangle, windowEventProxy, shortcut, View, IEvent, Matrix4x4, globalEmitter, Quaternion } from 'feng3d';
+import { editorData } from '../../Editor';
+import { sceneControlConfig } from '../../shortcut/Editorshortcut';
+import { menu } from '../../ui/components/Menu';
+import { EditorView } from '../EditorView';
+
 declare global
 {
     export interface MixinsComponentMap
     {
-        SceneRotateTool: editor.SceneRotateTool
+        SceneRotateTool: SceneRotateTool
     }
 }
 
-@feng3d.RegisterComponent()
-export class SceneRotateTool extends feng3d.Component
+@RegisterComponent()
+export class SceneRotateTool extends Component
 {
     get view() { return this._view; }
     set view(v) { this._view = v; this.load(); }
     private _view: EditorView;
 
-    private arrowsX: feng3d.GameObject;
-    private arrowsNX: feng3d.GameObject;
-    private arrowsY: feng3d.GameObject;
-    private arrowsNY: feng3d.GameObject;
-    private arrowsZ: feng3d.GameObject;
-    private arrowsNZ: feng3d.GameObject;
+    private arrowsX: GameObject;
+    private arrowsNX: GameObject;
+    private arrowsY: GameObject;
+    private arrowsNY: GameObject;
+    private arrowsZ: GameObject;
+    private arrowsNZ: GameObject;
 
     init()
     {
@@ -35,14 +41,14 @@ export class SceneRotateTool extends feng3d.Component
         if (this.isload) return;
         this.isload = true;
 
-        feng3d.loader.loadText(editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
+        loader.loadText(editorData.getEditorAssetPath("gameobjects/SceneRotateTool.gameobject.json"), (content) =>
         {
-            var rotationToolModel: feng3d.GameObject = feng3d.serialization.deserialize(JSON.parse(content));
+            var rotationToolModel: GameObject = serialization.deserialize(JSON.parse(content));
             this.onLoaded(rotationToolModel);
         });
     }
 
-    private onLoaded(rotationToolModel: feng3d.GameObject)
+    private onLoaded(rotationToolModel: GameObject)
     {
         var arrowsX = this.arrowsX = rotationToolModel.find("arrowsX");
         var arrowsY = this.arrowsY = rotationToolModel.find("arrowsY");
@@ -72,7 +78,7 @@ export class SceneRotateTool extends feng3d.Component
         });
         var arrowsArr = [arrowsX, arrowsY, arrowsZ, arrowsNX, arrowsNY, arrowsNZ];
 
-        feng3d.ticker.onframe(() =>
+        ticker.onframe(() =>
         {
             var rect = this.view.canvas.getBoundingClientRect();
             canvas.style.top = rect.top + "px";
@@ -82,11 +88,11 @@ export class SceneRotateTool extends feng3d.Component
             rotationToolModel.transform.rotation = rotation;
 
             //隐藏角度
-            var visibleAngle = Math.cos(15 * feng3d.mathUtil.DEG2RAD);
+            var visibleAngle = Math.cos(15 * mathUtil.DEG2RAD);
             //隐藏正面箭头
             arrowsArr.forEach(element =>
             {
-                if (Math.abs(element.transform.localToWorldMatrix.getAxisY().dot(feng3d.Vector3.Z_AXIS)) < visibleAngle)
+                if (Math.abs(element.transform.localToWorldMatrix.getAxisY().dot(Vector3.Z_AXIS)) < visibleAngle)
                     element.activeSelf = true;
                 else
                     element.activeSelf = false;
@@ -94,22 +100,22 @@ export class SceneRotateTool extends feng3d.Component
 
             //
             var canvasRect = canvas.getBoundingClientRect();
-            var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-            if (bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
+            var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+            if (bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
             {
-                feng3d.shortcut.activityState("mouseInSceneRotateTool");
+                shortcut.activityState("mouseInSceneRotateTool");
             } else
             {
-                feng3d.shortcut.deactivityState("mouseInSceneRotateTool");
+                shortcut.deactivityState("mouseInSceneRotateTool");
             }
         });
 
-        feng3d.windowEventProxy.on("mouseup", (event) =>
+        windowEventProxy.on("mouseup", (event) =>
         {
             const e = event.data;
             var canvasRect = canvas.getBoundingClientRect();
-            var bound = new feng3d.Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
-            if (!bound.contains(feng3d.windowEventProxy.clientX, feng3d.windowEventProxy.clientY))
+            var bound = new Rectangle(canvasRect.left, canvasRect.top, canvasRect.width, canvasRect.height);
+            if (!bound.contains(windowEventProxy.clientX, windowEventProxy.clientY))
                 return;
 
             //右键点击菜单
@@ -167,28 +173,28 @@ export class SceneRotateTool extends feng3d.Component
         canvas.width = 80;
         canvas.height = 80;
         // 
-        var toolView = new feng3d.View(canvas);
+        var toolView = new View(canvas);
         toolView.scene.background.a = 0.0;
         toolView.scene.ambientColor.setTo(0.2, 0.2, 0.2);
-        toolView.root.addChild(feng3d.GameObject.createPrimitive("Point Light"));
+        toolView.root.addChild(GameObject.createPrimitive("Point Light"));
         return { toolView: toolView, canvas };
     }
 
-    private onclick(e: feng3d.IEvent<any>)
+    private onclick(e: IEvent<any>)
     {
         this.clickItem(e.currentTarget as any);
     }
 
-    private clickItem(item: feng3d.GameObject)
+    private clickItem(item: GameObject)
     {
-        var front_view = new feng3d.Vector3(0, 0, 0);//前视图
-        var back_view = new feng3d.Vector3(0, 180, 0);//后视图
-        var right_view = new feng3d.Vector3(0, 90, 0);//右视图
-        var left_view = new feng3d.Vector3(0, -90, 0);//左视图
-        var top_view = new feng3d.Vector3(-90, 0, 0);//顶视图
-        var bottom_view = new feng3d.Vector3(90, 0, 0);//底视图
+        var front_view = new Vector3(0, 0, 0);//前视图
+        var back_view = new Vector3(0, 180, 0);//后视图
+        var right_view = new Vector3(0, 90, 0);//右视图
+        var left_view = new Vector3(0, -90, 0);//左视图
+        var top_view = new Vector3(-90, 0, 0);//顶视图
+        var bottom_view = new Vector3(90, 0, 0);//底视图
 
-        var rotation: feng3d.Vector3;
+        var rotation: Vector3;
         switch (item)
         {
             case this.arrowsX:
@@ -212,17 +218,17 @@ export class SceneRotateTool extends feng3d.Component
         }
         if (rotation)
         {
-            var cameraTargetMatrix = feng3d.Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
+            var cameraTargetMatrix = Matrix4x4.fromRotation(rotation.x, rotation.y, rotation.z);
             cameraTargetMatrix.invert();
             var result = cameraTargetMatrix.toTRS()[1];
 
-            feng3d.globalEmitter.emit("editorCameraRotate", result);
+            globalEmitter.emit("editorCameraRotate", result);
 
             this.onEditorCameraRotate(result);
         }
     }
 
-    private onEditorCameraRotate(resultRotation: feng3d.Vector3)
+    private onEditorCameraRotate(resultRotation: Vector3)
     {
         var camera = this.view.camera;
         var forward = camera.transform.matrix.getAxisZ();
@@ -240,12 +246,12 @@ export class SceneRotateTool extends feng3d.Component
         //旋转中心
         var rotateCenter = camera.transform.worldPosition.addTo(forward.scaleNumber(lookDistance));
         //计算目标四元素旋转
-        var targetQuat = new feng3d.Quaternion();
-        resultRotation.scaleNumber(feng3d.mathUtil.DEG2RAD);
+        var targetQuat = new Quaternion();
+        resultRotation.scaleNumber(mathUtil.DEG2RAD);
         targetQuat.fromEuler(resultRotation.x, resultRotation.y, resultRotation.z);
         //
-        var sourceQuat = new feng3d.Quaternion();
-        sourceQuat.fromEuler(camera.transform.rx * feng3d.mathUtil.DEG2RAD, camera.transform.ry * feng3d.mathUtil.DEG2RAD, camera.transform.rz * feng3d.mathUtil.DEG2RAD)
+        var sourceQuat = new Quaternion();
+        sourceQuat.fromEuler(camera.transform.rx * mathUtil.DEG2RAD, camera.transform.ry * mathUtil.DEG2RAD, camera.transform.rz * mathUtil.DEG2RAD)
         var rate = { rate: 0.0 };
         egret.Tween.get(rate, {
             onChange: () =>

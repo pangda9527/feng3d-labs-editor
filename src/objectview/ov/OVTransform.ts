@@ -1,6 +1,8 @@
+import { OVComponent, IObjectView, Transform, ObjectViewInfo } from 'feng3d';
+import { NumberTextInputBinder } from '../../ui/components/binders/NumberTextInputBinder';
 
-@feng3d.OVComponent()
-export class OVTransform extends eui.Component implements feng3d.IObjectView
+@OVComponent()
+export class OVTransform extends eui.Component implements IObjectView
 {
 	//
 	public xLabel: eui.Label;
@@ -23,10 +25,10 @@ export class OVTransform extends eui.Component implements feng3d.IObjectView
 	public szTextInput: eui.TextInput;
 
 	//
-	private _space: feng3d.Transform;
-	private _objectViewInfo: feng3d.ObjectViewInfo;
+	private _space: Transform;
+	private _objectViewInfo: ObjectViewInfo;
 
-	constructor(objectViewInfo: feng3d.ObjectViewInfo)
+	constructor(objectViewInfo: ObjectViewInfo)
 	{
 		super();
 		this._objectViewInfo = objectViewInfo;
@@ -108,7 +110,7 @@ export class OVTransform extends eui.Component implements feng3d.IObjectView
 	 */
 	updateView(): void
 	{
-		var transform: feng3d.Transform = <any>this.space;
+		var transform: Transform = <any>this.space;
 		if (!transform)
 			return;
 	}
