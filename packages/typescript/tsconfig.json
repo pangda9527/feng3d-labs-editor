@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "outFile": "./dist/index.d.ts"
+    },
+    "files": [
+        "src/typescriptServices.ts",
+        "src/typescriptSorting.ts",
+    ]
+}
