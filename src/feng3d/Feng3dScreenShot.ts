@@ -1,12 +1,18 @@
 import { View, Scene, Camera, GameObject, Geometry, Material, PerspectiveLens, serialization, Texture2D, TextureCube, Vector3, Renderable, GeometryLike } from 'feng3d';
 
-export var feng3dScreenShot: Feng3dScreenShot;
 
 /**
  * feng3d预览图工具
  */
 export class Feng3dScreenShot
 {
+    static get feng3dScreenShot()
+    {
+        this._feng3dScreenShot = this._feng3dScreenShot || new Feng3dScreenShot();
+        return this._feng3dScreenShot;
+    }
+    private static _feng3dScreenShot: Feng3dScreenShot;
+
     view: View;
 
     scene: Scene;
@@ -224,5 +230,3 @@ export class Feng3dScreenShot
     }
 
 }
-
-feng3dScreenShot = new Feng3dScreenShot();

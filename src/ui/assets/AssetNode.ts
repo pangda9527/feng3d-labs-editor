@@ -1,7 +1,7 @@
-import { serialize, FileAsset, AssetType, dataTransform, TextureAsset, TextureCubeAsset, MaterialAsset, GeometryAsset, GameObjectAsset, FolderAsset, globalEmitter, pathUtils } from 'feng3d';
+import { AssetType, dataTransform, FileAsset, FolderAsset, GameObjectAsset, GeometryAsset, globalEmitter, MaterialAsset, pathUtils, serialize, TextureAsset, TextureCubeAsset } from 'feng3d';
 import { editorRS } from '../../assets/EditorRS';
-import { feng3dScreenShot } from '../../feng3d/Feng3dScreenShot';
-import { TreeNodeMap, TreeNode } from '../components/TreeNode';
+import { Feng3dScreenShot } from '../../feng3d/Feng3dScreenShot';
+import { TreeNode, TreeNodeMap } from '../components/TreeNode';
 import { DragData } from '../drag/Drag';
 import { editorAsset } from './EditorAsset';
 
@@ -127,7 +127,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         {
             var texture = this.asset.data;
 
-            this.image = feng3dScreenShot.drawTexture(texture);
+            this.image = Feng3dScreenShot.feng3dScreenShot.drawTexture(texture);
 
             dataTransform.dataURLToImage(this.image, (image) =>
             {
@@ -139,7 +139,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
             var textureCube = this.asset.data;
             textureCube.onLoadCompleted(() =>
             {
-                this.image = feng3dScreenShot.drawTextureCube(textureCube);
+                this.image = Feng3dScreenShot.feng3dScreenShot.drawTextureCube(textureCube);
 
                 dataTransform.dataURLToImage(this.image, (image) =>
                 {
@@ -151,7 +151,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
             var mat = this.asset;
             mat.data.onLoadCompleted(() =>
             {
-                this.image = feng3dScreenShot.drawMaterial(mat.data).toDataURL();
+                this.image = Feng3dScreenShot.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
                 dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writePreview(image);
@@ -159,7 +159,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
             });
         } else if (this.asset instanceof GeometryAsset)
         {
-            this.image = feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
+            this.image = Feng3dScreenShot.feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
 
             dataTransform.dataURLToImage(this.image, (image) =>
             {
@@ -170,7 +170,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
             var gameObject = this.asset.data;
             gameObject.onLoadCompleted(() =>
             {
-                this.image = feng3dScreenShot.drawGameObject(gameObject).toDataURL();
+                this.image = Feng3dScreenShot.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
                 dataTransform.dataURLToImage(this.image, (image) =>
                 {
                     this.asset.writePreview(image);

@@ -1,5 +1,5 @@
 import { OAVComponent, AttributeViewInfo, windowEventProxy, ticker, Vector2, Vector3, GameObject, Geometry, Material } from 'feng3d';
-import { feng3dScreenShot } from '../../feng3d/Feng3dScreenShot';
+import { Feng3dScreenShot } from '../../feng3d/Feng3dScreenShot';
 import { MouseOnDisableScroll } from '../../ui/components/tools/MouseOnDisableScroll';
 import { OAVBase } from './OAVBase';
 
@@ -17,7 +17,7 @@ export class OAVFeng3dPreView extends OAVBase
 
     initView()
     {
-        this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+        this.cameraRotation = Feng3dScreenShot.feng3dScreenShot.camera.transform.rotation.clone();
         this.onResize();
         this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         //
@@ -52,11 +52,11 @@ export class OAVFeng3dPreView extends OAVBase
     {
         var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 
-        var X_AXIS = feng3dScreenShot.camera.transform.matrix.getAxisX();
-        var Y_AXIS = feng3dScreenShot.camera.transform.matrix.getAxisY();
-        feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
-        feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
-        this.cameraRotation = feng3dScreenShot.camera.transform.rotation.clone();
+        var X_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisX();
+        var Y_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisY();
+        Feng3dScreenShot.feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
+        Feng3dScreenShot.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
+        this.cameraRotation = Feng3dScreenShot.feng3dScreenShot.camera.transform.rotation.clone();
 
         this.preMousePos = mousePos;
     }
@@ -66,15 +66,15 @@ export class OAVFeng3dPreView extends OAVBase
     {
         if (this.space instanceof GameObject)
         {
-            feng3dScreenShot.drawGameObject(this.space, this.cameraRotation);
+            Feng3dScreenShot.feng3dScreenShot.drawGameObject(this.space, this.cameraRotation);
         } else if (this.space instanceof Geometry)
         {
-            feng3dScreenShot.drawGeometry(<any>this.space, this.cameraRotation);
+            Feng3dScreenShot.feng3dScreenShot.drawGeometry(<any>this.space, this.cameraRotation);
         } else if (this.space instanceof Material)
         {
-            feng3dScreenShot.drawMaterial(this.space, this.cameraRotation);
+            Feng3dScreenShot.feng3dScreenShot.drawMaterial(this.space, this.cameraRotation);
         }
-        this.image.source = feng3dScreenShot.toDataURL(this.width, this.height);
+        this.image.source = Feng3dScreenShot.feng3dScreenShot.toDataURL(this.width, this.height);
     }
 
     private onMouseUp()
