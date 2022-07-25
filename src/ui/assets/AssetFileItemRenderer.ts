@@ -104,7 +104,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         const isShift = shortcut.keyState.getKeyState('shift');
         if (isShift)
         {
-            const source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
+            const source = (<eui.ArrayCollection>(this.parent as eui.List).dataProvider).source;
             let index = source.indexOf(this.data);
             let min = index; let
                 max = index;

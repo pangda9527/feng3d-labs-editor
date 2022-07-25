@@ -148,7 +148,7 @@ export class MRSToolBase extends Component
     {
         const line3D = this.gameObject.scene.mouseRay3D;
         // 射线与平面交点
-        const crossPos = <Vector3>this.movePlane3D.intersectWithLine3(line3D);
+        const crossPos = this.movePlane3D.intersectWithLine3(line3D) as Vector3;
 
         return crossPos;
     }

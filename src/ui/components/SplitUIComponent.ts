@@ -206,8 +206,8 @@ class SplitManager
 
         this.dragingMousePoint = new Vector2(e.stageX, e.stageY);
         //
-        const preElement = <eui.Group>this.preElement;
-        const nextElement = <eui.Group>this.nextElement;
+        const preElement = this.preElement as eui.Group;
+        const nextElement = this.nextElement as eui.Group;
         const preElementRect = this.preElementRect = preElement.getGlobalBounds();
         const nextElementRect = this.nextElementRect = nextElement.getGlobalBounds();
         //

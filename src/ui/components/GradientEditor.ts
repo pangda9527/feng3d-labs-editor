@@ -299,14 +299,14 @@ export class GradientEditor extends eui.Component
             {
                 if (this._selectedValue.color)
                 {
-                    const index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
-                    if (index === -1) this.gradient.colorKeys.push(<any>this._selectedValue);
+                    const index = this.gradient.colorKeys.indexOf(this._selectedValue as any);
+                    if (index === -1) this.gradient.colorKeys.push(this._selectedValue as any);
                     this.gradient.colorKeys.sort((a, b) => a.time - b.time);
                 }
                 else
                 {
-                    const index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
-                    if (index === -1) this.gradient.alphaKeys.push(<any>this._selectedValue);
+                    const index = this.gradient.alphaKeys.indexOf(this._selectedValue as any);
+                    if (index === -1) this.gradient.alphaKeys.push(this._selectedValue as any);
                     this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
                 }
                 this._removedTemp = false;
@@ -317,13 +317,13 @@ export class GradientEditor extends eui.Component
             {
                 if (this._selectedValue.color)
                 {
-                    const index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
+                    const index = this.gradient.colorKeys.indexOf(this._selectedValue as any);
                     if (index !== -1) this.gradient.colorKeys.splice(index, 1);
                     this.gradient.colorKeys.sort((a, b) => a.time - b.time);
                 }
                 else
                 {
-                    const index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
+                    const index = this.gradient.alphaKeys.indexOf(this._selectedValue as any);
                     if (index !== -1) this.gradient.alphaKeys.splice(index, 1);
                     this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
                 }
