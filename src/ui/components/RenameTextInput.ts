@@ -1,6 +1,7 @@
 import { windowEventProxy } from 'feng3d';
 
-var defaultTextFiled: egret.TextField;
+let defaultTextFiled: egret.TextField;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function lostFocus(display: egret.DisplayObject)
 {
 	if (!defaultTextFiled)
@@ -11,7 +12,6 @@ function lostFocus(display: egret.DisplayObject)
 	}
 	defaultTextFiled.setFocus();
 }
-
 
 /**
  * 重命名组件
@@ -48,7 +48,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 	public constructor()
 	{
 		super();
-		this.skinName = "RenameTextInputSkin";
+		this.skinName = 'RenameTextInputSkin';
 	}
 
 	/**
@@ -57,6 +57,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 	edit(callback?: () => void)
 	{
 		this.callback = callback;
+		// eslint-disable-next-line no-self-assign
 		this.textAlign = this.textAlign;
 		this.nameeditTxt.text = this.nameLabel.text;
 		this.nameLabel.visible = false;
@@ -64,7 +65,7 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 		this.nameeditTxt.textDisplay.setFocus();
 		//
 		this.nameeditTxt.textDisplay.addEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-		windowEventProxy.on("keyup", this.onnameeditChanged, this);
+		windowEventProxy.on('keyup', this.onnameeditChanged, this);
 	}
 
 	/**
@@ -73,13 +74,13 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 	cancelEdit()
 	{
 		this.nameeditTxt.textDisplay.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.cancelEdit, this);
-		windowEventProxy.off("keyup", this.onnameeditChanged, this);
+		windowEventProxy.off('keyup', this.onnameeditChanged, this);
 		//
 		this.nameeditTxt.visible = false;
 		this.nameLabel.visible = true;
-		if (this.nameLabel.text == this.nameeditTxt.text)
-			return;
-		this.nameLabel.text = this.nameeditTxt.text
+		if (this.nameLabel.text === this.nameeditTxt.text)
+			{ return; }
+		this.nameLabel.text = this.nameeditTxt.text;
 		this.callback && this.callback();
 		this.callback = null;
 		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
@@ -87,12 +88,11 @@ export class RenameTextInput extends eui.Component implements eui.UIComponent
 
 	private onnameeditChanged()
 	{
-		if (windowEventProxy.key == "Enter" || windowEventProxy.key == "Escape")
+		if (windowEventProxy.key === 'Enter' || windowEventProxy.key === 'Escape')
 		{
-			//拾取焦点
-			var inputUtils: egret.InputController = this.nameeditTxt.textDisplay["inputUtils"];
-			inputUtils["onStageDownHandler"](new egret.Event(""))
+			// 拾取焦点
+			const inputUtils: egret.InputController = this.nameeditTxt.textDisplay['inputUtils'];
+			inputUtils['onStageDownHandler'](new egret.Event(''));
 		}
 	}
-
 }

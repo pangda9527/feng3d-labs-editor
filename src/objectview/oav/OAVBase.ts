@@ -45,16 +45,16 @@ export class OAVBase extends eui.Component implements IObjectAttributeView
     }
 
     // 占用，避免出现label命名的组件
-    private label = "";
+    private label = '';
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
     {
         super.$onAddToStage(stage, nestLevel);
 
-        var componentParam = this._attributeViewInfo.componentParam;
+        const componentParam = this._attributeViewInfo.componentParam;
         if (componentParam)
         {
-            for (var key in componentParam)
+            for (const key in componentParam)
             {
                 if (componentParam.hasOwnProperty(key))
                 {
@@ -65,12 +65,12 @@ export class OAVBase extends eui.Component implements IObjectAttributeView
         if (this.labelLab)
         {
             if (this.label)
-                this.labelLab.text = this.label;
+                { this.labelLab.text = this.label; }
             else
-                this.labelLab.text = this._attributeName;
+                { this.labelLab.text = this._attributeName; }
         }
         if (this._attributeViewInfo.tooltip)
-            toolTip.register(this.labelLab, this._attributeViewInfo.tooltip);
+            { toolTip.register(this.labelLab, this._attributeViewInfo.tooltip); }
 
         this.initView();
         this.updateView();
@@ -80,7 +80,7 @@ export class OAVBase extends eui.Component implements IObjectAttributeView
     {
         toolTip.unregister(this.labelLab);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
         this.dispose();
     }
 
@@ -120,10 +120,10 @@ export class OAVBase extends eui.Component implements IObjectAttributeView
 
     set attributeValue(value: any)
     {
-        if (this._space[this._attributeName] != value)
+        if (this._space[this._attributeName] !== value)
         {
             this._space[this._attributeName] = value;
-            var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
+            const objectViewEvent = <any> new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
             objectViewEvent.space = this._space;
             objectViewEvent.attributeName = this._attributeName;
             objectViewEvent.attributeValue = this.attributeValue;

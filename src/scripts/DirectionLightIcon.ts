@@ -10,7 +10,7 @@ declare global
 @RegisterComponent()
 export class DirectionLightIcon extends EditorScript
 {
-    __class__: "editor.DirectionLightIcon";
+    __class__: 'editor.DirectionLightIcon';
 
     light: DirectionalLight;
 
@@ -21,20 +21,20 @@ export class DirectionLightIcon extends EditorScript
     init()
     {
         super.init();
-        watcher.watch(<DirectionLightIcon>this, "light", this.onLightChanged, this);
+        watcher.watch(this as DirectionLightIcon, 'light', this.onLightChanged, this);
         this.initicon();
-        this.on("mousedown", this.onMousedown, this);
+        this.on('mousedown', this.onMousedown, this);
     }
 
     initicon()
     {
         if (!this._editorCamera) return;
 
-        var linesize = 20;
+        const linesize = 20;
 
         {
             const lightIcon = this._lightIcon = new GameObject();
-            lightIcon.name = "DirectionLightIcon";
+            lightIcon.name = 'DirectionLightIcon';
             const billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = this.editorCamera;
             const meshRenderer = lightIcon.addComponent(MeshRenderer);
@@ -45,10 +45,10 @@ export class DirectionLightIcon extends EditorScript
             geometry.segmentsW = 1;
             geometry.yUp = false;
             const material = meshRenderer.material = new Material();
-            material.shaderName = "texture";
+            material.shaderName = 'texture';
             const uniforms = material.uniforms as TextureUniforms;
             const texture = uniforms.s_texture = new Texture2D();
-            texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/sun.png") };
+            texture.source = { url: EditorData.editorData.getEditorAssetPath('assets/3d/icons/sun.png') };
             texture.format = TextureFormat.RGBA;
             texture.premulAlpha = true;
             material.renderParams.enableBlend = true;
@@ -57,27 +57,27 @@ export class DirectionLightIcon extends EditorScript
         }
 
         //
-        var num = 10;
-        var segments: Segment[] = [];
-        for (var i = 0; i < num; i++)
+        let num = 10;
+        const segments: Segment[] = [];
+        for (let i = 0; i < num; i++)
         {
-            var angle = i * Math.PI * 2 / num;
-            var x = Math.sin(angle) * linesize;
-            var y = Math.cos(angle) * linesize;
+            const angle = i * Math.PI * 2 / num;
+            const x = Math.sin(angle) * linesize;
+            const y = Math.cos(angle) * linesize;
             const segment = new Segment();
             segment.start = new Vector3(x, y, 0);
             segment.end = new Vector3(x, y, linesize * 5);
             segments.push(segment);
         }
         num = 36;
-        for (var i = 0; i < num; i++)
+        for (let i = 0; i < num; i++)
         {
-            var angle = i * Math.PI * 2 / num;
-            var x = Math.sin(angle) * linesize;
-            var y = Math.cos(angle) * linesize;
-            var angle1 = (i + 1) * Math.PI * 2 / num;
-            var x1 = Math.sin(angle1) * linesize;
-            var y1 = Math.cos(angle1) * linesize;
+            const angle = i * Math.PI * 2 / num;
+            const x = Math.sin(angle) * linesize;
+            const y = Math.cos(angle) * linesize;
+            const angle1 = (i + 1) * Math.PI * 2 / num;
+            const x1 = Math.sin(angle1) * linesize;
+            const y1 = Math.cos(angle1) * linesize;
             const segment = new Segment();
             segment.start = new Vector3(x, y, 0);
             segment.end = new Vector3(x1, y1, 0);
@@ -85,7 +85,7 @@ export class DirectionLightIcon extends EditorScript
         }
         {
             const lightLines = this._lightLines = new GameObject();
-            lightLines.name = "Lines";
+            lightLines.name = 'Lines';
             lightLines.mouseEnabled = false;
             lightLines.hideFlags = HideFlags.Hide;
             const holdSizeComponent = lightLines.addComponent(HoldSizeComponent);
@@ -93,7 +93,7 @@ export class DirectionLightIcon extends EditorScript
             holdSizeComponent.holdSize = 0.005;
             const meshRenderer = lightLines.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "segment";
+            material.shaderName = 'segment';
             const uniforms = material.uniforms as SegmentUniforms;
             uniforms.u_segmentColor = new Color4(163 / 255, 162 / 255, 107 / 255);
             material.renderParams.renderMode = RenderMode.LINES;
@@ -110,7 +110,7 @@ export class DirectionLightIcon extends EditorScript
         if (!this.light) return;
 
         (this._textureMaterial.uniforms as TextureUniforms).u_color = this.light.color.toColor4() as any;
-        this._lightLines.activeSelf = EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1;
+        this._lightLines.activeSelf = EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) !== -1;
     }
 
     dispose()
@@ -133,12 +133,12 @@ export class DirectionLightIcon extends EditorScript
     {
         if (oldValue)
         {
-            oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            oldValue.off('scenetransformChanged', this.onScenetransformChanged, this);
         }
         if (newValue)
         {
             this.onScenetransformChanged();
-            newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
+            newValue.on('scenetransformChanged', this.onScenetransformChanged, this);
         }
     }
 
@@ -150,10 +150,10 @@ export class DirectionLightIcon extends EditorScript
     private onMousedown()
     {
         EditorData.editorData.selectObject(this.light.gameObject);
-        shortcut.activityState("selectInvalid");
+        shortcut.activityState('selectInvalid');
         ticker.once(100, () =>
         {
-            shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState('selectInvalid');
         });
     }
 }

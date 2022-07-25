@@ -18,14 +18,14 @@ export class EditorComponent extends Component
     }
     set scene(v)
     {
-        if (this._scene == v) return;
+        if (this._scene === v) return;
 
         if (this._scene)
         {
-            this.scene.off("addComponent", this._onAddComponent, this);
-            this.scene.off("removeComponent", this._onRemoveComponent, this);
+            this.scene.off('addComponent', this._onAddComponent, this);
+            this.scene.off('removeComponent', this._onRemoveComponent, this);
 
-            this.scene.getComponentsInChildren(Component).forEach(element =>
+            this.scene.getComponentsInChildren(Component).forEach((element) =>
             {
                 this._removeComponent(element);
             });
@@ -33,22 +33,22 @@ export class EditorComponent extends Component
         this._scene = v;
         if (this._scene)
         {
-            this.scene.getComponentsInChildren(Component).forEach(element =>
+            this.scene.getComponentsInChildren(Component).forEach((element) =>
             {
                 this._addComponent(element);
             });
 
-            this.scene.on("addComponent", this._onAddComponent, this);
-            this.scene.on("removeComponent", this._onRemoveComponent, this);
-            this.scene.on("addChild", this._onAddChild, this);
-            this.scene.on("removeChild", this._onRemoveChild, this);
+            this.scene.on('addComponent', this._onAddComponent, this);
+            this.scene.on('removeComponent', this._onRemoveComponent, this);
+            this.scene.on('addChild', this._onAddChild, this);
+            this.scene.on('removeChild', this._onRemoveChild, this);
         }
     }
 
-    private _scene: Scene
+    private _scene: Scene;
 
     get editorCamera() { return this._editorCamera; }
-    set editorCamera(v) { if (this._editorCamera == v) return; this._editorCamera = v; this.update(); }
+    set editorCamera(v) { if (this._editorCamera === v) return; this._editorCamera = v; this.update(); }
     private _editorCamera: Camera;
 
     /**
@@ -62,8 +62,8 @@ export class EditorComponent extends Component
 
     private _onAddChild(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
-        var components = event.data.child.getComponentsInChildren();
-        components.forEach(v =>
+        const components = event.data.child.getComponentsInChildren();
+        components.forEach((v) =>
         {
             this._addComponent(v);
         });
@@ -71,8 +71,8 @@ export class EditorComponent extends Component
 
     private _onRemoveChild(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
-        var components = event.data.child.getComponentsInChildren();
-        components.forEach(v =>
+        const components = event.data.child.getComponentsInChildren();
+        components.forEach((v) =>
         {
             this._removeComponent(v);
         });
@@ -90,19 +90,19 @@ export class EditorComponent extends Component
 
     private update()
     {
-        this.directionLightIconMap.forEach(v =>
+        this.directionLightIconMap.forEach((v) =>
         {
             v.editorCamera = this.editorCamera;
         });
-        this.pointLightIconMap.forEach(v =>
+        this.pointLightIconMap.forEach((v) =>
         {
             v.editorCamera = this.editorCamera;
         });
-        this.spotLightIconMap.forEach(v =>
+        this.spotLightIconMap.forEach((v) =>
         {
             v.editorCamera = this.editorCamera;
         });
-        this.cameraIconMap.forEach(v =>
+        this.cameraIconMap.forEach((v) =>
         {
             v.editorCamera = this.editorCamera;
         });
@@ -113,34 +113,37 @@ export class EditorComponent extends Component
         if (component instanceof DirectionalLight)
         {
             const gameobject = new GameObject();
-            gameobject.name = "DirectionLightIcon";
+            gameobject.name = 'DirectionLightIcon';
             const directionLightIcon = gameobject.addComponent(DirectionLightIcon);
             directionLightIcon.light = component;
             directionLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(directionLightIcon.gameObject);
             this.directionLightIconMap.set(component, directionLightIcon);
-        } else if (component instanceof PointLight)
+        }
+        else if (component instanceof PointLight)
         {
             const gameobject = new GameObject();
-            gameobject.name = "PointLightIcon";
+            gameobject.name = 'PointLightIcon';
             const pointLightIcon = gameobject.addComponent(PointLightIcon);
             pointLightIcon.light = component;
             pointLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(pointLightIcon.gameObject);
             this.pointLightIconMap.set(component, pointLightIcon);
-        } else if (component instanceof SpotLight)
+        }
+        else if (component instanceof SpotLight)
         {
             const gameobject = new GameObject();
-            gameobject.name = "SpotLightIcon";
+            gameobject.name = 'SpotLightIcon';
             const spotLightIcon = gameobject.addComponent(SpotLightIcon);
             spotLightIcon.light = component;
             spotLightIcon.editorCamera = this.editorCamera;
             this.gameObject.addChild(spotLightIcon.gameObject);
             this.spotLightIconMap.set(component, spotLightIcon);
-        } else if (component instanceof Camera)
+        }
+        else if (component instanceof Camera)
         {
             const gameobject = new GameObject();
-            gameobject.name = "CameraIcon";
+            gameobject.name = 'CameraIcon';
             const cameraIcon = gameobject.addComponent(CameraIcon);
             cameraIcon.camera = component;
             cameraIcon.editorCamera = this.editorCamera;
@@ -155,15 +158,18 @@ export class EditorComponent extends Component
         {
             serialization.setValue(this.directionLightIconMap.get(component), { light: null }).gameObject.remove();
             this.directionLightIconMap.delete(component);
-        } else if (component instanceof PointLight)
+        }
+        else if (component instanceof PointLight)
         {
             serialization.setValue(this.pointLightIconMap.get(component), { light: null }).gameObject.remove();
             this.pointLightIconMap.delete(component);
-        } else if (component instanceof SpotLight)
+        }
+        else if (component instanceof SpotLight)
         {
             serialization.setValue(this.spotLightIconMap.get(component), { light: null }).gameObject.remove();
             this.spotLightIconMap.delete(component);
-        } else if (component instanceof Camera)
+        }
+        else if (component instanceof Camera)
         {
             serialization.setValue(this.cameraIconMap.get(component), { camera: null }).gameObject.remove();
             this.cameraIconMap.delete(component);
@@ -174,5 +180,4 @@ export class EditorComponent extends Component
     private pointLightIconMap = new Map<PointLight, PointLightIcon>();
     private spotLightIconMap = new Map<SpotLight, SpotLightIcon>();
     private cameraIconMap = new Map<Camera, CameraIcon>();
-
 }

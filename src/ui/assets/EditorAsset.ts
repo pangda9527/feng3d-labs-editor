@@ -19,7 +19,7 @@ export class EditorAsset
     /**
      * 显示文件夹
      */
-    @watch("showFloderChanged")
+    @watch('showFloderChanged')
     showFloder: AssetNode;
 
     /**
@@ -29,12 +29,12 @@ export class EditorAsset
 
     constructor()
     {
-        globalEmitter.on("asset.parsed", this.onParsed, this);
+        globalEmitter.on('asset.parsed', this.onParsed, this);
     }
 
     /**
      * 初始化项目
-     * @param callback 
+     * @param callback
      */
     initproject(callback: () => void)
     {
@@ -43,17 +43,18 @@ export class EditorAsset
             this._assetIDMap = {};
             this._assetPathMap = {};
 
-            var allAssets = editorRS.getAllAssets();
-            allAssets.map(asset =>
+            const allAssets = editorRS.getAllAssets();
+            allAssets.map((asset) =>
             {
-                var node = new AssetNode(asset);
+                const node = new AssetNode(asset);
                 this.addAsset(node);
+
                 return node;
-            }).forEach(element =>
+            }).forEach((element) =>
             {
                 if (element.asset.parentAsset)
                 {
-                    var parentNode = this.getAssetByID(element.asset.parentAsset.assetId);
+                    const parentNode = this.getAssetByID(element.asset.parentAsset.assetId);
                     parentNode.addChild(element);
                 }
             });
@@ -67,15 +68,15 @@ export class EditorAsset
 
     /**
      * 添加新资源
-     * 
+     *
      * @param node 资源
      */
     addAsset(node: AssetNode)
     {
         if (this._assetIDMap[node.asset.assetId])
-            throw "添加重复资源！";
+        { throw '添加重复资源！'; }
         if (this._assetPathMap[node.asset.assetPath])
-            throw "添加重复资源！";
+        { throw '添加重复资源！'; }
 
         this._assetIDMap[node.asset.assetId] = node;
         this._assetPathMap[node.asset.assetPath] = node;
@@ -88,11 +89,12 @@ export class EditorAsset
             if (err)
             {
                 callback(err, null);
+
                 return;
             }
             editorRS.deserializeWithAssets(obj, (object: GameObject) =>
             {
-                var scene = object.getComponent(Scene);
+                const scene = object.getComponent(Scene);
                 callback(null, scene);
             });
         });
@@ -100,7 +102,7 @@ export class EditorAsset
 
     /**
      * 根据资源编号获取文件
-     * 
+     *
      * @param assetId 文件路径
      */
     getAssetByID(assetId: string)
@@ -110,7 +112,7 @@ export class EditorAsset
 
     /**
      * 根据资源路径获取文件
-     * 
+     *
      * @param path 资源路径
      */
     getAssetByPath(path: string)
@@ -120,7 +122,7 @@ export class EditorAsset
 
     /**
      * 删除资源
-     * 
+     *
      * @param assetNode 资源
      */
     deleteAsset(assetNode: AssetNode, callback?: (err: Error) => void)
@@ -130,12 +132,13 @@ export class EditorAsset
             if (err)
             {
                 callback && callback(err);
+
                 return;
             }
             delete this._assetIDMap[assetNode.asset.assetId];
             delete this._assetPathMap[assetNode.asset.assetPath];
 
-            globalEmitter.emit("asset.deletefile", { id: assetNode.asset.assetId });
+            globalEmitter.emit('asset.deletefile', { id: assetNode.asset.assetId });
 
             callback && callback(err);
         });
@@ -143,7 +146,7 @@ export class EditorAsset
 
     /**
      * 保存资源
-     * 
+     *
      * @param assetNode 资源
      * @param callback 完成回调
      */
@@ -158,7 +161,7 @@ export class EditorAsset
 
     /**
      * 新增资源
-     * 
+     *
      * @param cls 资源类定义
      * @param fileName 文件名称
      * @param value 初始数据
@@ -167,14 +170,14 @@ export class EditorAsset
      */
     createAsset<T extends FileAsset>(folderPath: string, cls: new () => T, fileName?: string, value?: gPartial<T>, callback?: (err: Error, assetNode: AssetNode) => void)
     {
-        var folderNode = this.getAssetByPath(folderPath);
+        const folderNode = this.getAssetByPath(folderPath);
 
-        var folder = <FolderAsset>folderNode.asset;
+        const folder = <FolderAsset>folderNode.asset;
         editorRS.createAsset(cls, fileName, value, folder, (err, asset) =>
         {
             if (asset)
             {
-                var assetNode = new AssetNode(asset);
+                const assetNode = new AssetNode(asset);
 
                 assetNode.isLoaded = true;
 
@@ -185,9 +188,10 @@ export class EditorAsset
                 EditorData.editorData.selectObject(assetNode);
 
                 callback && callback(null, assetNode);
-            } else
+            }
+            else
             {
-                alert(err.message);
+                console.warn(err.message);
             }
         });
     }
@@ -197,122 +201,122 @@ export class EditorAsset
      */
     popupmenu(assetNode: AssetNode)
     {
-        var folder = <FolderAsset>assetNode.asset;
+        const folder = <FolderAsset>assetNode.asset;
         // 资源所在文件夹
-        var folderPath = assetNode.asset.assetPath;
+        let folderPath = assetNode.asset.assetPath;
         if (!assetNode.isDirectory) folderPath = assetNode.parent.asset.assetPath;
 
-        var menuconfig: MenuItem[] =
-            [
+        const menuconfig: MenuItem[]
+            = [
                 {
-                    label: "Create",
+                    label: 'Create',
                     submenu: [
                         {
-                            label: "Folder", click: () =>
+                            label: 'Folder', click: () =>
                             {
-                                this.createAsset(folderPath, FolderAsset, "NewFolder")
+                                this.createAsset(folderPath, FolderAsset, 'NewFolder');
                             }
                         },
                         {
-                            label: "TS Script", click: () =>
+                            label: 'TS Script', click: () =>
                             {
-                                var fileName = editorRS.getValidChildName(folder, "NewScript");
+                                const fileName = editorRS.getValidChildName(folder, 'NewScript');
                                 this.createAsset(folderPath, ScriptAsset, fileName, { textContent: assetFileTemplates.getNewScript(fileName) }, () =>
                                 {
-                                    globalEmitter.emit("script.compile");
+                                    globalEmitter.emit('script.compile');
                                 });
                             }
                         },
                         {
-                            label: "Shader", click: () =>
+                            label: 'Shader', click: () =>
                             {
-                                var fileName = editorRS.getValidChildName(folder, "NewShader");
+                                const fileName = editorRS.getValidChildName(folder, 'NewShader');
                                 this.createAsset(folderPath, ShaderAsset, fileName, { textContent: assetFileTemplates.getNewShader(fileName) }, () =>
                                 {
-                                    globalEmitter.emit("script.compile");
+                                    globalEmitter.emit('script.compile');
                                 });
                             }
                         },
                         {
-                            label: "js", click: () =>
+                            label: 'js', click: () =>
                             {
-                                this.createAsset(folderPath, JSAsset, "NewJs");
+                                this.createAsset(folderPath, JSAsset, 'NewJs');
                             }
                         },
                         {
-                            label: "Json", click: () =>
+                            label: 'Json', click: () =>
                             {
-                                this.createAsset(folderPath, JsonAsset, "New Json", { textContent: "{}" });
+                                this.createAsset(folderPath, JsonAsset, 'New Json', { textContent: '{}' });
                             }
                         },
                         {
-                            label: "Txt", click: () =>
+                            label: 'Txt', click: () =>
                             {
-                                this.createAsset(folderPath, TextAsset, "New Text");
+                                this.createAsset(folderPath, TextAsset, 'New Text');
                             }
                         },
-                        { type: "separator" },
+                        { type: 'separator' },
                         {
-                            label: "立方体贴图", click: () =>
+                            label: '立方体贴图', click: () =>
                             {
-                                this.createAsset(folderPath, TextureCubeAsset, "new TextureCube", { data: <any>new TextureCube() });
-                            }
-                        },
-                        {
-                            label: "Material", click: () =>
-                            {
-                                this.createAsset(folderPath, MaterialAsset, "New Material", { data: <any>new Material() });
+                                this.createAsset(folderPath, TextureCubeAsset, 'new TextureCube', { data: new TextureCube() as any });
                             }
                         },
                         {
-                            label: "几何体",
+                            label: 'Material', click: () =>
+                            {
+                                this.createAsset(folderPath, MaterialAsset, 'New Material', { data: new Material() as any });
+                            }
+                        },
+                        {
+                            label: '几何体',
                             submenu: [
                                 {
-                                    label: "平面", click: () =>
+                                    label: '平面', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New PlaneGeometry", { data: new PlaneGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New PlaneGeometry', { data: new PlaneGeometry() });
                                     }
                                 },
                                 {
-                                    label: "立方体", click: () =>
+                                    label: '立方体', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New CubeGeometry", { data: new CubeGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New CubeGeometry', { data: new CubeGeometry() });
                                     }
                                 },
                                 {
-                                    label: "球体", click: () =>
+                                    label: '球体', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New SphereGeometry", { data: new SphereGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New SphereGeometry', { data: new SphereGeometry() });
                                     }
                                 },
                                 {
-                                    label: "胶囊体", click: () =>
+                                    label: '胶囊体', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New CapsuleGeometry", { data: new CapsuleGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New CapsuleGeometry', { data: new CapsuleGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆柱体", click: () =>
+                                    label: '圆柱体', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New CylinderGeometry", { data: new CylinderGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New CylinderGeometry', { data: new CylinderGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆锥体", click: () =>
+                                    label: '圆锥体', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New ConeGeometry", { data: new ConeGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New ConeGeometry', { data: new ConeGeometry() });
                                     }
                                 },
                                 {
-                                    label: "圆环", click: () =>
+                                    label: '圆环', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New TorusGeometry", { data: new TorusGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New TorusGeometry', { data: new TorusGeometry() });
                                     }
                                 },
                                 {
-                                    label: "线段", click: () =>
+                                    label: '线段', click: () =>
                                     {
-                                        this.createAsset(folderPath, GeometryAsset, "New SegmentGeometry", { data: new SegmentGeometry() });
+                                        this.createAsset(folderPath, GeometryAsset, 'New SegmentGeometry', { data: new SegmentGeometry() });
                                     }
                                 },
                                 // {
@@ -326,13 +330,13 @@ export class EditorAsset
                     ]
                 },
                 {
-                    label: "Show In Explorer", click: () =>
+                    label: 'Show In Explorer', click: () =>
                     {
-                        var fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
+                        const fullpath = editorRS.fs.getAbsolutePath(assetNode.asset.assetPath);
                         nativeAPI.showFileInExplorer(fullpath);
                     }, enable: !!nativeAPI
                 }, {
-                    label: "使用VSCode打开项目", click: () =>
+                    label: '使用VSCode打开项目', click: () =>
                     {
                         nativeAPI.openWithVSCode(editorRS.fs.projectname, (err) =>
                         {
@@ -341,34 +345,34 @@ export class EditorAsset
                     }, enable: !!nativeAPI,
                 },
                 {
-                    label: "Open", click: () =>
+                    label: 'Open', click: () =>
                     {
                         if (assetNode.asset instanceof TextAsset)
                         {
-                            globalEmitter.emit("openScript", <TextAsset>assetNode.asset);
+                            globalEmitter.emit('openScript', <TextAsset>assetNode.asset);
                         }
                     },
                 },
                 {
-                    label: "Delete", click: () =>
+                    label: 'Delete', click: () =>
                     {
                         assetNode.delete();
-                    }, enable: assetNode != this.rootFile && assetNode != this.showFloder,
+                    }, enable: assetNode !== this.rootFile && assetNode !== this.showFloder,
                 },
                 {
-                    label: "Rename",
+                    label: 'Rename',
                     click: () =>
                     {
-                        alert("未实现");
+                        console.warn('未实现');
                     }
                 },
-                { type: "separator" },
+                { type: 'separator' },
                 {
-                    label: "Import New Asset...", click: () =>
+                    label: 'Import New Asset...', click: () =>
                     {
                         editorRS.selectFile((fileList: FileList) =>
                         {
-                            var files = [];
+                            const files = [];
                             for (let i = 0; i < fileList.length; i++)
                             {
                                 files[i] = fileList[i];
@@ -378,7 +382,7 @@ export class EditorAsset
                     }, enable: assetNode.isDirectory,
                 },
                 {
-                    label: "Export Package...", click: () =>
+                    label: 'Export Package...', click: () =>
                     {
                         assetNode.export();
                     }, enable: !assetNode.isDirectory,
@@ -389,15 +393,15 @@ export class EditorAsset
         this.parserMenu(menuconfig, assetNode);
         menuconfig.push(
             {
-                label: "去除背景色", click: () =>
+                label: '去除背景色', click: () =>
                 {
-                    var image: HTMLImageElement = assetNode.asset["image"];
-                    var imageUtil = new ImageUtil().fromImage(image);
-                    var backColor = new Color4(222 / 255, 222 / 255, 222 / 255);
+                    const image: HTMLImageElement = assetNode.asset['image'];
+                    const imageUtil = new ImageUtil().fromImage(image);
+                    const backColor = new Color4(222 / 255, 222 / 255, 222 / 255);
                     imageUtil.clearBackColor(backColor);
                     dataTransform.imagedataToImage(imageUtil.imageData, 1, (img) =>
                     {
-                        assetNode.asset["image"] = img;
+                        assetNode.asset['image'] = img;
                         this.saveAsset(assetNode);
                     });
                 }, enable: assetNode.asset.data instanceof Texture2D,
@@ -408,64 +412,68 @@ export class EditorAsset
 
     /**
      * 保存对象
-     * 
+     *
      * @param object 对象
-     * @param callback 
+     * @param callback
      */
     saveObject(object: any, callback?: (file: AssetNode) => void)
     {
-        this.createAsset(this.showFloder.asset.assetPath, GameObjectAsset, object.name, { data: object }, (err, assetNode) =>
+        this.createAsset(this.showFloder.asset.assetPath, GameObjectAsset, object.name, { data: object }, (_err, assetNode) =>
         {
             callback && callback(assetNode);
         });
     }
 
     /**
-     * 
+     *
      * @param files 需要导入的文件列表
      * @param callback 完成回调
      * @param assetNodes 生成资源文件列表（不用赋值，函数递归时使用）
      */
     inputFiles(files: File[], callback?: (files: AssetNode[]) => void, assetNodes: AssetNode[] = [])
     {
-        if (files.length == 0)
+        if (files.length === 0)
         {
             EditorData.editorData.selectMultiObject(assetNodes);
             callback && callback(assetNodes);
+
             return;
         }
-        var file = files.shift();
-        var reader = new FileReader();
+        const file = files.shift();
+        const reader = new FileReader();
         reader.addEventListener('load', (event) =>
         {
-            var result: ArrayBuffer = <any>event.target["result"];
-            var showFloder = this.showFloder.asset.assetPath;
+            const result: ArrayBuffer = <any>event.target['result'];
+            const showFloder = this.showFloder.asset.assetPath;
 
-            var createAssetCallback = (err: Error, assetNode: AssetNode) =>
+            const createAssetCallback = (err: Error, assetNode: AssetNode) =>
             {
                 if (err)
                 {
-                    alert(err.message);
-                } else
+                    console.warn(err.message);
+                }
+                else
                 {
                     assetNodes.push(assetNode);
                 }
                 this.inputFiles(files, callback, assetNodes);
             };
 
-            var fileName = file.name;
+            const fileName = file.name;
             if (regExps.image.test(file.name))
             {
                 dataTransform.arrayBufferToImage(result, (img) =>
                 {
-                    var texture2D = new Texture2D();
-                    texture2D["_pixels"] = img;
+                    const texture2D = new Texture2D();
+                    texture2D['_pixels'] = img;
                     this.createAsset(showFloder, TextureAsset, fileName, { data: <any>texture2D }, createAssetCallback);
                 });
-            } else if (regExps.audio.test(file.name))
+            }
+            else if (regExps.audio.test(file.name))
             {
                 this.createAsset(showFloder, AudioAsset, fileName, { arraybuffer: <any>result }, createAssetCallback);
-            } else
+            }
+            else
             {
                 this.createAsset(showFloder, ArrayBufferAsset, fileName, { arraybuffer: <any>result }, createAssetCallback);
             }
@@ -475,20 +483,21 @@ export class EditorAsset
 
     runProjectScript(callback?: () => void)
     {
-        editorRS.fs.readString("project.js", (err, content) =>
+        editorRS.fs.readString('project.js', (_err, content) =>
         {
-            if (content != this._preProjectJsContent)
+            if (content !== this._preProjectJsContent)
             {
                 //
-                var windowEval = eval.bind(window);
+                // eslint-disable-next-line no-eval
+                const windowEval = eval.bind(window);
                 try
                 {
                     // 运行project.js
                     windowEval(content);
                     // 刷新属性界面（界面中可能有脚本）
-                    globalEmitter.emit("inspector.update");
-
-                } catch (error)
+                    globalEmitter.emit('inspector.update');
+                }
+                catch (error)
                 {
                     console.warn(error);
                 }
@@ -501,19 +510,20 @@ export class EditorAsset
     /**
      * 上次执行的项目脚本
      */
-    private _preProjectJsContent = null
+    private _preProjectJsContent = null;
 
     /**
      * 解析菜单
-     * @param menuconfig 菜单
+     * @param _menuconfig 菜单
      * @param assetNode 文件
      */
-    private parserMenu(menuconfig: MenuItem[], assetNode: AssetNode)
+    private parserMenu(_menuconfig: MenuItem[], assetNode: AssetNode)
     {
         if (assetNode.asset instanceof FileAsset)
         {
-            var filePath = assetNode.asset.assetPath;
-            var extensions = pathUtils.extname(filePath);
+            const filePath = assetNode.asset.assetPath;
+            const extensions = pathUtils.extname(filePath);
+            // eslint-disable-next-line no-empty
             switch (extensions)
             {
                 // case "mdl": menuconfig.push({ label: "解析", click: () => mdlLoader.load(filePath) }); break;
@@ -526,21 +536,20 @@ export class EditorAsset
         }
     }
 
-    private showFloderChanged(property, oldValue, newValue)
+    private showFloderChanged(_property, oldValue, newValue)
     {
         this.showFloder.openParents();
-        globalEmitter.emit("asset.showFloderChanged", { oldpath: oldValue, newpath: newValue });
+        globalEmitter.emit('asset.showFloderChanged', { oldpath: oldValue, newpath: newValue });
     }
 
     private onParsed(e: IEvent<any>)
     {
-        var data = e.data;
+        const data = e.data;
         if (data instanceof FileAsset)
         {
             this.saveObject(data.data);
         }
     }
 }
-
 
 export const editorAsset = new EditorAsset();

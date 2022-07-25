@@ -6,7 +6,7 @@ import { ModuleView } from '../components/TabView';
  */
 export class AnimationView extends eui.Component implements ModuleView
 {
-    static moduleName = "Animation";
+    static moduleName = 'Animation';
 
     moduleName: string;
 
@@ -14,7 +14,7 @@ export class AnimationView extends eui.Component implements ModuleView
     {
         super();
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "AnimationView";
+        this.skinName = 'AnimationView';
         this.moduleName = AnimationView.moduleName;
     }
 
@@ -31,7 +31,6 @@ export class AnimationView extends eui.Component implements ModuleView
 
     private onAddedToStage()
     {
-
         //
         this.updateView();
     }
@@ -45,7 +44,6 @@ export class AnimationView extends eui.Component implements ModuleView
     {
 
     }
-
 }
 
 Modules.moduleViewCls[AnimationView.moduleName] = AnimationView;

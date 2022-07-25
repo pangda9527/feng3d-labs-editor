@@ -35,7 +35,7 @@ export class OVTransform extends eui.Component implements IObjectView
 		this._space = <any>objectViewInfo.owner;
 
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "OVTransform";
+		this.skinName = 'OVTransform';
 	}
 
 	private onComplete()
@@ -53,31 +53,29 @@ export class OVTransform extends eui.Component implements IObjectView
 
 	private onAddedToStage()
 	{
-		this._space.on("transformChanged", this.updateView, this);
+		this._space.on('transformChanged', this.updateView, this);
 		//
 		this.updateView();
 
-		["x", "y", "z", "sx", "sy", "sz"].forEach(v =>
+		['x', 'y', 'z', 'sx', 'sy', 'sz'].forEach((v) =>
 		{
 			this.addBinder(new NumberTextInputBinder().init({
-				space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
-				controller: this[v + "Label"],
+				space: this.space, attribute: v, textInput: this[`${v}TextInput`], editable: true,
+				controller: this[`${v}Label`],
 			}));
 		});
-		["rx", "ry", "rz"].forEach(v =>
+		['rx', 'ry', 'rz'].forEach((v) =>
 		{
 			this.addBinder(new NumberTextInputBinder().init({
-				space: this.space, attribute: v, textInput: this[v + "TextInput"], editable: true,
-				controller: this[v + "Label"], step: 0.1,
+				space: this.space, attribute: v, textInput: this[`${v}TextInput`], editable: true,
+				controller: this[`${v}Label`], step: 0.1,
 			}));
 		});
-
-
 	}
 
 	private onRemovedFromStage()
 	{
-		this._space.off("transformChanged", this.updateView, this);
+		this._space.off('transformChanged', this.updateView, this);
 		//
 	}
 
@@ -89,19 +87,19 @@ export class OVTransform extends eui.Component implements IObjectView
 	set space(value)
 	{
 		if (this._space)
-			this._space.off("transformChanged", this.updateView, this);
+			{ this._space.off('transformChanged', this.updateView, this); }
 		this._space = value;
 		if (this._space)
-			this._space.on("transformChanged", this.updateView, this);
+			{ this._space.on('transformChanged', this.updateView, this); }
 		this.updateView();
 	}
 
-	getAttributeView(attributeName: String)
+	getAttributeView(_attributeName: String)
 	{
 		return null;
 	}
 
-	getblockView(blockName: String)
+	getblockView(_blockName: String)
 	{
 		return null;
 	}
@@ -110,8 +108,8 @@ export class OVTransform extends eui.Component implements IObjectView
 	 */
 	updateView(): void
 	{
-		var transform: Transform = <any>this.space;
+		const transform: Transform = <any> this.space;
 		if (!transform)
-			return;
+			{ return; }
 	}
 }

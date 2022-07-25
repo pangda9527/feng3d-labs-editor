@@ -31,7 +31,7 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 		this._space = blockViewInfo.owner;
 		this._blockName = blockViewInfo.name;
 		this.itemList = blockViewInfo.itemList;
-		this.skinName = "OBVDefault";
+		this.skinName = 'OBVDefault';
 	}
 
 	$onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -52,21 +52,22 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 
 	initView(): void
 	{
-		if (this._blockName != null && this._blockName.length > 0)
+		if (this._blockName && this._blockName.length > 0)
 		{
 			this.addChildAt(this.border, 0);
 			this.group.addChildAt(this.titleGroup, 0);
-		} else
+		}
+		else
 		{
 			this.removeChild(this.border);
 			this.group.removeChild(this.titleGroup);
 		}
 
 		this.attributeViews = [];
-		var objectAttributeInfos = this.itemList;
-		for (var i = 0; i < objectAttributeInfos.length; i++)
+		const objectAttributeInfos = this.itemList;
+		for (let i = 0; i < objectAttributeInfos.length; i++)
 		{
-			var displayObject = objectview.getAttributeView(objectAttributeInfos[i]);
+			const displayObject = objectview.getAttributeView(objectAttributeInfos[i]);
 			displayObject.percentWidth = 100;
 			displayObject.objectView = this.objectView;
 			displayObject.objectBlockView = this;
@@ -77,9 +78,9 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 
 	dispose()
 	{
-		for (var i = 0; i < this.attributeViews.length; i++)
+		for (let i = 0; i < this.attributeViews.length; i++)
 		{
-			var displayObject = this.attributeViews[i];
+			const displayObject = this.attributeViews[i];
 			displayObject.objectView = null;
 			displayObject.objectBlockView = null;
 			this.contentGroup.removeChild(displayObject);
@@ -95,7 +96,7 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 	set space(value: Object)
 	{
 		this._space = value;
-		for (var i = 0; i < this.attributeViews.length; i++)
+		for (let i = 0; i < this.attributeViews.length; i++)
 		{
 			this.attributeViews[i].space = this._space;
 		}
@@ -108,7 +109,7 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 
 	updateView(): void
 	{
-		for (var i = 0; i < this.attributeViews.length; i++)
+		for (let i = 0; i < this.attributeViews.length; i++)
 		{
 			this.attributeViews[i].updateView();
 		}
@@ -116,18 +117,19 @@ export class OBVDefault extends eui.Component implements IObjectBlockView
 
 	getAttributeView(attributeName: String)
 	{
-		for (var i = 0; i < this.attributeViews.length; i++)
+		for (let i = 0; i < this.attributeViews.length; i++)
 		{
-			if (this.attributeViews[i].attributeName == attributeName)
+			if (this.attributeViews[i].attributeName === attributeName)
 			{
 				return this.attributeViews[i];
 			}
 		}
+
 		return null;
 	}
 
 	private onTitleButtonClick()
 	{
-		this.currentState = this.currentState == "hide" ? "show" : "hide";
+		this.currentState = this.currentState === 'hide' ? 'show' : 'hide';
 	}
 }

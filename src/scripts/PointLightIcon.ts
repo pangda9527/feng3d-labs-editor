@@ -19,9 +19,9 @@ export class PointLightIcon extends EditorScript
     init()
     {
         super.init();
-        watcher.watch(<PointLightIcon>this, "light", this.onLightChanged, this);
-        this.initicon()
-        this.on("mousedown", this.onMousedown, this);
+        watcher.watch(this as PointLightIcon, 'light', this.onLightChanged, this);
+        this.initicon();
+        this.on('mousedown', this.onMousedown, this);
     }
 
     initicon()
@@ -29,7 +29,7 @@ export class PointLightIcon extends EditorScript
         if (!this._editorCamera) return;
 
         const lightIcon = this._lightIcon = new GameObject();
-        lightIcon.name = "PointLightIcon";
+        lightIcon.name = 'PointLightIcon';
         const billboardComponent = lightIcon.addComponent(BillboardComponent);
         billboardComponent.camera = this.editorCamera;
         const meshRenderer = lightIcon.addComponent(MeshRenderer);
@@ -40,10 +40,10 @@ export class PointLightIcon extends EditorScript
         geometry.segmentsH = 1;
         geometry.yUp = false;
         const material = meshRenderer.material = new Material();
-        material.shaderName = "texture";
+        material.shaderName = 'texture';
         const uniforms = material.uniforms as TextureUniforms;
-        const texture = uniforms.s_texture = new Texture2D()
-        texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/light.png") };
+        const texture = uniforms.s_texture = new Texture2D();
+        texture.source = { url: EditorData.editorData.getEditorAssetPath('assets/3d/icons/light.png') };
         texture.format = TextureFormat.RGBA;
         texture.premulAlpha = true;
         material.renderParams.enableBlend = true;
@@ -51,38 +51,38 @@ export class PointLightIcon extends EditorScript
         this.gameObject.addChild(lightIcon);
 
         //
-        var lightLines = this._lightLines = serialization.setValue(new GameObject(), {
-            name: "Lines", mouseEnabled: false, hideFlags: HideFlags.Hide,
+        const lightLines = this._lightLines = serialization.setValue(new GameObject(), {
+            name: 'Lines', mouseEnabled: false, hideFlags: HideFlags.Hide,
             components: [{
-                __class__: "feng3d.MeshRenderer", material: {
-                    __class__: "feng3d.Material",
-                    shaderName: "segment",
+                __class__: 'feng3d.MeshRenderer', material: {
+                    __class__: 'feng3d.Material',
+                    shaderName: 'segment',
                     uniforms: {
-                        u_segmentColor: { __class__: "feng3d.Color4", r: 1, g: 1, b: 1, a: 0.5 },
-                    }, renderParams: { renderMode: RenderMode.LINES, enableBlend: true, }
+                        u_segmentColor: { __class__: 'feng3d.Color4', r: 1, g: 1, b: 1, a: 0.5 },
+                    }, renderParams: { renderMode: RenderMode.LINES, enableBlend: true }
                 },
-                geometry: { __class__: "feng3d.SegmentGeometry" },
+                geometry: { __class__: 'feng3d.SegmentGeometry' },
             }]
         });
         this._segmentGeometry = <any>lightLines.getComponent(Renderable).geometry;
         this.gameObject.addChild(lightLines);
         //
-        var lightpoints = this._lightpoints = serialization.setValue(new GameObject(), {
-            name: "points", mouseEnabled: false, hideFlags: HideFlags.Hide,
+        const lightpoints = this._lightpoints = serialization.setValue(new GameObject(), {
+            name: 'points', mouseEnabled: false, hideFlags: HideFlags.Hide,
             components: [{
-                __class__: "feng3d.MeshRenderer",
+                __class__: 'feng3d.MeshRenderer',
                 geometry: {
-                    __class__: "feng3d.PointGeometry",
+                    __class__: 'feng3d.PointGeometry',
                     points: [
-                        { position: { __class__: "feng3d.Vector3", x: 1 }, color: { __class__: "feng3d.Color4", r: 1 } },
-                        { position: { __class__: "feng3d.Vector3", x: -1 }, color: { __class__: "feng3d.Color4", r: 1 } },
-                        { position: { __class__: "feng3d.Vector3", y: 1 }, color: { __class__: "feng3d.Color4", g: 1 } },
-                        { position: { __class__: "feng3d.Vector3", y: -1 }, color: { __class__: "feng3d.Color4", g: 1 } },
-                        { position: { __class__: "feng3d.Vector3", z: 1 }, color: { __class__: "feng3d.Color4", b: 1 } },
-                        { position: { __class__: "feng3d.Vector3", z: -1 }, color: { __class__: "feng3d.Color4", b: 1 } }],
+                        { position: { __class__: 'feng3d.Vector3', x: 1 }, color: { __class__: 'feng3d.Color4', r: 1 } },
+                        { position: { __class__: 'feng3d.Vector3', x: -1 }, color: { __class__: 'feng3d.Color4', r: 1 } },
+                        { position: { __class__: 'feng3d.Vector3', y: 1 }, color: { __class__: 'feng3d.Color4', g: 1 } },
+                        { position: { __class__: 'feng3d.Vector3', y: -1 }, color: { __class__: 'feng3d.Color4', g: 1 } },
+                        { position: { __class__: 'feng3d.Vector3', z: 1 }, color: { __class__: 'feng3d.Color4', b: 1 } },
+                        { position: { __class__: 'feng3d.Vector3', z: -1 }, color: { __class__: 'feng3d.Color4', b: 1 } }],
                 },
                 material: {
-                    __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { renderMode: RenderMode.POINTS, enableBlend: true, },
+                    __class__: 'feng3d.Material', shaderName: 'point', uniforms: { u_PointSize: 5 }, renderParams: { renderMode: RenderMode.POINTS, enableBlend: true },
                 },
             }],
         });
@@ -98,95 +98,96 @@ export class PointLightIcon extends EditorScript
         if (!this.editorCamera) return;
 
         (this._textureMaterial.uniforms as TextureUniforms).u_color = this.light.color.toColor4() as any;
-        this._lightLines.transform.scale =
-            this._lightpoints.transform.scale =
-            new Vector3(this.light.range, this.light.range, this.light.range);
+        this._lightLines.transform.scale
+            = this._lightpoints.transform.scale
+            = new Vector3(this.light.range, this.light.range, this.light.range);
 
-        if (EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
+        if (EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) !== -1)
         {
             //
-            var camerapos = this.gameObject.transform.worldToLocalPoint(this.editorCamera.gameObject.transform.worldPosition);
+            const camerapos = this.gameObject.transform.worldToLocalPoint(this.editorCamera.gameObject.transform.worldPosition);
             //
-            var segments: Segment[] = [];
-            var alpha = 1;
-            var backalpha = 0.5;
-            var num = 36;
-            var point0: Vector3;
-            var point1: Vector3;
-            for (var i = 0; i < num; i++)
+            const segments: Segment[] = [];
+            let alpha = 1;
+            const backalpha = 0.5;
+            const num = 36;
+            let point0: Vector3;
+            let point1: Vector3;
+            for (let i = 0; i < num; i++)
             {
-                var angle = i * Math.PI * 2 / num;
-                var x = Math.sin(angle);
-                var y = Math.cos(angle);
-                var angle1 = (i + 1) * Math.PI * 2 / num;
-                var x1 = Math.sin(angle1);
-                var y1 = Math.cos(angle1);
+                const angle = i * Math.PI * 2 / num;
+                const x = Math.sin(angle);
+                const y = Math.cos(angle);
+                const angle1 = (i + 1) * Math.PI * 2 / num;
+                const x1 = Math.sin(angle1);
+                const y1 = Math.cos(angle1);
                 //
                 point0 = new Vector3(0, x, y);
                 point1 = new Vector3(0, x1, y1);
                 if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
-                    alpha = backalpha;
+                { alpha = backalpha; }
                 else
-                    alpha = 1.0;
+                { alpha = 1.0; }
                 segments.push({ start: point0, end: point1, startColor: new Color4(1, 0, 0, alpha), endColor: new Color4(1, 0, 0, alpha) });
                 point0 = new Vector3(x, 0, y);
                 point1 = new Vector3(x1, 0, y1);
                 if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
-                    alpha = backalpha;
+                { alpha = backalpha; }
                 else
-                    alpha = 1.0;
+                { alpha = 1.0; }
                 segments.push({ start: point0, end: point1, startColor: new Color4(0, 1, 0, alpha), endColor: new Color4(0, 1, 0, alpha) });
                 point0 = new Vector3(x, y, 0);
                 point1 = new Vector3(x1, y1, 0);
                 if (point0.dot(camerapos) < 0 || point1.dot(camerapos) < 0)
-                    alpha = backalpha;
+                { alpha = backalpha; }
                 else
-                    alpha = 1.0;
+                { alpha = 1.0; }
                 segments.push({ start: point0, end: point1, startColor: new Color4(0, 0, 1, alpha), endColor: new Color4(0, 0, 1, alpha) });
             }
             this._segmentGeometry.segments = segments;
 
             this._pointGeometry.points = [];
-            var point = new Vector3(1, 0, 0);
+            let point = new Vector3(1, 0, 0);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
             point = new Vector3(-1, 0, 0);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(1, 0, 0, alpha) });
             point = new Vector3(0, 1, 0);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
             point = new Vector3(0, -1, 0);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(0, 1, 0, alpha) });
             point = new Vector3(0, 0, 1);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
             point = new Vector3(0, 0, -1);
             if (point.dot(camerapos) < 0)
-                alpha = backalpha;
+            { alpha = backalpha; }
             else
-                alpha = 1.0;
+            { alpha = 1.0; }
             this._pointGeometry.points.push({ position: point, color: new Color4(0, 0, 1, alpha) });
             //
             this._lightLines.activeSelf = true;
             this._lightpoints.activeSelf = true;
-        } else
+        }
+        else
         {
             this._lightLines.activeSelf = false;
             this._lightpoints.activeSelf = false;
@@ -220,12 +221,12 @@ export class PointLightIcon extends EditorScript
     {
         if (oldValue)
         {
-            oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            oldValue.off('scenetransformChanged', this.onScenetransformChanged, this);
         }
         if (newValue)
         {
             this.onScenetransformChanged();
-            newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
+            newValue.on('scenetransformChanged', this.onScenetransformChanged, this);
         }
     }
 
@@ -238,10 +239,10 @@ export class PointLightIcon extends EditorScript
     {
         EditorData.editorData.selectObject(this.light.gameObject);
         // 防止再次调用鼠标拾取
-        shortcut.activityState("selectInvalid");
+        shortcut.activityState('selectInvalid');
         ticker.once(100, () =>
         {
-            shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState('selectInvalid');
         });
     }
 }

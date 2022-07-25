@@ -1,4 +1,3 @@
-
 export class Accordion extends eui.Component implements eui.UIComponent
 {
 	public titleGroup: eui.Group;
@@ -8,7 +7,7 @@ export class Accordion extends eui.Component implements eui.UIComponent
 	/**
 	 * 标签名称
 	 */
-	titleName = "";
+	titleName = '';
 
 	private components: eui.Component[] = [];
 
@@ -16,24 +15,32 @@ export class Accordion extends eui.Component implements eui.UIComponent
 	{
 		super();
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "Accordion";
+		this.skinName = 'Accordion';
 	}
 
 	addContent(component: eui.Component)
 	{
 		if (!this.contentGroup)
+		{
 			this.components.push(component);
+		}
 		else
+		{
 			this.contentGroup.addChild(component);
+		}
 	}
 
 	removeContent(component: eui.Component)
 	{
-		var index = this.components ? this.components.indexOf(component) : -1;
-		if (index != -1)
+		const index = this.components ? this.components.indexOf(component) : -1;
+		if (index !== -1)
+		{
 			this.components.splice(index, 1);
+		}
 		else
+		{
 			component.parent && component.parent.removeChild(component);
+		}
 	}
 
 	protected onComplete()
@@ -53,7 +60,7 @@ export class Accordion extends eui.Component implements eui.UIComponent
 		this.titleLabel.text = this.titleName;
 		if (this.components)
 		{
-			for (var i = 0; i < this.components.length; i++)
+			for (let i = 0; i < this.components.length; i++)
 			{
 				this.contentGroup.addChild(this.components[i]);
 			}
@@ -69,6 +76,6 @@ export class Accordion extends eui.Component implements eui.UIComponent
 
 	private onTitleButtonClick()
 	{
-		this.currentState = this.currentState == "hide" ? "show" : "hide";
+		this.currentState = this.currentState === 'hide' ? 'show' : 'hide';
 	}
 }

@@ -6,44 +6,44 @@ export const shortcutConfig = [ //
 	//	command				[可选]	要执行的command的id；使用“,”连接触发多个命令；例如 “commandA,commandB”表示满足触发条件后依次执行commandA与commandB命令。
 	//	stateCommand		[可选]	要执行的状态命令id；使用“,”连接触发多个状态命令，没带“!”表示激活该状态，否则表示使其处于非激活状态；例如 “stateA,!stateB”表示满足触发条件后激活状态“stateA，使“stateB处于非激活状态。
 	//	when				[可选]	快捷键激活的条件；使用“+”连接多个状态，没带“!”表示需要处于激活状态，否则需要处于非激活状态； 例如 “stateA+!stateB”表示stateA处于激活状态且stateB处于非激活状态时会判断按键是否满足条件。
-	{ key: "alt+rightmousedown", command: "sceneCameraForwardBackMouseMoveStart", stateCommand: "sceneCameraForwardBackMouseMoving", when: "mouseInView3D+!fpsViewing" },
-	{ key: "mousemove", command: "sceneCameraForwardBackMouseMove", when: "sceneCameraForwardBackMouseMoving" },
-	{ key: "rightmouseup", command: "sceneCameraForwardBackMouseMoveEnd", stateCommand: "!sceneCameraForwardBackMouseMoving", when: "sceneCameraForwardBackMouseMoving" },
+	{ key: 'alt+rightmousedown', command: 'sceneCameraForwardBackMouseMoveStart', stateCommand: 'sceneCameraForwardBackMouseMoving', when: 'mouseInView3D+!fpsViewing' },
+	{ key: 'mousemove', command: 'sceneCameraForwardBackMouseMove', when: 'sceneCameraForwardBackMouseMoving' },
+	{ key: 'rightmouseup', command: 'sceneCameraForwardBackMouseMoveEnd', stateCommand: '!sceneCameraForwardBackMouseMoving', when: 'sceneCameraForwardBackMouseMoving' },
 	//
-	{ key: "rightmousedown", command: "fpsViewStart", stateCommand: "fpsViewing", when: "!sceneCameraForwardBackMouseMoving" },
-	{ key: "rightmouseup", command: "fpsViewStop", stateCommand: "!fpsViewing", when: "fpsViewing" },
+	{ key: 'rightmousedown', command: 'fpsViewStart', stateCommand: 'fpsViewing', when: '!sceneCameraForwardBackMouseMoving' },
+	{ key: 'rightmouseup', command: 'fpsViewStop', stateCommand: '!fpsViewing', when: 'fpsViewing' },
 	//
-	{ key: "alt+mousedown", command: "mouseRotateSceneStart", stateCommand: "mouseRotateSceneing", when: "mouseInView3D" },
-	{ key: "mousemove", command: "mouseRotateScene", when: "mouseRotateSceneing" },
-	{ key: "mouseup", command: "mouseRotateSceneEnd", stateCommand: "!mouseRotateSceneing", when: "mouseRotateSceneing" },
+	{ key: 'alt+mousedown', command: 'mouseRotateSceneStart', stateCommand: 'mouseRotateSceneing', when: 'mouseInView3D' },
+	{ key: 'mousemove', command: 'mouseRotateScene', when: 'mouseRotateSceneing' },
+	{ key: 'mouseup', command: 'mouseRotateSceneEnd', stateCommand: '!mouseRotateSceneing', when: 'mouseRotateSceneing' },
 	//
-	{ key: "middlemousedown", command: "dragSceneStart", stateCommand: "dragSceneing", when: "mouseInView3D" },
-	{ key: "mousemove", command: "dragScene", when: "dragSceneing" },
-	{ key: "middlemouseup", command: "dragSceneEnd", stateCommand: "!dragSceneing", when: "dragSceneing" },
+	{ key: 'middlemousedown', command: 'dragSceneStart', stateCommand: 'dragSceneing', when: 'mouseInView3D' },
+	{ key: 'mousemove', command: 'dragScene', when: 'dragSceneing' },
+	{ key: 'middlemouseup', command: 'dragSceneEnd', stateCommand: '!dragSceneing', when: 'dragSceneing' },
 	//
-	{ key: "wheel", command: "mouseWheelMoveSceneCamera", when: "mouseInView3D" },
+	{ key: 'wheel', command: 'mouseWheelMoveSceneCamera', when: 'mouseInView3D' },
 	//
-	{ key: "f", command: "lookToSelectedGameObject", when: "" },
-	{ key: "w", command: "gameobjectMoveTool", when: "!fpsViewing" },
-	{ key: "e", command: "gameobjectRotationTool", when: "!fpsViewing" },
-	{ key: "r", command: "gameobjectScaleTool", when: "!fpsViewing" },
+	{ key: 'f', command: 'lookToSelectedGameObject', when: '' },
+	{ key: 'w', command: 'gameobjectMoveTool', when: '!fpsViewing' },
+	{ key: 'e', command: 'gameobjectRotationTool', when: '!fpsViewing' },
+	{ key: 'r', command: 'gameobjectScaleTool', when: '!fpsViewing' },
 	//
-	{ key: "del", command: "deleteSeletedGameObject", when: "" },
+	{ key: 'del', command: 'deleteSeletedGameObject', when: '' },
 	//
-	{ key: "!alt+mousedown", stateCommand: "selecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
-	{ key: "mousemove", stateCommand: "!selecting", when: "selecting" },
-	{ key: "mouseup", command: "selectGameObject", stateCommand: "!selecting", when: "selecting" },
+	{ key: '!alt+mousedown', stateCommand: 'selecting', when: '!inModal+mouseInView3D+!splitGroupDraging' },
+	{ key: 'mousemove', stateCommand: '!selecting', when: 'selecting' },
+	{ key: 'mouseup', command: 'selectGameObject', stateCommand: '!selecting', when: 'selecting' },
 	//
-	{ key: "!alt+mousedown", command: "areaSelectStart", stateCommand: "areaSelecting", when: "!inModal+mouseInView3D+!splitGroupDraging" },
-	{ key: "mousemove", command: "areaSelect", when: "areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid" },
-	{ key: "mouseup", command: "areaSelectEnd", stateCommand: "!areaSelecting", when: "areaSelecting" },
+	{ key: '!alt+mousedown', command: 'areaSelectStart', stateCommand: 'areaSelecting', when: '!inModal+mouseInView3D+!splitGroupDraging' },
+	{ key: 'mousemove', command: 'areaSelect', when: 'areaSelecting+!mouseInSceneRotateTool+!inTransforming+!selectInvalid' },
+	{ key: 'mouseup', command: 'areaSelectEnd', stateCommand: '!areaSelecting', when: 'areaSelecting' },
 	//
-	{ key: "f12", command: "openDevTools", stateCommand: "", when: "" },
-	{ key: "f5", command: "refreshWindow", stateCommand: "", when: "" },
+	{ key: 'f12', command: 'openDevTools', stateCommand: '', when: '' },
+	{ key: 'f5', command: 'refreshWindow', stateCommand: '', when: '' },
 	//
-	{ key: "ctrl+c", command: "copy" },
-	{ key: "ctrl+v", command: "paste" },
-	{ key: "ctrl+z", command: "undo" },
+	{ key: 'ctrl+c', command: 'copy' },
+	{ key: 'ctrl+v', command: 'paste' },
+	{ key: 'ctrl+z', command: 'undo' },
 
 	// 可用命令
 	// - fpsViewStart						启动fps浏览场景
@@ -95,4 +95,4 @@ export const shortcutConfig = [ //
 	// - mouseover
 	// - mouseout
 	// - mousewheel
-]
+];

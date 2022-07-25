@@ -1,25 +1,19 @@
-
+/**
+ * 是否支持本地API
+ */
+export const supportNative = !(typeof __dirname === 'undefined');
 
 /**
  * 本地文件系统
  */
-export var nativeFS: NativeFSBase;
+// eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+export const nativeFS: NativeFSBase = supportNative ? (require(`${__dirname}/native/NativeFSBase.js`).nativeFS) : null;
 
 /**
  * 本地API
  */
-export var nativeAPI: NativeAPI;
-
-/**
- * 是否支持本地API
- */
-export var supportNative = !(typeof __dirname == "undefined");
-
-if (supportNative)
-{
-    nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
-    nativeAPI = require(__dirname + "/native/electron_renderer.js");
-}
+// eslint-disable-next-line global-require
+export const nativeAPI: NativeAPI = supportNative ? (require(`${__dirname}/native/electron_renderer.js`)) : null;
 
 /**
  * 本地API
@@ -28,21 +22,21 @@ export interface NativeAPI
 {
     /**
      * 选择文件夹对话框
-     * 
+     *
      * @param callback 完成回调
      */
     selectDirectoryDialog(callback: (event: Event, path: string) => void): void;
 
     /**
      * 在资源管理器中显示
-     * 
+     *
      * @param fullPath 完整路径
      */
     showFileInExplorer(fullPath: string): void;
 
     /**
      * 使用 VSCode 打开项目
-     * 
+     *
      * @param  projectPath 项目路径
      */
     openWithVSCode(projectPath: string, callback: (err: Error) => void): void;

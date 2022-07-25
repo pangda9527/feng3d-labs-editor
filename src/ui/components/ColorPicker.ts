@@ -18,7 +18,8 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
             if (this._value instanceof Color3)
             {
                 this.picker.fillColor = this._value.toInt();
-            } else 
+            }
+            else
             {
                 this.picker.fillColor = this._value.toColor3().toInt();
             }
@@ -30,7 +31,7 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
     {
         super();
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "ColorPicker";
+        this.skinName = 'ColorPicker';
     }
 
     private onComplete()
@@ -58,7 +59,7 @@ export class ColorPicker extends eui.Component implements eui.UIComponent
     {
         if (!ColorPickerView.colorPickerView) ColorPickerView.colorPickerView = new ColorPickerView();
         ColorPickerView.colorPickerView.color = this.value;
-        var pos = this.localToGlobal(0, 0);
+        const pos = this.localToGlobal(0, 0);
         // pos.x = pos.x - colorPickerView.width;
         pos.x = pos.x - 318;
         ColorPickerView.colorPickerView.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);

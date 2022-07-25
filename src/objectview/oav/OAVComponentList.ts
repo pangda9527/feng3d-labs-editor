@@ -17,7 +17,7 @@ export class OAVComponentList extends OAVBase
 	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
-		this.skinName = "OAVComponentListSkin";
+		this.skinName = 'OAVComponentListSkin';
 	}
 
 	private onAddComponentButtonClick()
@@ -49,7 +49,7 @@ export class OAVComponentList extends OAVBase
 
 	set attributeValue(value: Object)
 	{
-		if (this._space[this._attributeName] != value)
+		if (this._space[this._attributeName] !== value)
 		{
 			this._space[this._attributeName] = value;
 		}
@@ -58,19 +58,19 @@ export class OAVComponentList extends OAVBase
 
 	initView(): void
 	{
-		(<eui.VerticalLayout>this.group.layout).gap = -1;
+		(this.group.layout as eui.VerticalLayout).gap = -1;
 
-		var components = <any>this.attributeValue;
-		for (var i = 0; i < components.length; i++)
+		const components: Component[] = this.attributeValue as any;
+		for (let i = 0; i < components.length; i++)
 		{
 			this.addComponentView(components[i]);
 		}
-		this.space.on("addComponent", this.onAddCompont, this);
-		this.space.on("removeComponent", this.onRemoveComponent, this);
+		this.space.on('addComponent', this.onAddCompont, this);
+		this.space.on('removeComponent', this.onRemoveComponent, this);
 
-		drag.register(this.addComponentButton, null, ["file_script"], (dragdata) =>
+		drag.register(this.addComponentButton, null, ['file_script'], (dragdata) =>
 		{
-			dragdata.getDragData("file_script").forEach(v =>
+			dragdata.getDragData('file_script').forEach((v) =>
 			{
 				this.space.addScript(v.scriptName);
 			});
@@ -81,14 +81,14 @@ export class OAVComponentList extends OAVBase
 
 	dispose()
 	{
-		var components = <any>this.attributeValue;
-		for (var i = 0; i < components.length; i++)
+		const components: Component[] = this.attributeValue as any;
+		for (let i = 0; i < components.length; i++)
 		{
 			this.removedComponentView(components[i]);
 		}
 
-		this.space.off("addComponent", this.onAddCompont, this);
-		this.space.off("removeComponent", this.onRemoveComponent, this);
+		this.space.off('addComponent', this.onAddCompont, this);
+		this.space.off('removeComponent', this.onRemoveComponent, this);
 
 		drag.unregister(this.addComponentButton);
 
@@ -98,9 +98,11 @@ export class OAVComponentList extends OAVBase
 	private addComponentView(component: Components)
 	{
 		if (component.hideFlags & HideFlags.HideInInspector)
+		{
 			return;
+		}
 
-		var displayObject = new ComponentView(component);
+		const displayObject = new ComponentView(component);
 		displayObject.percentWidth = 100;
 		this.group.addChild(displayObject);
 	}
@@ -110,20 +112,22 @@ export class OAVComponentList extends OAVBase
 	 */
 	updateView(): void
 	{
-		for (var i = 0, n = this.group.numChildren; i < n; i++)
+		for (let i = 0, n = this.group.numChildren; i < n; i++)
 		{
-			var child = this.group.getChildAt(i)
+			const child = this.group.getChildAt(i);
 			if (child instanceof ComponentView)
+			{
 				child.updateView();
+			}
 		}
 	}
 
 	private removedComponentView(component: Components)
 	{
-		for (var i = this.group.numChildren - 1; i >= 0; i--)
+		for (let i = this.group.numChildren - 1; i >= 0; i--)
 		{
-			var displayObject = this.group.getChildAt(i);
-			if (displayObject instanceof ComponentView && displayObject.component == component)
+			const displayObject = this.group.getChildAt(i);
+			if (displayObject instanceof ComponentView && displayObject.component === component)
 			{
 				this.group.removeChild(displayObject);
 			}
@@ -132,13 +136,17 @@ export class OAVComponentList extends OAVBase
 
 	private onAddCompont(event: IEvent<{ gameobject: GameObject; component: Component; }>)
 	{
-		if (event.data.component.gameObject == this.space)
+		if (event.data.component.gameObject === this.space)
+		{
 			this.addComponentView(event.data.component);
+		}
 	}
 
 	private onRemoveComponent(event: IEvent<{ gameobject: GameObject; component: Component; }>)
 	{
-		if (event.data.component.gameObject == this.space)
+		if (event.data.component.gameObject === this.space)
+		{
 			this.removedComponentView(event.data.component);
+		}
 	}
 }

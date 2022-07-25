@@ -43,10 +43,10 @@ export class EditorData
 
     set selectedObjects(v)
     {
-        v = v.filter(v => !!v);
+        v = v.filter((v) => !!v);
         if (!v) v = [];
-        if (v == this._selectedObjects) return;
-        if (v.length == this.selectedObjects.length && ArrayUtils.unique(v.concat(this._selectedObjects)).length == v.length) return;
+        if (v === this._selectedObjects) return;
+        if (v.length === this.selectedObjects.length && ArrayUtils.unique(v.concat(this._selectedObjects)).length === v.length) return;
 
         this._selectedObjects = v;
 
@@ -55,7 +55,7 @@ export class EditorData
         this._transformGameObjectInvalid = true;
         this._transformBoxInvalid = true;
 
-        globalEmitter.emit("editor.selectedObjectsChanged");
+        globalEmitter.emit('editor.selectedObjectsChanged');
     }
     private _selectedObjects = [];
 
@@ -76,13 +76,13 @@ export class EditorData
      */
     selectObject(object: any)
     {
-        var selecteds = this.selectedObjects.concat();
+        const selecteds = this.selectedObjects.concat();
 
-        var isAdd = shortcut.keyState.getKeyState("ctrl");
+        const isAdd = shortcut.keyState.getKeyState('ctrl');
         if (!isAdd) selecteds.length = 0;
         //
-        var index = selecteds.indexOf(object);
-        if (index == -1) selecteds.push(object);
+        const index = selecteds.indexOf(object);
+        if (index === -1) selecteds.push(object);
         else selecteds.splice(index, 1);
         //
         this.selectedObjects = selecteds;
@@ -95,18 +95,18 @@ export class EditorData
      */
     selectMultiObject(objs: (GameObject | AssetNode)[], isAdd?: boolean)
     {
-        var selecteds = this.selectedObjects.concat();
+        const selecteds = this.selectedObjects.concat();
 
         if (isAdd === undefined)
         {
-            isAdd = shortcut.keyState.getKeyState("ctrl");
+            isAdd = shortcut.keyState.getKeyState('ctrl');
         }
         if (!isAdd) selecteds.length = 0;
         //
-        objs.forEach(v =>
+        objs.forEach((v) =>
         {
-            var index = selecteds.indexOf(v);
-            if (index == -1) selecteds.push(v);
+            const index = selecteds.indexOf(v);
+            if (index === -1) selecteds.push(v);
             else selecteds.splice(index, 1);
         });
         //
@@ -122,9 +122,9 @@ export class EditorData
     }
     set toolType(v)
     {
-        if (this._toolType == v) return;
+        if (this._toolType === v) return;
         this._toolType = v;
-        globalEmitter.emit("editor.toolTypeChanged");
+        globalEmitter.emit('editor.toolTypeChanged');
     }
 
     private _toolType = MRSToolType.MOVE;
@@ -137,13 +137,14 @@ export class EditorData
         if (this._selectedGameObjectsInvalid)
         {
             this._selectedGameObjects.length = 0;
-            this.selectedObjects.forEach(v =>
+            this.selectedObjects.forEach((v) =>
             {
                 if (v instanceof GameObject) this._selectedGameObjects.push(v);
             });
 
             this._selectedGameObjectsInvalid = false;
         }
+
         return this._selectedGameObjects;
     }
     private _selectedGameObjects: GameObject[] = [];
@@ -158,10 +159,10 @@ export class EditorData
     }
     set isBaryCenter(v)
     {
-        if (this._isBaryCenter == v) return;
+        if (this._isBaryCenter === v) return;
         this._isBaryCenter = v;
         this._transformBoxInvalid = true;
-        globalEmitter.emit("editor.isBaryCenterChanged");
+        globalEmitter.emit('editor.isBaryCenterChanged');
     }
     private _isBaryCenter = true;
 
@@ -174,9 +175,9 @@ export class EditorData
     }
     set isWoldCoordinate(v)
     {
-        if (this._isWoldCoordinate == v) return;
+        if (this._isWoldCoordinate === v) return;
         this._isWoldCoordinate = v;
-        globalEmitter.emit("editor.isWoldCoordinateChanged");
+        globalEmitter.emit('editor.isWoldCoordinateChanged');
     }
     private _isWoldCoordinate = false;
 
@@ -187,13 +188,18 @@ export class EditorData
     {
         if (this._transformGameObjectInvalid)
         {
-            var length = this.selectedGameObjects.length;
+            const length = this.selectedGameObjects.length;
             if (length > 0)
+            {
                 this._transformGameObject = this.selectedGameObjects[length - 1];
+            }
             else
+            {
                 this._transformGameObject = null;
+            }
             this._transformGameObjectInvalid = false;
         }
+
         return this._transformGameObject;
     }
     private _transformGameObject: GameObject;
@@ -203,17 +209,18 @@ export class EditorData
     {
         if (this._transformBoxInvalid)
         {
-            var length = this.selectedGameObjects.length;
+            const length = this.selectedGameObjects.length;
             if (length > 0)
             {
                 this._transformBox = null;
-                this.selectedGameObjects.forEach(cv =>
+                this.selectedGameObjects.forEach((cv) =>
                 {
-                    var box = cv.boundingBox.worldBounds;
-                    if (EditorData.editorData.isBaryCenter || this._transformBox == null)
+                    const box = cv.boundingBox.worldBounds;
+                    if (EditorData.editorData.isBaryCenter || !this._transformBox)
                     {
                         this._transformBox = box.clone();
-                    } else
+                    }
+                    else
                     {
                         this._transformBox.union(box);
                     }
@@ -225,6 +232,7 @@ export class EditorData
             }
             this._transformBoxInvalid = false;
         }
+
         return this._transformBox;
     }
     private _transformBox: Box3;
@@ -238,12 +246,13 @@ export class EditorData
         if (this._selectedAssetFileInvalid)
         {
             this._selectedAssetNodes.length = 0;
-            this.selectedObjects.forEach(v =>
+            this.selectedObjects.forEach((v) =>
             {
                 if (v instanceof AssetNode) this._selectedAssetNodes.push(v);
             });
             this._selectedAssetFileInvalid = false;
         }
+
         return this._selectedAssetNodes;
     }
     private _selectedAssetFileInvalid = true;
@@ -265,6 +274,6 @@ export class EditorData
      */
     getEditorAssetPath(url: string)
     {
-        return document.URL.substring(0, document.URL.lastIndexOf("/") + 1) + "resource/" + url;
+        return `${document.URL.substring(0, document.URL.lastIndexOf('/') + 1)}resource/${url}`;
     }
 }

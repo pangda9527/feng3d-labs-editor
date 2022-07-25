@@ -15,12 +15,12 @@ export class OVBaseDefault extends eui.Component implements IObjectView
 	{
 		super();
 		this._space = objectViewInfo.owner;
-		this.skinName = "OVBaseDefault";
+		this.skinName = 'OVBaseDefault';
 	}
 
 	$onAddToStage(stage: egret.Stage, nestLevel: number)
 	{
-		super.$onAddToStage(stage, nestLevel)
+		super.$onAddToStage(stage, nestLevel);
 		this.updateView();
 	}
 
@@ -35,12 +35,12 @@ export class OVBaseDefault extends eui.Component implements IObjectView
 		this.updateView();
 	}
 
-	getAttributeView(attributeName: String)
+	getAttributeView(_attributeName: String)
 	{
 		return null;
 	}
 
-	getblockView(blockName: String)
+	getblockView(_blockName: String)
 	{
 		return null;
 	}
@@ -52,17 +52,18 @@ export class OVBaseDefault extends eui.Component implements IObjectView
 	{
 		this.image.visible = false;
 		this.label.visible = true;
-		var value = this._space;
-		if (typeof value == "string" && value.indexOf("data:") == 0)
+		const value = this._space;
+		if (typeof value === 'string' && value.indexOf('data:') === 0)
 		{
 			this.image.visible = true;
 			this.label.visible = false;
 			this.image.source = value;
-		} else
+		}
+		else
 		{
-			var string = String(value);
+			let string = String(value);
 			if (string.length > 1000)
-				string = string.substr(0, 1000) + "\n......."
+			{ string = `${string.substr(0, 1000)}\n.......`; }
 			this.label.text = string;
 		}
 	}

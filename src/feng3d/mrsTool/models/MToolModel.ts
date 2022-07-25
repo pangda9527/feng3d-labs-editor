@@ -35,47 +35,47 @@ export class MToolModel extends Component
     init()
     {
         super.init();
-        this.gameObject.name = "GameObjectMoveModel";
+        this.gameObject.name = 'GameObjectMoveModel';
         this.initModels();
     }
 
     private initModels()
     {
-        this.xAxis = serialization.setValue(new GameObject(), { name: "xAxis" }).addComponent(CoordinateAxis);
+        this.xAxis = serialization.setValue(new GameObject(), { name: 'xAxis' }).addComponent(CoordinateAxis);
         this.xAxis.color.setTo(1, 0, 0, 1);
         this.xAxis.transform.rz = -90;
         this.gameObject.addChild(this.xAxis.gameObject);
 
-        this.yAxis = serialization.setValue(new GameObject(), { name: "yAxis" }).addComponent(CoordinateAxis);
+        this.yAxis = serialization.setValue(new GameObject(), { name: 'yAxis' }).addComponent(CoordinateAxis);
         this.yAxis.color.setTo(0, 1, 0, 1);
         this.gameObject.addChild(this.yAxis.gameObject);
 
-        this.zAxis = serialization.setValue(new GameObject(), { name: "zAxis" }).addComponent(CoordinateAxis);
+        this.zAxis = serialization.setValue(new GameObject(), { name: 'zAxis' }).addComponent(CoordinateAxis);
         this.zAxis.color.setTo(0, 0, 1, 1);
         this.zAxis.transform.rx = 90;
         this.gameObject.addChild(this.zAxis.gameObject);
 
-        this.yzPlane = serialization.setValue(new GameObject(), { name: "yzPlane" }).addComponent(CoordinatePlane);
+        this.yzPlane = serialization.setValue(new GameObject(), { name: 'yzPlane' }).addComponent(CoordinatePlane);
         this.yzPlane.color.setTo(1, 0, 0, 0.2);
         this.yzPlane.selectedColor.setTo(1, 0, 0, 0.5);
         this.yzPlane.borderColor.setTo(1, 0, 0, 1);
         this.yzPlane.transform.rz = 90;
         this.gameObject.addChild(this.yzPlane.gameObject);
 
-        this.xzPlane = serialization.setValue(new GameObject(), { name: "xzPlane" }).addComponent(CoordinatePlane);
+        this.xzPlane = serialization.setValue(new GameObject(), { name: 'xzPlane' }).addComponent(CoordinatePlane);
         this.xzPlane.color.setTo(0, 1, 0, 0.2);
         this.xzPlane.selectedColor.setTo(0, 1, 0, 0.5);
         this.xzPlane.borderColor.setTo(0, 1, 0, 1);
         this.gameObject.addChild(this.xzPlane.gameObject);
 
-        this.xyPlane = serialization.setValue(new GameObject(), { name: "xyPlane" }).addComponent(CoordinatePlane);
+        this.xyPlane = serialization.setValue(new GameObject(), { name: 'xyPlane' }).addComponent(CoordinatePlane);
         this.xyPlane.color.setTo(0, 0, 1, 0.2);
         this.xyPlane.selectedColor.setTo(0, 0, 1, 0.5);
         this.xyPlane.borderColor.setTo(0, 0, 1, 1);
         this.xyPlane.transform.rx = -90;
         this.gameObject.addChild(this.xyPlane.gameObject);
 
-        this.oCube = serialization.setValue(new GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+        this.oCube = serialization.setValue(new GameObject(), { name: 'oCube' }).addComponent(CoordinateCube);
         this.gameObject.addChild(this.oCube.gameObject);
     }
 }
@@ -89,9 +89,9 @@ export class CoordinateAxis extends Component
 
     private xArrow: GameObject;
 
-    readonly color = new Color4(1, 0, 0, 0.99)
+    readonly color = new Color4(1, 0, 0, 0.99);
     private selectedColor = new Color4(1, 1, 0, 0.99);
-    private length: number = 100;
+    private length = 100;
 
     //
     selected = false;
@@ -100,27 +100,27 @@ export class CoordinateAxis extends Component
     {
         super.init();
 
-        watcher.watch(<CoordinateAxis>this, "selected", this.update, this);
+        watcher.watch(<CoordinateAxis> this, 'selected', this.update, this);
 
-        var xLine = new GameObject();
-        var model = xLine.addComponent(Renderable);
-        var segmentGeometry = model.geometry = new SegmentGeometry();
+        const xLine = new GameObject();
+        let model = xLine.addComponent(Renderable);
+        const segmentGeometry = model.geometry = new SegmentGeometry();
         segmentGeometry.addSegment({ start: new Vector3(), end: new Vector3(0, this.length, 0) });
-        this.segmentMaterial = model.material = Material.create("segment");
+        this.segmentMaterial = model.material = Material.create('segment');
         this.gameObject.addChild(xLine);
         //
         this.xArrow = new GameObject();
         model = this.xArrow.addComponent(Renderable);
         model.geometry = serialization.setValue(new ConeGeometry(), { bottomRadius: 5, height: 18 });
-        this.material = model.material = serialization.setValue(new Material(), { shaderName: "color" });
+        this.material = model.material = serialization.setValue(new Material(), { shaderName: 'color' });
         this.material.renderParams.enableBlend = true;
         this.xArrow.transform.y = this.length;
         this.gameObject.addChild(this.xArrow);
 
-        var mouseHit = serialization.setValue(new GameObject(), { name: "hitCoordinateAxis" });
+        const mouseHit = serialization.setValue(new GameObject(), { name: 'hitCoordinateAxis' });
         model = mouseHit.addComponent(Renderable);
         model.geometry = serialization.setValue(new CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length });
-        model.material = Material.create("color");
+        model.material = Material.create('color');
         mouseHit.transform.y = 20 + (this.length - 20) / 2;
         mouseHit.activeSelf = false;
         mouseHit.mouseEnabled = true;
@@ -133,10 +133,10 @@ export class CoordinateAxis extends Component
     update()
     {
         if (!this.isinit) return;
-        var color = this.selected ? this.selectedColor : this.color;
-        (<SegmentUniforms>this.segmentMaterial.uniforms).u_segmentColor = color;
+        const color = this.selected ? this.selectedColor : this.color;
+        (<SegmentUniforms> this.segmentMaterial.uniforms).u_segmentColor = color;
         //
-        (<ColorUniforms>this.material.uniforms).u_diffuseInput = color;
+        (<ColorUniforms> this.material.uniforms).u_diffuseInput = color;
     }
 }
 
@@ -156,13 +156,13 @@ export class CoordinateCube extends Component
     {
         super.init();
 
-        watcher.watch(<CoordinateCube>this, "selected", this.update, this);
+        watcher.watch(<CoordinateCube> this, 'selected', this.update, this);
 
         //
         this.oCube = new GameObject();
-        var model = this.oCube.addComponent(Renderable)
+        const model = this.oCube.addComponent(Renderable);
         model.geometry = serialization.setValue(new CubeGeometry(), { width: 8, height: 8, depth: 8 });
-        this.colorMaterial = model.material = Material.create("color");
+        this.colorMaterial = model.material = Material.create('color');
         this.colorMaterial.renderParams.enableBlend = true;
         this.oCube.mouseEnabled = true;
         this.gameObject.addChild(this.oCube);
@@ -174,7 +174,7 @@ export class CoordinateCube extends Component
     update()
     {
         if (!this.isinit) return;
-        (<ColorUniforms>this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
+        (<ColorUniforms> this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
     }
 }
 
@@ -193,30 +193,30 @@ export class CoordinatePlane extends Component
 
     //
     get width() { return this._width; }
-    private _width = 20
+    private _width = 20;
     //
     selected = false;
 
     init()
     {
         super.init();
-        watcher.watch(<CoordinatePlane>this, "selected", this.update, this);
+        watcher.watch(<CoordinatePlane> this, 'selected', this.update, this);
 
-        var plane = serialization.setValue(new GameObject(), { name: "plane" });
-        var model = plane.addComponent(Renderable);
+        const plane = serialization.setValue(new GameObject(), { name: 'plane' });
+        let model = plane.addComponent(Renderable);
         plane.transform.x = plane.transform.z = this._width / 2;
         model.geometry = serialization.setValue(new PlaneGeometry(), { width: this._width, height: this._width });
-        this.colorMaterial = model.material = Material.create("color");
+        this.colorMaterial = model.material = Material.create('color');
         this.colorMaterial.renderParams.cullFace = CullFace.NONE;
         this.colorMaterial.renderParams.enableBlend = true;
         plane.mouseEnabled = true;
         this.gameObject.addChild(plane);
 
-        var border = serialization.setValue(new GameObject(), { name: "border" });
+        const border = serialization.setValue(new GameObject(), { name: 'border' });
         model = border.addComponent(Renderable);
         this.segmentGeometry = model.geometry = new SegmentGeometry();
         model.material = Material.create(
-            "segment",
+            'segment',
             { u_segmentColor: new Color4(1, 1, 1, 0.99) },
         );
         this.gameObject.addChild(border);
@@ -229,9 +229,9 @@ export class CoordinatePlane extends Component
     {
         if (!this.isinit) return;
 
-        (<ColorUniforms>this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
+        (<ColorUniforms> this.colorMaterial.uniforms).u_diffuseInput = this.selected ? this.selectedColor : this.color;
 
-        var color = this.selected ? this.selectedborderColor : this.borderColor;
+        let color = this.selected ? this.selectedborderColor : this.borderColor;
         this.segmentGeometry.segments = [{ start: new Vector3(0, 0, 0), end: new Vector3(this._width, 0, 0), startColor: color, endColor: color }];
 
         color = this.selected ? this.selectedborderColor : this.borderColor;

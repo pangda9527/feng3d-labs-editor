@@ -43,7 +43,7 @@ export class OAVVector2 extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVVector2";
+        this.skinName = 'OAVVector2';
     }
 
     initView()
@@ -51,11 +51,11 @@ export class OAVVector2 extends OAVBase
         super.initView();
 
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'x', textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
             controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'y', textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
             controller: this.yLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
     }

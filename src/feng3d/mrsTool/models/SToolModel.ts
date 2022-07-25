@@ -21,30 +21,30 @@ export class SToolModel extends Component
     init()
     {
         super.init();
-        this.gameObject.name = "GameObjectScaleModel";
+        this.gameObject.name = 'GameObjectScaleModel';
         this.initModels();
     }
 
     private initModels()
     {
-        this.xCube = serialization.setValue(new GameObject(), { name: "xCube" }).addComponent(CoordinateScaleCube);
+        this.xCube = serialization.setValue(new GameObject(), { name: 'xCube' }).addComponent(CoordinateScaleCube);
         this.xCube.color.setTo(1, 0, 0, 1);
         this.xCube.update();
         this.xCube.transform.rz = -90;
         this.gameObject.addChild(this.xCube.gameObject);
 
-        this.yCube = serialization.setValue(new GameObject(), { name: "yCube" }).addComponent(CoordinateScaleCube);
+        this.yCube = serialization.setValue(new GameObject(), { name: 'yCube' }).addComponent(CoordinateScaleCube);
         this.yCube.color.setTo(0, 1, 0, 1);
         this.yCube.update();
         this.gameObject.addChild(this.yCube.gameObject);
 
-        this.zCube = serialization.setValue(new GameObject(), { name: "zCube" }).addComponent(CoordinateScaleCube);
+        this.zCube = serialization.setValue(new GameObject(), { name: 'zCube' }).addComponent(CoordinateScaleCube);
         this.zCube.color.setTo(0, 0, 1, 1);
         this.zCube.update();
         this.zCube.transform.rx = 90;
         this.gameObject.addChild(this.zCube.gameObject);
 
-        this.oCube = serialization.setValue(new GameObject(), { name: "oCube" }).addComponent(CoordinateCube);
+        this.oCube = serialization.setValue(new GameObject(), { name: 'oCube' }).addComponent(CoordinateCube);
         this.oCube.gameObject.transform.scale = new Vector3(1.2, 1.2, 1.2);
         this.gameObject.addChild(this.oCube.gameObject);
     }
@@ -54,10 +54,10 @@ export class SToolModel extends Component
 export class CoordinateScaleCube extends Component
 {
     private isinit: boolean;
-    private coordinateCube: CoordinateCube
+    private coordinateCube: CoordinateCube;
     private segmentGeometry: SegmentGeometry;
 
-    readonly color = new Color4(1, 0, 0, 0.99)
+    readonly color = new Color4(1, 0, 0, 0.99);
     private selectedColor = new Color4(1, 1, 0, 0.99);
     private length = 100;
     //
@@ -68,22 +68,22 @@ export class CoordinateScaleCube extends Component
     init()
     {
         super.init();
-        watcher.watch(<CoordinateScaleCube>this, "selected", this.update, this);
-        watcher.watch(<CoordinateScaleCube>this, "scaleValue", this.update, this);
+        watcher.watch(<CoordinateScaleCube> this, 'selected', this.update, this);
+        watcher.watch(<CoordinateScaleCube> this, 'scaleValue', this.update, this);
 
-        var xLine = new GameObject();
-        var model = xLine.addComponent(Renderable);
-        var material = model.material = serialization.setValue(new Material(), {
-            shaderName: "segment", renderParams: { renderMode: RenderMode.LINES },
+        const xLine = new GameObject();
+        let model = xLine.addComponent(Renderable);
+        const material = model.material = serialization.setValue(new Material(), {
+            shaderName: 'segment', renderParams: { renderMode: RenderMode.LINES },
             uniforms: { u_segmentColor: new Color4(1, 1, 1, 0.99) },
         });
         material.renderParams.enableBlend = true;
         this.segmentGeometry = model.geometry = new SegmentGeometry();
         this.gameObject.addChild(xLine);
-        this.coordinateCube = serialization.setValue(new GameObject(), { name: "coordinateCube" }).addComponent(CoordinateCube);
+        this.coordinateCube = serialization.setValue(new GameObject(), { name: 'coordinateCube' }).addComponent(CoordinateCube);
         this.gameObject.addChild(this.coordinateCube.gameObject);
 
-        var mouseHit = serialization.setValue(new GameObject(), { name: "hit" });
+        const mouseHit = serialization.setValue(new GameObject(), { name: 'hit' });
         model = mouseHit.addComponent(Renderable);
         model.geometry = serialization.setValue(new CylinderGeometry(), { topRadius: 5, bottomRadius: 5, height: this.length - 4 });
         model.material = new Material();

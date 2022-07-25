@@ -14,7 +14,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
     constructor()
     {
         super();
-        this.skinName = "AssetFileItemRenderer";
+        this.skinName = 'AssetFileItemRenderer';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -25,7 +25,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
         this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.selectedfilechanged, this);
         this.selectedfilechanged();
     }
 
@@ -36,7 +36,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
         this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
+        globalEmitter.off('editor.selectedObjectsChanged', this.selectedfilechanged, this);
     }
 
     dataChanged()
@@ -50,7 +50,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
                 drag.register(this, (dragsource) =>
                 {
                     this.data.setdargSource(dragsource);
-                }, ["assetNodes"], (dragdata) =>
+                }, ['assetNodes'], (dragdata) =>
                 {
                     this.data.acceptDragDrop(dragdata);
                 });
@@ -59,12 +59,13 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
             {
                 if (!this.data.isLoaded)
                 {
-                    var data = this.data;
+                    const data = this.data;
                     data.load(() =>
                     {
                         console.assert(data.isLoaded);
-                        if (data == this.data) this.dataChanged();
-                    })
+                        if (data === this.data) this.dataChanged();
+                    });
+
                     return;
                 }
 
@@ -73,7 +74,8 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
                     this.data.setdargSource(dragsource);
                 }, []);
             }
-        } else
+        }
+        else
         {
             drag.unregister(this);
         }
@@ -85,9 +87,10 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
         if (this.data.isDirectory)
         {
             editorAsset.showFloder = this.data;
-        } else if (this.data.asset instanceof GameObject)
+        }
+        else if (this.data.asset instanceof GameObject)
         {
-            var scene = this.data.asset.getComponent(Scene);
+            const scene = this.data.asset.getComponent(Scene);
             if (scene)
             {
                 EditorData.editorData.gameScene = scene;
@@ -98,20 +101,22 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
     private onclick()
     {
         // 处理按下shift键时
-        var isShift = shortcut.keyState.getKeyState("shift");
+        const isShift = shortcut.keyState.getKeyState('shift');
         if (isShift)
         {
-            var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
-            var index = source.indexOf(this.data);
-            var min = index, max = index;
-            if (EditorData.editorData.selectedAssetNodes.indexOf(preAssetFile) != -1)
+            const source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
+            let index = source.indexOf(this.data);
+            let min = index; let
+                max = index;
+            if (EditorData.editorData.selectedAssetNodes.indexOf(preAssetFile) !== -1)
             {
                 index = source.indexOf(preAssetFile);
                 if (index < min) min = index;
                 if (index > max) max = index;
             }
             EditorData.editorData.selectMultiObject(source.slice(min, max + 1));
-        } else
+        }
+        else
         {
             EditorData.editorData.selectObject(this.data);
             preAssetFile = this.data;
@@ -127,22 +132,22 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
 
     private selectedfilechanged()
     {
-        var selected = false;
+        let selected = false;
         if (this.data)
         {
-            var selectedAssetFile = EditorData.editorData.selectedAssetNodes;
-            selected = selectedAssetFile.indexOf(this.data) != -1;
+            const selectedAssetFile = EditorData.editorData.selectedAssetNodes;
+            selected = selectedAssetFile.indexOf(this.data) !== -1;
             if (!selected)
             {
-                var assetids = EditorData.editorData.selectedObjects.map(v => (<AssetData>v).assetId);
-                selected = assetids.indexOf(this.data.asset.assetId) != -1;
+                const assetids = EditorData.editorData.selectedObjects.map((v) => (<AssetData>v).assetId);
+                selected = assetids.indexOf(this.data.asset.assetId) !== -1;
             }
         }
 
-        if (this.itemSelected != selected)
+        if (this.itemSelected !== selected)
         {
             this.itemSelected = selected;
         }
     }
 }
-var preAssetFile: AssetNode;
+let preAssetFile: AssetNode;

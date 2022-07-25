@@ -16,7 +16,7 @@ export class OAVArray extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVArray";
+        this.skinName = 'OAVArray';
     }
 
     get space(): Object
@@ -42,7 +42,7 @@ export class OAVArray extends OAVBase
 
     set attributeValue(value: any[])
     {
-        if (this._space[this._attributeName] != value)
+        if (this._space[this._attributeName] !== value)
         {
             this._space[this._attributeName] = value;
         }
@@ -52,16 +52,16 @@ export class OAVArray extends OAVBase
     initView(): void
     {
         this.attributeViews = [];
-        var attributeValue = this.attributeValue;
+        const attributeValue = this.attributeValue;
         this.sizeTxt.text = this.attributeValue.length.toString();
-        for (var i = 0; i < attributeValue.length; i++)
+        for (let i = 0; i < attributeValue.length; i++)
         {
-            var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
+            const displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
             displayObject.percentWidth = 100;
             this.contentGroup.addChild(displayObject);
             this.attributeViews[i] = <any>displayObject;
         }
-        this.currentState = "hide";
+        this.currentState = 'hide';
         this.titleGroup.addEventListener(egret.MouseEvent.CLICK, this.onTitleGroupClick, this);
         this.sizeTxt.addEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
     }
@@ -72,9 +72,9 @@ export class OAVArray extends OAVBase
         this.sizeTxt.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.onsizeTxtfocusout, this);
 
         this.attributeViews = [];
-        for (var i = 0; i < this.attributeViews.length; i++)
+        for (let i = 0; i < this.attributeViews.length; i++)
         {
-            var displayObject = this.attributeViews[i];
+            const displayObject = this.attributeViews[i];
             this.contentGroup.removeChild(displayObject);
         }
         this.attributeViews = null;
@@ -82,17 +82,17 @@ export class OAVArray extends OAVBase
 
     private onTitleGroupClick()
     {
-        this.currentState = this.currentState == "hide" ? "show" : "hide";
+        this.currentState = this.currentState === 'hide' ? 'show' : 'hide';
     }
 
     private onsizeTxtfocusout()
     {
-        var size = parseInt(this.sizeTxt.text);
-        var attributeValue = this.attributeValue;
-        var attributeViews = this.attributeViews;
-        if (size != attributeValue.length)
+        const size = parseInt(this.sizeTxt.text, 10);
+        const attributeValue = this.attributeValue;
+        const attributeViews = this.attributeViews;
+        if (size !== attributeValue.length)
         {
-            for (var i = 0; i < attributeViews.length; i++)
+            for (let i = 0; i < attributeViews.length; i++)
             {
                 if (attributeViews[i].parent)
                 {
@@ -101,14 +101,14 @@ export class OAVArray extends OAVBase
             }
 
             attributeValue.length = size;
-            for (var i = 0; i < size; i++)
+            for (let i = 0; i < size; i++)
             {
-                if (attributeValue[i] == null && this._attributeViewInfo.componentParam)
-                    attributeValue[i] = lazy.getvalue((<any>this._attributeViewInfo.componentParam).defaultItem);
+                if (!attributeValue[i] && this._attributeViewInfo.componentParam)
+                    { attributeValue[i] = lazy.getvalue((<any> this._attributeViewInfo.componentParam).defaultItem); }
 
-                if (attributeViews[i] == null)
+                if (!attributeViews[i])
                 {
-                    var displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
+                    const displayObject = new OAVArrayItem(attributeValue, i, this._attributeViewInfo.componentParam);
                     attributeViews[i] = displayObject;
 
                     displayObject.percentWidth = 100;
@@ -123,12 +123,12 @@ export class OAVArrayItem extends OAVDefault
 {
     constructor(arr: any[], index: number, componentParam: Object)
     {
-        var attributeViewInfo: AttributeViewInfo = {
-            name: index + "",
+        const attributeViewInfo: AttributeViewInfo = {
+            name: `${index}`,
             editable: true,
-            componentParam: componentParam,
+            componentParam,
             owner: arr,
-            type: "number",
+            type: 'number',
         };
         super(attributeViewInfo);
     }

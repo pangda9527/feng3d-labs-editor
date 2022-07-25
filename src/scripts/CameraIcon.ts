@@ -19,9 +19,9 @@ export class CameraIcon extends EditorScript
     init()
     {
         super.init();
-        watcher.watch(<CameraIcon>this, "camera", this.onCameraChanged, this);
-        this.initicon()
-        this.on("mousedown", this.onMousedown, this);
+        watcher.watch(this as CameraIcon, 'camera', this.onCameraChanged, this);
+        this.initicon();
+        this.on('mousedown', this.onMousedown, this);
     }
 
     initicon()
@@ -31,15 +31,15 @@ export class CameraIcon extends EditorScript
 
         {
             const lightIcon = this._lightIcon = new GameObject();
-            lightIcon.name = "CameraIcon";
+            lightIcon.name = 'CameraIcon';
             const billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = this.editorCamera;
             const meshRenderer = lightIcon.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "texture";
+            material.shaderName = 'texture';
             const uniforms = material.uniforms as TextureUniforms;
             uniforms.s_texture = new Texture2D();
-            uniforms.s_texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/camera.png") };
+            uniforms.s_texture.source = { url: EditorData.editorData.getEditorAssetPath('assets/3d/icons/camera.png') };
             uniforms.s_texture.format = TextureFormat.RGBA;
             material.renderParams.enableBlend = true;
             material.renderParams.depthMask = false;
@@ -55,12 +55,12 @@ export class CameraIcon extends EditorScript
         //
         {
             const lightLines = this._lightLines = new GameObject();
-            lightLines.name = "Lines";
+            lightLines.name = 'Lines';
             lightLines.mouseEnabled = false;
             lightLines.hideFlags = HideFlags.Hide;
             const meshRenderer = lightLines.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "segment";
+            material.shaderName = 'segment';
             const uniforms = material.uniforms as SegmentUniforms;
             uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
@@ -73,12 +73,12 @@ export class CameraIcon extends EditorScript
         //
         {
             const lightpoints = this._lightpoints = new GameObject();
-            lightpoints.name = "points";
+            lightpoints.name = 'points';
             lightpoints.mouseEnabled = false;
             lightpoints.hideFlags = HideFlags.Hide;
             const meshRenderer = lightpoints.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "point";
+            material.shaderName = 'point';
             const uniforms = material.uniforms as PointUniforms;
             uniforms.u_PointSize = 5;
             material.renderParams.enableBlend = true;
@@ -95,43 +95,52 @@ export class CameraIcon extends EditorScript
     {
         if (!this.camera) return;
 
-        if (EditorData.editorData.selectedGameObjects.indexOf(this.camera.gameObject) != -1)
+        if (EditorData.editorData.selectedGameObjects.indexOf(this.camera.gameObject) !== -1)
         {
             if (this._lensChanged)
             {
                 //
-                var points: PointInfo[] = [];
-                var segments: Partial<Segment>[] = [];
-                var lens = this.camera.lens;
-                var near = lens.near;
-                var far = lens.far;
-                var aspect = lens.aspect;
+                const points: PointInfo[] = [];
+                const segments: Partial<Segment>[] = [];
+                const lens = this.camera.lens;
+                const near = lens.near;
+                const far = lens.far;
+                const aspect = lens.aspect;
+                let nearLeft: number;
+                let nearRight: number;
+                let nearTop: number;
+                let nearBottom: number;
+                let farLeft: number;
+                let farRight: number;
+                let farTop: number;
+                let farBottom: number;
                 if (lens instanceof PerspectiveLens)
                 {
-                    var fov = lens.fov;
-                    var tan = Math.tan(fov * Math.PI / 360);
+                    const fov = lens.fov;
+                    const tan = Math.tan(fov * Math.PI / 360);
                     //
-                    var nearLeft = -tan * near * aspect;
-                    var nearRight = tan * near * aspect;
-                    var nearTop = tan * near;
-                    var nearBottom = -tan * near;
-                    var farLeft = -tan * far * aspect;
-                    var farRight = tan * far * aspect;
-                    var farTop = tan * far;
-                    var farBottom = -tan * far;
+                    nearLeft = -tan * near * aspect;
+                    nearRight = tan * near * aspect;
+                    nearTop = tan * near;
+                    nearBottom = -tan * near;
+                    farLeft = -tan * far * aspect;
+                    farRight = tan * far * aspect;
+                    farTop = tan * far;
+                    farBottom = -tan * far;
                     //
-                } else if (lens instanceof OrthographicLens)
+                }
+                else if (lens instanceof OrthographicLens)
                 {
-                    var size = lens.size;
+                    const size = lens.size;
                     //
-                    var nearLeft = -size * aspect;
-                    var nearRight = size;
-                    var nearTop = size;
-                    var nearBottom = -size;
-                    var farLeft = -size;
-                    var farRight = size;
-                    var farTop = size;
-                    var farBottom = -size;
+                    nearLeft = -size * aspect;
+                    nearRight = size;
+                    nearTop = size;
+                    nearBottom = -size;
+                    farLeft = -size;
+                    farRight = size;
+                    farTop = size;
+                    farBottom = -size;
                 }
                 points.push({ position: new Vector3(0, farBottom, far) }, { position: new Vector3(0, farTop, far) }, { position: new Vector3(farLeft, 0, far) }, { position: new Vector3(farRight, 0, far) });
                 segments.push(
@@ -152,16 +161,17 @@ export class CameraIcon extends EditorScript
                 );
                 this._pointGeometry.points = points;
                 this._segmentGeometry.segments.length = 0;
-                segments.forEach(v =>
+                segments.forEach((v) =>
                 {
                     this._segmentGeometry.addSegment(v);
-                })
+                });
                 this._lensChanged = false;
             }
             //
             this._lightLines.activeSelf = true;
             this._lightpoints.activeSelf = true;
-        } else
+        }
+        else
         {
             this._lightLines.activeSelf = false;
             this._lightpoints.activeSelf = false;
@@ -194,14 +204,14 @@ export class CameraIcon extends EditorScript
     {
         if (oldValue)
         {
-            oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
-            oldValue.off("lensChanged", this.onLensChanged, this);
+            oldValue.off('scenetransformChanged', this.onScenetransformChanged, this);
+            oldValue.off('lensChanged', this.onLensChanged, this);
         }
         if (newValue)
         {
             this.onScenetransformChanged();
-            newValue.on("scenetransformChanged", this.onScenetransformChanged, this);
-            newValue.on("lensChanged", this.onLensChanged, this);
+            newValue.on('scenetransformChanged', this.onScenetransformChanged, this);
+            newValue.on('lensChanged', this.onLensChanged, this);
         }
     }
 
@@ -219,10 +229,10 @@ export class CameraIcon extends EditorScript
     {
         EditorData.editorData.selectObject(this.camera.gameObject);
         // 防止再次调用鼠标拾取
-        shortcut.activityState("selectInvalid");
+        shortcut.activityState('selectInvalid');
         ticker.once(100, () =>
         {
-            shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState('selectInvalid');
         });
     }
 }

@@ -1,6 +1,6 @@
 import { watch, Color3, Color4, ImageUtil, Gradient, windowEventProxy, Vector2, mathUtil } from 'feng3d';
 
-var colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
+const colors = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
 /**
  */
 export class ColorPickerView extends eui.Component
@@ -21,21 +21,21 @@ export class ColorPickerView extends eui.Component
     public txtColor: eui.TextInput;
 
     //
-    @watch("onColorChanged")
+    @watch('onColorChanged')
     color: Color3 | Color4 = new Color4(0.2, 0.5, 0);
 
     public constructor()
     {
         super();
-        this.skinName = "ColorPickerView";
+        this.skinName = 'ColorPickerView';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
     {
         super.$onAddToStage(stage, nestLevel);
 
-        var w = this.group1.width - 4;
-        var h = this.group1.height - 4;
+        const w = this.group1.width - 4;
+        const h = this.group1.height - 4;
         this.image1.source = new ImageUtil(w, h).drawMinMaxGradient(new Gradient().fromColors(colors), false).toDataURL();
         this.updateView();
 
@@ -82,7 +82,7 @@ export class ColorPickerView extends eui.Component
         this.group0.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         this.group1.removeEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         //
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     private _mouseDownGroup: eui.Group;
@@ -92,33 +92,35 @@ export class ColorPickerView extends eui.Component
 
         this.onMouseMove();
 
-        windowEventProxy.on("mousemove", this.onMouseMove, this);
-        windowEventProxy.on("mouseup", this.onMouseUp, this);
+        windowEventProxy.on('mousemove', this.onMouseMove, this);
+        windowEventProxy.on('mouseup', this.onMouseUp, this);
     }
 
     private onMouseMove()
     {
-        var image = this.image0;
-        if (this._mouseDownGroup == this.group0) image = this.image0;
+        let image = this.image0;
+        if (this._mouseDownGroup === this.group0) image = this.image0;
         else image = this.image1;
 
-        var p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        var start = image.localToGlobal(0, 0);
-        var end = image.localToGlobal(image.width, image.height);
+        const p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        const start = image.localToGlobal(0, 0);
+        const end = image.localToGlobal(image.width, image.height);
 
-        var rw = mathUtil.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
-        var rh = mathUtil.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
+        const rw = mathUtil.clamp((p.x - start.x) / (end.x - start.x), 0, 1);
+        const rh = mathUtil.clamp((p.y - start.y) / (end.y - start.y), 0, 1);
 
-        if (this.group0 == this._mouseDownGroup)
+        let color: Color3 | Color4;
+        if (this.group0 === this._mouseDownGroup)
         {
             this.rw = rw;
             this.rh = rh;
-            var color = getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
-        } else if (this.group1 == this._mouseDownGroup)
+            color = getColorPickerRectAtPosition(this.basecolor.toInt(), rw, rh);
+        }
+        else if (this.group1 === this._mouseDownGroup)
         {
             this.ratio = rh;
-            var basecolor = this.basecolor = getMixColorAtRatio(rh, colors);
-            var color = getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
+            const basecolor = this.basecolor = getMixColorAtRatio(rh, colors);
+            color = getColorPickerRectAtPosition(basecolor.toInt(), this.rw, this.rh);
         }
         if (this.color instanceof Color3)
         {
@@ -133,8 +135,8 @@ export class ColorPickerView extends eui.Component
     private onMouseUp()
     {
         this._mouseDownGroup = null;
-        windowEventProxy.off("mousemove", this.onMouseMove, this);
-        windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off('mousemove', this.onMouseMove, this);
+        windowEventProxy.off('mouseup', this.onMouseUp, this);
     }
 
     private _textfocusintxt: eui.TextInput;
@@ -143,7 +145,7 @@ export class ColorPickerView extends eui.Component
         this._textfocusintxt = e.currentTarget;
     }
 
-    protected ontxtfocusout(e: egret.Event)
+    protected ontxtfocusout(_e: egret.Event)
     {
         this._textfocusintxt = null;
         this.updateView();
@@ -151,9 +153,9 @@ export class ColorPickerView extends eui.Component
 
     private onTextChange(e: egret.Event)
     {
-        if (this._textfocusintxt == e.currentTarget)
+        if (this._textfocusintxt === e.currentTarget)
         {
-            var color = this.color.clone();
+            const color = this.color.clone();
             switch (this._textfocusintxt)
             {
                 case this.txtR:
@@ -169,14 +171,14 @@ export class ColorPickerView extends eui.Component
                     (<Color4>color).a = (Number(this.txtA.text) || 0) / 255;
                     break;
                 case this.txtColor:
-                    color.fromUnit(Number("0x" + this.txtColor.text) || 0);
+                    color.fromUnit(Number(`0x${this.txtColor.text}`) || 0);
                     break;
             }
             this.color = color;
         }
     }
 
-    private onColorChanged(property, oldValue: Color4 | Color4, newValue: Color4 | Color4)
+    private onColorChanged(_property, oldValue: Color4 | Color4, newValue: Color4 | Color4)
     {
         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
 
@@ -192,22 +194,22 @@ export class ColorPickerView extends eui.Component
     private ratio: number;
     private updateView()
     {
-        if (this._textfocusintxt != this.txtR) this.txtR.text = Math.round(this.color.r * 255).toString();
-        if (this._textfocusintxt != this.txtG) this.txtG.text = Math.round(this.color.g * 255).toString();
-        if (this._textfocusintxt != this.txtB) this.txtB.text = Math.round(this.color.b * 255).toString();
-        if (this._textfocusintxt != this.txtA) this.txtA.text = Math.round((<Color4>this.color).a * 255).toString();
-        if (this._textfocusintxt != this.txtColor) this.txtColor.text = this.color.toHexString().substr(1);
+        if (this._textfocusintxt !== this.txtR) this.txtR.text = Math.round(this.color.r * 255).toString();
+        if (this._textfocusintxt !== this.txtG) this.txtG.text = Math.round(this.color.g * 255).toString();
+        if (this._textfocusintxt !== this.txtB) this.txtB.text = Math.round(this.color.b * 255).toString();
+        if (this._textfocusintxt !== this.txtA) this.txtA.text = Math.round((this.color as Color4).a * 255).toString();
+        if (this._textfocusintxt !== this.txtColor) this.txtColor.text = this.color.toHexString().substr(1);
 
-        if (this._mouseDownGroup == null)
+        if (!this._mouseDownGroup)
         {
             //
-            var result = getColorPickerRectPosition(this.color.toInt());
+            const result = getColorPickerRectPosition(this.color.toInt());
             this.basecolor = result.color;
             this.rw = result.ratioW;
             this.rh = result.ratioH;
             this.ratio = getMixColorRatio(this.basecolor.toInt(), colors);
         }
-        if (this._mouseDownGroup != this.group0)
+        if (this._mouseDownGroup !== this.group0)
         {
             //
             this.image0.source = new ImageUtil(this.group0.width - 16, this.group0.height - 16).drawColorPickerRect(this.basecolor.toInt()).toDataURL();
@@ -223,13 +225,12 @@ export class ColorPickerView extends eui.Component
         {
             this._groupAParent = this._groupAParent || this.groupA.parent;
             this.groupA.parent && this.groupA.parent.removeChild(this.groupA);
-        } else
-        {
-            if (this.groupA.parent == null && this._groupAParent)
+        }
+        else
+            if (!this.groupA.parent && this._groupAParent)
             {
                 this._groupAParent.addChildAt(this.groupA, 3);
             }
-        }
     }
 
     private _groupAParent: egret.DisplayObjectContainer;
@@ -241,18 +242,23 @@ export class ColorPickerView extends eui.Component
  */
 function getColorPickerRectPosition(color: number)
 {
-    var black = new Color3(0, 0, 0);
-    var white = new Color3(1, 1, 1);
+    const black = new Color3(0, 0, 0);
+    const white = new Color3(1, 1, 1);
 
-    var c = new Color3().fromUnit(color);
-    var max = Math.max(c.r, c.g, c.b);
-    if (max != 0)
+    let c = new Color3().fromUnit(color);
+    const max = Math.max(c.r, c.g, c.b);
+    if (max !== 0)
+    {
         c = black.mix(c, 1 / max);
-    var min = Math.min(c.r, c.g, c.b);
-    if (min != 1)
+    }
+    const min = Math.min(c.r, c.g, c.b);
+    if (min !== 1)
+    {
         c = white.mix(c, 1 / (1 - min));
-    var ratioH = 1 - max;
-    var ratioW = 1 - min;
+    }
+    const ratioH = 1 - max;
+    const ratioW = 1 - min;
+
     return {
         /**
          * 基色
@@ -261,12 +267,12 @@ function getColorPickerRectPosition(color: number)
         /**
          * 横向位置
          */
-        ratioW: ratioW,
+        ratioW,
         /**
          * 纵向位置
          */
-        ratioH: ratioH
-    }
+        ratioH
+    };
 }
 
 function getMixColorRatio(color: number, colors: number[], ratios?: number[])
@@ -280,45 +286,48 @@ function getMixColorRatio(color: number, colors: number[], ratios?: number[])
         }
     }
 
-    var colors1 = colors.map(v => new Color3().fromUnit(v));
-    var c = new Color3().fromUnit(color);
+    const colors1 = colors.map((v) => new Color3().fromUnit(v));
+    const c = new Color3().fromUnit(color);
 
-    var r = c.r;
-    var g = c.g;
-    var b = c.b;
+    const r = c.r;
+    const g = c.g;
+    const b = c.b;
 
-    for (var i = 0; i < colors1.length - 1; i++)
+    for (let i = 0; i < colors1.length - 1; i++)
     {
-        var c0 = colors1[i];
-        var c1 = colors1[i + 1];
+        const c0 = colors1[i];
+        const c1 = colors1[i + 1];
         //
         if (c.equals(c0)) return ratios[i];
         if (c.equals(c1)) return ratios[i + 1];
         //
-        var r1 = c0.r + c1.r;
-        var g1 = c0.g + c1.g;
-        var b1 = c0.b + c1.b;
+        const r1 = c0.r + c1.r;
+        const g1 = c0.g + c1.g;
+        const b1 = c0.b + c1.b;
         //
-        var v = r * r1 + g * g1 + b * b1;
+        const v = r * r1 + g * g1 + b * b1;
         if (v > 2)
         {
-            var result = 0;
-            if (r1 == 1)
+            let result = 0;
+            if (r1 === 1)
             {
                 result = mathUtil.mapLinear(r, c0.r, c1.r, ratios[i], ratios[i + 1]);
-            } else if (g1 == 1)
+            }
+            else if (g1 === 1)
             {
                 result = mathUtil.mapLinear(g, c0.g, c1.g, ratios[i], ratios[i + 1]);
-            } else if (b1 == 1)
+            }
+            else if (b1 === 1)
             {
                 result = mathUtil.mapLinear(b, c0.b, c1.b, ratios[i], ratios[i + 1]);
             }
+
             return result;
         }
     }
+
     return 0;
 }
-
 
 /**
  * 获取颜色的基色以及颜色拾取矩形所在位置
@@ -326,14 +335,15 @@ function getMixColorRatio(color: number, colors: number[], ratios?: number[])
  */
 function getColorPickerRectAtPosition(color: number, rw: number, rh: number)
 {
-    var leftTop = new Color3(1, 1, 1);
-    var rightTop = new Color3().fromUnit(color);
-    var leftBottom = new Color3(0, 0, 0);
-    var rightBottom = new Color3(0, 0, 0);
+    const leftTop = new Color3(1, 1, 1);
+    const rightTop = new Color3().fromUnit(color);
+    const leftBottom = new Color3(0, 0, 0);
+    const rightBottom = new Color3(0, 0, 0);
 
-    var top = leftTop.mixTo(rightTop, rw);
-    var bottom = leftBottom.mixTo(rightBottom, rw);
-    var v = top.mixTo(bottom, rh);
+    const top = leftTop.mixTo(rightTop, rw);
+    const bottom = leftBottom.mixTo(rightBottom, rw);
+    const v = top.mixTo(bottom, rh);
+
     return v;
 }
 
@@ -348,17 +358,19 @@ function getMixColorAtRatio(ratio: number, colors: number[], ratios?: number[])
         }
     }
 
-    var colors1 = colors.map(v => new Color3().fromUnit(v));
+    const colors1 = colors.map((v) => new Color3().fromUnit(v));
 
-    for (var i = 0; i < colors1.length - 1; i++)
+    for (let i = 0; i < colors1.length - 1; i++)
     {
         if (ratios[i] <= ratio && ratio <= ratios[i + 1])
         {
-            var mix = mathUtil.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
-            var c = colors1[i].mixTo(colors1[i + 1], mix);
+            const mix = mathUtil.mapLinear(ratio, ratios[i], ratios[i + 1], 0, 1);
+            const c = colors1[i].mixTo(colors1[i + 1], mix);
+
             return c;
         }
     }
+
     return colors1[0];
 }
 

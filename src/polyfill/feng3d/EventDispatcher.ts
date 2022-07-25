@@ -1,88 +1,88 @@
-import { Vector3, TextAsset } from 'feng3d'
+import { Vector3, TextAsset } from 'feng3d';
 
-export { }
+export { };
 declare global
 {
     export interface MixinsGlobalEvents
     {
-        "editor.selectedObjectsChanged"
-        "editor.isBaryCenterChanged"
-        "editor.isWoldCoordinateChanged"
-        "editor.toolTypeChanged"
-        "editor.allLoaded"
+        'editor.selectedObjectsChanged'
+        'editor.isBaryCenterChanged'
+        'editor.isWoldCoordinateChanged'
+        'editor.toolTypeChanged'
+        'editor.allLoaded'
 
         /**
          * 资源显示文件夹发生变化
          */
-        "asset.showFloderChanged": { oldpath: string, newpath: string };
+        'asset.showFloderChanged': { oldpath: string, newpath: string };
         /**
          * 删除文件
          */
-        "asset.deletefile": { id: string };
+        'asset.deletefile': { id: string };
 
         /**
          * 显示指定资源
          */
-        "asset.showAsset"
+        'asset.showAsset'
 
         /**
          * 更新属性界面（检查器）
          */
-        "inspector.update": undefined;
+        'inspector.update': undefined;
 
         /**
          * 保存属性界面（检查器）数据
          */
-        "inspector.saveShowData": () => void;
+        'inspector.saveShowData': () => void;
 
         /**
          * 旋转场景摄像机
          */
-        "editorCameraRotate": Vector3
+        'editorCameraRotate': Vector3
 
         /**
          * 使用编辑器打开脚本
          */
-        "codeeditor.openScript": TextAsset;
+        'codeeditor.openScript': TextAsset;
 
         /**
          * 脚本编译
          */
-        "script.compile": { onComplete?: () => void };
+        'script.compile': { onComplete?: () => void };
 
         /**
          * 获取项目依赖库 定义
          */
-        "script.gettslibs": { callback: (tslibs: { path: string, code: string }[]) => void }
+        'script.gettslibs': { callback: (tslibs: { path: string, code: string }[]) => void }
 
         /**
          * 提示信息
          */
-        "message": string;
+        'message': string;
 
         /**
          * 错误信息
          */
-        "message.error": string;
+        'message.error': string;
 
         /**
          * 界面布局发生变化
          */
-        "viewLayout.changed": string;
+        'viewLayout.changed': string;
 
         /**
          * 还原默认窗口布局
          */
-        "viewLayout.reset": Object;
+        'viewLayout.reset': Object;
 
         /**
          * 打开脚本
          */
-        "openScript": TextAsset;
+        'openScript': TextAsset;
 
         /**
          * 在场景窗口添加工具界面
          */
-        "editor.addSceneToolView": eui.Component;
+        'editor.addSceneToolView': eui.Component;
     }
 }

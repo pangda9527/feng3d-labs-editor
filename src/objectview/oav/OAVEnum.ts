@@ -13,9 +13,10 @@ export class OAVEnum extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVEnum";
+        this.skinName = 'OAVEnum';
     }
 
+    // eslint-disable-next-line accessor-pairs
     set enumClass(obj)
     {
         this.list = [];
@@ -24,7 +25,7 @@ export class OAVEnum extends OAVBase
             if (obj.hasOwnProperty(key))
             {
                 if (isNaN(Number(key)))
-                    this.list.push({ label: key, value: obj[key] });
+                { this.list.push({ label: key, value: obj[key] }); }
             }
         }
     }
@@ -51,8 +52,11 @@ export class OAVEnum extends OAVBase
             this.combobox.data = this.list.reduce((prevalue, item) =>
             {
                 if (prevalue) return prevalue;
-                if (item.value == this.attributeValue)
+                if (item.value === this.attributeValue)
+                {
                     return item;
+                }
+
                 return null;
             }, null);
         }

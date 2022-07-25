@@ -3,6 +3,7 @@ import { ObjectViewEvent } from '../../../objectview/events/ObjectViewEvent';
 
 declare global
 {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace eui
     {
         export interface Component
@@ -12,26 +13,25 @@ declare global
     }
 }
 
-eui.Component.prototype["addBinder"] = function (...binders: UIBinder[])
+eui.Component.prototype['addBinder'] = function (...binders: UIBinder[])
 {
     this._binders = this._binders || [];
-    binders.forEach(v =>
+    binders.forEach((v) =>
     {
         this._binders.push(v);
     });
-}
+};
 
-var old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
-eui.Component.prototype["$onRemoveFromStage"] = function ()
+const old$onRemoveFromStage = eui.Component.prototype.$onRemoveFromStage;
+eui.Component.prototype['$onRemoveFromStage'] = function ()
 {
     if (this._binders)
     {
-        this._binders.forEach(v => v.dispose());
+        this._binders.forEach((v) => v.dispose());
         this._binders.length = 0;
     }
     old$onRemoveFromStage.call(this);
 };
-
 
 export interface UIBinder
 {
@@ -80,10 +80,9 @@ export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinder
     {
         Object.assign(this, v);
 
-        //
         this.initView();
         this.invalidateView();
-        //
+
         return this;
     }
 
@@ -112,13 +111,13 @@ export class TextInputBinder<T extends TextInputBinderEventMap = TextInputBinder
 
     protected onValueChanged()
     {
-        var objectViewEvent = <any>new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
+        const objectViewEvent = new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
         objectViewEvent.space = this.space;
         objectViewEvent.attributeName = this.attribute;
         objectViewEvent.attributeValue = this.space[this.attribute];
         this.textInput.dispatchEvent(objectViewEvent);
 
-        this.emit("valueChanged");
+        this.emit('valueChanged');
 
         this.invalidateView();
     }

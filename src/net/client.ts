@@ -1,81 +1,79 @@
-
-var connection: WebSocket;
-var clientID = 0;
+let connection: WebSocket;
+let clientID = 0;
 
 function setUsername()
 {
-    console.log("***SETUSERNAME");
-    var msg = {
+    console.log('***SETUSERNAME');
+    const msg = {
         name: 'user-feng',
         date: Date.now(),
         id: clientID,
-        type: "username"
+        type: 'username'
     };
     connection.send(JSON.stringify(msg));
 }
 
 function connect()
 {
-    var serverUrl;
-    var scheme = "ws";
+    let scheme = 'ws';
 
     // If this is an HTTPS connection, we have to use a secure WebSocket
     // connection too, so add another "s" to the scheme.
 
-    if (document.location.protocol === "https:")
+    if (document.location.protocol === 'https:')
     {
-        scheme += "s";
+        scheme += 's';
     }
 
-    serverUrl = scheme + "://" + document.location.hostname + ":6502";
+    const serverUrl = `${scheme}://${document.location.hostname}:6502`;
 
-    connection = new WebSocket(serverUrl, "json");
-    console.log("***CREATED WEBSOCKET");
+    connection = new WebSocket(serverUrl, 'json');
+    console.log('***CREATED WEBSOCKET');
 
-    connection.onopen = function (evt)
+    connection.onopen = function (_evt)
     {
-        console.log("***ONOPEN");
+        console.log('***ONOPEN');
     };
-    console.log("***CREATED ONOPEN");
+    console.log('***CREATED ONOPEN');
 
     connection.onmessage = function (evt)
     {
-        console.log("***ONMESSAGE");
-        var f = {
+        console.log('***ONMESSAGE');
+        const f = {
             write(text: string)
             {
-                console.log(`write: ${text}`)
+                console.log(`write: ${text}`);
             }
         };
-        var text = "";
-        var msg = JSON.parse(evt.data);
-        console.log("Message received: ");
+        let text = '';
+        const msg = JSON.parse(evt.data);
+        console.log('Message received: ');
         console.dir(msg);
-        var time = new Date(msg.date);
-        var timeStr = time.toLocaleTimeString();
+        const time = new Date(msg.date);
+        const timeStr = time.toLocaleTimeString();
 
         switch (msg.type)
         {
-            case "id":
+            case 'id':
                 clientID = msg.id;
                 setUsername();
                 break;
-            case "username":
-                text = "<b>User <em>" + msg.name + "</em> signed in at " + timeStr + "</b><br>";
+            case 'username':
+                text = `<b>User <em>${msg.name}</em> signed in at ${timeStr}</b><br>`;
                 break;
-            case "message":
-                text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
+            case 'message':
+                text = `(${timeStr}) <b>${msg.name}</b>: ${msg.text}<br>`;
                 break;
-            case "rejectusername":
-                text = "<b>Your username has been set to <em>" + msg.name + "</em> because the name you chose is in use.</b><br>";
+            case 'rejectusername':
+                text = `<b>Your username has been set to <em>${msg.name}</em> because the name you chose is in use.</b><br>`;
                 break;
-            case "userlist":
-                var ul = "";
-                var i;
+            case 'userlist':
+                let ul = '';
 
-                for (i = 0; i < msg.users.length; i++)
+                for (let i = 0; i < msg.users.length; i++)
                 {
-                    ul += msg.users[i] + "<br>";
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    ul += `${msg.users[i]}<br>`;
                 }
                 break;
         }
@@ -85,15 +83,15 @@ function connect()
             f.write(text);
         }
     };
-    console.log("***CREATED ONMESSAGE");
+    console.log('***CREATED ONMESSAGE');
 }
 
 function send()
 {
-    console.log("***SEND");
-    var msg = {
+    console.log('***SEND');
+    const msg = {
         text: 'send msg',
-        type: "message",
+        type: 'message',
         id: clientID,
         date: Date.now()
     };

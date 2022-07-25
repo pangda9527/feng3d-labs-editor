@@ -14,12 +14,12 @@ export class OVTerrain extends TerrainView implements IObjectView
         this.space = <any>objectViewInfo.owner;
     }
 
-    getAttributeView(attributeName: String)
+    getAttributeView(_attributeName: String)
     {
         return null;
     }
 
-    getblockView(blockName: String)
+    getblockView(_blockName: String)
     {
         return null;
     }

@@ -11,19 +11,19 @@ export class Editorshortcut
         // 初始化快捷键
         shortcut.addShortCuts(shortcutConfig);
 
-        //监听命令
-        shortcut.on("deleteSeletedGameObject", this.onDeleteSeletedGameObject, this);
+        // 监听命令
+        shortcut.on('deleteSeletedGameObject', this.onDeleteSeletedGameObject, this);
         //
-        shortcut.on("gameobjectMoveTool", this.onGameobjectMoveTool, this);
-        shortcut.on("gameobjectRotationTool", this.onGameobjectRotationTool, this);
-        shortcut.on("gameobjectScaleTool", this.onGameobjectScaleTool, this);
+        shortcut.on('gameobjectMoveTool', this.onGameobjectMoveTool, this);
+        shortcut.on('gameobjectRotationTool', this.onGameobjectRotationTool, this);
+        shortcut.on('gameobjectScaleTool', this.onGameobjectScaleTool, this);
         //
-        shortcut.on("openDevTools", this.onOpenDevTools, this);
-        shortcut.on("refreshWindow", this.onRefreshWindow, this);
-        // 
-        shortcut.on("copy", this.onCopy, this);
-        shortcut.on("paste", this.onPaste, this);
-        shortcut.on("undo", this.onUndo, this);
+        shortcut.on('openDevTools', this.onOpenDevTools, this);
+        shortcut.on('refreshWindow', this.onRefreshWindow, this);
+        //
+        shortcut.on('copy', this.onCopy, this);
+        shortcut.on('paste', this.onPaste, this);
+        shortcut.on('undo', this.onUndo, this);
     }
 
     private onGameobjectMoveTool()
@@ -43,17 +43,18 @@ export class Editorshortcut
 
     private onDeleteSeletedGameObject()
     {
-        var selectedObject = EditorData.editorData.selectedObjects;
+        const selectedObject = EditorData.editorData.selectedObjects;
 
         if (!selectedObject)
-            return;
-        //删除文件引用计数
-        selectedObject.forEach(element =>
+        { return; }
+        // 删除文件引用计数
+        selectedObject.forEach((element) =>
         {
             if (element instanceof GameObject)
             {
                 element.remove();
-            } else if (element instanceof AssetNode)
+            }
+            else if (element instanceof AssetNode)
             {
                 element.delete();
             }
@@ -73,19 +74,19 @@ export class Editorshortcut
 
     private onCopy()
     {
-        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
+        const objects = EditorData.editorData.selectedObjects.filter((v) => v instanceof GameObject);
         EditorData.editorData.copyObjects = objects;
     }
 
     private onPaste()
     {
-        var undoSelectedObjects = EditorData.editorData.selectedObjects;
+        const undoSelectedObjects = EditorData.editorData.selectedObjects;
         //
-        var objects: GameObject[] = EditorData.editorData.copyObjects.filter(v => v instanceof GameObject);
-        if (objects.length == 0) return;
-        var parent = objects[0].parent;
-        var newGameObjects = objects.map(v => serialization.clone(v));
-        newGameObjects.forEach(v =>
+        const objects: GameObject[] = EditorData.editorData.copyObjects.filter((v) => v instanceof GameObject);
+        if (objects.length === 0) return;
+        const parent = objects[0].parent;
+        const newGameObjects = objects.map((v) => serialization.clone(v));
+        newGameObjects.forEach((v) =>
         {
             parent.addChild(v);
         });
@@ -94,7 +95,7 @@ export class Editorshortcut
         // undo
         EditorData.editorData.undoList.push(() =>
         {
-            newGameObjects.forEach(v =>
+            newGameObjects.forEach((v) =>
             {
                 v.remove();
             });
@@ -104,7 +105,7 @@ export class Editorshortcut
 
     private onUndo()
     {
-        var item = EditorData.editorData.undoList.pop();
+        const item = EditorData.editorData.undoList.pop();
         if (item) item();
     }
 }
@@ -113,9 +114,9 @@ export class SceneControlConfig
 {
     mouseWheelMoveStep = 0.004;
 
-    //dynamic
+    // dynamic
     lookDistance = 3;
 
     sceneCameraForwardBackwardStep = 0.01;
 }
-export var sceneControlConfig = new SceneControlConfig();
+export const sceneControlConfig = new SceneControlConfig();

@@ -12,7 +12,7 @@ export class OAVMinMaxGradient extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVMinMaxGradient";
+        this.skinName = 'OAVMinMaxGradient';
     }
 
     initView()

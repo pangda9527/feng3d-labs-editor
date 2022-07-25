@@ -48,7 +48,7 @@ export class OAVVector4 extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVVector4";
+        this.skinName = 'OAVVector4';
     }
 
     initView()
@@ -56,19 +56,19 @@ export class OAVVector4 extends OAVBase
         super.initView();
 
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "x", textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'x', textInput: this.xTextInput, editable: this._attributeViewInfo.editable,
             controller: this.xLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "y", textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'y', textInput: this.yTextInput, editable: this._attributeViewInfo.editable,
             controller: this.yLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "z", textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'z', textInput: this.zTextInput, editable: this._attributeViewInfo.editable,
             controller: this.zLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.attributeValue, attribute: "w", textInput: this.wTextInput, editable: this._attributeViewInfo.editable,
+            space: this.attributeValue, attribute: 'w', textInput: this.wTextInput, editable: this._attributeViewInfo.editable,
             controller: this.wLabel, step: this.step, stepDownup: this.stepDownup, stepScale: this.stepScale, minValue: this.minValue, maxValue: this.maxValue,
         }));
     }

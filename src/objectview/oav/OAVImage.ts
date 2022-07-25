@@ -9,13 +9,13 @@ export class OAVImage extends OAVBase
 	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
-		this.skinName = "OAVImage";
+		this.skinName = 'OAVImage';
 		this.alpha = 1;
 	}
 
 	initView()
 	{
-		var texture: Texture2D = this.space;
+		const texture: Texture2D = this.space;
 		this.image.source = texture.dataURL;
 
 		this.addEventListener(egret.Event.RESIZE, this.onResize, this);

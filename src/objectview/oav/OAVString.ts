@@ -10,13 +10,13 @@ export class OAVString extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVString";
+        this.skinName = 'OAVString';
     }
 
     initView()
     {
         this.addBinder(
-            new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable, })
+            new TextInputBinder().init({ space: this.space, attribute: this._attributeName, textInput: this.txtInput, editable: this._attributeViewInfo.editable })
         );
     }
 }

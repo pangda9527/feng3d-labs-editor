@@ -1,4 +1,4 @@
-import { OVComponent, IObjectView, ObjectViewInfo, IObjectBlockView, objectview } from 'feng3d';
+import { IObjectBlockView, IObjectView, objectview, ObjectViewInfo, OVComponent } from 'feng3d';
 
 declare global
 {
@@ -28,7 +28,7 @@ export class OVDefault extends eui.Component implements IObjectView
 
 		this._objectViewInfo = objectViewInfo;
 		this._space = objectViewInfo.owner;
-		this.skinName = "OVDefault";
+		this.skinName = 'OVDefault';
 	}
 
 	$onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -48,10 +48,10 @@ export class OVDefault extends eui.Component implements IObjectView
 	{
 		if (this.blockViews) return;
 		this.blockViews = [];
-		var objectBlockInfos = this._objectViewInfo.objectBlockInfos;
-		for (var i = 0; i < objectBlockInfos.length; i++)
+		const objectBlockInfos = this._objectViewInfo.objectBlockInfos;
+		for (let i = 0; i < objectBlockInfos.length; i++)
 		{
-			var displayObject = objectview.getBlockView(objectBlockInfos[i]);
+			const displayObject = objectview.getBlockView(objectBlockInfos[i]);
 			displayObject.percentWidth = 100;
 			displayObject.objectView = this;
 			this.group.addChild(displayObject);
@@ -62,9 +62,9 @@ export class OVDefault extends eui.Component implements IObjectView
 	dispose()
 	{
 		if (!this.blockViews) return;
-		for (var i = 0; i < this.blockViews.length; i++)
+		for (let i = 0; i < this.blockViews.length; i++)
 		{
-			var displayObject = this.blockViews[i];
+			const displayObject = this.blockViews[i];
 			displayObject.objectView = null;
 			this.group.removeChild(displayObject);
 		}
@@ -97,7 +97,7 @@ export class OVDefault extends eui.Component implements IObjectView
 
 		this.initview();
 
-		for (var i = 0; i < this.blockViews.length; i++)
+		for (let i = 0; i < this.blockViews.length; i++)
 		{
 			this.blockViews[i].updateView();
 		}
@@ -105,26 +105,28 @@ export class OVDefault extends eui.Component implements IObjectView
 
 	getblockView(blockName: string)
 	{
-		for (var i = 0; i < this.blockViews.length; i++)
+		for (let i = 0; i < this.blockViews.length; i++)
 		{
-			if (this.blockViews[i].blockName == blockName)
+			if (this.blockViews[i].blockName === blockName)
 			{
 				return this.blockViews[i];
 			}
 		}
+
 		return null;
 	}
 
 	getAttributeView(attributeName: string)
 	{
-		for (var i = 0; i < this.blockViews.length; i++)
+		for (let i = 0; i < this.blockViews.length; i++)
 		{
-			var attributeView = this.blockViews[i].getAttributeView(attributeName);
-			if (attributeView != null)
+			const attributeView = this.blockViews[i].getAttributeView(attributeName);
+			if (attributeView)
 			{
 				return attributeView;
 			}
 		}
+
 		return null;
 	}
 }

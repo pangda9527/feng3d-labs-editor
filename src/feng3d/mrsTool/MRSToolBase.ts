@@ -12,7 +12,7 @@ export class MRSToolBase extends Component
 
     protected ismouseDown = false;
 
-    //平移平面，该平面处于场景空间，用于计算位移量
+    // 平移平面，该平面处于场景空间，用于计算位移量
     protected movePlane3D: Plane;
     protected startSceneTransform: Matrix4x4;
 
@@ -25,19 +25,19 @@ export class MRSToolBase extends Component
     init()
     {
         super.init();
-        var holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
+        const holdSizeComponent = this.gameObject.addComponent(HoldSizeComponent);
         holdSizeComponent.holdSize = 0.005;
         //
-        this.on("addedToScene", this.onAddedToScene, this);
-        this.on("removedFromScene", this.onRemovedFromScene, this);
+        this.on('addedToScene', this.onAddedToScene, this);
+        this.on('removedFromScene', this.onRemovedFromScene, this);
     }
 
     protected onAddedToScene()
     {
         this.mrsToolTarget.controllerTool = this.transform;
         //
-        windowEventProxy.on("mousedown", this.onMouseDown, this);
-        windowEventProxy.on("mouseup", this.onMouseUp, this);
+        windowEventProxy.on('mousedown', this.onMouseDown, this);
+        windowEventProxy.on('mouseup', this.onMouseUp, this);
 
         ticker.onframe(this.updateToolModel, this);
     }
@@ -46,8 +46,8 @@ export class MRSToolBase extends Component
     {
         this.mrsToolTarget.controllerTool = null;
         //
-        windowEventProxy.off("mousedown", this.onMouseDown, this);
-        windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off('mousedown', this.onMouseDown, this);
+        windowEventProxy.off('mouseup', this.onMouseUp, this);
 
         ticker.offframe(this.updateToolModel, this);
     }
@@ -59,13 +59,13 @@ export class MRSToolBase extends Component
 
     private update()
     {
-        var holdSizeComponent = this.gameObject.getComponent(HoldSizeComponent);
+        const holdSizeComponent = this.gameObject.getComponent(HoldSizeComponent);
         holdSizeComponent.camera = this._editorCamera;
     }
 
-    protected onItemMouseDown(event: IEvent<any>)
+    protected onItemMouseDown(_event: IEvent<any>)
     {
-        shortcut.activityState("inTransforming");
+        shortcut.activityState('inTransforming');
     }
 
     protected get toolModel()
@@ -76,8 +76,8 @@ export class MRSToolBase extends Component
     protected set toolModel(value)
     {
         if (this._toolModel)
-            this.gameObject.removeChild(this._toolModel.gameObject);
-        this._toolModel = value;;
+        { this.gameObject.removeChild(this._toolModel.gameObject); }
+        this._toolModel = value;
         if (this._toolModel)
         {
             this.gameObject.addChild(this._toolModel.gameObject);
@@ -91,13 +91,19 @@ export class MRSToolBase extends Component
 
     set selectedItem(value)
     {
-        if (this._selectedItem == value)
+        if (this._selectedItem === value)
+        {
             return;
+        }
         if (this._selectedItem)
+        {
             this._selectedItem.selected = false;
+        }
         this._selectedItem = value;
         if (this._selectedItem)
+        {
             this._selectedItem.selected = true;
+        }
     }
 
     protected updateToolModel()
@@ -119,7 +125,7 @@ export class MRSToolBase extends Component
 
         ticker.nextframe(() =>
         {
-            shortcut.deactivityState("inTransforming");
+            shortcut.deactivityState('inTransforming');
         });
     }
 
@@ -128,20 +134,22 @@ export class MRSToolBase extends Component
      */
     protected getLocalMousePlaneCross()
     {
-        //射线与平面交点
-        var crossPos = this.getMousePlaneCross();
-        //把交点从世界转换为模型空间
-        var inverseGlobalMatrix = this.startSceneTransform.clone();
+        // 射线与平面交点
+        let crossPos = this.getMousePlaneCross();
+        // 把交点从世界转换为模型空间
+        const inverseGlobalMatrix = this.startSceneTransform.clone();
         inverseGlobalMatrix.invert();
         crossPos = inverseGlobalMatrix.transformPoint3(crossPos);
+
         return crossPos;
     }
 
     protected getMousePlaneCross()
     {
-        var line3D = this.gameObject.scene.mouseRay3D;
-        //射线与平面交点
-        var crossPos = <Vector3>this.movePlane3D.intersectWithLine3(line3D);
+        const line3D = this.gameObject.scene.mouseRay3D;
+        // 射线与平面交点
+        const crossPos = <Vector3>this.movePlane3D.intersectWithLine3(line3D);
+
         return crossPos;
     }
 }

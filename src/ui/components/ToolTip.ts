@@ -2,8 +2,6 @@ import { windowEventProxy } from 'feng3d';
 import { editorui } from '../../global/editorui';
 import { TipString } from './tipviews/TipString';
 
-export var toolTip: ToolTip;
-
 export interface ITipView extends egret.DisplayObject
 {
     value: any;
@@ -41,13 +39,15 @@ export class ToolTip
     {
         this.removeTipview();
 
-        var displayObject = event.currentTarget;
-        var tip = this.tipmap.get(displayObject);
-        var tipviewcls = this.tipviewmap.get(tip.constructor);
-        if (!tipviewcls)
-            tipviewcls = this.defaultTipview();
+        const displayObject = event.currentTarget;
+        const tip = this.tipmap.get(displayObject);
+        let TipviewCls = this.tipviewmap.get(tip.constructor);
+        if (!TipviewCls)
+        {
+            TipviewCls = this.defaultTipview();
+        }
 
-        this.tipView = new tipviewcls();
+        this.tipView = new TipviewCls();
         editorui.tooltipLayer.addChild(this.tipView);
         this.tipView.value = tip;
         this.tipView.x = windowEventProxy.clientX;
@@ -59,7 +59,7 @@ export class ToolTip
 
     private onMouseOut(event: egret.MouseEvent)
     {
-        var displayObject = event.currentTarget;
+        const displayObject = event.currentTarget;
         displayObject.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
         this.removeTipview();
     }
@@ -72,7 +72,6 @@ export class ToolTip
             this.tipView = null;
         }
     }
-
 }
 
-toolTip = new ToolTip();
+export const toolTip = new ToolTip();

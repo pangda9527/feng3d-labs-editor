@@ -13,7 +13,7 @@ export class OAVParticleComponentList extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVParticleComponentList";
+        this.skinName = 'OAVParticleComponentList';
     }
 
     get space()
@@ -40,7 +40,7 @@ export class OAVParticleComponentList extends OAVBase
 
     set attributeValue(value: Object)
     {
-        if (this._space[this._attributeName] != value)
+        if (this._space[this._attributeName] !== value)
         {
             this._space[this._attributeName] = value;
         }
@@ -49,10 +49,10 @@ export class OAVParticleComponentList extends OAVBase
 
     initView(): void
     {
-        (<eui.VerticalLayout>this.group.layout).gap = -1;
+        (<eui.VerticalLayout> this.group.layout).gap = -1;
 
-        var components = <any>this.attributeValue;
-        for (var i = 0; i < components.length; i++)
+        const components = <any> this.attributeValue;
+        for (let i = 0; i < components.length; i++)
         {
             this.addComponentView(components[i]);
         }
@@ -60,8 +60,8 @@ export class OAVParticleComponentList extends OAVBase
 
     dispose()
     {
-        var components = <any>this.attributeValue;
-        for (var i = 0; i < components.length; i++)
+        const components = <any> this.attributeValue;
+        for (let i = 0; i < components.length; i++)
         {
             this.removedComponentView(components[i]);
         }
@@ -72,28 +72,27 @@ export class OAVParticleComponentList extends OAVBase
      */
     updateView(): void
     {
-        for (var i = 0, n = this.group.numChildren; i < n; i++)
+        for (let i = 0, n = this.group.numChildren; i < n; i++)
         {
-            var child = this.group.getChildAt(i)
+            const child = this.group.getChildAt(i);
             if (child instanceof ParticleComponentView)
-                child.updateView();
+                { child.updateView(); }
         }
     }
 
     private addComponentView(component: ParticleModule)
     {
-        var o: Object;
-        var displayObject = new ParticleComponentView(component);
+        const displayObject = new ParticleComponentView(component);
         displayObject.percentWidth = 100;
         this.group.addChild(displayObject);
     }
 
     private removedComponentView(component: ParticleModule)
     {
-        for (var i = this.group.numChildren - 1; i >= 0; i--)
+        for (let i = this.group.numChildren - 1; i >= 0; i--)
         {
-            var displayObject = this.group.getChildAt(i);
-            if (displayObject instanceof ParticleComponentView && displayObject.component == component)
+            const displayObject = this.group.getChildAt(i);
+            if (displayObject instanceof ParticleComponentView && displayObject.component === component)
             {
                 this.group.removeChild(displayObject);
             }

@@ -8,7 +8,7 @@ enum MessageType
 }
 /**
  * 消息模块
- * 
+ *
  * 用于显示提示信息，例如屏幕中间的上浮信息
  */
 export class Message
@@ -23,8 +23,8 @@ export class Message
 
     constructor()
     {
-        globalEmitter.on("message", this._onMessage, this);
-        globalEmitter.on("message.error", this._onErrorMessage, this);
+        globalEmitter.on('message', this._onMessage, this);
+        globalEmitter.on('message.error', this._onErrorMessage, this);
     }
 
     private _onMessage(event: IEvent<string>)
@@ -41,7 +41,7 @@ export class Message
 
     private _getMessageItem(message: [MessageType, string])
     {
-        var label = this._messageLabelPool.pop();
+        let label = this._messageLabelPool.pop();
         if (!label)
         {
             label = new eui.Label();
@@ -58,7 +58,8 @@ export class Message
                 label.textColor = 0xffffff;
                 break;
         }
-        return label;
+
+return label;
     }
 
     private _showMessage()
@@ -67,10 +68,11 @@ export class Message
         {
             this._showMessageIndex = 0;
             this._messages = [];
-            return;
+
+return;
         }
-        let message = this._messages[this._showMessageIndex++];
-        let showItem = this._getMessageItem(message);
+        const message = this._messages[this._showMessageIndex++];
+        const showItem = this._getMessageItem(message);
 
         //
         showItem.x = (editorui.stage.stageWidth - showItem.width) / 2;

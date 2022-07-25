@@ -4,18 +4,18 @@ import { menu, MenuItem } from './Menu';
 
 export const componentIconMap = new Map<any, string>();
 
-componentIconMap.set(Transform, "Transform_png");
-componentIconMap.set(Water, "Water_png");
-componentIconMap.set(Renderable, "Model_png");
-componentIconMap.set(ScriptComponent, "ScriptComponent_png");
-componentIconMap.set(Camera, "Camera_png");
-componentIconMap.set(AudioSource, "AudioSource_png");
-componentIconMap.set(AudioListener, "AudioListener_png");
-componentIconMap.set(SpotLight, "SpotLight_png");
-componentIconMap.set(PointLight, "PointLight_png");
-componentIconMap.set(DirectionalLight, "DirectionalLight_png");
-componentIconMap.set(FPSController, "FPSController_png");
-componentIconMap.set(Terrain, "Terrain_png");
+componentIconMap.set(Transform, 'Transform_png');
+componentIconMap.set(Water, 'Water_png');
+componentIconMap.set(Renderable, 'Model_png');
+componentIconMap.set(ScriptComponent, 'ScriptComponent_png');
+componentIconMap.set(Camera, 'Camera_png');
+componentIconMap.set(AudioSource, 'AudioSource_png');
+componentIconMap.set(AudioListener, 'AudioListener_png');
+componentIconMap.set(SpotLight, 'SpotLight_png');
+componentIconMap.set(PointLight, 'PointLight_png');
+componentIconMap.set(DirectionalLight, 'DirectionalLight_png');
+componentIconMap.set(FPSController, 'FPSController_png');
+componentIconMap.set(Terrain, 'Terrain_png');
 
 export class ComponentView extends eui.Component
 {
@@ -41,9 +41,9 @@ export class ComponentView extends eui.Component
 		super();
 		this.component = component;
 
-		component.on("refreshView", this.onRefreshView, this);
+		component.on('refreshView', this.onRefreshView, this);
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "ComponentSkin";
+		this.skinName = 'ComponentSkin';
 	}
 
 	/**
@@ -53,22 +53,22 @@ export class ComponentView extends eui.Component
 	{
 		this.updateEnableCB();
 		if (this.componentView)
-			this.componentView.updateView();
+		{ this.componentView.updateView(); }
 	}
 
 	private onComplete()
 	{
-		var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
+		const componentName = classUtils.getQualifiedClassName(this.component).split('.').pop();
 		this.accordion.titleName = componentName;
-		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ['enabled'] });
 		this.accordion.addContent(this.componentView);
 
-		this.enabledCB = this.accordion["enabledCB"];
-		this.componentIcon = this.accordion["componentIcon"];
-		this.helpBtn = this.accordion["helpBtn"];
-		this.operationBtn = this.accordion["operationBtn"];
+		this.enabledCB = this.accordion['enabledCB'];
+		this.componentIcon = this.accordion['componentIcon'];
+		this.helpBtn = this.accordion['helpBtn'];
+		this.operationBtn = this.accordion['operationBtn'];
 
-		var icon = componentIconMap.get(<any>this.component.constructor);
+		const icon = componentIconMap.get(this.component.constructor);
 		if (icon)
 		{
 			this.componentIcon.source = icon;
@@ -78,13 +78,17 @@ export class ComponentView extends eui.Component
 		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
 		if (this.stage)
+		{
 			this.onAddToStage();
+		}
 	}
 
-	private onDeleteButton(event: egret.MouseEvent)
+	private onDeleteButton(_event: egret.MouseEvent)
 	{
 		if (this.component.gameObject)
+		{
 			this.component.gameObject.removeComponent(this.component);
+		}
 	}
 
 	private onAddToStage()
@@ -94,28 +98,28 @@ export class ComponentView extends eui.Component
 
 		this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 		if (this.component instanceof Behaviour)
-			watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+		{ watcher.watch(this.component, 'enabled', this.updateEnableCB, this); }
 
 		this.operationBtn.addEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 		this.helpBtn.addEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-		globalEmitter.on("asset.scriptChanged", this.onScriptChanged, this);
+		globalEmitter.on('asset.scriptChanged', this.onScriptChanged, this);
 	}
 
 	private onRemovedFromStage()
 	{
 		this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
 		if (this.component instanceof Behaviour)
-			watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		{ watcher.unwatch(this.component, 'enabled', this.updateEnableCB, this); }
 
 		this.operationBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOperationBtnClick, this);
 		this.helpBtn.removeEventListener(egret.MouseEvent.CLICK, this.onHelpBtnClick, this);
-		globalEmitter.off("asset.scriptChanged", this.onScriptChanged, this);
+		globalEmitter.off('asset.scriptChanged', this.onScriptChanged, this);
 	}
 
 	private onRefreshView()
 	{
 		this.accordion.removeContent(this.componentView);
-		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ['enabled'] });
 		this.accordion.addContent(this.componentView);
 	}
 
@@ -145,8 +149,8 @@ export class ComponentView extends eui.Component
 		// 初始化Script属性界面
 		if (this.component instanceof ScriptComponent)
 		{
-			watcher.watch(this.component, "scriptName", this.onScriptChanged, this);
-			var component = this.component;
+			watcher.watch(this.component, 'scriptName', this.onScriptChanged, this);
+			const component = this.component;
 			if (component.scriptInstance)
 			{
 				this.scriptView = objectview.getObjectView(component.scriptInstance, { autocreate: false });
@@ -160,27 +164,27 @@ export class ComponentView extends eui.Component
 		// 移除Script属性界面
 		if (this.component instanceof ScriptComponent)
 		{
-			watcher.unwatch(this.component, "scriptName", this.onScriptChanged, this);
+			watcher.unwatch(this.component, 'scriptName', this.onScriptChanged, this);
 		}
 		if (this.scriptView)
 		{
 			if (this.scriptView.parent)
-				this.scriptView.parent.removeChild(this.scriptView);
+			{ this.scriptView.parent.removeChild(this.scriptView); }
 		}
 	}
 
 	private onOperationBtnClick()
 	{
-		var menus: MenuItem[] = [];
+		const menus: MenuItem[] = [];
 
 		if (!(this.component instanceof Transform))
 		{
 			menus.push({
-				label: "移除组件",
+				label: '移除组件',
 				click: () =>
 				{
 					if (this.component.gameObject)
-						this.component.gameObject.removeComponent(this.component);
+					{ this.component.gameObject.removeComponent(this.component); }
 				}
 			});
 		}

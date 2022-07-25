@@ -1,14 +1,13 @@
 import { editorui } from '../../global/editorui';
 import { maskview } from './Maskview';
 
-
 /**
  * 下拉列表
  */
 export class ComboBox extends eui.Component implements eui.UIComponent
 {
 	public label: eui.Label;
-	public list: eui.List
+	public list: eui.List;
 
 	/**
 	 * 数据
@@ -27,9 +26,13 @@ export class ComboBox extends eui.Component implements eui.UIComponent
 		if (this.label)
 		{
 			if (this._data)
+			{
 				this.label.text = this._data.label;
+			}
 			else
-				this.label.text = "";
+			{
+				this.label.text = '';
+			}
 		}
 	}
 	_data: { label: string, value: any };
@@ -37,7 +40,7 @@ export class ComboBox extends eui.Component implements eui.UIComponent
 	public constructor()
 	{
 		super();
-		this.skinName = "ComboBoxSkin";
+		this.skinName = 'ComboBoxSkin';
 	}
 
 	$onAddToStage(stage: egret.Stage, nestLevel: number): void
@@ -66,23 +69,29 @@ export class ComboBox extends eui.Component implements eui.UIComponent
 
 	private updateview()
 	{
-		if (this.data == null && this.dataProvider != null)
+		if (!this.data && this.dataProvider)
+		{
 			this.data = this.dataProvider[0];
+		}
 
 		if (this.data)
+		{
 			this.label.text = this.data.label;
+		}
 		else
-			this.label.text = "";
+		{
+			this.label.text = '';
+		}
 	}
 
 	private onClick()
 	{
 		if (!this.dataProvider)
-			return;
+		{ return; }
 
 		this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
 
-		var rect = this.getTransformedBounds(this.stage);
+		const rect = this.getTransformedBounds(this.stage);
 
 		this.list.x = rect.left;
 		this.list.y = rect.bottom;
@@ -98,7 +107,7 @@ export class ComboBox extends eui.Component implements eui.UIComponent
 		this.updateview();
 
 		if (this.list.parent)
-			this.list.parent.removeChild(this.list);
+		{ this.list.parent.removeChild(this.list); }
 
 		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
 	}

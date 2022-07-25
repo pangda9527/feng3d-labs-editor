@@ -10,7 +10,7 @@ import { popupview } from './Popupview';
 export class MinMaxGradientView extends eui.Component
 {
     //
-    @watch("_onMinMaxGradientChanged")
+    @watch('_onMinMaxGradientChanged')
     minMaxGradient = new MinMaxGradient();
 
     public colorGroup0: eui.Group;
@@ -25,7 +25,7 @@ export class MinMaxGradientView extends eui.Component
     public constructor()
     {
         super();
-        this.skinName = "MinMaxGradientView";
+        this.skinName = 'MinMaxGradientView';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -59,7 +59,7 @@ export class MinMaxGradientView extends eui.Component
         this.colorGroup0.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
         this.colorGroup1.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this._onRightClick, this);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()
@@ -67,20 +67,20 @@ export class MinMaxGradientView extends eui.Component
         //
         if (this.colorGroup0.width > 0 && this.colorGroup0.height > 0)
         {
-            if (this.minMaxGradient.mode == MinMaxGradientMode.Color)
+            if (this.minMaxGradient.mode === MinMaxGradientMode.Color)
             {
-                var color = this.minMaxGradient.getValue(0);
+                const color = this.minMaxGradient.getValue(0);
                 this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(color).toDataURL();
                 //
                 if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
             }
-            else if (this.minMaxGradient.mode == MinMaxGradientMode.Gradient)
+            else if (this.minMaxGradient.mode === MinMaxGradientMode.Gradient)
             {
                 this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                 //
                 if (this.secondGroup.parent) this.secondGroup.parent.removeChild(this.secondGroup);
             }
-            else if (this.minMaxGradient.mode == MinMaxGradientMode.TwoColors)
+            else if (this.minMaxGradient.mode === MinMaxGradientMode.TwoColors)
             {
                 this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawColorRect(this.minMaxGradient.colorMin).toDataURL();
                 //
@@ -88,7 +88,7 @@ export class MinMaxGradientView extends eui.Component
                 //
                 if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
             }
-            else if (this.minMaxGradient.mode == MinMaxGradientMode.TwoGradients)
+            else if (this.minMaxGradient.mode === MinMaxGradientMode.TwoGradients)
             {
                 this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradientMin).toDataURL();
                 //
@@ -96,7 +96,7 @@ export class MinMaxGradientView extends eui.Component
                 //
                 if (!this.secondGroup.parent) this.secondGroupParent.addChildAt(this.secondGroup, 1);
             }
-            else if (this.minMaxGradient.mode == MinMaxGradientMode.RandomColor)
+            else if (this.minMaxGradient.mode === MinMaxGradientMode.RandomColor)
             {
                 this.colorImage0.source = new ImageUtil(this.colorGroup0.width, this.colorGroup0.height).drawMinMaxGradient(this.minMaxGradient.gradient).toDataURL();
                 //
@@ -118,7 +118,7 @@ export class MinMaxGradientView extends eui.Component
     private activeColorGroup: any;
     private onClick(e: egret.MouseEvent)
     {
-        var view: eui.Component = null;
+        let view: eui.Component = null;
         switch (e.currentTarget)
         {
             case this.colorGroup0:
@@ -171,7 +171,7 @@ export class MinMaxGradientView extends eui.Component
         }
         if (view)
         {
-            var pos = this.localToGlobal(0, 0);
+            const pos = this.localToGlobal(0, 0);
             pos.x = pos.x - 318;
             view.addEventListener(egret.Event.CHANGE, this.onPickerViewChanged, this);
             //
@@ -187,7 +187,7 @@ export class MinMaxGradientView extends eui.Component
 
     private onPickerViewChanged()
     {
-        if (this.activeColorGroup == this.colorGroup0)
+        if (this.activeColorGroup === this.colorGroup0)
         {
             switch (this.minMaxGradient.mode)
             {
@@ -207,7 +207,8 @@ export class MinMaxGradientView extends eui.Component
                     this.minMaxGradient.gradient = GradientEditor.gradientEditor.gradient;
                     break;
             }
-        } else if (this.activeColorGroup == this.colorGroup1)
+        }
+        else if (this.activeColorGroup === this.colorGroup1)
         {
             switch (this.minMaxGradient.mode)
             {
@@ -226,54 +227,68 @@ export class MinMaxGradientView extends eui.Component
 
     private _onRightClick(e: egret.MouseEvent)
     {
-        var mode = this.minMaxGradient.mode;
-        var target = e.currentTarget;
+        const mode = this.minMaxGradient.mode;
+        const target = e.currentTarget;
 
-        var menus: MenuItem[] = [{
-            label: "Copy", click: () =>
+        const menus: MenuItem[] = [{
+            label: 'Copy', click: () =>
             {
-                if (target == this.colorGroup0)
+                if (target === this.colorGroup0)
                 {
-                    if (mode == MinMaxGradientMode.Color)
-                        copyColor = this.minMaxGradient.color.clone();
-                    else if (mode == MinMaxGradientMode.TwoColors)
-                        copyColor = this.minMaxGradient.colorMin.clone();
-                    else if (mode == MinMaxGradientMode.TwoGradients)
-                        copyGradient = serialization.clone(this.minMaxGradient.gradientMin);
+                    if (mode === MinMaxGradientMode.Color)
+                    { copyColor = this.minMaxGradient.color.clone(); }
+                    else if (mode === MinMaxGradientMode.TwoColors)
+                    { copyColor = this.minMaxGradient.colorMin.clone(); }
+                    else if (mode === MinMaxGradientMode.TwoGradients)
+                    { copyGradient = serialization.clone(this.minMaxGradient.gradientMin); }
                     else
-                        copyGradient = serialization.clone(this.minMaxGradient.gradient);
-                } else if (target == this.colorGroup1)
+                    { copyGradient = serialization.clone(this.minMaxGradient.gradient); }
+                }
+                else if (target === this.colorGroup1)
                 {
-                    if (mode == MinMaxGradientMode.TwoColors)
-                        copyColor = this.minMaxGradient.colorMax.clone();
+                    if (mode === MinMaxGradientMode.TwoColors)
+                    { copyColor = this.minMaxGradient.colorMax.clone(); }
                     else
-                        copyGradient = serialization.clone(this.minMaxGradient.gradientMax);
+                    { copyGradient = serialization.clone(this.minMaxGradient.gradientMax); }
                 }
             }
         }];
-        if ((copyGradient != null && (mode == MinMaxGradientMode.Gradient || mode == MinMaxGradientMode.TwoGradients || mode == MinMaxGradientMode.RandomColor))
-            || (copyColor != null && (mode == MinMaxGradientMode.Color || mode == MinMaxGradientMode.TwoColors))
+        if ((copyGradient && (mode === MinMaxGradientMode.Gradient || mode === MinMaxGradientMode.TwoGradients || mode === MinMaxGradientMode.RandomColor))
+            || (copyColor && (mode === MinMaxGradientMode.Color || mode === MinMaxGradientMode.TwoColors))
         )
         {
             menus.push({
-                label: "Paste", click: () =>
+                label: 'Paste', click: () =>
                 {
-                    if (target == this.colorGroup0)
+                    if (target === this.colorGroup0)
                     {
-                        if (mode == MinMaxGradientMode.Color)
+                        if (mode === MinMaxGradientMode.Color)
+                        {
                             this.minMaxGradient.color.copy(copyColor);
-                        else if (mode == MinMaxGradientMode.TwoColors)
+                        }
+                        else if (mode === MinMaxGradientMode.TwoColors)
+                        {
                             this.minMaxGradient.colorMin.copy(copyColor);
-                        else if (mode == MinMaxGradientMode.TwoGradients)
+                        }
+                        else if (mode === MinMaxGradientMode.TwoGradients)
+                        {
                             this.minMaxGradient.gradientMin = serialization.clone(copyGradient);
+                        }
                         else
+                        {
                             this.minMaxGradient.gradient = serialization.clone(copyGradient);
-                    } else if (target == this.colorGroup1)
+                        }
+                    }
+                    else if (target === this.colorGroup1)
                     {
-                        if (mode == MinMaxGradientMode.TwoColors)
+                        if (mode === MinMaxGradientMode.TwoColors)
+                        {
                             this.minMaxGradient.colorMax.copy(copyColor);
+                        }
                         else
+                        {
                             this.minMaxGradient.gradientMax = serialization.clone(copyGradient);
+                        }
                     }
 
                     this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -283,9 +298,8 @@ export class MinMaxGradientView extends eui.Component
         }
         menu.popup(menus);
     }
-
 }
 
-var copyGradient: Gradient;
-var copyColor: Color4;
+let copyGradient: Gradient;
+let copyColor: Color4;
 

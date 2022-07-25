@@ -23,18 +23,20 @@ export class EditorCache
      */
     setLastProject(projectname: string)
     {
-        var index = this.lastProjects.indexOf(projectname);
-        if (index != -1)
+        const index = this.lastProjects.indexOf(projectname);
+        if (index !== -1)
+        {
             this.lastProjects.splice(index, 1);
+        }
         this.lastProjects.unshift(projectname);
     }
 
     constructor()
     {
-        var value = localStorage.getItem("feng3d-editor");
+        const value = localStorage.getItem('feng3d-editor');
         if (!value) return;
-        var obj = JSON.parse(value);
-        for (var key in obj)
+        const obj = JSON.parse(value);
+        for (const key in obj)
         {
             if (obj.hasOwnProperty(key))
             {
@@ -45,13 +47,13 @@ export class EditorCache
 
     save()
     {
-        localStorage.setItem("feng3d-editor", JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
+        localStorage.setItem('feng3d-editor', JSON.stringify(this, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
     }
 }
 
-export var editorcache = new EditorCache();
+export const editorcache = new EditorCache();
 
-window.addEventListener("beforeunload", () =>
+window.addEventListener('beforeunload', () =>
 {
     if (EditorAsset.codeeditoWin) EditorAsset.codeeditoWin.close();
     if (TopView.runwin) TopView.runwin.close();

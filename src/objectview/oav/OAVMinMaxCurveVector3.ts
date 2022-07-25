@@ -12,7 +12,7 @@ export class OAVMinMaxCurveVector3 extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVMinMaxCurveVector3";
+        this.skinName = 'OAVMinMaxCurveVector3';
     }
 
     initView()

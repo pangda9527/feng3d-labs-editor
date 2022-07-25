@@ -52,7 +52,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
 
     /**
      * 构建
-     * 
+     *
      * @param asset 资源
      */
     constructor(asset: FileAsset)
@@ -60,24 +60,25 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         super();
 
         this.asset = asset;
-        this.isDirectory = asset.assetType == AssetType.folder;
+        this.isDirectory = asset.assetType === AssetType.folder;
         this.label = asset.fileName;
         // 更新图标
         if (this.isDirectory)
         {
-            this.image = "folder_png";
+            this.image = 'folder_png';
         }
         else
         {
-            this.image = "file_png";
+            this.image = 'file_png';
         }
 
-        asset.readPreview((err, image) =>
+        asset.readPreview((_err, image) =>
         {
             if (image)
             {
                 this.image = dataTransform.imageToDataURL(image);
-            } else
+            }
+            else
             {
                 this.updateImage();
             }
@@ -86,7 +87,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
 
     /**
      * 加载
-     * 
+     *
      * @param callback 加载完成回调
      */
     load(callback?: () => void)
@@ -94,18 +95,20 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
         if (this.isLoaded)
         {
             callback && callback();
+
             return;
         }
 
         if (this.isLoading)
         {
-            callback && this.on("loaded", callback);
+            callback && this.on('loaded', callback);
+
             return;
         }
 
         this.isLoading = true;
 
-        editorRS.readAsset(this.asset.assetId, (err, asset) =>
+        editorRS.readAsset(this.asset.assetId, (err, _asset) =>
         {
             console.assert(!err);
 
@@ -114,7 +117,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
 
             callback && callback();
 
-            this.emit("loaded", this);
+            this.emit('loaded', this);
         });
     }
 
@@ -125,7 +128,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
     {
         if (this.asset instanceof TextureAsset)
         {
-            var texture = this.asset.data;
+            const texture = this.asset.data;
 
             this.image = Feng3dScreenShot.feng3dScreenShot.drawTexture(texture);
 
@@ -133,10 +136,10 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
             {
                 this.asset.writePreview(image);
             });
-
-        } else if (this.asset instanceof TextureCubeAsset)
+        }
+        else if (this.asset instanceof TextureCubeAsset)
         {
-            var textureCube = this.asset.data;
+            const textureCube = this.asset.data;
             textureCube.onLoadCompleted(() =>
             {
                 this.image = Feng3dScreenShot.feng3dScreenShot.drawTextureCube(textureCube);
@@ -146,9 +149,10 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
                     this.asset.writePreview(image);
                 });
             });
-        } else if (this.asset instanceof MaterialAsset)
+        }
+        else if (this.asset instanceof MaterialAsset)
         {
-            var mat = this.asset;
+            const mat = this.asset;
             mat.data.onLoadCompleted(() =>
             {
                 this.image = Feng3dScreenShot.feng3dScreenShot.drawMaterial(mat.data).toDataURL();
@@ -157,17 +161,19 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
                     this.asset.writePreview(image);
                 });
             });
-        } else if (this.asset instanceof GeometryAsset)
+        }
+        else if (this.asset instanceof GeometryAsset)
         {
-            this.image = Feng3dScreenShot.feng3dScreenShot.drawGeometry(<any>this.asset.data).toDataURL();
+            this.image = Feng3dScreenShot.feng3dScreenShot.drawGeometry(this.asset.data as any).toDataURL();
 
             dataTransform.dataURLToImage(this.image, (image) =>
             {
                 this.asset.writePreview(image);
             });
-        } else if (this.asset instanceof GameObjectAsset)
+        }
+        else if (this.asset instanceof GameObjectAsset)
         {
-            var gameObject = this.asset.data;
+            const gameObject = this.asset.data;
             gameObject.onLoadCompleted(() =>
             {
                 this.image = Feng3dScreenShot.feng3dScreenShot.drawGameObject(gameObject).toDataURL();
@@ -184,7 +190,7 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     delete()
     {
-        this.children.forEach(element =>
+        this.children.forEach((element) =>
         {
             element.delete();
         });
@@ -195,24 +201,25 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
 
     /**
      * 获取文件夹列表
-     * 
+     *
      * @param includeClose 是否包含关闭的文件夹
      */
     getFolderList(includeClose = false)
     {
-        var folders: AssetNode[] = [];
+        let folders: AssetNode[] = [];
         if (this.isDirectory)
         {
             folders.push(this);
         }
         if (this.isOpen || includeClose)
         {
-            this.children.forEach(v =>
+            this.children.forEach((v) =>
             {
-                var cfolders = v.getFolderList();
+                const cfolders = v.getFolderList();
                 folders = folders.concat(cfolders);
             });
         }
+
         return folders;
     }
 
@@ -221,74 +228,76 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     getFileList()
     {
-        var files: AssetNode[] = [];
+        let files: AssetNode[] = [];
         files.push(this);
-        this.children.forEach(v =>
+        this.children.forEach((v) =>
         {
-            var cfiles = v.getFileList();
+            const cfiles = v.getFileList();
             files = files.concat(cfiles);
         });
+
         return files;
     }
 
     /**
      * 提供拖拽数据
-     * 
-     * @param dragsource 
+     *
+     * @param dragsource
      */
     setdargSource(dragsource: DragData)
     {
-        var extension = this.asset.assetType;
+        const extension = this.asset.assetType;
         switch (extension)
         {
             case AssetType.gameobject:
-                dragsource.addDragData("file_gameobject", <any>this.asset);
+                dragsource.addDragData('file_gameobject', this.asset as any);
                 break;
             case AssetType.script:
-                dragsource.addDragData("file_script", <any>this.asset);
+                dragsource.addDragData('file_script', this.asset as any);
                 break;
             case AssetType.anim:
-                dragsource.addDragData("animationclip", <any>this.asset.data);
+                dragsource.addDragData('animationclip', this.asset.data as any);
                 break;
             case AssetType.material:
-                dragsource.addDragData("material", <any>this.asset.data);
+                dragsource.addDragData('material', this.asset.data as any);
                 break;
             case AssetType.texturecube:
-                dragsource.addDragData("texturecube", <any>this.asset.data);
+                dragsource.addDragData('texturecube', this.asset.data as any);
                 break;
             case AssetType.geometry:
-                dragsource.addDragData("geometry", <any>this.asset.data);
+                dragsource.addDragData('geometry', this.asset.data as any);
                 break;
             case AssetType.texture:
-                dragsource.addDragData("texture2d", <any>this.asset.data);
+                dragsource.addDragData('texture2d', this.asset.data as any);
                 break;
             case AssetType.audio:
-                dragsource.addDragData("audio", <any>this.asset.data);
+                dragsource.addDragData('audio', this.asset.data);
                 break;
         }
-        dragsource.addDragData("assetNodes", this);
+        dragsource.addDragData('assetNodes', this);
     }
 
     /**
      * 接受拖拽数据
-     * 
-     * @param dragdata 
+     *
+     * @param dragdata
      */
     acceptDragDrop(dragdata: DragData)
     {
         if (!(this.asset instanceof FolderAsset)) return;
-        var folder = this.asset;
+        const folder = this.asset;
 
-        dragdata.getDragData("assetNodes").forEach(v =>
+        dragdata.getDragData('assetNodes').forEach((v) =>
         {
             editorRS.moveAsset(v.asset, folder, (err) =>
             {
                 if (!err)
                 {
                     this.addChild(v);
-                } else
+                }
+                else
                 {
-                    globalEmitter.emit("message.error", err.message);
+                    globalEmitter.emit('message.error', err.message);
                 }
             });
         });
@@ -299,30 +308,31 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
      */
     export()
     {
-        var zip = new JSZip();
+        const zip = new JSZip();
 
-        var path = this.asset.assetPath;
+        let path = this.asset.assetPath;
         if (!pathUtils.isDirectory(path))
-            path = pathUtils.dirname(path);
+        { path = pathUtils.dirname(path); }
 
-        var filename = this.label;
-        editorRS.fs.getAllPathsInFolder(path, (err, filepaths) =>
+        const filename = this.label;
+        editorRS.fs.getAllPathsInFolder(path, (_err, filepaths) =>
         {
             readfiles();
             function readfiles()
             {
                 if (filepaths.length > 0)
                 {
-                    var filepath = filepaths.shift();
-                    editorRS.fs.readArrayBuffer(filepath, (err, data: ArrayBuffer) =>
+                    const filepath = filepaths.shift();
+                    editorRS.fs.readArrayBuffer(filepath, (_err, data: ArrayBuffer) =>
                     {
-                        //处理文件夹
+                        // 处理文件夹
                         data && zip.file(filepath, data);
                         readfiles();
                     });
-                } else
+                }
+                else
                 {
-                    zip.generateAsync({ type: "blob" }).then(function (content)
+                    zip.generateAsync({ type: 'blob' }).then(function (content)
                     {
                         saveAs(content, `${filename}.zip`);
                     });

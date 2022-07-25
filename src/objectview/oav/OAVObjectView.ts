@@ -11,31 +11,35 @@ export class OAVObjectView extends OAVBase
 	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
-		this.skinName = "OVDefault";
+		this.skinName = 'OVDefault';
 
 		this.alpha = 1;
 	}
 
 	initView()
 	{
-		var arr = [];
+		let arr = [];
 		if (Array.isArray(this.attributeValue))
+		{
 			arr = this.attributeValue;
+		}
 		else
+		{
 			arr.push(this.attributeValue);
+		}
 
 		this.views = [];
-		arr.forEach(element =>
+		arr.forEach((element) =>
 		{
-			var editable = true;
-			if (element instanceof Feng3dObject) editable = editable && !Boolean(element.hideFlags & HideFlags.NotEditable);
-			var view = objectview.getObjectView(element, { editable: editable });
+			let editable = true;
+			if (element instanceof Feng3dObject) editable = editable && !(element.hideFlags & HideFlags.NotEditable);
+			const view = objectview.getObjectView(element, { editable });
 			view.percentWidth = 100;
 			this.group.addChild(view);
 			this.views.push(view);
 			if (element instanceof EventEmitter)
 			{
-				element.on("refreshView", this.onRefreshView, this);
+				element.on('refreshView', this.onRefreshView, this);
 			}
 		});
 	}
@@ -49,18 +53,18 @@ export class OAVObjectView extends OAVBase
 	 */
 	dispose()
 	{
-		this.views.forEach(element =>
+		this.views.forEach((element) =>
 		{
 			this.group.removeChild(element);
 			if (element.space instanceof EventEmitter)
 			{
-				element.space.on("refreshView", this.onRefreshView, this);
+				element.space.on('refreshView', this.onRefreshView, this);
 			}
 		});
 		this.views.length = 0;
 	}
 
-	private onRefreshView(event: IEvent<any>)
+	private onRefreshView(_event: IEvent<any>)
 	{
 		this.dispose();
 		this.initView();

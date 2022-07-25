@@ -31,7 +31,7 @@ export class NativeFS implements IReadWriteFS
      */
     readArrayBuffer(path: string, callback: (err: Error, arraybuffer: ArrayBuffer) => void)
     {
-        var realPath = this.getAbsolutePath(path);
+        const realPath = this.getAbsolutePath(path);
         this.fs.readFile(realPath, callback);
     }
 
@@ -44,7 +44,12 @@ export class NativeFS implements IReadWriteFS
     {
         this.readArrayBuffer(path, (err, data) =>
         {
-            if (err) { callback(err, null); return; }
+            if (err)
+            {
+                callback(err, null);
+
+                return;
+            }
             dataTransform.arrayBufferToString(data, (content) =>
             {
                 callback(null, content);
@@ -61,7 +66,12 @@ export class NativeFS implements IReadWriteFS
     {
         this.readArrayBuffer(path, (err, buffer) =>
         {
-            if (err) { callback(err, null); return; }
+            if (err)
+            {
+                callback(err, null);
+
+                return;
+            }
             dataTransform.arrayBufferToObject(buffer, (content) =>
             {
                 callback(null, content);
@@ -76,26 +86,26 @@ export class NativeFS implements IReadWriteFS
      */
     readImage(path: string, callback: (err: Error, img: HTMLImageElement) => void)
     {
-        this.exists(path, exists =>
+        this.exists(path, (exists) =>
         {
             if (exists)
             {
-                var img = new Image();
+                const img = new Image();
                 img.onload = function ()
                 {
                     callback(null, img);
                 };
-                img.onerror = (evt) =>
+                img.onerror = (_evt) =>
                 {
                     callback(new Error(`加载图片${path}失败`), null);
-                }
+                };
                 img.src = this.getAbsolutePath(path);
-            } else
+            }
+            else
             {
                 callback(new Error(`图片资源 ${path} 不存在`), null);
             }
         });
-
     }
 
     /**
@@ -108,7 +118,8 @@ export class NativeFS implements IReadWriteFS
         {
             console.error(`请先使用 initproject 初始化项目`);
         }
-        return this.projectname + "/" + path;
+
+        return `${this.projectname}/${path}`;
     }
 
     /**
@@ -118,7 +129,7 @@ export class NativeFS implements IReadWriteFS
      */
     exists(path: string, callback: (exists: boolean) => void)
     {
-        var realPath = this.getAbsolutePath(path);
+        const realPath = this.getAbsolutePath(path);
         this.fs.exists(realPath, callback);
     }
 
@@ -130,19 +141,19 @@ export class NativeFS implements IReadWriteFS
      */
     isDirectory(path: string, callback: (result: boolean) => void)
     {
-        var realPath = this.getAbsolutePath(path);
+        const realPath = this.getAbsolutePath(path);
         this.fs.isDirectory(realPath, callback);
     }
 
     /**
      * 读取文件夹中文件列表
-     * 
+     *
      * @param path 路径
      * @param callback 回调函数
      */
     readdir(path: string, callback: (err: Error, files: string[]) => void)
     {
-        var realPath = this.getAbsolutePath(path);
+        const realPath = this.getAbsolutePath(path);
         this.fs.readdir(realPath, callback);
     }
 
@@ -153,7 +164,7 @@ export class NativeFS implements IReadWriteFS
      */
     mkdir(path: string, callback?: (err: Error) => void)
     {
-        var realPath = this.getAbsolutePath(path);
+        const realPath = this.getAbsolutePath(path);
         this.fs.mkdir(realPath, callback);
     }
 
@@ -165,18 +176,19 @@ export class NativeFS implements IReadWriteFS
     deleteFile(path: string, callback?: (err: Error) => void)
     {
         callback = callback || (() => { });
-        var realPath = this.getAbsolutePath(path);
-        this.isDirectory(path, result =>
+        const realPath = this.getAbsolutePath(path);
+        this.isDirectory(path, (result) =>
         {
             if (result)
             {
                 this.fs.rmdir(realPath, callback);
-            } else
+            }
+            else
             {
                 this.fs.deleteFile(realPath, callback);
             }
         });
-        globalEmitter.emit("fs.delete", path);
+        globalEmitter.emit('fs.delete', path);
     }
 
     /**
@@ -187,9 +199,9 @@ export class NativeFS implements IReadWriteFS
      */
     writeArrayBuffer(path: string, arraybuffer: ArrayBuffer, callback?: (err: Error) => void)
     {
-        var realPath = this.getAbsolutePath(path);
-        this.fs.writeFile(realPath, arraybuffer, err => { callback && callback(err); });
-        globalEmitter.emit("fs.write", path);
+        const realPath = this.getAbsolutePath(path);
+        this.fs.writeFile(realPath, arraybuffer, (err) => { callback && callback(err); });
+        globalEmitter.emit('fs.write', path);
     }
 
     /**
@@ -200,9 +212,9 @@ export class NativeFS implements IReadWriteFS
      */
     writeString(path: string, str: string, callback?: (err: Error) => void)
     {
-        var buffer = dataTransform.stringToArrayBuffer(str);
+        const buffer = dataTransform.stringToArrayBuffer(str);
         this.writeArrayBuffer(path, buffer, callback);
-        globalEmitter.emit("fs.write", path);
+        globalEmitter.emit('fs.write', path);
     }
 
     /**
@@ -213,9 +225,9 @@ export class NativeFS implements IReadWriteFS
      */
     writeObject(path: string, object: Object, callback?: (err: Error) => void)
     {
-        var str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1')
+        const str = JSON.stringify(object, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1');
         this.writeString(path, str, callback);
-        globalEmitter.emit("fs.write", path);
+        globalEmitter.emit('fs.write', path);
     }
 
     /**
@@ -230,7 +242,7 @@ export class NativeFS implements IReadWriteFS
         {
             this.writeArrayBuffer(path, buffer, callback);
         });
-        globalEmitter.emit("fs.write", path);
+        globalEmitter.emit('fs.write', path);
     }
 
     /**
@@ -243,7 +255,12 @@ export class NativeFS implements IReadWriteFS
     {
         this.readArrayBuffer(src, (err, buffer) =>
         {
-            if (err) { callback && callback(err); return; }
+            if (err)
+            {
+                callback && callback(err);
+
+                return;
+            }
             this.writeArrayBuffer(dest, buffer, callback);
         });
     }
@@ -258,20 +275,21 @@ export class NativeFS implements IReadWriteFS
     }
     /**
      * 初始化项目
-     * @param projectname 项目名称
+     * @param _projectname 项目名称
      * @param callback 回调函数
      */
-    initproject(projectname: string, callback: (err?: Error) => void)
+    initproject(_projectname: string, callback: (err?: Error) => void)
     {
-        this.fs.exists(editorcache.projectname, exists =>
+        this.fs.exists(editorcache.projectname, (exists) =>
         {
             if (exists)
             {
                 this.projectname = editorcache.projectname;
                 callback();
+
                 return;
             }
-            nativeAPI.selectDirectoryDialog((event, path) =>
+            nativeAPI.selectDirectoryDialog((_event, path) =>
             {
                 editorcache.projectname = this.projectname = path;
                 callback();

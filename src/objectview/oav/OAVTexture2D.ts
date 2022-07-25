@@ -17,7 +17,7 @@ export class OAVTexture2D extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVTexture2D";
+        this.skinName = 'OAVTexture2D';
     }
 
     initView()
@@ -25,7 +25,7 @@ export class OAVTexture2D extends OAVBase
         this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 
         if (this._attributeViewInfo.editable)
-            this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this);
+        { this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.ontxtClick, this); }
 
         watcher.watch(this.space, this.attributeName, this.updateView, this);
     }
@@ -40,9 +40,9 @@ export class OAVTexture2D extends OAVBase
 
     private ontxtClick()
     {
-        var menus: MenuItem[] = [];
-        var texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
-        texture2ds.forEach(texture2d =>
+        const menus: MenuItem[] = [];
+        const texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
+        texture2ds.forEach((texture2d) =>
         {
             menus.push({
                 label: texture2d.name, click: () =>
@@ -60,13 +60,15 @@ export class OAVTexture2D extends OAVBase
      */
     updateView(): void
     {
-        var texture: Texture2D = this.attributeValue;
+        const texture: Texture2D = this.attributeValue;
         this.image.source = texture.dataURL;
     }
 
     private onDoubleClick()
     {
-        if (this.attributeValue && typeof this.attributeValue == "object")
+        if (this.attributeValue && typeof this.attributeValue === 'object')
+        {
             EditorData.editorData.selectObject(this.attributeValue);
+        }
     }
 }

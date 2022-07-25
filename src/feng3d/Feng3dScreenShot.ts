@@ -1,6 +1,5 @@
 import { View, Scene, Camera, GameObject, Geometry, Material, PerspectiveLens, serialization, Texture2D, TextureCube, Vector3, Renderable, GeometryLike } from 'feng3d';
 
-
 /**
  * feng3d预览图工具
  */
@@ -9,6 +8,7 @@ export class Feng3dScreenShot
     static get feng3dScreenShot()
     {
         this._feng3dScreenShot = this._feng3dScreenShot || new Feng3dScreenShot();
+
         return this._feng3dScreenShot;
     }
     private static _feng3dScreenShot: Feng3dScreenShot;
@@ -21,32 +21,32 @@ export class Feng3dScreenShot
 
     container: GameObject;
 
-    defaultGeometry = Geometry.getDefault("Sphere");
+    defaultGeometry = Geometry.getDefault('Sphere');
 
-    defaultMaterial = Material.getDefault("Default-Material");
+    defaultMaterial = Material.getDefault('Default-Material');
 
     constructor()
     {
         // 初始化3d
-        var view = this.view = new View();
-        view.canvas.style.visibility = "hidden";
+        const view = this.view = new View();
+        view.canvas.style.visibility = 'hidden';
         view.setSize(64, 64);
         //
-        var scene = this.scene = view.scene;
+        const scene = this.scene = view.scene;
         scene.background.fromUnit(0xff525252);
         scene.ambientColor.setTo(0.4, 0.4, 0.4);
         //
-        var camera = this.camera = view.camera;
+        const camera = this.camera = view.camera;
         camera.lens = new PerspectiveLens(45);
         //
-        var light = serialization.setValue(new GameObject(), {
-            name: "DirectionalLight",
-            components: [{ __class__: "feng3d.Transform", rx: 50, ry: -30 }, { __class__: "feng3d.DirectionalLight" },]
+        const light = serialization.setValue(new GameObject(), {
+            name: 'DirectionalLight',
+            components: [{ __class__: 'feng3d.Transform', rx: 50, ry: -30 }, { __class__: 'feng3d.DirectionalLight' }]
         });
         scene.gameObject.addChild(light);
 
         this.container = new GameObject();
-        this.container.name = "渲染截图容器";
+        this.container.name = '渲染截图容器';
         scene.gameObject.addChild(this.container);
 
         view.stop();
@@ -58,27 +58,28 @@ export class Feng3dScreenShot
      */
     drawTexture(texture: Texture2D)
     {
-        var image: ImageData | HTMLImageElement = <any>texture.activePixels;
+        const image: ImageData | HTMLImageElement = <any>texture.activePixels;
 
-        var w = 64;
-        var h = 64;
+        const w = 64;
+        const h = 64;
 
-        var canvas2D = document.createElement("canvas");
+        const canvas2D = document.createElement('canvas');
         canvas2D.width = w;
         canvas2D.height = h;
-        var context2D = canvas2D.getContext("2d");
+        const context2D = canvas2D.getContext('2d');
 
-        context2D.fillStyle = "black";
+        context2D.fillStyle = 'black';
 
         if (image instanceof HTMLImageElement)
-            context2D.drawImage(image, 0, 0, w, h);
+        { context2D.drawImage(image, 0, 0, w, h); }
         else if (image instanceof ImageData)
-            context2D.putImageData(image, 0, 0);
+        { context2D.putImageData(image, 0, 0); }
         else
-            context2D.fillRect(0, 0, w, h);
+        { context2D.fillRect(0, 0, w, h); }
 
         //
-        var dataUrl = canvas2D.toDataURL();
+        const dataUrl = canvas2D.toDataURL();
+
         return dataUrl;
     }
 
@@ -88,26 +89,26 @@ export class Feng3dScreenShot
      */
     drawTextureCube(textureCube: TextureCube)
     {
-        var pixels = textureCube["_pixels"];
+        const pixels = textureCube['_pixels'];
 
-        var canvas2D = document.createElement("canvas");
-        var width = 64;
+        const canvas2D = document.createElement('canvas');
+        const width = 64;
         canvas2D.width = width;
         canvas2D.height = width;
-        var context2D = canvas2D.getContext("2d");
+        const context2D = canvas2D.getContext('2d');
 
-        context2D.fillStyle = "black";
+        context2D.fillStyle = 'black';
         // context2D.fillRect(10, 10, 100, 100);
 
-        var w4 = Math.round(width / 4);
-        var Yoffset = w4 / 2;
+        const w4 = Math.round(width / 4);
+        const Yoffset = w4 / 2;
         //
-        var X = w4 * 2;
-        var Y = w4;
+        let X = w4 * 2;
+        let Y = w4;
         if (pixels[0])
-            context2D.drawImage(pixels[0], X, Y + Yoffset, w4, w4);
+        { context2D.drawImage(pixels[0], X, Y + Yoffset, w4, w4); }
         else
-            context2D.fillRect(X, Y + Yoffset, w4, w4);
+        { context2D.fillRect(X, Y + Yoffset, w4, w4); }
         //
         X = w4;
         Y = 0;
@@ -135,7 +136,8 @@ export class Feng3dScreenShot
         else context2D.fillRect(X, Y + Yoffset, w4, w4);
 
         //
-        var dataUrl = canvas2D.toDataURL();
+        const dataUrl = canvas2D.toDataURL();
+
         return dataUrl;
     }
 
@@ -145,13 +147,14 @@ export class Feng3dScreenShot
      */
     drawMaterial(material: Material, cameraRotation = new Vector3(20, -90, 0))
     {
-        var mode = this.materialObject.getComponent(Renderable);
+        const mode = this.materialObject.getComponent(Renderable);
         mode.geometry = this.defaultGeometry;
         mode.material = material;
 
         //
         cameraRotation && (this.camera.transform.rotation = cameraRotation);
         this._drawGameObject(this.materialObject);
+
         return this;
     }
 
@@ -161,12 +164,13 @@ export class Feng3dScreenShot
      */
     drawGeometry(geometry: GeometryLike, cameraRotation = new Vector3(-20, 120, 0))
     {
-        var model = this.geometryObject.getComponent(Renderable);
+        const model = this.geometryObject.getComponent(Renderable);
         model.geometry = geometry;
         model.material = this.defaultMaterial;
 
         cameraRotation && (this.camera.transform.rotation = cameraRotation);
         this._drawGameObject(this.geometryObject);
+
         return this;
     }
 
@@ -178,6 +182,7 @@ export class Feng3dScreenShot
     {
         cameraRotation && (this.camera.transform.rotation = cameraRotation);
         this._drawGameObject(gameObject);
+
         return this;
     }
 
@@ -188,28 +193,29 @@ export class Feng3dScreenShot
     {
         this.view.setSize(width, height);
         this.view.render();
-        var dataUrl = this.view.canvas.toDataURL();
+        const dataUrl = this.view.canvas.toDataURL();
+
         return dataUrl;
     }
 
     updateCameraPosition(gameObject: GameObject)
     {
         //
-        var bounds = gameObject.boundingBox.worldBounds;
-        var scenePosition = bounds.getCenter();
-        var size = bounds.getSize().length;
+        const bounds = gameObject.boundingBox.worldBounds;
+        const scenePosition = bounds.getCenter();
+        let size = bounds.getSize().length;
         size = Math.max(size, 1);
-        var lookDistance = size;
-        var lens = this.camera.lens;
+        let lookDistance = size;
+        const lens = this.camera.lens;
         if (lens instanceof PerspectiveLens)
         {
             lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
         }
         //
-        var lookPos = this.camera.transform.localToWorldMatrix.getAxisZ();
+        const lookPos = this.camera.transform.localToWorldMatrix.getAxisZ();
         lookPos.scaleNumber(-lookDistance);
         lookPos.add(scenePosition);
-        var localLookPos = lookPos.clone();
+        let localLookPos = lookPos.clone();
         if (this.camera.transform.parent)
         {
             localLookPos = this.camera.transform.parent.worldToLocalMatrix.transformPoint3(lookPos);
@@ -217,8 +223,8 @@ export class Feng3dScreenShot
         this.camera.transform.position = localLookPos;
     }
 
-    private materialObject = serialization.setValue(new GameObject(), { components: [{ __class__: "feng3d.MeshRenderer" }] });
-    private geometryObject = serialization.setValue(new GameObject(), { components: [{ __class__: "feng3d.MeshRenderer", }, { __class__: "feng3d.WireframeComponent", }] });
+    private materialObject = serialization.setValue(new GameObject(), { components: [{ __class__: 'feng3d.MeshRenderer' }] });
+    private geometryObject = serialization.setValue(new GameObject(), { components: [{ __class__: 'feng3d.MeshRenderer' }, { __class__: 'feng3d.WireframeComponent' }] });
 
     private _drawGameObject(gameObject: GameObject)
     {
@@ -228,5 +234,4 @@ export class Feng3dScreenShot
         //
         this.updateCameraPosition(gameObject);
     }
-
 }

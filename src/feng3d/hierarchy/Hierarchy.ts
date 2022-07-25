@@ -2,8 +2,6 @@ import { Canvas, GameObject, GameObjectAsset, globalEmitter, HideFlags, IEvent, 
 import { EditorData } from '../../global/EditorData';
 import { HierarchyNode } from './HierarchyNode';
 
-export var hierarchy: Hierarchy;
-
 export class Hierarchy
 {
     rootnode: HierarchyNode;
@@ -12,8 +10,8 @@ export class Hierarchy
 
     constructor()
     {
-        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChanged, this);
-        watcher.watch(<Hierarchy>this, "rootGameObject", this.rootGameObjectChanged, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.onSelectedGameObjectChanged, this);
+        watcher.watch(this as Hierarchy, 'rootGameObject', this.rootGameObjectChanged, this);
     }
 
     /**
@@ -21,7 +19,13 @@ export class Hierarchy
      */
     getSelectedNode()
     {
-        var node = EditorData.editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) => { pv = pv || this.getNode(cv); return pv; }, null);
+        const node = EditorData.editorData.selectedGameObjects.reduce((pv: HierarchyNode, cv) =>
+        {
+            pv = pv || this.getNode(cv);
+
+            return pv;
+        }, null);
+
         return node;
     }
 
@@ -30,13 +34,14 @@ export class Hierarchy
      */
     getNode(gameObject: GameObject)
     {
-        var node = nodeMap.get(gameObject);
+        const node = nodeMap.get(gameObject);
+
         return node;
     }
 
     delete(gameobject: GameObject)
     {
-        var node = nodeMap.get(gameobject);
+        const node = nodeMap.get(gameobject);
         if (node)
         {
             node.destroy();
@@ -46,7 +51,7 @@ export class Hierarchy
 
     /**
      * 添加游戏对象到层级树
-     * 
+     *
      * @param gameobject 游戏对象
      */
     addGameObject(gameobject: GameObject)
@@ -54,35 +59,36 @@ export class Hierarchy
         if (gameobject.getComponent(Transform2D))
         {
             this.addUI(gameobject);
+
             return;
         }
 
-        var selectedNode = this.getSelectedNode();
+        const selectedNode = this.getSelectedNode();
         if (selectedNode)
-            selectedNode.gameobject.addChild(gameobject);
+        { selectedNode.gameobject.addChild(gameobject); }
         else
-            this.rootnode.gameobject.addChild(gameobject);
+        { this.rootnode.gameobject.addChild(gameobject); }
         EditorData.editorData.selectObject(gameobject);
     }
 
     /**
      * 添加UI
-     * 
-     * @param gameobject 
+     *
+     * @param gameobject
      */
     addUI(gameobject: GameObject)
     {
-        var selectedNode = this.getSelectedNode();
+        const selectedNode = this.getSelectedNode();
         if (selectedNode && selectedNode.gameobject.getComponent(Transform2D))
         {
             selectedNode.gameobject.addChild(gameobject);
         }
         else
         {
-            var canvas = this.rootnode.gameobject.getComponentsInChildren(Canvas)[0];
+            let canvas = this.rootnode.gameobject.getComponentsInChildren(Canvas)[0];
             if (!canvas)
             {
-                canvas = GameObject.createPrimitive("Canvas").getComponent(Canvas);
+                canvas = GameObject.createPrimitive('Canvas').getComponent(Canvas);
                 this.rootnode.gameobject.addChild(canvas.gameObject);
             }
             canvas.gameObject.addChild(gameobject);
@@ -92,15 +98,16 @@ export class Hierarchy
 
     addGameoObjectFromAsset(gameobjectAsset: GameObjectAsset, parent?: GameObject)
     {
-        var gameobject = gameobjectAsset.getAssetData();
+        const gameobject = gameobjectAsset.getAssetData();
 
         console.assert(!gameobject.parent);
 
         if (parent)
-            parent.addChild(gameobject);
+        { parent.addChild(gameobject); }
         else
-            this.rootnode.gameobject.addChild(gameobject);
+        { this.rootnode.gameobject.addChild(gameobject); }
         EditorData.editorData.selectObject(gameobject);
+
         return gameobject;
     }
 
@@ -110,31 +117,35 @@ export class Hierarchy
     {
         if (oldValue)
         {
-            oldValue.off("addChild", this.ongameobjectadded, this);
-            oldValue.off("removeChild", this.ongameobjectremoved, this);
+            oldValue.off('addChild', this.ongameobjectadded, this);
+            oldValue.off('removeChild', this.ongameobjectremoved, this);
         }
         if (newValue)
         {
             this.init(newValue);
-            newValue.on("addChild", this.ongameobjectadded, this);
-            newValue.on("removeChild", this.ongameobjectremoved, this);
+            newValue.on('addChild', this.ongameobjectadded, this);
+            newValue.on('removeChild', this.ongameobjectremoved, this);
         }
     }
 
     private onSelectedGameObjectChanged()
     {
-        this._selectedGameObjects.forEach(element =>
+        this._selectedGameObjects.forEach((element) =>
         {
-            var node = this.getNode(element);
+            const node = this.getNode(element);
             if (node)
+            {
                 node.selected = false;
+            }
             else
-                debugger; // 为什么为空，是否被允许？
+            {
+                console.warn(`为什么为空，是否被允许？`);
+            }
         });
         this._selectedGameObjects = EditorData.editorData.selectedGameObjects.concat();
-        this._selectedGameObjects.forEach(element =>
+        this._selectedGameObjects.forEach((element) =>
         {
-            var node = this.getNode(element);
+            const node = this.getNode(element);
             node.selected = true;
         });
     }
@@ -146,23 +157,23 @@ export class Hierarchy
 
     private ongameobjectremoved(event: IEvent<{ parent: GameObject; child: GameObject; }>)
     {
-        var node = nodeMap.get(event.data.child);
+        const node = nodeMap.get(event.data.child);
         this.remove(node);
     }
 
     private init(gameobject: GameObject)
     {
         if (this.rootnode)
-            this.rootnode.destroy();
+        { this.rootnode.destroy(); }
 
         nodeMap.clear();
 
-        var node = new HierarchyNode({ gameobject: <any>gameobject });
+        const node = new HierarchyNode({ gameobject: <any>gameobject });
         nodeMap.set(gameobject, node);
         node.isOpen = true;
 
         this.rootnode = node;
-        gameobject.children.forEach(element =>
+        gameobject.children.forEach((element) =>
         {
             this.add(element);
         });
@@ -171,13 +182,13 @@ export class Hierarchy
     private add(gameobject: GameObject)
     {
         if (gameobject.hideFlags & HideFlags.HideInHierarchy)
-            return;
-        var node = nodeMap.get(gameobject);
+        { return; }
+        let node = nodeMap.get(gameobject);
         if (node)
         {
             node.remove();
         }
-        var parentnode = nodeMap.get(gameobject.parent);
+        const parentnode = nodeMap.get(gameobject.parent);
         if (parentnode)
         {
             if (!node)
@@ -187,23 +198,24 @@ export class Hierarchy
             }
             parentnode.addChild(node);
         }
-        gameobject.children.forEach(element =>
+        gameobject.children.forEach((element) =>
         {
             this.add(element);
         });
+
         return node;
     }
 
     private remove(node: HierarchyNode)
     {
         if (!node) return;
-        node.children.forEach(element =>
+        node.children.forEach((element) =>
         {
             this.remove(element);
         });
         node.remove();
     }
 }
-var nodeMap = new Map<GameObject, HierarchyNode>();
+const nodeMap = new Map<GameObject, HierarchyNode>();
 
-hierarchy = new Hierarchy();
+export const hierarchy: Hierarchy = new Hierarchy();

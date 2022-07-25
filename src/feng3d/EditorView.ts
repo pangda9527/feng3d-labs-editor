@@ -19,7 +19,7 @@ export class EditorView extends View
      */
     render()
     {
-        if (EditorData.editorData.gameScene != this.scene)
+        if (EditorData.editorData.gameScene !== this.scene)
         {
             if (this.scene)
             {
@@ -32,7 +32,7 @@ export class EditorView extends View
                 hierarchy.rootGameObject = this.scene.gameObject;
             }
         }
-        if (this.editorComponent) 
+        if (this.editorComponent)
         {
             this.editorComponent.scene = this.scene;
             this.editorComponent.editorCamera = this.camera;
@@ -50,15 +50,17 @@ export class EditorView extends View
 
             this.editorScene.update();
             forwardRenderer.draw(this.gl, this.editorScene, this.camera);
-            var selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
+            const selectedObject = this.mouse3DManager.pick(this, this.editorScene, this.camera);
             if (selectedObject) this.selectedObject = selectedObject;
         }
         if (this.scene)
         {
-            EditorData.editorData.selectedGameObjects.forEach(element =>
+            EditorData.editorData.selectedGameObjects.forEach((element) =>
             {
                 if (element.getComponent(Renderable))
+                {
                     wireframeRenderer.drawGameObject(this.gl, element.getComponent(Renderable), this.scene, this.camera, this.wireframeColor);
+                }
             });
         }
     }

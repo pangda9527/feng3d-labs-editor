@@ -16,9 +16,10 @@ export class OAVDefault extends OAVBase
 	{
 		super(attributeViewInfo);
 
-		this.skinName = "OAVDefault";
+		this.skinName = 'OAVDefault';
 	}
 
+	// eslint-disable-next-line accessor-pairs
 	set dragparam(param: { accepttype: keyof DragDataMap; datatype: string; })
 	{
 		if (param)
@@ -46,7 +47,7 @@ export class OAVDefault extends OAVBase
 		this.text.addEventListener(egret.Event.CHANGE, this.onTextChange, this);
 
 		if (this._attributeViewInfo.editable)
-			watcher.watch(this.space, this.attributeName, this.updateView, this);
+		{ watcher.watch(this.space, this.attributeName, this.updateView, this); }
 	}
 
 	dispose()
@@ -54,7 +55,7 @@ export class OAVDefault extends OAVBase
 		drag.unregister(this);
 
 		if (this._attributeViewInfo.editable)
-			watcher.unwatch(this.space, this.attributeName, this.updateView, this);
+		{ watcher.unwatch(this.space, this.attributeName, this.updateView, this); }
 
 		this.text.removeEventListener(egret.FocusEvent.FOCUS_IN, this.ontxtfocusin, this);
 		this.text.removeEventListener(egret.FocusEvent.FOCUS_OUT, this.ontxtfocusout, this);
@@ -78,17 +79,19 @@ export class OAVDefault extends OAVBase
 	updateView(): void
 	{
 		this.text.enabled = this._attributeViewInfo.editable;
-		var value = this.attributeValue;
+		const value = this.attributeValue;
 		if (value === undefined)
 		{
 			this.text.text = String(value);
-		} else if (!(value instanceof Object))
+		}
+		else if (!(value instanceof Object))
 		{
 			this.text.text = String(value);
-		} else
+		}
+		else
 		{
-			var valuename = value["name"] || "";
-			this.text.text = valuename + " (" + value.constructor.name + ")";
+			const valuename = value['name'] || '';
+			this.text.text = `${valuename} (${value.constructor.name})`;
 			this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
 			this.text.enabled = false;
 		}
@@ -105,15 +108,15 @@ export class OAVDefault extends OAVBase
 		{
 			switch (this._attributeType)
 			{
-				case "String":
+				case 'String':
 					this.attributeValue = this.text.text;
 					break;
-				case "number":
-					var num = Number(this.text.text);
+				case 'number':
+					let num = Number(this.text.text);
 					num = isNaN(num) ? 0 : num;
 					this.attributeValue = num;
 					break;
-				case "Boolean":
+				case 'Boolean':
 					this.attributeValue = Boolean(this.text.text);
 					break;
 				default:

@@ -21,13 +21,13 @@ export class OAVMaterialName extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OVMaterial";
+        this.skinName = 'OVMaterial';
     }
 
     initView()
     {
         this.shaderComboBox.addEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-        globalEmitter.on("asset.shaderChanged", this.onShaderComboBoxChange, this);
+        globalEmitter.on('asset.shaderChanged', this.onShaderComboBoxChange, this);
 
         this.shaderComboBox.touchChildren = this.shaderComboBox.touchEnabled = this._attributeViewInfo.editable;
     }
@@ -35,20 +35,23 @@ export class OAVMaterialName extends OAVBase
     dispose()
     {
         this.shaderComboBox.removeEventListener(egret.Event.CHANGE, this.onShaderComboBoxChange, this);
-        globalEmitter.off("asset.shaderChanged", this.onShaderComboBoxChange, this);
+        globalEmitter.off('asset.shaderChanged', this.onShaderComboBoxChange, this);
     }
 
     updateView()
     {
-        var material = this.space;
+        const material = this.space;
         this.nameLabel.text = material.shaderName;
 
-        var data = shaderlib.getShaderNames().sort().map((v) => { return { label: v, value: v } });
-        var selected = data.reduce((prevalue, item) =>
+        const data = shaderlib.getShaderNames().sort().map((v) => ({ label: v, value: v }));
+        const selected = data.reduce((prevalue, item) =>
         {
             if (prevalue) return prevalue;
-            if (item.value == material.shaderName)
+            if (item.value === material.shaderName)
+            {
                 return item;
+            }
+
             return null;
         }, null);
         this.shaderComboBox.dataProvider = data;

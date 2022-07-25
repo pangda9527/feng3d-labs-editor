@@ -19,7 +19,7 @@ export class OAVAccordionObjectView extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "ParticleComponentView";
+        this.skinName = 'ParticleComponentView';
     }
 
     /**
@@ -29,20 +29,20 @@ export class OAVAccordionObjectView extends OAVBase
     {
         this.updateEnableCB();
         if (this.componentView)
-            this.componentView.updateView();
+            { this.componentView.updateView(); }
     }
 
     initView()
     {
-        var componentName = classUtils.getQualifiedClassName(this.attributeValue).split(".").pop();
+        const componentName = classUtils.getQualifiedClassName(this.attributeValue).split('.').pop();
         this.accordion.titleName = componentName;
-        this.componentView = objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ["enabled"] });
+        this.componentView = objectview.getObjectView(this.attributeValue, { autocreate: false, excludeAttrs: ['enabled'] });
         this.accordion.addContent(this.componentView);
 
-        this.enabledCB = this.accordion["enabledCB"];
+        this.enabledCB = this.accordion['enabledCB'];
 
         this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-        watcher.watch(this.attributeValue, "enabled", this.updateEnableCB, this);
+        watcher.watch(this.attributeValue, 'enabled', this.updateEnableCB, this);
 
         this.updateView();
     }
@@ -50,7 +50,7 @@ export class OAVAccordionObjectView extends OAVBase
     dispose()
     {
         this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-        watcher.unwatch(this.attributeValue, "enabled", this.updateEnableCB, this);
+        watcher.unwatch(this.attributeValue, 'enabled', this.updateEnableCB, this);
     }
 
     private updateEnableCB()

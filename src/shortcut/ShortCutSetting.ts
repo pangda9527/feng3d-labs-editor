@@ -6,7 +6,7 @@ import { Modules } from '../Modules';
  */
 export class ShortCutSetting extends eui.Component
 {
-    static moduleName = "ShortCutSetting";
+    static moduleName = 'ShortCutSetting';
 
     public searchTxt: eui.TextInput;
     public list: eui.List;
@@ -17,7 +17,7 @@ export class ShortCutSetting extends eui.Component
     {
         super();
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "ShortCutSetting";
+        this.skinName = 'ShortCutSetting';
         this.moduleName = ShortCutSetting.moduleName;
     }
 
@@ -45,21 +45,22 @@ export class ShortCutSetting extends eui.Component
 
     private updateView()
     {
-        var text = this.searchTxt.text;
-        var reg = new RegExp(text, "i");
+        const text = this.searchTxt.text;
+        const reg = new RegExp(text, 'i');
 
-        var data = shortcutConfig.filter(v =>
+        const data = shortcutConfig.filter((v) =>
         {
             for (const key in v)
             {
-                if (key.charAt(0) != "_")
+                if (key.charAt(0) !== '_')
                 {
-                    if (typeof v[key] == "string" && v[key].search(reg) != -1)
-                        return true;
+                    if (typeof v[key] === 'string' && v[key].search(reg) !== -1)
+                    { return true; }
                 }
             }
+
             return false;
-        })
+        });
         this.list.dataProvider = new eui.ArrayCollection(data);
     }
 }

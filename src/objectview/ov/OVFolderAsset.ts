@@ -13,7 +13,7 @@ export class OVFolderAsset extends eui.Component implements IObjectView
     constructor(objectViewInfo: ObjectViewInfo)
     {
         super();
-        this.skinName = "OVFolderAsset";
+        this.skinName = 'OVFolderAsset';
         this._objectViewInfo = objectViewInfo;
         this.space = <any>objectViewInfo.owner;
     }
@@ -21,7 +21,6 @@ export class OVFolderAsset extends eui.Component implements IObjectView
     $onAddToStage(stage: egret.Stage, nestLevel: number)
     {
         super.$onAddToStage(stage, nestLevel);
-
 
         this.openBtn.addEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
 
@@ -32,7 +31,7 @@ export class OVFolderAsset extends eui.Component implements IObjectView
     {
         this.openBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()
@@ -42,12 +41,12 @@ export class OVFolderAsset extends eui.Component implements IObjectView
         this.nameLabel.name = this.space.fileName;
     }
 
-    getAttributeView(attributeName: String)
+    getAttributeView(_attributeName: String)
     {
         return null;
     }
 
-    getblockView(blockName: String)
+    getblockView(_blockName: String)
     {
         return null;
     }

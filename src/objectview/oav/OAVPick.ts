@@ -19,7 +19,7 @@ export class OAVPick extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVPick";
+        this.skinName = 'OAVPick';
     }
 
     initView()
@@ -30,11 +30,11 @@ export class OAVPick extends OAVBase
         {
             this.pickBtn.addEventListener(egret.MouseEvent.CLICK, this.onPickBtnClick, this);
 
-            var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+            const param: { accepttype: keyof DragDataMap; datatype: string; } = this._attributeViewInfo.componentParam;
             drag.register(this,
                 (dragsource) =>
                 {
-                    if (param.datatype) dragsource.addDragData(<any>param.datatype, this.attributeValue);
+                    if (param.datatype) dragsource.addDragData(param.datatype as any, this.attributeValue);
                 },
                 [param.accepttype],
                 (dragSource) =>
@@ -57,14 +57,14 @@ export class OAVPick extends OAVBase
 
     private onPickBtnClick()
     {
-        var param: { accepttype: keyof DragDataMap; datatype: string; } = <any>this._attributeViewInfo.componentParam;
+        const param: { accepttype: keyof DragDataMap; datatype: string; } = this._attributeViewInfo.componentParam;
         if (param.accepttype)
         {
-            if (param.accepttype == "texture2d")
+            if (param.accepttype === 'texture2d')
             {
-                var menus: MenuItem[] = [];
-                var texture2ds = editorRS.getLoadedAssetDatasByType(Texture2D);
-                texture2ds.forEach(item =>
+                const menus: MenuItem[] = [];
+                const texture2ds = editorRS.getLoadedAssetDatasByType(Texture2D);
+                texture2ds.forEach((item) =>
                 {
                     menus.push({
                         label: item.name, click: () =>
@@ -75,11 +75,11 @@ export class OAVPick extends OAVBase
                 });
                 menu.popup(menus);
             }
-            else if (param.accepttype == "texturecube")
+            else if (param.accepttype === 'texturecube')
             {
-                var menus: MenuItem[] = [];
-                var textureCubes = editorRS.getLoadedAssetDatasByType(TextureCube);
-                textureCubes.forEach(item =>
+                const menus: MenuItem[] = [];
+                const textureCubes = editorRS.getLoadedAssetDatasByType(TextureCube);
+                textureCubes.forEach((item) =>
                 {
                     menus.push({
                         label: item.name, click: () =>
@@ -89,12 +89,13 @@ export class OAVPick extends OAVBase
                     });
                 });
                 menu.popup(menus);
-            } else if (param.accepttype == "audio")
+            }
+            else if (param.accepttype === 'audio')
             {
-                var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ""; } }];
+                const menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = ''; } }];
 
-                var audioFiles = editorRS.getAssetsByType(AudioAsset);
-                audioFiles.forEach(item =>
+                const audioFiles = editorRS.getAssetsByType(AudioAsset);
+                audioFiles.forEach((item) =>
                 {
                     menus.push({
                         label: item.fileName, click: () =>
@@ -104,12 +105,13 @@ export class OAVPick extends OAVBase
                     });
                 }, []);
                 menu.popup(menus);
-            } else if (param.accepttype == "file_script")
+            }
+            else if (param.accepttype === 'file_script')
             {
-                var scriptFiles = editorRS.getAssetsByType(ScriptAsset);
+                const scriptFiles = editorRS.getAssetsByType(ScriptAsset);
 
-                var menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
-                scriptFiles.forEach(element =>
+                const menus: MenuItem[] = [{ label: `None`, click: () => { this.attributeValue = null; } }];
+                scriptFiles.forEach((element) =>
                 {
                     menus.push({
                         label: element.scriptName,
@@ -120,11 +122,12 @@ export class OAVPick extends OAVBase
                     });
                 });
                 menu.popup(menus);
-            } else if (param.accepttype == "material")
+            }
+            else if (param.accepttype === 'material')
             {
-                var assets = editorRS.getLoadedAssetDatasByType(Material);
-                var menus: MenuItem[] = [];
-                assets.forEach(element =>
+                const assets = editorRS.getLoadedAssetDatasByType(Material);
+                const menus: MenuItem[] = [];
+                assets.forEach((element) =>
                 {
                     menus.push({
                         label: element.name,
@@ -135,11 +138,12 @@ export class OAVPick extends OAVBase
                     });
                 });
                 menu.popup(menus);
-            } else if (param.accepttype == "geometry")
+            }
+            else if (param.accepttype === 'geometry')
             {
-                var geometrys = editorRS.getLoadedAssetDatasByType(Geometry);
-                var menus: MenuItem[] = [];
-                geometrys.forEach(element =>
+                const geometrys = editorRS.getLoadedAssetDatasByType(Geometry);
+                const menus: MenuItem[] = [];
+                geometrys.forEach((element) =>
                 {
                     menus.push({
                         label: element.name,
@@ -162,19 +166,21 @@ export class OAVPick extends OAVBase
         if (this.attributeValue === undefined)
         {
             this.text.text = String(this.attributeValue);
-        } else if (!(this.attributeValue instanceof Object))
+        }
+        else if (!(this.attributeValue instanceof Object))
         {
             this.text.text = String(this.attributeValue);
-        } else
+        }
+        else
         {
-            this.text.text = this.attributeValue["name"] || "";
+            this.text.text = this.attributeValue['name'] || '';
             this.once(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
         }
     }
 
     private onDoubleClick()
     {
-        if (this.attributeValue && typeof this.attributeValue == "object")
+        if (this.attributeValue && typeof this.attributeValue === 'object')
         {
             EditorData.editorData.selectObject(this.attributeValue);
         }

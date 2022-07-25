@@ -19,7 +19,7 @@ export class OAVColorPicker extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVColorPicker";
+        this.skinName = 'OAVColorPicker';
     }
 
     initView()
@@ -44,11 +44,12 @@ export class OAVColorPicker extends OAVBase
 
     updateView()
     {
-        var color = this.attributeValue;
+        const color = this.attributeValue;
         this.colorPicker.value = color;
         this.input.text = color.toHexString();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected onChange(event: egret.Event)
     {
         //
@@ -72,15 +73,16 @@ export class OAVColorPicker extends OAVBase
     {
         if (this._textfocusintxt)
         {
-            var text = this.input.text;
+            const text = this.input.text;
             if (this.attributeValue instanceof Color3)
             {
-                this.colorPicker.value = new Color3().fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = new Color3().fromUnit(Number("0x" + text.substr(1)));
-            } else
+                this.colorPicker.value = new Color3().fromUnit(Number(`0x${text.substr(1)}`));
+                this.attributeValue = new Color3().fromUnit(Number(`0x${text.substr(1)}`));
+            }
+ else
             {
-                this.colorPicker.value = new Color4().fromUnit(Number("0x" + text.substr(1)));
-                this.attributeValue = new Color4().fromUnit(Number("0x" + text.substr(1)));
+                this.colorPicker.value = new Color4().fromUnit(Number(`0x${text.substr(1)}`));
+                this.attributeValue = new Color4().fromUnit(Number(`0x${text.substr(1)}`));
             }
         }
     }

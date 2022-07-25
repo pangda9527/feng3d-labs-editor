@@ -7,28 +7,28 @@ export class MouseRayTestScript extends EditorScript
     {
         super.init();
 
-        windowEventProxy.on("click", this.onclick, this);
+        windowEventProxy.on('click', this.onclick, this);
     }
 
     private onclick()
     {
-        var mouseRay3D = this.gameObject.scene.mouseRay3D;
+        const mouseRay3D = this.gameObject.scene.mouseRay3D;
 
-        var gameobject = serialization.setValue(new GameObject(), { name: "test" });
-        var model = gameobject.addComponent(Renderable);
+        const gameobject = serialization.setValue(new GameObject(), { name: 'test' });
+        const model = gameobject.addComponent(Renderable);
         model.material = new Material();
         model.geometry = serialization.setValue(new SphereGeometry(), { radius: 10 });
         gameobject.mouseEnabled = false;
         this.gameObject.addChild(gameobject);
 
-        var position = mouseRay3D.origin.clone();
-        var direction = mouseRay3D.direction.clone();
+        let position = mouseRay3D.origin.clone();
+        let direction = mouseRay3D.direction.clone();
         position = gameobject.transform.worldToLocalPoint(position);
         direction = gameobject.transform.inverseTransformDirection(direction);
         gameobject.transform.position = position;
 
-        var num = 1000;
-        var translate = () =>
+        let num = 1000;
+        const translate = () =>
         {
             gameobject.transform.translate(direction, 15);
             if (num > 0)
@@ -37,12 +37,13 @@ export class MouseRayTestScript extends EditorScript
                 {
                     translate();
                 }, 1000 / 60);
-            } else
+            }
+            else
             {
                 gameobject.remove();
             }
             num--;
-        }
+        };
         translate();
     }
 
@@ -55,6 +56,6 @@ export class MouseRayTestScript extends EditorScript
      */
     dispose()
     {
-        windowEventProxy.off("click", this.onclick, this);
+        windowEventProxy.off('click', this.onclick, this);
     }
 }

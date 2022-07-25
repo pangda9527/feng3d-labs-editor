@@ -10,7 +10,7 @@ export class OAVFunction extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVFunction";
+        this.skinName = 'OAVFunction';
     }
 
     initView()
@@ -28,7 +28,7 @@ export class OAVFunction extends OAVBase
 
     }
 
-    protected click(event: egret.Event)
+    protected click(_event: egret.Event)
     {
         this._space[this._attributeName]();
     }

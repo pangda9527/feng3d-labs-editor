@@ -33,17 +33,17 @@ export class NavigationAgent
      * 允许行走坡度
      */
     @oav()
-    maxSlope = 45;//[0,60]
+    maxSlope = 45;// [0,60]
 }
 
 /**
  * 导航组件，提供生成导航网格功能
  */
-@AddComponentMenu("Navigation/Navigation")
+@AddComponentMenu('Navigation/Navigation')
 @RegisterComponent()
 export class Navigation extends Component
 {
-    @oav({ component: "OAVObjectView" })
+    @oav({ component: 'OAVObjectView' })
     agent = new NavigationAgent();
 
     private _navobject: GameObject;
@@ -57,13 +57,13 @@ export class Navigation extends Component
         super.init();
         this.hideFlags = this.hideFlags | HideFlags.DontSaveInBuild;
 
-        this._navobject = serialization.setValue(new GameObject(), { name: "NavObject", hideFlags: HideFlags.DontSave });
+        this._navobject = serialization.setValue(new GameObject(), { name: 'NavObject', hideFlags: HideFlags.DontSave });
         {
             const pointsObject = new GameObject();
-            pointsObject.name = "allowedVoxels";
+            pointsObject.name = 'allowedVoxels';
             const meshRenderer = pointsObject.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "point";
+            material.shaderName = 'point';
             const uniforms = material.uniforms as PointUniforms;
             uniforms.u_color = new Color4(0, 1, 0);
             uniforms.u_PointSize = 2;
@@ -73,10 +73,10 @@ export class Navigation extends Component
         }
         {
             const pointsObject = new GameObject();
-            pointsObject.name = "rejectivedVoxels";
+            pointsObject.name = 'rejectivedVoxels';
             const meshRenderer = pointsObject.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "point";
+            material.shaderName = 'point';
             const uniforms = material.uniforms as PointUniforms;
             uniforms.u_color = new Color4(1, 0, 0);
             uniforms.u_PointSize = 2;
@@ -86,10 +86,10 @@ export class Navigation extends Component
         }
         {
             const pointsObject = new GameObject();
-            pointsObject.name = "debugVoxels";
+            pointsObject.name = 'debugVoxels';
             const meshRenderer = pointsObject.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "point";
+            material.shaderName = 'point';
             const uniforms = material.uniforms as PointUniforms;
             uniforms.u_color = new Color4(0, 0, 1);
             uniforms.u_PointSize = 2;
@@ -114,57 +114,62 @@ export class Navigation extends Component
     @oav()
     bake()
     {
-        var geometrys = this._getNavGeometrys(this.gameObject.scene.gameObject);
-        if (geometrys.length == 0)
+        const geometrys = this._getNavGeometrys(this.gameObject.scene.gameObject);
+        if (geometrys.length === 0)
         {
             this._navobject && this._navobject.remove();
+
             return;
         }
         this.gameObject.scene.gameObject.addChild(this._navobject);
         this._navobject.transform.position = new Vector3();
 
-        var geometry = geometryUtils.mergeGeometry(geometrys);
+        const geometry = geometryUtils.mergeGeometry(geometrys);
 
         this._recastnavigation = this._recastnavigation || new Recastnavigation();
 
         this._recastnavigation.doRecastnavigation(geometry, this.agent);
-        var voxels = this._recastnavigation.getVoxels();
+        const voxels = this._recastnavigation.getVoxels();
 
-        var voxels0 = voxels.filter(v => v.flag == VoxelFlag.Default);
-        var voxels1 = voxels.filter(v => v.flag != VoxelFlag.Default);
-        var voxels2 = voxels.filter(v => !!(v.flag & VoxelFlag.IsContour));
+        const voxels0 = voxels.filter((v) => v.flag === VoxelFlag.Default);
+        const voxels1 = voxels.filter((v) => v.flag !== VoxelFlag.Default);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const voxels2 = voxels.filter((v) => !!(v.flag & VoxelFlag.IsContour));
 
-        this._allowedVoxelsPointGeometry.points = voxels0.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
-        this._rejectivedVoxelsPointGeometry.points = voxels1.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
+        this._allowedVoxelsPointGeometry.points = voxels0.map((v) => ({ position: new Vector3(v.x, v.y, v.z) }));
+        this._rejectivedVoxelsPointGeometry.points = voxels1.map((v) => ({ position: new Vector3(v.x, v.y, v.z) }));
         // this._debugVoxelsPointGeometry.points = voxels2.map(v => { return { position: new Vector3(v.x, v.y, v.z) } });
     }
 
     /**
      * 获取参与导航的几何体列表
-     * @param gameobject 
-     * @param geometrys 
+     * @param gameobject
+     * @param geometrys
      */
     private _getNavGeometrys(gameobject: GameObject, geometrys?: { positions: number[], indices: number[] }[])
     {
         geometrys = geometrys || [];
 
         if (!gameobject.activeSelf)
-            return geometrys;
-        var model = gameobject.getComponent(Renderable);
-        var geometry = model && model.geometry;
+        { return geometrys; }
+        const model = gameobject.getComponent(Renderable);
+        const geometry = model && model.geometry;
         if (geometry)
         {
-            var matrix = gameobject.transform.localToWorldMatrix;
-            var positions = Array.apply(null, geometry.positions);
+            const matrix = gameobject.transform.localToWorldMatrix;
+            // eslint-disable-next-line prefer-spread
+            const positions = Array.apply(null, geometry.positions);
             matrix.transformPoints(positions, positions);
-            var indices = Array.apply(null, geometry.indices);
+            // eslint-disable-next-line prefer-spread
+            const indices = Array.apply(null, geometry.indices);
             //
-            geometrys.push({ positions: positions, indices: indices });
+            geometrys.push({ positions, indices });
         }
-        gameobject.children.forEach(element =>
+        gameobject.children.forEach((element) =>
         {
             this._getNavGeometrys(element, geometrys);
         });
+
         return geometrys;
     }
 }

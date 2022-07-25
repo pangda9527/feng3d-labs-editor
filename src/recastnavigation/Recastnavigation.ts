@@ -3,15 +3,15 @@ import { NavigationAgent } from '../navigation/Navigation';
 
 /**
  * 重铸导航
- * 
+ *
  *  将接收的网格模型转换为导航网格数据
- * 
+ *
  * #### 设计思路
  * 1. 将接收到的网格模型的所有三角形栅格化为体素保存到三维数组内
  * 1. 遍历所有体素计算出可行走体素
  * 1. 构建可行走轮廓
  * 1. 构建可行走（导航）网格
- * 
+ *
  * #### 参考
  * @see https://github.com/recastnavigation/recastnavigation
  */
@@ -58,8 +58,8 @@ export class Recastnavigation
         this._aabb = Box3.formPositions(mesh.positions);
         this._voxelSize = voxelSize || new Vector3(agent.radius / 3, agent.radius / 3, agent.radius / 3);
         this._agent = agent;
-        // 
-        var size = this._aabb.getSize().divide(this._voxelSize).ceil();
+        //
+        const size = this._aabb.getSize().divide(this._voxelSize).ceil();
         this._numX = size.x + 1;
         this._numY = size.y + 1;
         this._numZ = size.z + 1;
@@ -83,7 +83,7 @@ export class Recastnavigation
      */
     getVoxels()
     {
-        var voxels: Voxel[] = [];
+        const voxels: Voxel[] = [];
         for (let x = 0; x < this._numX; x++)
         {
             for (let y = 0; y < this._numY; y++)
@@ -94,6 +94,7 @@ export class Recastnavigation
                 }
             }
         }
+
         return voxels;
     }
 
@@ -104,12 +105,12 @@ export class Recastnavigation
     {
         for (let i = 0, n = indices.length; i < n; i += 3)
         {
-            var pi0 = indices[i] * 3;
-            var p0 = [positions[pi0], positions[pi0 + 1], positions[pi0 + 2]];
-            var pi1 = indices[i + 1] * 3;
-            var p1 = [positions[pi1], positions[pi1 + 1], positions[pi1 + 2]]
-            var pi2 = indices[i + 2] * 3
-            var p2 = [positions[pi2], positions[pi2 + 1], positions[pi2 + 2]]
+            const pi0 = indices[i] * 3;
+            const p0 = [positions[pi0], positions[pi0 + 1], positions[pi0 + 2]];
+            const pi1 = indices[i + 1] * 3;
+            const p1 = [positions[pi1], positions[pi1 + 1], positions[pi1 + 2]];
+            const pi2 = indices[i + 2] * 3;
+            const p2 = [positions[pi2], positions[pi2 + 1], positions[pi2 + 2]];
             this._voxelizationTriangle(p0, p1, p2);
         }
     }
@@ -122,20 +123,20 @@ export class Recastnavigation
      */
     private _voxelizationTriangle(p0: number[], p1: number[], p2: number[])
     {
-        var triangle = Triangle3.fromPositions(p0.concat(p1).concat(p2));
-        var normal = triangle.getNormal();
-        var result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
+        const triangle = Triangle3.fromPositions(p0.concat(p1).concat(p2));
+        const normal = triangle.getNormal();
+        const result = triangle.rasterizeCustom(this._voxelSize, this._aabb.min);
 
-        result.forEach((v, i) =>
+        result.forEach((v, _i) =>
         {
             this._voxels[v.xi][v.yi][v.zi] = {
                 x: v.xv,
                 y: v.yv,
                 z: v.zv,
-                normal: normal,
+                normal,
                 triangleId: this._triangleId,
                 flag: VoxelFlag.Default,
-            }
+            };
         });
         this._triangleId++;
     }
@@ -145,7 +146,7 @@ export class Recastnavigation
      */
     private _applyAgent()
     {
-        this._agent.maxSlope
+        this._agent.maxSlope;
 
         this._applyAgentMaxSlope();
         this._applyAgentHeight();
@@ -157,13 +158,13 @@ export class Recastnavigation
      */
     private _applyAgentMaxSlope()
     {
-        var mincos = Math.cos(this._agent.maxSlope * mathUtil.DEG2RAD);
+        const mincos = Math.cos(this._agent.maxSlope * mathUtil.DEG2RAD);
 
-        this.getVoxels().forEach(v =>
+        this.getVoxels().forEach((v) =>
         {
-            var dot = v.normal.dot(Vector3.Y_AXIS);
+            const dot = v.normal.dot(Vector3.Y_AXIS);
             if (dot < mincos)
-                v.flag = v.flag | VoxelFlag.DontMaxSlope;
+            { v.flag = v.flag | VoxelFlag.DontMaxSlope; }
         });
     }
 
@@ -173,13 +174,13 @@ export class Recastnavigation
         {
             for (let z = 0; z < this._numZ; z++)
             {
-                var preVoxel: Voxel = null;
+                let preVoxel: Voxel = null;
                 for (let y = this._numY - 1; y >= 0; y--)
                 {
-                    var voxel = this._voxels[x][y][z];
+                    const voxel = this._voxels[x][y][z];
                     if (!voxel) continue;
                     // 不同属一个三角形且上下距离小于指定高度
-                    if (preVoxel != null && preVoxel.triangleId != voxel.triangleId && preVoxel.y - voxel.y < this._agent.height)
+                    if (preVoxel && preVoxel.triangleId !== voxel.triangleId && preVoxel.y - voxel.y < this._agent.height)
                     {
                         voxel.flag = voxel.flag | VoxelFlag.DontHeight;
                     }
@@ -210,30 +211,57 @@ export class Recastnavigation
 
     private _checkContourVoxel(x: number, y: number, z: number)
     {
-        var voxel = this._voxels[x][y][z];
+        const voxel = this._voxels[x][y][z];
         if (!voxel) return;
-        if (x == 0 || x == this._numX - 1 || y == 0 || y == this._numY - 1 || z == 0 || z == this._numZ - 1) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }
+        if (x === 0 || x === this._numX - 1 || y === 0 || y === this._numY - 1 || z === 0 || z === this._numZ - 1)
+        {
+            voxel.flag = voxel.flag | VoxelFlag.IsContour;
+
+            return;
+        }
         // this._getRoundVoxels();
         // 获取周围格子
         if (voxel.normal.equals(Vector3.Z_AXIS))
+        // eslint-disable-next-line no-empty
         {
 
         }
-        voxel.normal
+        voxel.normal;
 
-        voxel.normal
+        voxel.normal;
 
-        if (!(this._isVoxelFlagDefault(x, y, z + 1) || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }// 前
-        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }// 后
-        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }// 左
-        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z])) { voxel.flag = voxel.flag | VoxelFlag.IsContour; return; }// 右
+        if (!(this._isVoxelFlagDefault(x, y, z + 1) || this._voxels[x][y + 1][z + 1] || this._voxels[x][y - 1][z + 1]))
+        {
+            voxel.flag = voxel.flag | VoxelFlag.IsContour;
+
+            return;
+        }// 前
+        if (!(this._voxels[x][y][z - 1] || this._voxels[x][y + 1][z - 1] || this._voxels[x][y - 1][z - 1]))
+        {
+            voxel.flag = voxel.flag | VoxelFlag.IsContour;
+
+            return;
+        }// 后
+        if (!(this._voxels[x - 1][y][z] || this._voxels[x - 1][y + 1][z] || this._voxels[x - 1][y - 1][z]))
+        {
+            voxel.flag = voxel.flag | VoxelFlag.IsContour;
+
+            return;
+        }// 左
+        if (!(this._voxels[x + 1][y][z] || this._voxels[x + 1][y + 1][z] || this._voxels[x + 1][y - 1][z]))
+        {
+            voxel.flag = voxel.flag | VoxelFlag.IsContour;
+
+            return;
+        }// 右
     }
 
     private _isVoxelFlagDefault(x: number, y: number, z: number)
     {
-        var voxel = this._voxels[x][y][z];
+        const voxel = this._voxels[x][y][z];
         if (!voxel) return false;
-        return voxel.flag == VoxelFlag.Default;
+
+        return voxel.flag === VoxelFlag.Default;
     }
 }
 
@@ -257,5 +285,4 @@ export enum VoxelFlag
     DontHeight = 2,
     IsContour = 4,
 }
-
 

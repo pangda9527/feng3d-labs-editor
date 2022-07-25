@@ -1,10 +1,10 @@
 /**
  * (快捷键)状态列表
  */
-export var shortCutStates = {
-    disableScroll: "禁止滚动",
-    splitGroupDraging: "正在拖拽分割界面",
-    draging: "正在拖拽中"
+export const shortCutStates = {
+    disableScroll: '禁止滚动',
+    splitGroupDraging: '正在拖拽分割界面',
+    draging: '正在拖拽中'
 };
 
 /**

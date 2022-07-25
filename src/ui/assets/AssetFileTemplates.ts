@@ -1,38 +1,34 @@
-
-export var assetFileTemplates: AssetFileTemplates;
-
 export class AssetFileTemplates
 {
     /**
-     * 
+     *
      * @param scriptName 脚本名称（类名）
      */
-    getNewScript(scriptName)
+    getNewScript(scriptName: string)
     {
-        return scriptTemplate.replace("NewScript", scriptName);
+        return scriptTemplate.replace('NewScript', scriptName);
     }
     /**
-     * 
+     *
      * @param shadername shader名称
      */
     getNewShader(shadername: string)
     {
-        return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
+        return shaderTemplate.replace(new RegExp('NewShader', 'g'), shadername);
     }
 }
+export const assetFileTemplates = new AssetFileTemplates();
 
-assetFileTemplates = new AssetFileTemplates();
-
-var scriptTemplate = `
-class NewScript extends Script
+const scriptTemplate = `
+class NewScript extends feng3d.Script
 {
 
     /** 
      * 测试属性 
      */
-    @serialize
-    @oav()
-    t_attr = new Color4();
+    @feng3d.serialize
+    @feng3d.oav()
+    t_attr = new feng3d.Color4();
 
     /**
      * 初始化时调用
@@ -59,15 +55,15 @@ class NewScript extends Script
     }
 }`;
 
-var shaderTemplate = `
+const shaderTemplate = `
 class NewShaderUniforms
 {
     /** 
      * 颜色 
      */
-    @serialize
-    @oav()
-    u_color = new Color4();
+    @feng3d.serialize
+    @feng3d.oav()
+    u_color = new feng3d.Color4();
 }
 
 shaderConfig.shaders["NewShader"] = {

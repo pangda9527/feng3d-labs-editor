@@ -3,26 +3,20 @@ import { editorcache } from '../caches/Editorcache';
 import { NativeFS } from './NativeFS';
 import { supportNative, nativeFS } from './NativeRequire';
 
-var templateurls = [
-    ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
-    ["resource/template/app.js", "app.js"],
-    ["resource/template/index.html", "index.html"],
-    ["resource/template/project.js", "project.js"],
-    ["resource/template/tsconfig.json", "tsconfig.json"],
-    ["resource/template/default.scene.json", "default.scene.json"],
-    ["resource/template/libs/js", "libs/js"],
-    ["resource/template/libs/d.ts", "libs/d.ts"],
-    ["resource/template/libs/cannon.js", "libs/cannon.js"],
-    ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
-    ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
-    ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
+const templateurls = [
+    ['resource/template/.vscode/settings.json', '.vscode/settings.json'],
+    ['resource/template/app.js', 'app.js'],
+    ['resource/template/index.html', 'index.html'],
+    ['resource/template/project.js', 'project.js'],
+    ['resource/template/tsconfig.json', 'tsconfig.json'],
+    ['resource/template/default.scene.json', 'default.scene.json'],
+    ['resource/template/libs/js', 'libs/js'],
+    ['resource/template/libs/d.ts', 'libs/d.ts'],
+    ['resource/template/libs/cannon.js', 'libs/cannon.js'],
+    ['resource/template/libs/cannon.d.ts', 'libs/cannon.d.ts'],
+    ['resource/template/libs/cannon-plugin.js', 'libs/cannon-plugin.js'],
+    ['resource/template/libs/cannon-plugin.d.ts', 'libs/cannon-plugin.d.ts'],
 ];
-
-
-/**
- * 编辑器资源系统
- */
-export var editorRS: EditorRS;
 
 /**
  * 编辑器资源系统
@@ -31,7 +25,7 @@ export class EditorRS extends ReadWriteRS
 {
     /**
      * 初始化项目
-     * 
+     *
      * @param callback 完成回调
      */
     initproject(callback: (err?: Error) => void)
@@ -40,8 +34,18 @@ export class EditorRS extends ReadWriteRS
         {
             this.fs.initproject(editorcache.projectname, (err: Error) =>
             {
-                if (err) { callback(err); return; }
-                if (has) { callback(); return; }
+                if (err)
+                {
+                    callback(err);
+
+                    return;
+                }
+                if (has)
+                {
+                    callback();
+
+                    return;
+                }
                 this.createproject(callback);
             });
         });
@@ -52,11 +56,16 @@ export class EditorRS extends ReadWriteRS
      */
     private createproject(callback: (err?: Error) => void)
     {
-        var urls = templateurls;
-        var index = 0;
-        var loadUrls = () =>
+        const urls = templateurls;
+        let index = 0;
+        const loadUrls = () =>
         {
-            if (index >= urls.length) { callback(); return; }
+            if (index >= urls.length)
+            {
+                callback();
+
+                return;
+            }
             loader.loadText(urls[index][0], (content) =>
             {
                 this.fs.writeString(urls[index][1], content, (err) =>
@@ -65,24 +74,28 @@ export class EditorRS extends ReadWriteRS
                     index++;
                     loadUrls();
                 });
-
             }, null, (e) =>
             {
                 throw e;
                 index++;
                 loadUrls();
             });
-        }
+        };
         loadUrls();
     }
 
     upgradeProject(callback: () => void)
     {
-        var urls = templateurls;
-        var index = 0;
-        var loadUrls = () =>
+        const urls = templateurls;
+        let index = 0;
+        const loadUrls = () =>
         {
-            if (index >= urls.length) { callback(); return; }
+            if (index >= urls.length)
+            {
+                callback();
+
+                return;
+            }
             loader.loadText(urls[index][0], (content) =>
             {
                 this.fs.writeString(urls[index][1], content, (err) =>
@@ -91,20 +104,19 @@ export class EditorRS extends ReadWriteRS
                     index++;
                     loadUrls();
                 });
-
             }, null, (e) =>
             {
                 console.warn(e);
                 index++;
                 loadUrls();
             });
-        }
+        };
         loadUrls();
     }
 
     /**
      * 选择文件
-     * 
+     *
      * @param callback 完成回调
      */
     selectFile(callback: (file: FileList) => void)
@@ -115,31 +127,32 @@ export class EditorRS extends ReadWriteRS
 
     /**
      * 清理项目
-     * 
-     * @param callback 
+     *
+     * @param callback
      */
     clearProject(callback: () => void)
     {
         this._idMap = {};
         this._pathMap = {};
 
-        this.fs.delete("", callback);
+        this.fs.delete('', callback);
     }
 
     /**
      * 导出项目为zip压缩包
-     * 
+     *
      * @param filename 导出后压缩包名称
      * @param callback 完成回调
      */
     exportProjectToJSZip(filename: string, callback?: () => void)
     {
-        this.fs.getAllPathsInFolder("", (err, filepaths) =>
+        this.fs.getAllPathsInFolder('', (err, filepaths) =>
         {
             if (err)
             {
                 console.error(err);
                 callback && callback();
+
                 return;
             }
             this.exportFilesToJSZip(filename, filepaths, callback);
@@ -148,7 +161,7 @@ export class EditorRS extends ReadWriteRS
 
     /**
      * 导出指定文件夹为zip压缩包
-     * 
+     *
      * @param filename 导出后压缩包名称
      * @param folderpath 需要导出的文件夹路径
      * @param callback 完成回调
@@ -161,6 +174,7 @@ export class EditorRS extends ReadWriteRS
             {
                 console.error(err);
                 callback && callback();
+
                 return;
             }
             this.exportFilesToJSZip(filename, filepaths, callback);
@@ -169,15 +183,15 @@ export class EditorRS extends ReadWriteRS
 
     /**
      * 导出文件列表为zip压缩包
-     * 
+     *
      * @param filename 导出后压缩包名称
      * @param filepaths 需要导出的文件列表
      * @param callback 完成回调
      */
     exportFilesToJSZip(filename: string, filepaths: string[], callback?: () => void)
     {
-        var zip = new JSZip();
-        var fns = filepaths.map(p => (callback) =>
+        const zip = new JSZip();
+        const fns = filepaths.map((p) => (callback) =>
         {
             this.fs.isDirectory(p, (result) =>
             {
@@ -185,11 +199,12 @@ export class EditorRS extends ReadWriteRS
                 {
                     zip.folder(p);
                     callback();
-                } else
+                }
+                else
                 {
-                    this.fs.readArrayBuffer(p, (err, data) =>
+                    this.fs.readArrayBuffer(p, (_err, data) =>
                     {
-                        //处理文件夹
+                        // 处理文件夹
                         data && zip.file(p, data);
                         callback();
                     });
@@ -198,7 +213,7 @@ export class EditorRS extends ReadWriteRS
         });
         task.parallel(fns)(() =>
         {
-            zip.generateAsync({ type: "blob" }).then(function (content)
+            zip.generateAsync({ type: 'blob' }).then(function (content)
             {
                 saveAs(content, filename);
                 callback && callback();
@@ -211,29 +226,30 @@ export class EditorRS extends ReadWriteRS
      */
     importProject(file: File, callback: () => void)
     {
-        var zip = new JSZip();
+        const zip = new JSZip();
         zip.loadAsync(file).then((value) =>
         {
-            var filepaths = Object.keys(value.files);
+            const filepaths = Object.keys(value.files);
             filepaths.sort();
 
-            var fns = filepaths.map(p => (callback) =>
+            const fns = filepaths.map((p) => (callback) =>
             {
                 if (value.files[p].dir)
                 {
-                    this.fs.mkdir(p, (err) =>
+                    this.fs.mkdir(p, (_err) =>
                     {
                         callback();
                     });
-                } else
+                }
+                else
                 {
-                    zip.file(p).async("arraybuffer").then((data) =>
+                    zip.file(p).async('arraybuffer').then((data) =>
                     {
-                        this.fs.writeFile(p, data, (err) =>
+                        this.fs.writeFile(p, data, (_err) =>
                         {
                             callback();
                         });
-                    }, (reason) =>
+                    }, (_reason) =>
                     {
                     });
                 }
@@ -247,31 +263,37 @@ export class EditorRS extends ReadWriteRS
 if (supportNative)
 {
     FS.basefs = new NativeFS(nativeFS);
-} else
+}
+else
 {
     FS.basefs = indexedDBFS;
 }
+
+/**
+ * 编辑器资源系统
+ */
+export const editorRS = new EditorRS();
 FS.fs = new ReadWriteFS();
-ReadRS.rs = editorRS = new EditorRS();
+ReadRS.rs = editorRS;
 
 //
-var isSelectFile = false;
-var fileInput = document.createElement('input');
+let isSelectFile = false;
+const fileInput = document.createElement('input');
 fileInput.type = 'file';
 fileInput.multiple = true;
-fileInput.style.display = "none";
-fileInput.addEventListener('change', function (event)
+fileInput.style.display = 'none';
+fileInput.addEventListener('change', function (_event)
 {
     selectFileCallback && selectFileCallback(fileInput.files);
     selectFileCallback = null;
     fileInput.value = null;
 });
 // document.body.appendChild(fileInput);
-window.addEventListener("click", () =>
+window.addEventListener('click', () =>
 {
     if (isSelectFile)
-        fileInput.click();
+    { fileInput.click(); }
     isSelectFile = false;
 });
 
-var selectFileCallback: (file: FileList) => void;
+let selectFileCallback: (file: FileList) => void;

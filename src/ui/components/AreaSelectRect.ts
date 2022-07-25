@@ -5,7 +5,7 @@ import { editorui } from '../../global/editorui';
  */
 export class AreaSelectRect extends eui.Rect
 {
-    fillAlpha = 0.5
+    fillAlpha = 0.5;
     fillColor = 0x8888ff;
 
     /**
@@ -15,10 +15,10 @@ export class AreaSelectRect extends eui.Rect
      */
     show(start: { x: number, y: number }, end: { x: number, y: number })
     {
-        var minX = Math.min(start.x, end.x);
-        var maxX = Math.max(start.x, end.x);
-        var minY = Math.min(start.y, end.y);
-        var maxY = Math.max(start.y, end.y);
+        const minX = Math.min(start.x, end.x);
+        const maxX = Math.max(start.x, end.x);
+        const minY = Math.min(start.y, end.y);
+        const maxY = Math.max(start.y, end.y);
         this.x = minX;
         this.y = minY;
         this.width = maxX - minX;

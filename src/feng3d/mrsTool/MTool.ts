@@ -36,50 +36,50 @@ export class MTool extends MRSToolBase
     protected onAddedToScene()
     {
         super.onAddedToScene();
-        this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yzPlane.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.xzPlane.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.xyPlane.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.oCube.on("mousedown", this.onItemMouseDown, this);
+        this.toolModel.xAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.zAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yzPlane.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.xzPlane.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.xyPlane.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.oCube.on('mousedown', this.onItemMouseDown, this);
     }
 
     protected onRemovedFromScene()
     {
         super.onRemovedFromScene();
-        this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yzPlane.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.xzPlane.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.xyPlane.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.oCube.off("mousedown", this.onItemMouseDown, this);
+        this.toolModel.xAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.zAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yzPlane.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.xzPlane.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.xyPlane.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.oCube.off('mousedown', this.onItemMouseDown, this);
     }
 
     protected onItemMouseDown(event: IEvent<any>)
     {
-        if (!shortcut.getState("mouseInView3D")) return;
+        if (!shortcut.getState('mouseInView3D')) return;
 
-        if (shortcut.keyState.getKeyState("alt"))
-            return;
+        if (shortcut.keyState.getKeyState('alt'))
+            { return; }
         if (!this.editorCamera) return;
 
         super.onItemMouseDown(event);
-        //全局矩阵
-        var globalMatrix = this.transform.localToWorldMatrix;
-        //中心与X,Y,Z轴上点坐标
-        var po = globalMatrix.transformPoint3(new Vector3(0, 0, 0));
-        var px = globalMatrix.transformPoint3(new Vector3(1, 0, 0));
-        var py = globalMatrix.transformPoint3(new Vector3(0, 1, 0));
-        var pz = globalMatrix.transformPoint3(new Vector3(0, 0, 1));
+        // 全局矩阵
+        const globalMatrix = this.transform.localToWorldMatrix;
+        // 中心与X,Y,Z轴上点坐标
+        const po = globalMatrix.transformPoint3(new Vector3(0, 0, 0));
+        const px = globalMatrix.transformPoint3(new Vector3(1, 0, 0));
+        const py = globalMatrix.transformPoint3(new Vector3(0, 1, 0));
+        const pz = globalMatrix.transformPoint3(new Vector3(0, 0, 1));
         //
-        var ox = px.subTo(po);
-        var oy = py.subTo(po);
-        var oz = pz.subTo(po);
-        //摄像机前方方向
-        var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-        var cameraDir = cameraSceneTransform.getAxisZ();
+        const ox = px.subTo(po);
+        const oy = py.subTo(po);
+        const oz = pz.subTo(po);
+        // 摄像机前方方向
+        const cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
+        const cameraDir = cameraSceneTransform.getAxisZ();
         this.movePlane3D = new Plane();
         //
         switch (event.currentTarget)
@@ -126,26 +126,26 @@ export class MTool extends MRSToolBase
         this.startPos = this.toolModel.transform.position;
         this.mrsToolTarget.startTranslation();
         //
-        windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on('mousemove', this.onMouseMove, this);
     }
 
     private onMouseMove()
     {
-        var crossPos = this.getLocalMousePlaneCross();
-        var addPos = crossPos.subTo(this.startPlanePos);
+        const crossPos = this.getLocalMousePlaneCross();
+        const addPos = crossPos.subTo(this.startPlanePos);
         addPos.x *= this.changeXYZ.x;
         addPos.y *= this.changeXYZ.y;
         addPos.z *= this.changeXYZ.z;
-        var sceneTransform = this.startSceneTransform.clone();
+        const sceneTransform = this.startSceneTransform.clone();
         sceneTransform.prependTranslation(addPos.x, addPos.y, addPos.z);
-        var sceneAddpos = sceneTransform.getPosition().subTo(this.startSceneTransform.getPosition());
+        const sceneAddpos = sceneTransform.getPosition().subTo(this.startSceneTransform.getPosition());
         this.mrsToolTarget.translation(sceneAddpos);
     }
 
     protected onMouseUp()
     {
-        super.onMouseUp()
-        windowEventProxy.off("mousemove", this.onMouseMove, this);
+        super.onMouseUp();
+        windowEventProxy.off('mousemove', this.onMouseMove, this);
 
         this.mrsToolTarget.stopTranslation();
         this.startPos = null;
@@ -155,12 +155,12 @@ export class MTool extends MRSToolBase
 
     protected updateToolModel()
     {
-        //鼠标按下时不更新
+        // 鼠标按下时不更新
         if (this.ismouseDown) return;
         if (!this.editorCamera) return;
 
-        var cameraPos = this.editorCamera.transform.worldPosition;
-        var localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformPoint3(cameraPos);
+        const cameraPos = this.editorCamera.transform.worldPosition;
+        const localCameraPos = this.toolModel.transform.worldToLocalMatrix.transformPoint3(cameraPos);
 
         this.toolModel.xyPlane.transform.x = localCameraPos.x > 0 ? 0 : -this.toolModel.xyPlane.width;
         this.toolModel.xyPlane.transform.y = localCameraPos.y > 0 ? 0 : -this.toolModel.xyPlane.width;

@@ -27,21 +27,26 @@ export class MRSToolTarget
         }
     }
 
+    get controllerTargets()
+    {
+        return this._controllerTargets;
+    }
+
     set controllerTargets(value: Transform[])
     {
         if (this._controllerTargets)
         {
-            this._controllerTargets.forEach(v =>
+            this._controllerTargets.forEach((v) =>
             {
-                v.off("scenetransformChanged", this.invalidateControllerImage, this);
+                v.off('scenetransformChanged', this.invalidateControllerImage, this);
             });
         }
         this._controllerTargets = value;
         if (this._controllerTargets)
         {
-            this._controllerTargets.forEach(v =>
+            this._controllerTargets.forEach((v) =>
             {
-                v.on("scenetransformChanged", this.invalidateControllerImage, this);
+                v.on('scenetransformChanged', this.invalidateControllerImage, this);
             });
         }
         this.invalidateControllerImage();
@@ -49,18 +54,19 @@ export class MRSToolTarget
 
     constructor()
     {
-        globalEmitter.on("editor.isWoldCoordinateChanged", this.invalidateControllerImage, this);
-        globalEmitter.on("editor.isBaryCenterChanged", this.invalidateControllerImage, this);
+        globalEmitter.on('editor.isWoldCoordinateChanged', this.invalidateControllerImage, this);
+        globalEmitter.on('editor.isBaryCenterChanged', this.invalidateControllerImage, this);
         //
-        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.onSelectedGameObjectChange, this);
     }
 
     private onSelectedGameObjectChange()
     {
-        //筛选出 工具控制的对象
-        var transforms = <Transform[]>EditorData.editorData.selectedGameObjects.reduce((result, item) =>
+        // 筛选出 工具控制的对象
+        const transforms = <Transform[]>EditorData.editorData.selectedGameObjects.reduce((result, item) =>
         {
             result.push(item.transform);
+
             return result;
         }, []);
         if (transforms.length > 0)
@@ -80,23 +86,24 @@ export class MRSToolTarget
 
     private updateControllerImage()
     {
-        if (!this._controllerTargets || this._controllerTargets.length == 0)
-            return;
+        if (!this._controllerTargets || this._controllerTargets.length === 0)
+        { return; }
 
-        var transform = this._controllerTargets[this._controllerTargets.length - 1];
-        var position = new Vector3();
+        const transform = this._controllerTargets[this._controllerTargets.length - 1];
+        const position = new Vector3();
         if (EditorData.editorData.isBaryCenter)
         {
             position.copy(transform.worldPosition);
-        } else
+        }
+        else
         {
-            for (var i = 0; i < this._controllerTargets.length; i++)
+            for (let i = 0; i < this._controllerTargets.length; i++)
             {
                 position.add(this._controllerTargets[i].worldPosition);
             }
             position.scaleNumber(1 / this._controllerTargets.length);
         }
-        var rotation = new Vector3();
+        let rotation = new Vector3();
         if (!EditorData.editorData.isWoldCoordinate)
         {
             rotation = this._controllerTargets[0].rotation;
@@ -116,11 +123,11 @@ export class MRSToolTarget
     startTranslation()
     {
         this._startTransformDic = new Map<Transform, TransformData>();
-        var objects = this._controllerTargets.concat();
+        const objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        for (var i = 0; i < objects.length; i++)
+        for (let i = 0; i < objects.length; i++)
         {
-            var transform = objects[i];
+            const transform = objects[i];
             this._startTransformDic.set(transform, this.getTransformData(transform));
         }
     }
@@ -128,16 +135,16 @@ export class MRSToolTarget
     translation(addPos: Vector3)
     {
         if (!this._controllerTargets)
-            return;
-        var objects = this._controllerTargets.concat();
+        { return; }
+        const objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        for (var i = 0; i < objects.length; i++)
+        for (let i = 0; i < objects.length; i++)
         {
-            var gameobject = objects[i];
-            var transform = this._startTransformDic.get(gameobject);
-            var localMove = addPos.clone();
+            const gameobject = objects[i];
+            const transform = this._startTransformDic.get(gameobject);
+            let localMove = addPos.clone();
             if (gameobject.parent)
-                localMove = gameobject.parent.worldToLocalMatrix.transformVector3(localMove);
+            { localMove = gameobject.parent.worldToLocalMatrix.transformVector3(localMove); }
             gameobject.position = transform.position.addTo(localMove);
         }
     }
@@ -150,11 +157,11 @@ export class MRSToolTarget
     startRotate()
     {
         this._startTransformDic = new Map<Transform, TransformData>();
-        var objects = this._controllerTargets.concat();
+        const objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        for (var i = 0; i < objects.length; i++)
+        for (let i = 0; i < objects.length; i++)
         {
-            var transform = objects[i];
+            const transform = objects[i];
             this._startTransformDic.set(transform, this.getTransformData(transform));
         }
     }
@@ -166,35 +173,37 @@ export class MRSToolTarget
      */
     rotate1(angle: number, normal: Vector3)
     {
-        var objects = this._controllerTargets.concat();
+        const objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        var localnormal: Vector3;
-        var gameobject = objects[0];
+        let localnormal: Vector3;
+        let gameobject = objects[0];
         if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
         {
             if (gameobject.parent)
-                localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(normal);
+            { localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(normal); }
         }
-        for (var i = 0; i < objects.length; i++)
+        for (let i = 0; i < objects.length; i++)
         {
             gameobject = objects[i];
-            var tempTransform = this._startTransformDic.get(gameobject);
+            const tempTransform = this._startTransformDic.get(gameobject);
             if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
             {
                 gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
-            } else
+            }
+            else
             {
                 localnormal = normal.clone();
                 if (gameobject.parent)
-                    localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal);
+                { localnormal = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal); }
                 if (EditorData.editorData.isBaryCenter)
                 {
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
-                } else
+                }
+                else
                 {
-                    var localPivotPoint = this._position;
+                    let localPivotPoint = this._position;
                     if (gameobject.parent)
-                        localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
+                    { localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint); }
                     gameobject.position = Matrix4x4.fromPosition(tempTransform.position.x, tempTransform.position.y, tempTransform.position.z).appendRotation(localnormal, angle, localPivotPoint).getPosition();
                     gameobject.rotation = this.rotateRotation(tempTransform.rotation, localnormal, angle);
                 }
@@ -211,9 +220,9 @@ export class MRSToolTarget
      */
     rotate2(angle1: number, normal1: Vector3, angle2: number, normal2: Vector3)
     {
-        var objects = this._controllerTargets.concat();
+        const objects = this._controllerTargets.concat();
         objects.push(this._controllerTool);
-        var gameobject = objects[0];
+        let gameobject = objects[0];
         if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
         {
             if (gameobject.parent)
@@ -222,20 +231,21 @@ export class MRSToolTarget
                 normal2 = gameobject.parent.worldToLocalMatrix.transformVector3(normal2);
             }
         }
-        for (var i = 0; i < objects.length; i++)
+        for (let i = 0; i < objects.length; i++)
         {
             gameobject = objects[i];
-            var tempsceneTransform = this._startTransformDic.get(gameobject);
-            var tempPosition = tempsceneTransform.position.clone();
-            var tempRotation = tempsceneTransform.rotation.clone();
+            const tempsceneTransform = this._startTransformDic.get(gameobject);
+            let tempPosition = tempsceneTransform.position.clone();
+            let tempRotation = tempsceneTransform.rotation.clone();
             if (!EditorData.editorData.isWoldCoordinate && EditorData.editorData.isBaryCenter)
             {
                 tempRotation = this.rotateRotation(tempRotation, normal2, angle2);
                 gameobject.rotation = this.rotateRotation(tempRotation, normal1, angle1);
-            } else
+            }
+            else
             {
-                var localnormal1 = normal1.clone();
-                var localnormal2 = normal2.clone();
+                let localnormal1 = normal1.clone();
+                let localnormal2 = normal2.clone();
                 if (gameobject.parent)
                 {
                     localnormal1 = gameobject.parent.worldToLocalMatrix.transformVector3(localnormal1);
@@ -245,11 +255,12 @@ export class MRSToolTarget
                 {
                     tempRotation = this.rotateRotation(tempRotation, localnormal1, angle1);
                     gameobject.rotation = this.rotateRotation(tempRotation, localnormal2, angle2);
-                } else
+                }
+                else
                 {
-                    var localPivotPoint = this._position;
+                    let localPivotPoint = this._position;
                     if (gameobject.parent)
-                        localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint);
+                    { localPivotPoint = gameobject.parent.worldToLocalMatrix.transformPoint3(localPivotPoint); }
                     //
                     tempPosition = Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
                     gameobject.position = Matrix4x4.fromPosition(tempPosition.x, tempPosition.y, tempPosition.z).appendRotation(localnormal1, angle1, localPivotPoint).getPosition();
@@ -268,7 +279,7 @@ export class MRSToolTarget
 
     startScale()
     {
-        for (var i = 0; i < this._controllerTargets.length; i++)
+        for (let i = 0; i < this._controllerTargets.length; i++)
         {
             this._startScaleVec[i] = this._controllerTargets[i].scale.clone();
         }
@@ -277,9 +288,9 @@ export class MRSToolTarget
     doScale(scale: Vector3)
     {
         console.assert(!!scale.length);
-        for (var i = 0; i < this._controllerTargets.length; i++)
+        for (let i = 0; i < this._controllerTargets.length; i++)
         {
-            var result = this._startScaleVec[i].multiplyTo(scale);
+            const result = this._startScaleVec[i].multiplyTo(scale);
             this._controllerTargets[i].sx = result.x;
             this._controllerTargets[i].sy = result.y;
             this._controllerTargets[i].sz = result.z;
@@ -298,19 +309,19 @@ export class MRSToolTarget
 
     private rotateRotation(rotation: Vector3, axis: Vector3, angle)
     {
-        var rotationmatrix = new Matrix4x4();
+        const rotationmatrix = new Matrix4x4();
         rotationmatrix.fromRotation(rotation.x, rotation.y, rotation.z);
         rotationmatrix.appendRotation(axis, angle);
-        var newrotation = rotationmatrix.toTRS()[1];
-        var v = Math.round((newrotation.x - rotation.x) / 180);
-        if (v % 2 != 0)
+        const newrotation = rotationmatrix.toTRS()[1];
+        const v = Math.round((newrotation.x - rotation.x) / 180);
+        if (v % 2 !== 0)
         {
             newrotation.x += 180;
             newrotation.y = 180 - newrotation.y;
             newrotation.z += 180;
         }
 
-        function toround(a: number, b: number, c: number = 360)
+        function toround(a: number, b: number, c = 360)
         {
             return Math.round((b - a) / c) * c + a;
         }
@@ -318,6 +329,7 @@ export class MRSToolTarget
         newrotation.x = toround(newrotation.x, rotation.x);
         newrotation.y = toround(newrotation.y, rotation.y);
         newrotation.z = toround(newrotation.z, rotation.z);
+
         return newrotation;
     }
 }

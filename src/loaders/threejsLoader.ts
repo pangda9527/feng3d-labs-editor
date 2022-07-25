@@ -5,45 +5,45 @@ import { loadjs } from './load';
 
 export class ThreejsLoader
 {
-    load(url: string, completed?: (gameobject: feng3d.GameObject) => void)
+    load(url: string, _completed?: (gameobject: feng3d.GameObject) => void)
     {
-        editorRS.fs.readArrayBuffer(url, (err, data) =>
+        editorRS.fs.readArrayBuffer(url, (_err, data) =>
         {
             load(data, (gameobject) =>
             {
                 gameobject.name = feng3d.pathUtils.getName(url);
-                feng3d.globalEmitter.emit("asset.parsed", gameobject);
+                feng3d.globalEmitter.emit('asset.parsed', gameobject);
             });
         });
     }
 }
 
-export var threejsLoader = new ThreejsLoader();
+export const threejsLoader = new ThreejsLoader();
 
-var usenumberfixed = true;
+const usenumberfixed = true;
 
 function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => void)
 {
-    var skeletonComponent: feng3d.SkeletonComponent;
+    let skeletonComponent: feng3d.SkeletonComponent;
     prepare(() =>
     {
         //
-        var loader = new window["THREE"].FBXLoader();
-        if (typeof url == "string")
+        const loader = new window['THREE'].FBXLoader();
+        if (typeof url === 'string')
         {
-            loader.load(url, onLoad, onProgress, onError)
+            loader.load(url, onLoad, onProgress, onError);
         }
         else if (url instanceof ArrayBuffer)
         {
-            var scene = loader.parse(url);
+            const scene = loader.parse(url);
             onLoad(scene);
         }
         else
         {
-            var reader = new FileReader();
+            const reader = new FileReader();
             reader.addEventListener('load', function (event)
             {
-                var scene = loader.parse(event.target["result"]);
+                const scene = loader.parse(event.target['result']);
                 onLoad(scene);
             }, false);
             reader.readAsArrayBuffer(url);
@@ -52,10 +52,10 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
 
     function onLoad(scene)
     {
-        var gameobject = parse(scene);
+        const gameobject = parse(scene);
         gameobject.transform.sx = -1;
         onParseComplete && onParseComplete(gameobject);
-        console.log("onLoad");
+        console.log('onLoad');
     }
     function onProgress(event: ProgressEvent)
     {
@@ -68,44 +68,46 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
 
     function parse(object3d, parent?: feng3d.GameObject)
     {
-        if (object3d.type == "Bone")
+        if (object3d.type === 'Bone')
+        {
             return null;
+        }
 
-        var gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: object3d.name });
+        const gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: object3d.name });
         gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
         gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
         gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
         if (parent)
-            parent.addChild(gameobject);
+        { parent.addChild(gameobject); }
 
         switch (object3d.type)
         {
-            case "PerspectiveCamera":
+            case 'PerspectiveCamera':
                 gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
                 break;
-            case "SkinnedMesh":
-                var skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
+            case 'SkinnedMesh':
+                const skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
                 skinnedModel.geometry = parseGeometry(object3d.geometry);
                 skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
-                console.assert(object3d.bindMode == "attached");
+                console.assert(object3d.bindMode === 'attached');
                 skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                 if (parent)
-                    skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone();
+                { skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone(); }
                 break;
-            case "Mesh":
-                var model = gameobject.addComponent(feng3d.Renderable);
+            case 'Mesh':
+                const model = gameobject.addComponent(feng3d.Renderable);
                 model.geometry = parseGeometry(object3d.geometry);
                 model.material.renderParams.cullFace = feng3d.CullFace.NONE;
                 break;
-            case "Group":
+            case 'Group':
                 if (object3d.skeleton)
                 {
                     skeletonComponent = gameobject.addComponent(feng3d.SkeletonComponent);
                     skeletonComponent.joints = parseSkeleton(object3d.skeleton);
                 }
                 break;
-            case "Bone":
-                //Bone 由SkeletonComponent自动生成，不用解析
+            case 'Bone':
+                // Bone 由SkeletonComponent自动生成，不用解析
                 break;
             default:
                 console.warn(`没有提供 ${object3d.type} 类型对象的解析`);
@@ -114,17 +116,16 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
 
         if (object3d.animations && object3d.animations.length > 0)
         {
-            var animation = gameobject.addComponent(feng3d.Animation);
-            for (var i = 0; i < object3d.animations.length; i++)
+            const animation = gameobject.addComponent(feng3d.Animation);
+            for (let i = 0; i < object3d.animations.length; i++)
             {
-                var animationClip = parseAnimations(object3d.animations[i]);
+                const animationClip = parseAnimations(object3d.animations[i]);
                 animation.animations.push(animationClip);
                 animation.animation = animation.animations[0];
             }
-
         }
 
-        object3d.children.forEach(element =>
+        object3d.children.forEach((element) =>
         {
             parse(element, gameobject);
         });
@@ -133,25 +134,20 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
     }
 }
 
-
-function parseAnimations(animationClipData)
+function parseAnimations(animationClipData: { name: string; duration: number; tracks: any; })
 {
-    var matrixTemp = new window["THREE"].Matrix4();
-    var quaternionTemp = new window["THREE"].Quaternion();
-    var fmatrix = new feng3d.Matrix4x4();
-
     //
-    var animationClip = new feng3d.AnimationClip();
+    const animationClip = new feng3d.AnimationClip();
 
     animationClip.name = animationClipData.name;
     animationClip.length = animationClipData.duration * 1000;
     animationClip.propertyClips = [];
 
-    var tracks = animationClipData.tracks;
-    var len = tracks.length;
-    for (var i = 0; i < len; i++)
+    const tracks = animationClipData.tracks;
+    const len = tracks.length;
+    for (let i = 0; i < len; i++)
     {
-        var propertyClip = parsePropertyClip(tracks[i]);
+        const propertyClip = parsePropertyClip(tracks[i]);
         animationClip.propertyClips.push(propertyClip);
     }
 
@@ -159,25 +155,26 @@ function parseAnimations(animationClipData)
 
     function parsePropertyClip(keyframeTrack)
     {
-        var propertyClip = new feng3d.PropertyClip();
+        const propertyClip = new feng3d.PropertyClip();
 
-        var trackName: string = keyframeTrack.name;
-        var result = /\.bones\[(\w+)\]\.(\w+)/.exec(trackName);
+        const trackName: string = keyframeTrack.name;
+        const result = (/\.bones\[(\w+)\]\.(\w+)/).exec(trackName);
         propertyClip.path = <any>[
             [feng3d.PropertyClipPathItemType.GameObject, result[1]],
-            [feng3d.PropertyClipPathItemType.Component, , "feng3d.Transform"],
+            // eslint-disable-next-line no-sparse-arrays
+            [feng3d.PropertyClipPathItemType.Component, , 'feng3d.Transform'],
         ];
 
         switch (result[2])
         {
-            case "position":
-                propertyClip.propertyName = "position";
+            case 'position':
+                propertyClip.propertyName = 'position';
                 break;
-            case "scale":
-                propertyClip.propertyName = "scale";
+            case 'scale':
+                propertyClip.propertyName = 'scale';
                 break;
-            case "quaternion":
-                propertyClip.propertyName = "orientation";
+            case 'quaternion':
+                propertyClip.propertyName = 'orientation';
                 break;
             default:
                 console.warn(`没有处理 propertyName ${result[2]}`);
@@ -185,27 +182,27 @@ function parseAnimations(animationClipData)
         }
 
         propertyClip.propertyValues = [];
-        var propertyValues = propertyClip.propertyValues;
-        var times: number[] = keyframeTrack.times;
-        var values: number[] = Array.from(keyframeTrack.values);
+        const propertyValues = propertyClip.propertyValues;
+        const times: number[] = keyframeTrack.times;
+        let values: number[] = Array.from(keyframeTrack.values);
         if (usenumberfixed)
         {
-            values = values.map((v: number) => { return Number(v.toFixed(6)); });
+            values = values.map((v: number) => Number(v.toFixed(6)));
         }
 
-        var len = times.length;
+        const len = times.length;
         switch (keyframeTrack.ValueTypeName)
         {
-            case "vector":
-                propertyClip.type = "Vector3";
-                for (var i = 0; i < len; i++)
+            case 'vector':
+                propertyClip.type = 'Vector3';
+                for (let i = 0; i < len; i++)
                 {
                     propertyValues.push([times[i] * 1000, [values[i * 3], values[i * 3 + 1], values[i * 3 + 2]]]);
                 }
                 break;
-            case "quaternion":
-                propertyClip.type = "Quaternion";
-                for (var i = 0; i < len; i++)
+            case 'quaternion':
+                propertyClip.type = 'Quaternion';
+                for (let i = 0; i < len; i++)
                 {
                     propertyValues.push([times[i] * 1000, [values[i * 4], values[i * 4 + 1], values[i * 4 + 2], values[i * 4 + 3]]]);
                 }
@@ -221,25 +218,25 @@ function parseAnimations(animationClipData)
 
 function parseSkeleton(skeleton)
 {
-    var joints: feng3d.SkeletonJoint[] = [];
-    var skeNameDic = {};
+    const joints: feng3d.SkeletonJoint[] = [];
+    const skeNameDic = {};
 
-    var len = skeleton.bones.length;
-    for (var i = 0; i < len; i++)
+    const len = skeleton.bones.length;
+    for (let i = 0; i < len; i++)
     {
         skeNameDic[skeleton.bones[i].name] = i;
     }
-    for (var i = 0; i < len; i++)
+    for (let i = 0; i < len; i++)
     {
-        var bone = skeleton.bones[i];
-        var skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
+        const bone = skeleton.bones[i];
+        const skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
         //
         skeletonJoint.name = bone.name;
         skeletonJoint.matrix = new feng3d.Matrix4x4(bone.matrixWorld.elements);
 
-        var parentId = skeNameDic[bone.parent.name];
+        let parentId = skeNameDic[bone.parent.name];
         if (parentId === undefined)
-            parentId = -1;
+        { parentId = -1; }
 
         skeletonJoint.parentIndex = parentId;
     }
@@ -249,22 +246,22 @@ function parseSkeleton(skeleton)
 
 function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonData)
 {
-    var skinSkeleton = new feng3d.SkinSkeletonTemp();
+    const skinSkeleton = new feng3d.SkinSkeletonTemp();
 
-    var joints = skeleton.joints;
-    var jointsMap = {};
-    for (var i = 0; i < joints.length; i++)
+    const joints = skeleton.joints;
+    const jointsMap = {};
+    for (let i = 0; i < joints.length; i++)
     {
         jointsMap[joints[i].name] = [i, joints[i].name];
     }
 
-    var bones = skinSkeletonData.bones;
-    var len = bones.length;
+    const bones = skinSkeletonData.bones;
+    const len = bones.length;
     skinSkeleton.numJoint = len;
-    for (var i = 0; i < len; i++)
+    for (let i = 0; i < len; i++)
     {
-        var jointsMapitem = jointsMap[bones[i].name];
-        if (jointsMapitem == null && bones[i].parent)
+        let jointsMapitem = jointsMap[bones[i].name];
+        if (!jointsMapitem && bones[i].parent)
         {
             jointsMapitem = jointsMap[bones[i].parent.name];
         }
@@ -272,7 +269,8 @@ function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonDa
         {
             skinSkeleton.joints[i] = jointsMapitem;
             joints[jointsMapitem[0]].matrix = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
-        } else
+        }
+        else
         {
             console.warn(`没有在骨架中找到 骨骼 ${bones[i].name}`);
         }
@@ -283,39 +281,39 @@ function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonDa
 
 function parseGeometry(geometry)
 {
-    var attributes = geometry.attributes;
+    const attributes = geometry.attributes;
 
-    var geo = new feng3d.CustomGeometry();
+    const geo = new feng3d.CustomGeometry();
 
-    for (var key in attributes)
+    for (const key in attributes)
     {
         if (attributes.hasOwnProperty(key))
         {
-            var element = attributes[key];
-            var array: number[] = Array.from(element.array);
+            const element = attributes[key];
+            let array: number[] = Array.from(element.array);
             if (usenumberfixed)
             {
-                array = array.map((v: number) => { return Number(v.toFixed(6)); });
+                array = array.map((v: number) => Number(v.toFixed(6)));
             }
             switch (key)
             {
-                case "position":
+                case 'position':
                     geo.positions = array;
                     break;
-                case "normal":
+                case 'normal':
                     geo.normals = array;
                     break;
-                case "uv":
+                case 'uv':
                     geo.uvs = array;
                     break;
-                case "skinIndex":
+                case 'skinIndex':
                     geo.skinIndices = array;
                     break;
-                case "skinWeight":
+                case 'skinWeight':
                     geo.skinWeights = array;
                     break;
                 default:
-                    console.warn("没有解析顶点数据", key);
+                    console.warn('没有解析顶点数据', key);
                     break;
             }
         }
@@ -325,12 +323,13 @@ function parseGeometry(geometry)
     {
         geo.indices = geometry.index;
     }
+
     return geo;
 }
 
 function parsePerspectiveCamera(perspectiveCamera)
 {
-    var perspectiveLen = new feng3d.PerspectiveLens();
+    const perspectiveLen = new feng3d.PerspectiveLens();
 
     perspectiveLen.near = perspectiveCamera.near;
     perspectiveLen.far = perspectiveCamera.far;
@@ -340,67 +339,70 @@ function parsePerspectiveCamera(perspectiveCamera)
     return perspectiveLen;
 }
 
-var prepare = (() =>
+const prepare = (() =>
 {
-    var isprepare = false;
-    var prepareCallbacks = [];
-    var preparing = false;
+    let isprepare = false;
+    const prepareCallbacks = [];
+    let preparing = false;
+
     return (callback: () => void) =>
     {
         if (isprepare)
         {
             callback();
+
             return;
         }
         prepareCallbacks.push(callback);
         if (preparing)
-            return;
+        { return; }
 
         preparing = true;
         loadjs.load({
             paths: [
-                "threejs/three.js",
+                'threejs/three.js',
                 // <!-- FBX -->
-                "threejs/libs/inflate.min.js",
+                'threejs/libs/inflate.min.js',
                 //
-                "threejs/loaders/AMFLoader.js",
-                "threejs/loaders/AWDLoader.js",
-                "threejs/loaders/BabylonLoader.js",
-                "threejs/loaders/ColladaLoader.js",
-                "threejs/loaders/FBXLoader.js",
-                "threejs/loaders/GLTFLoader.js",
-                "threejs/loaders/KMZLoader.js",
-                "threejs/loaders/MD2Loader.js",
-                "threejs/loaders/OBJLoader.js",
-                "threejs/loaders/MTLLoader.js",
-                "threejs/loaders/PlayCanvasLoader.js",
-                "threejs/loaders/PLYLoader.js",
-                "threejs/loaders/STLLoader.js",
-                "threejs/loaders/TGALoader.js",
-                "threejs/loaders/TDSLoader.js",
-                "threejs/loaders/UTF8Loader.js",
-                "threejs/loaders/VRMLLoader.js",
-                "threejs/loaders/VTKLoader.js",
-                "threejs/loaders/ctm/lzma.js",
-                "threejs/loaders/ctm/ctm.js",
-                "threejs/loaders/ctm/CTMLoader.js",
-            ].map((value) => { return EditorData.editorData.getEditorAssetPath(value); }),
-            bundleId: "threejs",
+                'threejs/loaders/AMFLoader.js',
+                'threejs/loaders/AWDLoader.js',
+                'threejs/loaders/BabylonLoader.js',
+                'threejs/loaders/ColladaLoader.js',
+                'threejs/loaders/FBXLoader.js',
+                'threejs/loaders/GLTFLoader.js',
+                'threejs/loaders/KMZLoader.js',
+                'threejs/loaders/MD2Loader.js',
+                'threejs/loaders/OBJLoader.js',
+                'threejs/loaders/MTLLoader.js',
+                'threejs/loaders/PlayCanvasLoader.js',
+                'threejs/loaders/PLYLoader.js',
+                'threejs/loaders/STLLoader.js',
+                'threejs/loaders/TGALoader.js',
+                'threejs/loaders/TDSLoader.js',
+                'threejs/loaders/UTF8Loader.js',
+                'threejs/loaders/VRMLLoader.js',
+                'threejs/loaders/VTKLoader.js',
+                'threejs/loaders/ctm/lzma.js',
+                'threejs/loaders/ctm/ctm.js',
+                'threejs/loaders/ctm/CTMLoader.js',
+            ].map((value) => EditorData.editorData.getEditorAssetPath(value)),
+            bundleId: 'threejs',
             success: () =>
             {
-                Number.prototype["format"] = function ()        
+                // eslint-disable-next-line no-extend-native
+                Number.prototype['format'] = function ()
                 {
-                    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                    return this.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
                 };
 
                 // log("提供解析的 three.js 初始化完成，")
                 isprepare = true;
                 preparing = false;
-                prepareCallbacks.forEach(element =>
+                prepareCallbacks.forEach((element) =>
                 {
                     element();
                 });
             }
         });
-    }
+    };
 })();

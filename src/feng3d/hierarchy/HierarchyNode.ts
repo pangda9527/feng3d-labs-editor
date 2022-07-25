@@ -11,7 +11,7 @@ export class HierarchyNode extends TreeNode
      * 游戏对象
      */
     gameobject: GameObject;
-    /** 
+    /**
      * 父结点
      */
     parent: HierarchyNode = null;
@@ -24,49 +24,48 @@ export class HierarchyNode extends TreeNode
     {
         super(obj);
 
-        watcher.watch(this.gameobject, "name", this.update, this);
+        watcher.watch(this.gameobject, 'name', this.update, this);
 
         this.update();
     }
 
     /**
      * 提供拖拽数据
-     * 
-     * @param dragSource 
+     *
+     * @param dragSource
      */
     setdargSource(dragSource: DragData)
     {
-        dragSource.addDragData("gameobject", this.gameobject);
+        dragSource.addDragData('gameobject', this.gameobject);
     }
 
     /**
      * 接受拖拽数据
-     * 
-     * @param dragdata 
+     *
+     * @param dragdata
      */
     acceptDragDrop(dragdata: DragData)
     {
-        dragdata.getDragData("gameobject").forEach(v =>
+        dragdata.getDragData('gameobject').forEach((v) =>
         {
             if (!v.contains(this.gameobject))
             {
-                var localToWorldMatrix = v.transform.localToWorldMatrix
+                const localToWorldMatrix = v.transform.localToWorldMatrix;
                 this.gameobject.addChild(v);
                 v.transform.localToWorldMatrix = localToWorldMatrix;
                 //
                 hierarchy.getNode(v).openParents();
             }
         });
-        dragdata.getDragData("file_gameobject").forEach(v =>
+        dragdata.getDragData('file_gameobject').forEach((v) =>
         {
-            let gameobject = hierarchy.addGameoObjectFromAsset(v, this.gameobject);
+            const gameobject = hierarchy.addGameoObjectFromAsset(v, this.gameobject);
             hierarchy.getNode(gameobject).openParents();
         });
-        dragdata.getDragData("file_script").forEach(v =>
+        dragdata.getDragData('file_script').forEach((v) =>
         {
             this.gameobject.addScript(v.scriptName);
-        })
-
+        });
     }
 
     /**
@@ -74,7 +73,7 @@ export class HierarchyNode extends TreeNode
      */
     destroy()
     {
-        watcher.unwatch(this.gameobject, "name", this.update, this);
+        watcher.unwatch(this.gameobject, 'name', this.update, this);
 
         this.gameobject = null;
         super.destroy();

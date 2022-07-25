@@ -12,7 +12,7 @@ export class OAVMinMaxCurve extends OAVBase
     {
         super(attributeViewInfo);
 
-        this.skinName = "OAVMinMaxCurve";
+        this.skinName = 'OAVMinMaxCurve';
     }
 
     initView()

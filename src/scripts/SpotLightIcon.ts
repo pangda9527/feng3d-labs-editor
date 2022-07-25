@@ -10,7 +10,7 @@ declare global
 @RegisterComponent()
 export class SpotLightIcon extends EditorScript
 {
-    @watch("onLightChanged")
+    @watch('onLightChanged')
     light: SpotLight;
 
     get editorCamera() { return this._editorCamera; }
@@ -20,8 +20,8 @@ export class SpotLightIcon extends EditorScript
     init()
     {
         super.init();
-        this.initicon()
-        this.on("mousedown", this.onMousedown, this);
+        this.initicon();
+        this.on('mousedown', this.onMousedown, this);
     }
 
     initicon()
@@ -29,15 +29,15 @@ export class SpotLightIcon extends EditorScript
         if (!this._editorCamera) return;
         {
             const lightIcon = this._lightIcon = new GameObject();
-            lightIcon.name = "SpotLightIcon";
+            lightIcon.name = 'SpotLightIcon';
             const billboardComponent = lightIcon.addComponent(BillboardComponent);
             billboardComponent.camera = this.editorCamera;
             const meshRenderer = lightIcon.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "texture";
+            material.shaderName = 'texture';
             const uniforms = material.uniforms as TextureUniforms;
             const texture = uniforms.s_texture = new Texture2D();
-            texture.source = { url: EditorData.editorData.getEditorAssetPath("assets/3d/icons/spot.png") };
+            texture.source = { url: EditorData.editorData.getEditorAssetPath('assets/3d/icons/spot.png') };
             texture.format = TextureFormat.RGBA;
             texture.premulAlpha = true;
             material.renderParams.enableBlend = true;
@@ -54,12 +54,12 @@ export class SpotLightIcon extends EditorScript
         //
         {
             const lightLines = this._lightLines = new GameObject();
-            lightLines.name = "Lines";
+            lightLines.name = 'Lines';
             lightLines.mouseEnabled = false;
             lightLines.hideFlags = HideFlags.Hide;
             const meshRenderer = lightLines.addComponent(MeshRenderer);
             const material = meshRenderer.material = new Material();
-            material.shaderName = "segment";
+            material.shaderName = 'segment';
             const uniforms = material.uniforms as SegmentUniforms;
             uniforms.u_segmentColor = new Color4(1, 1, 1, 0.5);
             material.renderParams.enableBlend = true;
@@ -69,12 +69,12 @@ export class SpotLightIcon extends EditorScript
             this.gameObject.addChild(lightLines);
         }
         //
-        var lightpoints = this._lightpoints = serialization.setValue(new GameObject(), {
-            name: "points", mouseEnabled: false, hideFlags: HideFlags.Hide, components: [
+        const lightpoints = this._lightpoints = serialization.setValue(new GameObject(), {
+            name: 'points', mouseEnabled: false, hideFlags: HideFlags.Hide, components: [
                 {
-                    __class__: "feng3d.MeshRenderer",
-                    material: { __class__: "feng3d.Material", shaderName: "point", uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: RenderMode.POINTS } },
-                    geometry: { __class__: "feng3d.PointGeometry", },
+                    __class__: 'feng3d.MeshRenderer',
+                    material: { __class__: 'feng3d.Material', shaderName: 'point', uniforms: { u_PointSize: 5 }, renderParams: { enableBlend: true, renderMode: RenderMode.POINTS } },
+                    geometry: { __class__: 'feng3d.PointGeometry' },
                 },
             ]
         });
@@ -88,26 +88,26 @@ export class SpotLightIcon extends EditorScript
     {
         if (!this.light) return;
 
-        (<TextureUniforms>this._textureMaterial.uniforms).u_color = this.light.color.toColor4() as any;
+        (<TextureUniforms> this._textureMaterial.uniforms).u_color = this.light.color.toColor4() as any;
 
-        if (EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) != -1)
+        if (EditorData.editorData.selectedGameObjects.indexOf(this.light.gameObject) !== -1)
         {
             //
-            var points: PointInfo[] = [];
-            var segments: Segment[] = [];
-            var num = 36;
-            var point0: Vector3;
-            var point1: Vector3;
-            var radius = this.light.range * Math.tan(this.light.angle * mathUtil.DEG2RAD * 0.5);
-            var distance = this.light.range;
-            for (var i = 0; i < num; i++)
+            const points: PointInfo[] = [];
+            const segments: Segment[] = [];
+            const num = 36;
+            let point0: Vector3;
+            let point1: Vector3;
+            const radius = this.light.range * Math.tan(this.light.angle * mathUtil.DEG2RAD * 0.5);
+            const distance = this.light.range;
+            for (let i = 0; i < num; i++)
             {
-                var angle = i * Math.PI * 2 / num;
-                var x = Math.sin(angle);
-                var y = Math.cos(angle);
-                var angle1 = (i + 1) * Math.PI * 2 / num;
-                var x1 = Math.sin(angle1);
-                var y1 = Math.cos(angle1);
+                const angle = i * Math.PI * 2 / num;
+                const x = Math.sin(angle);
+                const y = Math.cos(angle);
+                const angle1 = (i + 1) * Math.PI * 2 / num;
+                const x1 = Math.sin(angle1);
+                const y1 = Math.cos(angle1);
                 //
                 point0 = new Vector3(x * radius, y * radius, distance);
                 point1 = new Vector3(x1 * radius, y1 * radius, distance);
@@ -130,7 +130,8 @@ export class SpotLightIcon extends EditorScript
             //
             this._lightLines.activeSelf = true;
             this._lightpoints.activeSelf = true;
-        } else
+        }
+ else
         {
             this._lightLines.activeSelf = false;
             this._lightpoints.activeSelf = false;
@@ -164,12 +165,12 @@ export class SpotLightIcon extends EditorScript
     {
         if (oldValue)
         {
-            oldValue.off("scenetransformChanged", this.onScenetransformChanged, this);
+            oldValue.off('scenetransformChanged', this.onScenetransformChanged, this);
         }
         if (value)
         {
             this.onScenetransformChanged();
-            value.on("scenetransformChanged", this.onScenetransformChanged, this);
+            value.on('scenetransformChanged', this.onScenetransformChanged, this);
         }
     }
 
@@ -182,10 +183,10 @@ export class SpotLightIcon extends EditorScript
     {
         EditorData.editorData.selectObject(this.light.gameObject);
         // 防止再次调用鼠标拾取
-        shortcut.activityState("selectInvalid");
+        shortcut.activityState('selectInvalid');
         ticker.once(100, () =>
         {
-            shortcut.deactivityState("selectInvalid");
+            shortcut.deactivityState('selectInvalid');
         });
     }
 }

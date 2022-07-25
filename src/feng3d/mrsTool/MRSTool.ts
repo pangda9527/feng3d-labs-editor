@@ -14,14 +14,13 @@ declare global
     }
 }
 
-
 /**
  * 设置永久可见
  */
 function setAwaysVisible(component: Component)
 {
-    var models = component.getComponentsInChildren(Renderable);
-    models.forEach(element =>
+    const models = component.getComponentsInChildren(Renderable);
+    models.forEach((element) =>
     {
         if (element.material)
         {
@@ -53,11 +52,11 @@ export class MRSTool extends Component
     {
         super.init();
 
-        this.mrsToolObject = serialization.setValue(new GameObject(), { name: "MRSTool" });
+        this.mrsToolObject = serialization.setValue(new GameObject(), { name: 'MRSTool' });
 
-        this.mTool = serialization.setValue(new GameObject(), { name: "MTool" }).addComponent(MTool);
-        this.rTool = serialization.setValue(new GameObject(), { name: "RTool" }).addComponent(RTool);
-        this.sTool = serialization.setValue(new GameObject(), { name: "STool" }).addComponent(STool);
+        this.mTool = serialization.setValue(new GameObject(), { name: 'MTool' }).addComponent(MTool);
+        this.rTool = serialization.setValue(new GameObject(), { name: 'RTool' }).addComponent(RTool);
+        this.sTool = serialization.setValue(new GameObject(), { name: 'STool' }).addComponent(STool);
 
         this.mTool.mrsToolTarget = this.mrsToolTarget;
         this.rTool.mrsToolTarget = this.mrsToolTarget;
@@ -69,8 +68,8 @@ export class MRSTool extends Component
         //
         this.currentTool = this.mTool;
         //
-        globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        globalEmitter.on("editor.toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.onSelectedGameObjectChange, this);
+        globalEmitter.on('editor.toolTypeChanged', this.onToolTypeChange, this);
     }
 
     dispose()
@@ -88,8 +87,8 @@ export class MRSTool extends Component
         this.sTool.dispose();
         this.sTool = null;
         //
-        globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedGameObjectChange, this);
-        globalEmitter.off("editor.toolTypeChanged", this.onToolTypeChange, this);
+        globalEmitter.off('editor.selectedObjectsChanged', this.onSelectedGameObjectChange, this);
+        globalEmitter.off('editor.toolTypeChanged', this.onToolTypeChange, this);
 
         super.dispose();
     }
@@ -108,9 +107,9 @@ export class MRSTool extends Component
 
     private onSelectedGameObjectChange()
     {
-        var objects = EditorData.editorData.selectedGameObjects.filter(v => !(v.hideFlags & HideFlags.DontTransform));
+        const objects = EditorData.editorData.selectedGameObjects.filter((v) => !(v.hideFlags & HideFlags.DontTransform));
 
-        //筛选出 工具控制的对象
+        // 筛选出 工具控制的对象
         if (objects.length > 0)
         {
             this.gameObject.addChild(this.mrsToolObject);
@@ -137,10 +136,17 @@ export class MRSTool extends Component
         }
     }
 
+    private get currentTool()
+    {
+        return this._currentTool;
+    }
+
     private set currentTool(value)
     {
-        if (this._currentTool == value)
+        if (this._currentTool === value)
+        {
             return;
+        }
         if (this._currentTool)
         {
             this._currentTool.gameObject.remove();

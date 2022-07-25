@@ -1,4 +1,4 @@
-import { watch, MinMaxCurve, AnimationCurve, Rectangle, AnimationCurveKeyframe, Color4, ImageUtil, watcher, MinMaxCurveMode, mathUtil, Vector2, serialization, WrapMode, gPartial } from 'feng3d';
+import { AnimationCurve, AnimationCurveKeyframe, Color4, gPartial, ImageUtil, mathUtil, MinMaxCurve, MinMaxCurveMode, Rectangle, serialization, Vector2, watch, watcher, WrapMode } from 'feng3d';
 import { editorui } from '../../global/editorui';
 import { NumberTextInputBinder } from './binders/NumberTextInputBinder';
 import { menu } from './Menu';
@@ -7,7 +7,7 @@ export class MinMaxCurveEditor extends eui.Component
 {
     static minMaxCurveEditor: MinMaxCurveEditor;
 
-    @watch("_onMinMaxCurveChanged")
+    @watch('_onMinMaxCurveChanged')
     minMaxCurve = new MinMaxCurve();
 
     public viewGroup: eui.Group;
@@ -43,7 +43,6 @@ export class MinMaxCurveEditor extends eui.Component
     public postWrapModeBtn: eui.Button;
     public keyPosLab: eui.Label;
 
-
     //
     private timeline: AnimationCurve;
     private timeline1: AnimationCurve;
@@ -53,7 +52,7 @@ export class MinMaxCurveEditor extends eui.Component
     private editKey: AnimationCurveKeyframe;
     private editorControlkey: AnimationCurveKeyframe;
     private editing = false;
-    private mousedownxy = { x: -1, y: -1 }
+    private mousedownxy = { x: -1, y: -1 };
     private selectedKey: AnimationCurveKeyframe;
     private selectTimeline: AnimationCurve;
 
@@ -80,7 +79,7 @@ export class MinMaxCurveEditor extends eui.Component
     constructor()
     {
         super();
-        this.skinName = "MinMaxCurveEditor";
+        this.skinName = 'MinMaxCurveEditor';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -95,19 +94,19 @@ export class MinMaxCurveEditor extends eui.Component
         this.viewGroup.addEventListener(egret.MouseEvent.MOUSE_DOWN, this.onMouseDown, this);
         editorui.stage.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondblclick, this);
 
-        this.sampleImages.forEach(v => v.addEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
+        this.sampleImages.forEach((v) => v.addEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
 
         this.addEventListener(egret.Event.RESIZE, this._onReSize, this);
 
         this.addBinder(new NumberTextInputBinder().init({
-            space: this.minMaxCurve, attribute: "curveMultiplier", textInput: this.multiplierInput, editable: true,
+            space: this.minMaxCurve, attribute: 'curveMultiplier', textInput: this.multiplierInput, editable: true,
             controller: null,
         }));
 
         this.preWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
         this.postWrapModeBtn.addEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
-        watcher.watch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+        watcher.watch(this.minMaxCurve, 'curveMultiplier', this.updateXYLabels, this);
 
         this.updateXYLabels();
         this.updateSampleImages();
@@ -116,7 +115,7 @@ export class MinMaxCurveEditor extends eui.Component
 
     $onRemoveFromStage()
     {
-        this.sampleImages.forEach(v => v.removeEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
+        this.sampleImages.forEach((v) => v.removeEventListener(egret.MouseEvent.CLICK, this.onSampleClick, this));
 
         this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
@@ -128,9 +127,9 @@ export class MinMaxCurveEditor extends eui.Component
         this.preWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPreWrapModeBtn, this);
         this.postWrapModeBtn.removeEventListener(egret.MouseEvent.CLICK, this.onPostWrapMode, this);
 
-        watcher.unwatch(this.minMaxCurve, "curveMultiplier", this.updateXYLabels, this);
+        watcher.unwatch(this.minMaxCurve, 'curveMultiplier', this.updateXYLabels, this);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()
@@ -149,12 +148,13 @@ export class MinMaxCurveEditor extends eui.Component
         this.timeline = this.minMaxCurve.curve;
         this.timeline1 = this.minMaxCurve.curveMax;
 
-        if (this.minMaxCurve.mode == MinMaxCurveMode.Curve)
+        if (this.minMaxCurve.mode === MinMaxCurveMode.Curve)
         {
             this.imageUtil.drawCurve(this.timeline, this.minMaxCurve.between0And1, this.curveColor, this.curveRect);
 
             this.drawCurveKeys(this.timeline);
-        } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves)
+        }
+        else if (this.minMaxCurve.mode === MinMaxCurveMode.TwoCurves)
         {
             this.imageUtil.drawBetweenTwoCurves(this.minMaxCurve.curve, this.minMaxCurve.curveMax, this.minMaxCurve.between0And1, this.curveColor, this.fillTwoCurvesColor, this.curveRect);
 
@@ -184,28 +184,29 @@ export class MinMaxCurveEditor extends eui.Component
 
     private updateSampleImages()
     {
-        var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
-        var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
+        const curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
+        const doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
 
         for (let i = 0; i < this.sampleImages.length; i++)
         {
             const element = this.sampleImages[i];
-            if (this.minMaxCurve.mode == MinMaxCurveMode.Curve && curves[i])
+            if (this.minMaxCurve.mode === MinMaxCurveMode.Curve && curves[i])
             {
-                var imageUtil = new ImageUtil(element.width, element.height, this.backColor);
+                const imageUtil = new ImageUtil(element.width, element.height, this.backColor);
                 if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new Vector2(0, element.height / 2), new Vector2(element.width, element.height / 2), Color4.BLACK);
-                var curve = serialization.setValue(new AnimationCurve(), curves[i]);
+                const curve = serialization.setValue(new AnimationCurve(), curves[i]);
                 imageUtil.drawCurve(curve, this.minMaxCurve.between0And1, Color4.WHITE);
 
                 element.source = imageUtil.toDataURL();
                 this.samplesGroup.addChild(element);
-            } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves && doubleCurves[i])
+            }
+            else if (this.minMaxCurve.mode === MinMaxCurveMode.TwoCurves && doubleCurves[i])
             {
-                var imageUtil = new ImageUtil(element.width, element.height, this.backColor);
+                const imageUtil = new ImageUtil(element.width, element.height, this.backColor);
                 if (!this.minMaxCurve.between0And1) imageUtil.drawLine(new Vector2(0, element.height / 2), new Vector2(element.width, element.height / 2), Color4.BLACK);
 
-                var curveMin = serialization.setValue(new AnimationCurve(), doubleCurves[i].curve);
-                var curveMax = serialization.setValue(new AnimationCurve(), doubleCurves[i].curveMax);
+                const curveMin = serialization.setValue(new AnimationCurve(), doubleCurves[i].curve);
+                const curveMax = serialization.setValue(new AnimationCurve(), doubleCurves[i].curveMax);
 
                 imageUtil.drawBetweenTwoCurves(curveMin, curveMax, this.minMaxCurve.between0And1, Color4.WHITE);
 
@@ -224,14 +225,15 @@ export class MinMaxCurveEditor extends eui.Component
         for (let i = 0; i < this.sampleImages.length; i++)
         {
             const element = this.sampleImages[i];
-            if (element == e.currentTarget)
+            if (element === e.currentTarget)
             {
-                var curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
-                var doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
-                if (this.minMaxCurve.mode == MinMaxCurveMode.Curve)
+                const curves = this.minMaxCurve.between0And1 ? particleCurves : particleCurvesSingend;
+                const doubleCurves = this.minMaxCurve.between0And1 ? particleDoubleCurves : particleDoubleCurvesSingend;
+                if (this.minMaxCurve.mode === MinMaxCurveMode.Curve)
                 {
                     this.minMaxCurve.curve = serialization.setValue(new AnimationCurve(), curves[i]);
-                } else if (this.minMaxCurve.mode == MinMaxCurveMode.TwoCurves)
+                }
+                else if (this.minMaxCurve.mode === MinMaxCurveMode.TwoCurves)
                 {
                     this.minMaxCurve.curve = serialization.setValue(new AnimationCurve(), doubleCurves[i].curve);
                     this.minMaxCurve.curveMax = serialization.setValue(new AnimationCurve(), doubleCurves[i].curveMax);
@@ -246,40 +248,42 @@ export class MinMaxCurveEditor extends eui.Component
 
     /**
      * 绘制曲线关键点
-     * @param animationCurve 
+     * @param animationCurve
      */
     private drawCurveKeys(animationCurve: AnimationCurve)
     {
-        var c = new Color4(1, 0, 0);
-        animationCurve.keys.forEach(key =>
+        const c = new Color4(1, 0, 0);
+        animationCurve.keys.forEach((key) =>
         {
-            var pos = this.curveToUIPos(key.time, key.value);
+            const pos = this.curveToUIPos(key.time, key.value);
             this.imageUtil.drawPoint(pos.x, pos.y, c, this.pointSize);
         });
     }
 
     /**
      * 曲线上的坐标转换为UI上的坐标
-     * @param time 
-     * @param value 
+     * @param time
+     * @param value
      */
     private curveToUIPos(time: number, value: number)
     {
-        var x = mathUtil.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
-        var y = mathUtil.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
+        const x = mathUtil.mapLinear(time, 0, 1, this.curveRect.left, this.curveRect.right);
+        const y = mathUtil.mapLinear(value, this.range[0], this.range[1], this.curveRect.top, this.curveRect.bottom);
+
         return new Vector2(x, y);
     }
 
     /**
      * UI上坐标转换为曲线上坐标
-     * @param x 
-     * @param y 
+     * @param x
+     * @param y
      */
     private uiToCurvePos(x: number, y: number)
     {
-        var time = mathUtil.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
-        var value = mathUtil.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
-        return { time: time, value: value };
+        const time = mathUtil.mapLinear(x, this.curveRect.left, this.curveRect.right, 0, 1);
+        const value = mathUtil.mapLinear(y, this.curveRect.top, this.curveRect.bottom, this.range[0], this.range[1]);
+
+        return { time, value };
     }
 
     private getKeyUIPos(key: AnimationCurveKeyframe)
@@ -289,17 +293,19 @@ export class MinMaxCurveEditor extends eui.Component
 
     private getKeyLeftControlUIPos(key: AnimationCurveKeyframe)
     {
-        var current = this.curveToUIPos(key.time, key.value);
-        var currenttan = key.inTangent * this.curveRect.height / this.curveRect.width;
-        var lcp = new Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
+        const current = this.curveToUIPos(key.time, key.value);
+        const currenttan = key.inTangent * this.curveRect.height / this.curveRect.width;
+        const lcp = new Vector2(current.x - this.controllerLength * Math.cos(Math.atan(currenttan)), current.y + this.controllerLength * Math.sin(Math.atan(currenttan)));
+
         return lcp;
     }
 
     private getKeyRightControlUIPos(key: AnimationCurveKeyframe)
     {
-        var current = this.curveToUIPos(key.time, key.value);
-        var currenttan = key.outTangent * this.curveRect.height / this.curveRect.width;
-        var rcp = new Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
+        const current = this.curveToUIPos(key.time, key.value);
+        const currenttan = key.outTangent * this.curveRect.height / this.curveRect.width;
+        const rcp = new Vector2(current.x + this.controllerLength * Math.cos(Math.atan(currenttan)), current.y - this.controllerLength * Math.sin(Math.atan(currenttan)));
+
         return rcp;
     }
 
@@ -308,31 +314,31 @@ export class MinMaxCurveEditor extends eui.Component
      */
     private drawSelectedKey()
     {
-        if (this.selectedKey == null || this.selectTimeline == null) return;
+        if (!this.selectedKey || !this.selectTimeline) return;
 
-        var key = this.selectedKey;
+        const key = this.selectedKey;
         //
-        var i = this.selectTimeline.keys.indexOf(key);
-        if (i == -1) return;
+        const i = this.selectTimeline.keys.indexOf(key);
+        if (i === -1) return;
 
-        var n = this.selectTimeline.keys.length;
-        var c = new Color4();
+        const n = this.selectTimeline.keys.length;
+        const c = new Color4();
 
-        var current = this.getKeyUIPos(key);
+        const current = this.getKeyUIPos(key);
         this.imageUtil.drawPoint(current.x, current.y, c, this.pointSize);
 
-        if (this.selectedKey == key)
+        if (this.selectedKey === key)
         {
             // 绘制控制点
             if (i > 0)
             {
-                var lcp = this.getKeyLeftControlUIPos(key);
+                const lcp = this.getKeyLeftControlUIPos(key);
                 this.imageUtil.drawPoint(lcp.x, lcp.y, c, this.pointSize);
                 this.imageUtil.drawLine(current, lcp, new Color4());
             }
             if (i < n - 1)
             {
-                var rcp = this.getKeyRightControlUIPos(key);
+                const rcp = this.getKeyRightControlUIPos(key);
                 this.imageUtil.drawPoint(rcp.x, rcp.y, c, this.pointSize);
                 this.imageUtil.drawLine(current, rcp, new Color4());
             }
@@ -344,7 +350,7 @@ export class MinMaxCurveEditor extends eui.Component
      */
     private updateWrapModeBtnPosition()
     {
-        var selectTimeline = this.selectTimeline;
+        const selectTimeline = this.selectTimeline;
 
         this.preWrapModeBtn.visible = false;
         this.postWrapModeBtn.visible = false;
@@ -354,41 +360,41 @@ export class MinMaxCurveEditor extends eui.Component
         this.preWrapModeBtn.visible = true;
         this.postWrapModeBtn.visible = true;
 
-        var firstKey = selectTimeline.keys[0];
-        var prePos = this.curveToUIPos(firstKey.time, firstKey.value);
+        const firstKey = selectTimeline.keys[0];
+        const prePos = this.curveToUIPos(firstKey.time, firstKey.value);
         this.preWrapModeBtn.x = prePos.x - this.preWrapModeBtn.width - 10;
         this.preWrapModeBtn.y = prePos.y;
 
-        var lastKey = selectTimeline.keys[selectTimeline.keys.length - 1];/*  */
-        var postPos = this.curveToUIPos(lastKey.time, lastKey.value);
+        const lastKey = selectTimeline.keys[selectTimeline.keys.length - 1];/*  */
+        const postPos = this.curveToUIPos(lastKey.time, lastKey.value);
         this.postWrapModeBtn.x = postPos.x + 15;
         this.postWrapModeBtn.y = postPos.y;
 
         if (this.editKey)
         {
-            var editKeyPos = this.curveToUIPos(this.editKey.time, this.editKey.value);
+            const editKeyPos = this.curveToUIPos(this.editKey.time, this.editKey.value);
             this.keyPosLab.x = editKeyPos.x;
             this.keyPosLab.y = editKeyPos.y - this.keyPosLab.height - 5;
 
-            this.keyPosLab.text = this.editKey.time.toFixed(3) + "," + this.editKey.value.toFixed(3);
+            this.keyPosLab.text = `${this.editKey.time.toFixed(3)},${this.editKey.value.toFixed(3)}`;
         }
     }
 
     private drawGrid(segmentW = 10, segmentH = 2)
     {
         //
-        var lines: { start: Vector2, end: Vector2, color: Color4 }[] = [];
-        var c0 = Color4.fromUnit24(0x494949);
-        var c1 = Color4.fromUnit24(0x4f4f4f);
-        for (var i = 0; i <= segmentW; i++)
+        const lines: { start: Vector2, end: Vector2, color: Color4 }[] = [];
+        const c0 = Color4.fromUnit24(0x494949);
+        const c1 = Color4.fromUnit24(0x4f4f4f);
+        for (let i = 0; i <= segmentW; i++)
         {
-            lines.push({ start: new Vector2(i / segmentW, 0), end: new Vector2(i / segmentW, 1), color: i % 2 == 0 ? c0 : c1 });
+            lines.push({ start: new Vector2(i / segmentW, 0), end: new Vector2(i / segmentW, 1), color: i % 2 === 0 ? c0 : c1 });
         }
-        for (var i = 0; i <= segmentH; i++)
+        for (let i = 0; i <= segmentH; i++)
         {
-            lines.push({ start: new Vector2(0, i / segmentH), end: new Vector2(1, i / segmentH), color: i % 2 == 0 ? c0 : c1 });
+            lines.push({ start: new Vector2(0, i / segmentH), end: new Vector2(1, i / segmentH), color: i % 2 === 0 ? c0 : c1 });
         }
-        lines.forEach(v =>
+        lines.forEach((v) =>
         {
             v.start.x = this.curveRect.x + this.curveRect.width * v.start.x;
             v.start.y = this.curveRect.y + this.curveRect.height * v.start.y;
@@ -413,38 +419,39 @@ export class MinMaxCurveEditor extends eui.Component
 
     private onMouseDown(ev: egret.MouseEvent)
     {
-        var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
+        const lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
-        var x = lp.x;
-        var y = lp.y;
+        const x = lp.x;
+        const y = lp.y;
 
         this.mousedownxy.x = x;
         this.mousedownxy.y = y;
 
-        var curvePos = this.uiToCurvePos(x, y);
+        const curvePos = this.uiToCurvePos(x, y);
 
-        var timeline = this.timeline;
+        let timeline = this.timeline;
         this.editKey = timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
-        if (this.editKey == null && this.timeline1 != null)
+        if (!this.editKey && this.timeline1)
         {
             timeline = this.timeline1;
             this.editKey = timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
         }
-        if (this.editKey != null)
+        if (this.editKey)
         {
             this.selectedKey = this.editKey;
             this.selectTimeline = timeline;
-        } else if (this.selectedKey)
+        }
+        else if (this.selectedKey)
         {
             this.editorControlkey = this.findControlKey(this.selectedKey, x, y, this.pointSize);
-            if (this.editorControlkey == null)
+            if (!this.editorControlkey)
             {
                 this.selectedKey = null;
                 this.selectTimeline = null;
             }
         }
 
-        if (this.editKey != null || this.editorControlkey != null)
+        if (this.editKey || this.editorControlkey)
         {
             this.keyPosLab.visible = true;
             editorui.stage.addEventListener(egret.MouseEvent.MOUSE_MOVE, this.onMouseMove, this);
@@ -459,12 +466,12 @@ export class MinMaxCurveEditor extends eui.Component
     {
         this.editing = true;
 
-        var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
+        const lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
-        var x = lp.x;
-        var y = lp.y;
+        const x = lp.x;
+        const y = lp.y;
 
-        var curvePos = this.uiToCurvePos(x, y);
+        const curvePos = this.uiToCurvePos(x, y);
 
         if (this.editKey)
         {
@@ -478,18 +485,21 @@ export class MinMaxCurveEditor extends eui.Component
 
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-        } else if (this.editorControlkey)
+        }
+        else if (this.editorControlkey)
         {
-            var index = this.selectTimeline.indexOfKeys(this.editorControlkey);
+            const index = this.selectTimeline.indexOfKeys(this.editorControlkey);
 
-            if (index == 0 && curvePos.time < this.editorControlkey.time)
+            if (index === 0 && curvePos.time < this.editorControlkey.time)
             {
                 this.editorControlkey.inTangent = curvePos.value > this.editorControlkey.value ? Infinity : -Infinity;
+
                 return;
             }
-            if (index == this.selectTimeline.numKeys - 1 && curvePos.time > this.editorControlkey.time) 
+            if (index === this.selectTimeline.numKeys - 1 && curvePos.time > this.editorControlkey.time)
             {
                 this.editorControlkey.outTangent = curvePos.value > this.editorControlkey.value ? -Infinity : Infinity;
+
                 return;
             }
             this.editorControlkey.inTangent = this.editorControlkey.outTangent = (curvePos.value - this.editorControlkey.value) / (curvePos.time - this.editorControlkey.time);
@@ -499,7 +509,7 @@ export class MinMaxCurveEditor extends eui.Component
         }
     }
 
-    private onMouseUp(ev: MouseEvent)
+    private onMouseUp(_ev: MouseEvent)
     {
         this.editing = false;
         this.editorControlkey = null;
@@ -511,18 +521,19 @@ export class MinMaxCurveEditor extends eui.Component
 
     private findControlKey(key: AnimationCurveKeyframe, x: number, y: number, radius: number)
     {
-        var lcp = this.getKeyLeftControlUIPos(key);
+        const lcp = this.getKeyLeftControlUIPos(key);
 
         if (Math.abs(lcp.x - x) < radius && Math.abs(lcp.y - y) < radius)
         {
             return key;
         }
 
-        var rcp = this.getKeyRightControlUIPos(key);
+        const rcp = this.getKeyRightControlUIPos(key);
         if (Math.abs(rcp.x - x) < radius && Math.abs(rcp.y - y) < radius)
         {
             return key;
         }
+
         return null;
     }
 
@@ -532,64 +543,67 @@ export class MinMaxCurveEditor extends eui.Component
         this.editKey = null;
         this.editorControlkey = null;
 
-        var lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
+        const lp = this.viewGroup.globalToLocal(ev.stageX, ev.stageY);
 
-        var x = lp.x;
-        var y = lp.y;
+        const x = lp.x;
+        const y = lp.y;
 
-        var curvePos = this.uiToCurvePos(x, y);
+        const curvePos = this.uiToCurvePos(x, y);
 
-        var selectedKey = this.timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
-        if (selectedKey != null)
+        let selectedKey = this.timeline.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
+        if (selectedKey !== null)
         {
             this.timeline.deleteKey(selectedKey);
 
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+
             return;
         }
-        if (this.timeline1 != null)
+        if (this.timeline1)
         {
-            var selectedKey = this.timeline1.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
-            if (selectedKey != null)
+            selectedKey = this.timeline1.findKey(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
+            if (selectedKey)
             {
                 this.timeline1.deleteKey(selectedKey);
 
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+
                 return;
             }
         }
         // 没有选中关键与控制点时，检查是否点击到曲线
-        var newKey = this.timeline.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
+        let newKey = this.timeline.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
         if (newKey)
         {
             this.selectedKey = newKey;
             this.selectTimeline = this.timeline;
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
             this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+
             return;
         }
-        if (this.timeline1 != null)
+        if (this.timeline1)
         {
-            var newKey = this.timeline1.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
+            newKey = this.timeline1.addKeyAtCurve(curvePos.time, curvePos.value, this.pointSize / this.curveRect.height);
             if (newKey)
             {
                 this.selectedKey = newKey;
                 this.selectTimeline = this.timeline1;
                 this.once(egret.Event.ENTER_FRAME, this.updateView, this);
                 this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
+
                 return;
             }
         }
-
     }
 
     private onPreWrapModeBtn(e: egret.TouchEvent)
     {
         e.stopPropagation();
 
-        var selectTimeline = this.selectTimeline;
+        const selectTimeline = this.selectTimeline;
         if (!selectTimeline) return;
         menu.popupEnum(WrapMode, selectTimeline.preWrapMode, (v) =>
         {
@@ -602,7 +616,7 @@ export class MinMaxCurveEditor extends eui.Component
     {
         e.stopPropagation();
 
-        var selectTimeline = this.selectTimeline;
+        const selectTimeline = this.selectTimeline;
         if (!selectTimeline) return;
         menu.popupEnum(WrapMode, selectTimeline.postWrapMode, (v) =>
         {
@@ -612,7 +626,7 @@ export class MinMaxCurveEditor extends eui.Component
     }
 }
 
-var particleCurves: gPartial<AnimationCurve>[] = [
+const particleCurves: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
     { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
@@ -622,7 +636,7 @@ var particleCurves: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: -2, outTangent: -2 }] },
     { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
 ];
-var particleCurvesSingend: gPartial<AnimationCurve>[] = [
+const particleCurvesSingend: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] },
     { keys: [{ time: 0, value: 1, inTangent: -1, outTangent: -1 }, { time: 1, value: 0, inTangent: -1, outTangent: -1 }] },
@@ -633,7 +647,7 @@ var particleCurvesSingend: gPartial<AnimationCurve>[] = [
     { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
 ];
 
-var particleDoubleCurves: gPartial<MinMaxCurve>[] = [{
+const particleDoubleCurves: gPartial<MinMaxCurve>[] = [{
     curveMin: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
     curveMax: { keys: [{ time: 0, value: 0, inTangent: 0, outTangent: 0 }, { time: 1, value: 0, inTangent: 0, outTangent: 0 }] }
 },
@@ -667,7 +681,7 @@ var particleDoubleCurves: gPartial<MinMaxCurve>[] = [{
 },
 ];
 
-var particleDoubleCurvesSingend: gPartial<MinMaxCurve>[] = [
+const particleDoubleCurvesSingend: gPartial<MinMaxCurve>[] = [
     {
         curve: { keys: [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }] },
         curveMax: { keys: [{ time: 0, value: -1, inTangent: 0, outTangent: 0 }, { time: 1, value: -1, inTangent: 0, outTangent: 0 }] }

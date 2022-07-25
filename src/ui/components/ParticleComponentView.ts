@@ -21,7 +21,7 @@ export class ParticleComponentView extends eui.Component
 		this.component = component;
 
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "ParticleComponentView";
+		this.skinName = 'ParticleComponentView';
 	}
 
 	/**
@@ -31,23 +31,23 @@ export class ParticleComponentView extends eui.Component
 	{
 		this.updateEnableCB();
 		if (this.componentView)
-			this.componentView.updateView();
+			{ this.componentView.updateView(); }
 	}
 
 	private onComplete()
 	{
-		var componentName = classUtils.getQualifiedClassName(this.component).split(".").pop();
+		const componentName = classUtils.getQualifiedClassName(this.component).split('.').pop();
 		this.accordion.titleName = componentName;
-		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ["enabled"] });
+		this.componentView = objectview.getObjectView(this.component, { autocreate: false, excludeAttrs: ['enabled'] });
 		this.accordion.addContent(this.componentView);
 
-		this.enabledCB = this.accordion["enabledCB"];
+		this.enabledCB = this.accordion['enabledCB'];
 
 		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
 		this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemovedFromStage, this);
 
 		if (this.stage)
-			this.onAddToStage();
+			{ this.onAddToStage(); }
 	}
 
 	private onAddToStage()
@@ -55,13 +55,13 @@ export class ParticleComponentView extends eui.Component
 		this.updateView();
 
 		this.enabledCB.addEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		watcher.watch(this.component, "enabled", this.updateEnableCB, this);
+		watcher.watch(this.component, 'enabled', this.updateEnableCB, this);
 	}
 
 	private onRemovedFromStage()
 	{
 		this.enabledCB.removeEventListener(egret.Event.CHANGE, this.onEnableCBChange, this);
-		watcher.unwatch(this.component, "enabled", this.updateEnableCB, this);
+		watcher.unwatch(this.component, 'enabled', this.updateEnableCB, this);
 	}
 
 	private updateEnableCB()

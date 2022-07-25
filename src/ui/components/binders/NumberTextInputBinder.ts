@@ -37,16 +37,18 @@ export class NumberTextInputBinder extends TextInputBinder
     toText(v: number)
     {
         // 消除数字显示为类似 0.0000000001 的问题
-        var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
-        var text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
+        let fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
+        const text = String(Math.round(fractionDigits * (Math.round(v / this.step) * this.step)) / fractionDigits);
+
         return text;
     }
 
     toValue(v: string)
     {
-        var n = Number(v) || 0;
-        var fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
+        let n = Number(v) || 0;
+        let fractionDigits = 1; while (fractionDigits * this.step < 1) { fractionDigits *= 10; }
         n = Math.round(fractionDigits * (Math.round(n / this.step) * this.step)) / fractionDigits;
+
         return n;
     }
 
@@ -71,7 +73,7 @@ export class NumberTextInputBinder extends TextInputBinder
 
     protected onValueChanged()
     {
-        var value = this.space[this.attribute];
+        let value = this.space[this.attribute];
         if (!isNaN(this.minValue))
         {
             value = Math.max(this.minValue, value);
@@ -80,24 +82,24 @@ export class NumberTextInputBinder extends TextInputBinder
         {
             value = Math.min(this.maxValue, value);
         }
-        this.space[this.attribute] = value
+        this.space[this.attribute] = value;
         super.onValueChanged();
     }
 
     private mouseDownPosition = new Vector2();
     private mouseDownValue = 0;
 
-    private onMouseDown(e: egret.MouseEvent)
+    private onMouseDown(_e: egret.MouseEvent)
     {
-        var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        const mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 
         //
         this.mouseDownPosition = mousePos;
         this.mouseDownValue = this.space[this.attribute];
 
         //
-        windowEventProxy.on("mousemove", this.onStageMouseMove, this);
-        windowEventProxy.on("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.on('mousemove', this.onStageMouseMove, this);
+        windowEventProxy.on('mouseup', this.onStageMouseUp, this);
     }
 
     private onStageMouseMove()
@@ -107,31 +109,34 @@ export class NumberTextInputBinder extends TextInputBinder
 
     private onStageMouseUp()
     {
-        windowEventProxy.off("mousemove", this.onStageMouseMove, this);
-        windowEventProxy.off("mouseup", this.onStageMouseUp, this);
+        windowEventProxy.off('mousemove', this.onStageMouseMove, this);
+        windowEventProxy.off('mouseup', this.onStageMouseUp, this);
     }
 
     protected ontxtfocusin()
     {
         super.ontxtfocusin();
-        windowEventProxy.on("keydown", this.onWindowKeyDown, this);
+        windowEventProxy.on('keydown', this.onWindowKeyDown, this);
     }
 
     protected ontxtfocusout()
     {
         super.ontxtfocusout();
-        windowEventProxy.off("keydown", this.onWindowKeyDown, this);
+        windowEventProxy.off('keydown', this.onWindowKeyDown, this);
     }
 
     private onWindowKeyDown(event: IEvent<KeyboardEvent>)
     {
-        if (event.data.key == "ArrowUp")
+        if (event.data.key === 'ArrowUp')
         {
             this.space[this.attribute] += this.step * this.stepDownup;
+            // eslint-disable-next-line no-useless-call
             this.textInput.text = this.toText.call(this, this.space[this.attribute]);
-        } else if (event.data.key == "ArrowDown")
+        }
+        else if (event.data.key === 'ArrowDown')
         {
             this.space[this.attribute] -= this.step * this.stepDownup;
+            // eslint-disable-next-line no-useless-call
             this.textInput.text = this.toText.call(this, this.space[this.attribute]);
         }
         this.invalidateView();

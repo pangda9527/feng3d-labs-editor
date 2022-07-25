@@ -25,14 +25,13 @@ export class OAVCubeMap extends OAVBase
 	public nzGroup: eui.Group;
 	public nzBtn: eui.Button;
 
-
 	private images: eui.Image[];
 	private btns: eui.Button[];
 
 	constructor(attributeViewInfo: AttributeViewInfo)
 	{
 		super(attributeViewInfo);
-		this.skinName = "OAVCubeMap";
+		this.skinName = 'OAVCubeMap';
 		this.alpha = 1;
 	}
 
@@ -44,7 +43,7 @@ export class OAVCubeMap extends OAVBase
 		// var param: { accepttype: keyof DragData; datatype?: string; } = { accepttype: "image" };
 		for (let i = 0; i < propertys.length; i++)
 		{
-			this.updateImage(i)
+			this.updateImage(i);
 			// drag.register(image,
 			// 	(dragsource) => { },
 			// 	[param.accepttype],
@@ -63,13 +62,14 @@ export class OAVCubeMap extends OAVBase
 	private updateImage(i: number)
 	{
 		const image = this.images[i];
-		var textureCube: TextureCube = this.space;
+		const textureCube: TextureCube = this.space;
 		textureCube.getTextureImage(TextureCube.ImageNames[i], (img) =>
 		{
 			if (img)
 			{
 				image.source = dataTransform.imageToDataURL(img);
-			} else
+			}
+ else
 			{
 				image.source = null;
 			}
@@ -78,12 +78,12 @@ export class OAVCubeMap extends OAVBase
 
 	private onImageClick(e: egret.MouseEvent)
 	{
-		var index = this.btns.indexOf(e.currentTarget);
-		if (index != -1)
+		const index = this.btns.indexOf(e.currentTarget);
+		if (index !== -1)
 		{
-			var textureCube: TextureCube = this.space;
-			var texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
-			var menus: MenuItem[] = [{
+			const textureCube: TextureCube = this.space;
+			const texture2ds = ReadRS.rs.getLoadedAssetDatasByType(Texture2D);
+			const menus: MenuItem[] = [{
 				label: `None`, click: () =>
 				{
 					textureCube.setTexture2D(TextureCube.ImageNames[index], null);
@@ -91,7 +91,7 @@ export class OAVCubeMap extends OAVBase
 					this.dispatchValueChange(index);
 				}
 			}];
-			texture2ds.forEach(d =>
+			texture2ds.forEach((d) =>
 			{
 				menus.push({
 					label: d.name, click: () =>
@@ -108,13 +108,13 @@ export class OAVCubeMap extends OAVBase
 
 	private dispatchValueChange(index: number)
 	{
-		var objectViewEvent = new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
+		const objectViewEvent = new ObjectViewEvent(ObjectViewEvent.VALUE_CHANGE, true);
 		objectViewEvent.space = this._space;
 		objectViewEvent.attributeName = propertys[index];
 		this.dispatchEvent(objectViewEvent);
 
 		//
-		objectEmitter.emit(this._space, "propertyValueChanged");
+		objectEmitter.emit(this._space, 'propertyValueChanged');
 	}
 
 	dispose()
@@ -127,7 +127,7 @@ export class OAVCubeMap extends OAVBase
 
 	onResize()
 	{
-		var w4 = Math.round(this.width / 4);
+		const w4 = Math.round(this.width / 4);
 		this.px.width = this.py.width = this.pz.width = this.nx.width = this.ny.width = this.nz.width = w4;
 		this.px.height = this.py.height = this.pz.height = this.nx.height = this.ny.height = this.nz.height = w4;
 		//
@@ -153,4 +153,4 @@ export class OAVCubeMap extends OAVBase
 		this.height = w4 * 3;
 	}
 }
-var propertys = ["positive_x_url", "positive_y_url", "positive_z_url", "negative_x_url", "negative_y_url", "negative_z_url"];
+const propertys = ['positive_x_url', 'positive_y_url', 'positive_z_url', 'negative_x_url', 'negative_y_url', 'negative_z_url'];

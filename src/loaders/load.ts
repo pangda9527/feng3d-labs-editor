@@ -1,7 +1,6 @@
-
-export var loadjs = {
-    load: load,
-    ready: ready,
+export const loadjs = {
+    load,
+    ready,
 };
 
 /**
@@ -29,14 +28,15 @@ function load(params: {
     {
         if (params.bundleId in bundleIdCache)
         {
-            throw "LoadJS";
-        } else
+            throw 'LoadJS';
+        }
+        else
         {
             bundleIdCache[params.bundleId] = true;
         }
     }
 
-    var paths = getPaths(params.paths);
+    const paths = getPaths(params.paths);
 
     // load scripts
     loadFiles(paths, (pathsNotFound: string[]) =>
@@ -71,6 +71,7 @@ function ready(params: { depends: string | string[], success?: () => void, error
  * 完成下载包
  * @param bundleId 下载包编号
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function done(bundleId: string)
 {
     publish(bundleId, []);
@@ -79,6 +80,7 @@ function done(bundleId: string)
 /**
  * 重置下载包依赖状态
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function reset()
 {
     bundleIdCache = {};
@@ -90,15 +92,17 @@ function reset()
  * 是否定义下载包
  * @param {string} bundleId 包编号
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isDefined(bundleId: string)
 {
     return bundleId in bundleIdCache;
 }
 
-var devnull = function () { },
-    bundleIdCache: { [bundleId: string]: boolean } = {},
-    bundleResultCache: { [bundleId: string]: string[] } = {},
-    bundleCallbackQueue: { [bundleId: string]: ((bundleId: string, pathsNotFound: string[]) => void)[] } = {};
+// eslint-disable-next-line func-style
+const devnull = function () { };
+let bundleIdCache: { [bundleId: string]: boolean } = {};
+let bundleResultCache: { [bundleId: string]: string[] } = {};
+let bundleCallbackQueue: { [bundleId: string]: ((bundleId: string, pathsNotFound: string[]) => void)[] } = {};
 
 /**
  * 订阅包加载事件
@@ -107,7 +111,7 @@ var devnull = function () { },
  */
 function subscribe(bundleIds: string | string[], callbackFn: (depsNotFound: string[]) => void)
 {
-    var depsNotFound: string[] = [];
+    const depsNotFound: string[] = [];
 
     // listify
     if (bundleIds instanceof String)
@@ -116,8 +120,8 @@ function subscribe(bundleIds: string | string[], callbackFn: (depsNotFound: stri
     }
 
     // define callback function
-    var numWaiting = bundleIds.length;
-    var fn = (bundleId: string, pathsNotFound: string[]) =>
+    let numWaiting = bundleIds.length;
+    const fn = (bundleId: string, pathsNotFound: string[]) =>
     {
         if (pathsNotFound.length) depsNotFound.push(bundleId);
 
@@ -126,13 +130,13 @@ function subscribe(bundleIds: string | string[], callbackFn: (depsNotFound: stri
     };
 
     // register callback
-    var i = bundleIds.length
+    let i = bundleIds.length;
     while (i--)
     {
-        let bundleId = bundleIds[i];
+        const bundleId = bundleIds[i];
 
         // execute callback if in result cache
-        let r = bundleResultCache[bundleId];
+        const r = bundleResultCache[bundleId];
         if (r)
         {
             fn(bundleId, r);
@@ -140,7 +144,7 @@ function subscribe(bundleIds: string | string[], callbackFn: (depsNotFound: stri
         }
 
         // add to callback queue
-        let q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
+        const q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
         q.push(fn);
     }
 }
@@ -155,7 +159,7 @@ function publish(bundleId: string | undefined, pathsNotFound: string[])
     // exit if id isn't defined
     if (!bundleId) return;
 
-    var q = bundleCallbackQueue[bundleId];
+    const q = bundleCallbackQueue[bundleId];
 
     // cache result
     bundleResultCache[bundleId] = pathsNotFound;
@@ -183,7 +187,7 @@ function publish(bundleId: string | undefined, pathsNotFound: string[])
  */
 function loadFile(path: { url: string, type: string }, callbackFn: (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content) => void, args: { async?: boolean, numRetries?: number, before?: (path: { url: string, type: string }, e) => boolean }, numTries?: number)
 {
-    var loaderFun = loaders[path.type] || loadTxt;
+    const loaderFun = loaders[path.type] || loadTxt;
     loaderFun(path, callbackFn, args, numTries);
 }
 
@@ -199,14 +203,14 @@ function loadFile(path: { url: string, type: string }, callbackFn: (path: { url:
  */
 function loadImage(path: { url: string, type: string }, callbackFn: (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content) => void, args: { async?: boolean, numRetries?: number, before?: (path: { url: string, type: string }, e) => boolean }, numTries = 0)
 {
-    var image = new Image();
-    image.crossOrigin = "Anonymous";
+    const image = new Image();
+    image.crossOrigin = 'Anonymous';
     image.onerror = image.onload = (ev) =>
     {
-        var result: string = ev.type;
+        const result: string = ev.type;
 
         // handle retries in case of load failure
-        if (result == 'error')
+        if (result === 'error')
         {
             // increment counter
             numTries = ~~numTries + 1;
@@ -217,15 +221,15 @@ function loadImage(path: { url: string, type: string }, callbackFn: (path: { url
             {
                 return loadImage(path, callbackFn, args, numTries);
             }
-            image.src = "data:image/jpg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QBmRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAAQAAAATgAAAAAAAABgAAAAAQAAAGAAAAABcGFpbnQubmV0IDQuMC41AP/bAEMABAIDAwMCBAMDAwQEBAQFCQYFBQUFCwgIBgkNCw0NDQsMDA4QFBEODxMPDAwSGBITFRYXFxcOERkbGRYaFBYXFv/bAEMBBAQEBQUFCgYGChYPDA8WFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFv/AABEIAQABAAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APH6KKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76P//Z";
+            image.src = 'data:image/jpg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QBmRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAExAAIAAAAQAAAATgAAAAAAAABgAAAAAQAAAGAAAAABcGFpbnQubmV0IDQuMC41AP/bAEMABAIDAwMCBAMDAwQEBAQFCQYFBQUFCwgIBgkNCw0NDQsMDA4QFBEODxMPDAwSGBITFRYXFxcOERkbGRYaFBYXFv/bAEMBBAQEBQUFCgYGChYPDA8WFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFv/AABEIAQABAAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/APH6KKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76CiiigD5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BQooooA+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/voKKKKAPl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FCiiigD6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++gooooA+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gUKKKKAPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76Pl+iiivuj+BT6gooor4U/vo+X6KKK+6P4FPqCiiivhT++j5fooor7o/gU+oKKKK+FP76P//Z';
         }
         // execute callback
         callbackFn(path, result, ev.defaultPrevented, image);
     };
     //
-    var beforeCallbackFn = args.before || (() => true);
+    const beforeCallbackFn = args.before || (() => true);
     if (beforeCallbackFn(path, image) !== false)
-        image.src = path.url;
+    { image.src = path.url; }
 }
 
 /**
@@ -240,13 +244,12 @@ function loadImage(path: { url: string, type: string }, callbackFn: (path: { url
  */
 function loadTxt(path: { url: string, type: string }, callbackFn: (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content: string) => void, args: { async?: boolean, numRetries?: number, before?: (path: { url: string, type: string }, e) => boolean }, numTries = 0)
 {
-    var request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     request.onreadystatechange = (ev) =>
     {
-        var result: string = ev.type;
-        if (request.readyState == 4)
-        {// 4 = "loaded"
-
+        const result: string = ev.type;
+        if (request.readyState === 4)
+        { // 4 = "loaded"
             request.onreadystatechange = <any>null;
 
             // handle retries in case of load failure
@@ -268,9 +271,9 @@ function loadTxt(path: { url: string, type: string }, callbackFn: (path: { url: 
     };
     request.open('Get', path.url, true);
     //
-    var beforeCallbackFn = args.before || (() => true);
+    const beforeCallbackFn = args.before || (() => true);
     if (beforeCallbackFn(path, request) !== false)
-        request.send();
+    { request.send(); }
 }
 
 /**
@@ -285,19 +288,20 @@ function loadTxt(path: { url: string, type: string }, callbackFn: (path: { url: 
  */
 function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content) => void, args: { async?: boolean, numRetries?: number, before?: (path: { url: string, type: string }, e) => boolean }, numTries = 0)
 {
-    var doc = document,
-        isCss,
-        e;
+    const doc = document;
+    let isCss;
+    let e;
 
-    if (/(^css!|\.css$)/.test(path.url))
+    if ((/(^css!|\.css$)/).test(path.url))
     {
         isCss = true;
 
         // css
         e = doc.createElement('link');
         e.rel = 'stylesheet';
-        e.href = path.url.replace(/^css!/, '');  // remove "css!" prefix
-    } else
+        e.href = path.url.replace(/^css!/, ''); // remove "css!" prefix
+    }
+    else
     {
         // javascript
         e = doc.createElement('script');
@@ -307,7 +311,7 @@ function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url
 
     e.onload = e.onerror = e.onbeforeload = function (ev)
     {
-        var result: string = ev.type;
+        let result: string = ev.type;
 
         // Note: The following code isolates IE using `hideFocus` and treats empty
         // stylesheets as failures to get around lack of onerror support
@@ -316,7 +320,8 @@ function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url
             try
             {
                 if (!e.sheet.cssText.length) result = 'error';
-            } catch (x)
+            }
+            catch (x)
             {
                 // sheets objects created from load errors don't allow access to
                 // `cssText`
@@ -325,7 +330,7 @@ function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url
         }
 
         // handle retries in case of load failure
-        if (result == 'error')
+        if (result === 'error')
         {
             // increment counter
             numTries = ~~numTries + 1;
@@ -343,7 +348,7 @@ function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url
     };
 
     // add to document (unless callback returns `false`)
-    var beforeCallbackFn = args.before || (() => true);
+    const beforeCallbackFn = args.before || (() => true);
     if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
 }
 
@@ -354,35 +359,35 @@ function loadJsCss(path: { url: string, type: string }, callbackFn: (path: { url
  */
 function loadFiles(paths: { url: string, type: string }[], callbackFn: (pathsNotFound: string[]) => void, args: { async?: boolean, numRetries?: number, before?: (path: { url: string, type: string }, e) => boolean, onitemload?: (url: string, content: string) => void })
 {
-    var notLoadFiles = paths.concat();
-    var loadingFiles: { url: string, type: string }[] = [];
+    const notLoadFiles = paths.concat();
+    const loadingFiles: { url: string, type: string }[] = [];
 
-    var pathsNotFound: string[] = [];
+    const pathsNotFound: string[] = [];
 
     // define callback function
-    var fn = (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content: string) =>
+    const fn = (path: { url: string, type: string }, result: string, defaultPrevented: boolean, content: string) =>
     {
         // handle error
-        if (result == 'error') pathsNotFound.push(path.url);
+        if (result === 'error') pathsNotFound.push(path.url);
 
         // handle beforeload event. If defaultPrevented then that means the load
         // will be blocked (ex. Ghostery/ABP on Safari)
-        if (result[0] == 'b')
+        if (result[0] === 'b')
         {
             if (defaultPrevented) pathsNotFound.push(path.url);
             else return;
         }
-        var index = loadingFiles.indexOf(path);
+        const index = loadingFiles.indexOf(path);
         loadingFiles.splice(index, 1);
 
         args.onitemload && args.onitemload(path.url, content);
 
-        if (loadingFiles.length == 0 && notLoadFiles.length == 0)
-            callbackFn(pathsNotFound);
+        if (loadingFiles.length === 0 && notLoadFiles.length === 0)
+        { callbackFn(pathsNotFound); }
 
         if (notLoadFiles.length)
         {
-            var file = notLoadFiles[0];
+            const file = notLoadFiles[0];
             notLoadFiles.shift();
             loadingFiles.push(file);
             loadFile(file, fn, args);
@@ -390,17 +395,18 @@ function loadFiles(paths: { url: string, type: string }[], callbackFn: (pathsNot
     };
 
     // load scripts
-    var file: { url: string, type: string };
-    if (!!args.async)
+    let file: { url: string, type: string };
+    if (args.async)
     {
-        for (var i = 0, x = notLoadFiles.length; i < x; i++)
+        for (let i = 0, x = notLoadFiles.length; i < x; i++)
         {
             file = notLoadFiles[i];
             loadingFiles.push(file);
             loadFile(file, fn, args);
         }
         notLoadFiles.length = 0;
-    } else
+    }
+    else
     {
         file = notLoadFiles[0];
         notLoadFiles.shift();
@@ -415,9 +421,9 @@ function loadFiles(paths: { url: string, type: string }[], callbackFn: (pathsNot
  */
 function getPaths(pathUrls: string | string[] | { url: string, type: string } | { url: string, type: string }[])
 {
-    var paths: { url: string, type: string }[] = [];
+    const paths: { url: string, type: string }[] = [];
 
-    if (typeof pathUrls == "string")
+    if (typeof pathUrls === 'string')
     {
         pathUrls = [pathUrls];
     }
@@ -425,17 +431,19 @@ function getPaths(pathUrls: string | string[] | { url: string, type: string } | 
     {
         pathUrls = [pathUrls];
     }
-    for (var i = 0; i < pathUrls.length; i++)
+    for (let i = 0; i < pathUrls.length; i++)
     {
-        var pathurl = pathUrls[i];
-        if (typeof pathurl == "string")
+        const pathurl = pathUrls[i];
+        if (typeof pathurl === 'string')
         {
             paths[i] = { url: <string>pathurl, type: getPathType(pathurl) };
-        } else
+        }
+        else
         {
             paths[i] = pathurl;
         }
     }
+
     return paths;
 }
 
@@ -445,13 +453,14 @@ function getPaths(pathUrls: string | string[] | { url: string, type: string } | 
  */
 function getPathType(path: string)
 {
-    var type = "txt";
-    for (var i = 0; i < typeRegExps.length; i++)
+    let type = 'txt';
+    for (let i = 0; i < typeRegExps.length; i++)
     {
-        var element = typeRegExps[i];
+        const element = typeRegExps[i];
         if (element.reg.test(path))
-            type = element.type;
+        { type = element.type; }
     }
+
     return type;
 }
 
@@ -473,17 +482,17 @@ type LoaderFun = (path: {
 /**
  * 资源类型
  */
-var types = { js: "js", css: "css", txt: "txt", image: "image" };
+const types = { js: 'js', css: 'css', txt: 'txt', image: 'image' };
 /**
  * 加载函数
  */
-var loaders: { [type: string]: LoaderFun } = {
+const loaders: { [type: string]: LoaderFun } = {
     txt: loadTxt,
     js: loadJsCss,
     css: loadJsCss,
     image: loadImage,
 };
-var typeRegExps = [
+const typeRegExps = [
     { reg: /(^css!|\.css$)/i, type: types.css },
     { reg: /(\.js\b)/i, type: types.js },
     { reg: /(\.png\b)/i, type: types.image },

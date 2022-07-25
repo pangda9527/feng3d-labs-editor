@@ -8,7 +8,7 @@ export class GradientEditor extends eui.Component
 {
     static gradientEditor: GradientEditor;
 
-    @watch("_onGradientChanged")
+    @watch('_onGradientChanged')
     gradient = new Gradient();
 
     public modeCB: ComboBox;
@@ -28,7 +28,7 @@ export class GradientEditor extends eui.Component
     public constructor()
     {
         super();
-        this.skinName = "GradientEditor";
+        this.skinName = 'GradientEditor';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -54,21 +54,23 @@ export class GradientEditor extends eui.Component
         this.modeCB.removeEventListener(egret.Event.CHANGE, this._onModeCBChange, this);
         this.removeEventListener(egret.Event.RESIZE, this._onReSize, this);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()
     {
         if (!this.stage) return;
 
-        var list = [];
+        const list = [];
         for (const key in GradientMode)
         {
             if (isNaN(Number(key)))
+            {
                 list.push({ label: key, value: GradientMode[key] });
+            }
         }
         this.modeCB.dataProvider = list;
-        this.modeCB.data = list.filter(v => v.value == this.gradient.mode)[0];
+        this.modeCB.data = list.filter((v) => v.value === this.gradient.mode)[0];
         //
         if (this.colorImage.width > 0 && this.colorImage.height > 0)
         {
@@ -85,17 +87,17 @@ export class GradientEditor extends eui.Component
         }
         this._colorSprite.graphics.clear();
         //
-        var alphaKeys = this.gradient.alphaKeys;
+        const alphaKeys = this.gradient.alphaKeys;
         for (let i = 0, n = alphaKeys.length; i < n; i++)
         {
             const element = alphaKeys[i];
-            this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == alphaKeys[i]);
+            this._drawAlphaGraphics(this._alphaSprite.graphics, element.time, element.alpha, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue === alphaKeys[i]);
         }
-        var colorKeys = this.gradient.colorKeys;
+        const colorKeys = this.gradient.colorKeys;
         for (let i = 0, n = colorKeys.length; i < n; i++)
         {
             const element = colorKeys[i];
-            this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue == colorKeys[i]);
+            this._drawColorGraphics(this._colorSprite.graphics, element.time, element.color, this.alphaLineGroup.width, this.alphaLineGroup.height, this._selectedValue === colorKeys[i]);
         }
         //
         this._parentGroup = this._parentGroup || this.colorGroup.parent;
@@ -103,13 +105,13 @@ export class GradientEditor extends eui.Component
         //
         if (this._alphaNumberSliderTextInputBinder)
         {
-            this._alphaNumberSliderTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+            this._alphaNumberSliderTextInputBinder.off('valueChanged', this._onLocationChanged, this);
             this._alphaNumberSliderTextInputBinder.dispose();
         }
         //
         if (this._loactionNumberTextInputBinder)
         {
-            this._loactionNumberTextInputBinder.off("valueChanged", this._onLocationChanged, this);
+            this._loactionNumberTextInputBinder.off('valueChanged', this._onLocationChanged, this);
             this._loactionNumberTextInputBinder.dispose();
         }
         this.controllerGroup.visible = !!this._selectedValue;
@@ -121,22 +123,23 @@ export class GradientEditor extends eui.Component
                 this.colorGroup.parent || this._parentGroup.addChildAt(this.colorGroup, 0);
                 //
                 this.colorPicker.value = this._selectedValue.color;
-            } else
+            }
+            else
             {
                 this.colorGroup.parent && this.colorGroup.parent.removeChild(this.colorGroup);
                 this.alphaGroup.parent || this._parentGroup.addChildAt(this.alphaGroup, 0);
                 this._alphaNumberSliderTextInputBinder = new NumberSliderTextInputBinder().init({
-                    space: this._selectedValue, attribute: "alpha",
+                    space: this._selectedValue, attribute: 'alpha',
                     slider: this.alphaSlide,
                     textInput: this.alphaInput, controller: this.alphaLabel, minValue: 0, maxValue: 1,
                 });
-                this._alphaNumberSliderTextInputBinder.on("valueChanged", this._onAlphaChanged, this);
+                this._alphaNumberSliderTextInputBinder.on('valueChanged', this._onAlphaChanged, this);
             }
             this._loactionNumberTextInputBinder = new NumberTextInputBinder().init({
-                space: this._selectedValue, attribute: "time",
+                space: this._selectedValue, attribute: 'time',
                 textInput: this.locationInput, controller: this.locationLabel, minValue: 0, maxValue: 1,
             });
-            this._loactionNumberTextInputBinder.on("valueChanged", this._onLocationChanged, this);
+            this._loactionNumberTextInputBinder.on('valueChanged', this._onLocationChanged, this);
         }
     }
 
@@ -150,7 +153,7 @@ export class GradientEditor extends eui.Component
     private _drawAlphaGraphics(graphics: egret.Graphics, time: number, alpha: number, width: number, height: number, selected: boolean)
     {
         graphics.beginFill(0xffffff, alpha);
-        graphics.lineStyle(1, selected ? 0x0091ff : 0x606060)
+        graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
         graphics.moveTo(time * width, height);
         graphics.lineTo(time * width - 5, height - 10);
         graphics.lineTo(time * width - 5, height - 15);
@@ -163,7 +166,7 @@ export class GradientEditor extends eui.Component
     private _drawColorGraphics(graphics: egret.Graphics, time: number, color: Color3, width: number, height: number, selected: boolean)
     {
         graphics.beginFill(color.toInt(), 1);
-        graphics.lineStyle(1, selected ? 0x0091ff : 0x606060)
+        graphics.lineStyle(1, selected ? 0x0091ff : 0x606060);
         graphics.moveTo(time * width, 0);
         graphics.lineTo(time * width - 5, 10);
         graphics.lineTo(time * width - 5, 15);
@@ -218,18 +221,17 @@ export class GradientEditor extends eui.Component
     private _onMouseDown(e: egret.MouseEvent)
     {
         this._onMouseDownLineGroup = e.currentTarget;
-        var sp = (<egret.DisplayObject>e.currentTarget).localToGlobal(0, 0);
-        var localPosX = windowEventProxy.clientX - sp.x;
-        var time = localPosX / (<egret.DisplayObject>e.currentTarget).width;
-        var newAlphaKey = { time: time, alpha: this.gradient.getAlpha(time) };
-        var newColorKey = { time: time, color: this.gradient.getColor(time) };
-
+        const sp = (<egret.DisplayObject>e.currentTarget).localToGlobal(0, 0);
+        const localPosX = windowEventProxy.clientX - sp.x;
+        const time = localPosX / (<egret.DisplayObject>e.currentTarget).width;
+        const newAlphaKey = { time, alpha: this.gradient.getAlpha(time) };
+        const newColorKey = { time, color: this.gradient.getColor(time) };
+        let onClickIndex = -1;
         switch (e.currentTarget)
         {
             case this.alphaLineGroup:
                 this._selectedValue = null;
-                var onClickIndex = -1;
-                var alphaKeys = this.gradient.alphaKeys;
+                const alphaKeys = this.gradient.alphaKeys;
                 for (let i = 0, n = alphaKeys.length; i < n; i++)
                 {
                     const element = alphaKeys[i];
@@ -239,19 +241,19 @@ export class GradientEditor extends eui.Component
                         break;
                     }
                 }
-                if (onClickIndex != -1)
+                if (onClickIndex !== -1)
                 {
                     this._selectedValue = alphaKeys[onClickIndex];
-                } else if (alphaKeys.length < 8)
+                }
+                else if (alphaKeys.length < 8)
                 {
                     this._selectedValue = newAlphaKey;
                     alphaKeys.push(newAlphaKey);
                     alphaKeys.sort((a, b) => a.time - b.time);
                 }
-                break
+                break;
             case this.colorLineGroup:
-                var onClickIndex = -1;
-                var colorKeys = this.gradient.colorKeys;
+                const colorKeys = this.gradient.colorKeys;
                 for (let i = 0, n = colorKeys.length; i < n; i++)
                 {
                     const element = colorKeys[i];
@@ -261,23 +263,24 @@ export class GradientEditor extends eui.Component
                         break;
                     }
                 }
-                if (onClickIndex != -1)
+                if (onClickIndex !== -1)
                 {
                     this._selectedValue = colorKeys[onClickIndex];
-                } else if (colorKeys.length < 8)
+                }
+                else if (colorKeys.length < 8)
                 {
                     this._selectedValue = newColorKey;
                     colorKeys.push(newColorKey);
                     colorKeys.sort((a, b) => a.time - b.time);
                 }
-                break
+                break;
         }
         if (this._selectedValue)
         {
             //
             this.updateView();
-            windowEventProxy.on("mousemove", this._onAlphaColorMouseMove, this);
-            windowEventProxy.on("mouseup", this._onAlphaColorMouseUp, this);
+            windowEventProxy.on('mousemove', this._onAlphaColorMouseMove, this);
+            windowEventProxy.on('mouseup', this._onAlphaColorMouseUp, this);
             this._removedTemp = false;
         }
     }
@@ -286,9 +289,9 @@ export class GradientEditor extends eui.Component
     {
         if (!this._selectedValue) return;
 
-        var sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
-        var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        var rect = new Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
+        const sp = this._onMouseDownLineGroup.localToGlobal(0, 0);
+        const mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        const rect = new Rectangle(sp.x, sp.y, this._onMouseDownLineGroup.width, this._onMouseDownLineGroup.height);
         rect.inflate(8, 8);
         if (rect.containsPoint(mousePos))
         {
@@ -296,46 +299,48 @@ export class GradientEditor extends eui.Component
             {
                 if (this._selectedValue.color)
                 {
-                    var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
-                    if (index == -1) this.gradient.colorKeys.push(<any>this._selectedValue);
-                    this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
-                } else
+                    const index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
+                    if (index === -1) this.gradient.colorKeys.push(<any>this._selectedValue);
+                    this.gradient.colorKeys.sort((a, b) => a.time - b.time);
+                }
+                else
                 {
-                    var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
-                    if (index == -1) this.gradient.alphaKeys.push(<any>this._selectedValue);
-                    this.gradient.alphaKeys.sort((a, b) => a.time - b.time);;
+                    const index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
+                    if (index === -1) this.gradient.alphaKeys.push(<any>this._selectedValue);
+                    this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
                 }
                 this._removedTemp = false;
             }
-        } else
-        {
+        }
+        else
             if (!this._removedTemp)
             {
                 if (this._selectedValue.color)
                 {
-                    var index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
-                    if (index != -1) this.gradient.colorKeys.splice(index, 1);
-                    this.gradient.colorKeys.sort((a, b) => a.time - b.time);;
-                } else
+                    const index = this.gradient.colorKeys.indexOf(<any>this._selectedValue);
+                    if (index !== -1) this.gradient.colorKeys.splice(index, 1);
+                    this.gradient.colorKeys.sort((a, b) => a.time - b.time);
+                }
+                else
                 {
-                    var index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
-                    if (index != -1) this.gradient.alphaKeys.splice(index, 1);
-                    this.gradient.alphaKeys.sort((a, b) => a.time - b.time);;
+                    const index = this.gradient.alphaKeys.indexOf(<any>this._selectedValue);
+                    if (index !== -1) this.gradient.alphaKeys.splice(index, 1);
+                    this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
                 }
                 this._removedTemp = true;
             }
-        }
         if (this._selectedValue.color)
         {
-            var sp = this.colorLineGroup.localToGlobal(0, 0);
-            var localPosX = windowEventProxy.clientX - sp.x;
+            const sp = this.colorLineGroup.localToGlobal(0, 0);
+            const localPosX = windowEventProxy.clientX - sp.x;
             this._selectedValue.time = localPosX / this.colorLineGroup.width;
             this.gradient.colorKeys.sort((a, b) => a.time - b.time);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
-        } else
+        }
+        else
         {
-            var sp = this.alphaLineGroup.localToGlobal(0, 0);
-            var localPosX = windowEventProxy.clientX - sp.x;
+            const sp = this.alphaLineGroup.localToGlobal(0, 0);
+            const localPosX = windowEventProxy.clientX - sp.x;
             this._selectedValue.time = localPosX / this.alphaLineGroup.width;
             this.gradient.alphaKeys.sort((a, b) => a.time - b.time);
             this.once(egret.Event.ENTER_FRAME, this.updateView, this);
@@ -350,8 +355,8 @@ export class GradientEditor extends eui.Component
             this._selectedValue = null;
         }
         this._onMouseDownLineGroup = null;
-        windowEventProxy.off("mousemove", this._onAlphaColorMouseMove, this);
-        windowEventProxy.off("mouseup", this._onAlphaColorMouseUp, this);
+        windowEventProxy.off('mousemove', this._onAlphaColorMouseMove, this);
+        windowEventProxy.off('mouseup', this._onAlphaColorMouseUp, this);
         this.once(egret.Event.ENTER_FRAME, this.updateView, this);
     }
 }

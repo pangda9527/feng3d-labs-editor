@@ -2,11 +2,6 @@ import { windowEventProxy } from 'feng3d';
 import { editorui } from '../../global/editorui';
 import { maskview } from './Maskview';
 
-/**
- * 菜单
- */
-export var menu: Menu;
-
 export type MenuItem = {
     /**
      * 显示标签
@@ -39,10 +34,10 @@ export class Menu
 {
     /**
      * 弹出菜单
-     * 
-     * 
+     *
+     *
      * @param menuItems 菜单数据
-     * 
+     *
      * @returns
 该功能存在一个暂时无法解决的bug
 ```
@@ -66,57 +61,60 @@ submenu: [
 ]
 }]
 ```
-     * 
+     *
      */
     popup(menuItems: MenuItem[])
     {
-        var menuItem = this.handleShow({ submenu: menuItems });
-        if (menuItem.submenu.length == 0) return;
-        var menuUI = MenuUI.create(menuItem.submenu, null);
+        const menuItem = this.handleShow({ submenu: menuItems });
+        if (menuItem.submenu.length === 0) return;
+        const menuUI = MenuUI.create(menuItem.submenu, null);
         maskview.mask(menuUI);
+
         return menuUI;
     }
 
     /**
      * 处理菜单中 show==false的菜单项
-     * 
+     *
      * @param menuItem 菜单数据
      */
     handleShow(menuItem: MenuItem)
     {
         if (menuItem.submenu)
         {
-            var submenu = menuItem.submenu.filter(v => v.show != false);
+            const submenu = menuItem.submenu.filter((v) => v.show !== false);
 
             for (let i = submenu.length - 1; i >= 0; i--)
             {
-                if (submenu[i].type == 'separator')
+                if (submenu[i].type === 'separator')
                 {
-                    if (i == 0 || i == submenu.length - 1)
+                    if (i === 0 || i === submenu.length - 1)
                     {
                         submenu.splice(i, 1);
-                    } else if (submenu[i - 1].type == 'separator')
+                    }
+                    else if (submenu[i - 1].type === 'separator')
                     {
                         submenu.splice(i, 1);
                     }
                 }
             }
             menuItem.submenu = submenu;
-            menuItem.submenu.forEach(v => this.handleShow(v));
+            menuItem.submenu.forEach((v) => this.handleShow(v));
         }
+
         return menuItem;
     }
 
     /**
      * 弹出枚举选择菜单
-     * 
+     *
      * @param enumDefinition 枚举定义
      * @param currentValue 当前枚举值
      * @param selectCallBack 选择回调
      */
     popupEnum(enumDefinition: Object, currentValue: any, selectCallBack: (v: any) => void)
     {
-        var menu: MenuItem[] = [];
+        const menu: MenuItem[] = [];
         for (const key in enumDefinition)
         {
             if (enumDefinition.hasOwnProperty(key))
@@ -124,21 +122,22 @@ submenu: [
                 if (isNaN(Number(key)))
                 {
                     menu.push({
-                        label: (currentValue == enumDefinition[key] ? "√ " : "   ") + key,
+                        label: (currentValue === enumDefinition[key] ? '√ ' : '   ') + key,
                         click: ((v) =>
-                        {
-                            return () => selectCallBack(v);
-                        })(enumDefinition[key])
+                            () => selectCallBack(v))(enumDefinition[key])
                     });
                 }
             }
         }
 
-        this.popup(menu)
+        this.popup(menu);
     }
-};
+}
 
-menu = new Menu();
+/**
+ * 菜单
+ */
+export const menu = new Menu();
 
 class MenuUI extends eui.List
 {
@@ -149,10 +148,10 @@ class MenuUI extends eui.List
     set subMenuUI(v)
     {
         if (this._subMenuUI)
-            this._subMenuUI.remove();
+        { this._subMenuUI.remove(); }
         this._subMenuUI = v;
         if (this._subMenuUI)
-            this._subMenuUI.parentMenuUI = this;
+        { this._subMenuUI.parentMenuUI = this; }
     }
     private _subMenuUI: MenuUI;
 
@@ -160,7 +159,8 @@ class MenuUI extends eui.List
 
     get topMenu()
     {
-        var m: MenuUI = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
+        const m: MenuUI = this.parentMenuUI ? this.parentMenuUI.topMenu : this;
+
         return m;
     }
 
@@ -173,8 +173,8 @@ class MenuUI extends eui.List
 
     static create(menuItems: MenuItem[], menuItemRendererRect: egret.Rectangle = null)
     {
-        var menuUI = new MenuUI();
-        var dataProvider = new eui.ArrayCollection();
+        const menuUI = new MenuUI();
+        const dataProvider = new eui.ArrayCollection();
         dataProvider.replaceAll(menuItems);
 
         menuUI.dataProvider = dataProvider;
@@ -186,8 +186,9 @@ class MenuUI extends eui.List
             menuUI.y = windowEventProxy.clientY;
 
             if (menuUI.x + menuUI.width > editorui.popupLayer.stage.stageWidth - 10)
-                menuUI.x = editorui.popupLayer.stage.stageWidth - menuUI.width - 10;
-        } else
+            { menuUI.x = editorui.popupLayer.stage.stageWidth - menuUI.width - 10; }
+        }
+        else
         {
             menuUI.x = menuItemRendererRect.right;
             menuUI.y = menuItemRendererRect.top;
@@ -198,7 +199,7 @@ class MenuUI extends eui.List
             }
         }
         if (menuUI.y + menuUI.height > editorui.popupLayer.stage.stageHeight)
-            menuUI.y = editorui.popupLayer.stage.stageHeight - menuUI.height;
+        { menuUI.y = editorui.popupLayer.stage.stageHeight - menuUI.height; }
 
         return menuUI;
     }
@@ -254,7 +255,7 @@ class MenuItemRenderer extends eui.ItemRenderer
     {
         super();
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "MenuItemRender";
+        this.skinName = 'MenuItemRender';
     }
 
     private onComplete(): void
@@ -274,7 +275,7 @@ class MenuItemRenderer extends eui.ItemRenderer
         this.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onItemMouseOver, this);
         this.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onItemMouseOut, this);
 
-        this.menuUI = <any>this.parent;
+        this.menuUI = this.parent as any;
 
         this.updateView();
     }
@@ -291,28 +292,28 @@ class MenuItemRenderer extends eui.ItemRenderer
     private updateView()
     {
         if (!this.data)
-            return;
+        { return; }
         this.touchEnabled = true;
         this.touchChildren = true;
-        if (this.data.type == 'separator')
+        if (this.data.type === 'separator')
         {
-            this.skin.currentState = "separator";
+            this.skin.currentState = 'separator';
             this.touchEnabled = false;
             this.touchChildren = false;
         }
         else
         {
-            this.subSign.visible = (!!this.data.submenu && this.data.submenu.length > 0)
-            this.skin.currentState = "normal";
+            this.subSign.visible = (!!this.data.submenu && this.data.submenu.length > 0);
+            this.skin.currentState = 'normal';
         }
-        this.subSign.textColor = this.label.textColor = this.data.enable != false ? 0x000000 : 0x6E6E6E;
+        this.subSign.textColor = this.label.textColor = this.data.enable !== false ? 0x000000 : 0x6E6E6E;
 
         this.selectedRect.visible = false;
     }
 
-    private onItemMouseDown(event: egret.TouchEvent): void
+    private onItemMouseDown(_event: egret.TouchEvent): void
     {
-        if (this.data.enable == false) return;
+        if (this.data.enable === false) return;
 
         if (this.data.click)
         {
@@ -325,28 +326,29 @@ class MenuItemRenderer extends eui.ItemRenderer
     {
         if (this.data.submenu)
         {
-            if (this.data.enable != false)
+            if (this.data.enable !== false)
             {
-                var rect = this.getTransformedBounds(this.stage);
+                const rect = this.getTransformedBounds(this.stage);
                 this.menuUI.subMenuUI = MenuUI.create(this.data.submenu, rect);
                 this.menuUI.subMenuUI.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
             }
-        } else
+        }
+        else
         {
             this.menuUI.subMenuUI = null;
         }
-        this.selectedRect.visible = this.data.enable != false;
+        this.selectedRect.visible = this.data.enable !== false;
     }
 
     private onItemMouseOut()
     {
         if (!this.menuUI.subMenuUI)
-            this.selectedRect.visible = false;
+        { this.selectedRect.visible = false; }
     }
 
     private onsubMenuUIRemovedFromeStage(e: egret.Event)
     {
-        var current = e.currentTarget;
+        const current = e.currentTarget;
         current.removeEventListener(egret.Event.REMOVED_FROM_STAGE, this.onsubMenuUIRemovedFromeStage, this);
         this.selectedRect.visible = false;
     }

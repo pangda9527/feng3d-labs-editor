@@ -37,13 +37,13 @@ export class ProjectView extends eui.Component implements ModuleView
      * 模块名称
      */
     moduleName: string;
-    static moduleName = "Project";
+    static moduleName = 'Project';
 
     constructor()
     {
         super();
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "ProjectView";
+        this.skinName = 'ProjectView';
 
         //
         this.moduleName = ProjectView.moduleName;
@@ -71,13 +71,13 @@ export class ProjectView extends eui.Component implements ModuleView
     {
         super.$onAddToStage(stage, nestLevel);
 
-        this.excludeTxt.text = "";
-        this.filepathLabel.text = "";
+        this.excludeTxt.text = '';
+        this.filepathLabel.text = '';
 
         //
-        drag.register(this.filelistgroup, (dragsource) => { }, ["gameobject"], (dragSource) =>
+        drag.register(this.filelistgroup, (_dragsource) => { }, ['gameobject'], (dragSource) =>
         {
-            dragSource.getDragData("gameobject").forEach(v =>
+            dragSource.getDragData('gameobject').forEach((v) =>
             {
                 editorAsset.saveObject(v);
             });
@@ -98,8 +98,8 @@ export class ProjectView extends eui.Component implements ModuleView
         this.floderpathTxt.touchEnabled = true;
         this.floderpathTxt.addEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
 
-        globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        globalEmitter.on("asset.showAsset", this.onShowAsset, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.selectedfilechanged, this);
+        globalEmitter.on('asset.showAsset', this.onShowAsset, this);
     }
 
     $onRemoveFromStage()
@@ -114,11 +114,11 @@ export class ProjectView extends eui.Component implements ModuleView
 
         MouseOnDisableScroll.unRegister(this.filelist);
 
-        watcher.unwatch(editorAsset, "showFloder", this.updateShowFloder, this);
+        watcher.unwatch(editorAsset, 'showFloder', this.updateShowFloder, this);
 
         this.floderpathTxt.removeEventListener(egret.TextEvent.LINK, this.onfloderpathTxtLink, this);
-        globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        globalEmitter.on("asset.showAsset", this.onShowAsset, this);
+        globalEmitter.off('editor.selectedObjectsChanged', this.selectedfilechanged, this);
+        globalEmitter.on('asset.showAsset', this.onShowAsset, this);
 
         //
         drag.unregister(this.filelistgroup);
@@ -130,11 +130,11 @@ export class ProjectView extends eui.Component implements ModuleView
     {
         this.invalidateAssettree();
 
-        editorAsset.rootFile.on("openChanged", this.invalidateAssettree, this);
-        editorAsset.rootFile.on("added", this.invalidateAssettree, this);
-        editorAsset.rootFile.on("removed", this.invalidateAssettree, this);
+        editorAsset.rootFile.on('openChanged', this.invalidateAssettree, this);
+        editorAsset.rootFile.on('added', this.invalidateAssettree, this);
+        editorAsset.rootFile.on('removed', this.invalidateAssettree, this);
 
-        watcher.watch(editorAsset, "showFloder", this.updateShowFloder, this);
+        watcher.watch(editorAsset, 'showFloder', this.updateShowFloder, this);
     }
 
     private update()
@@ -155,66 +155,82 @@ export class ProjectView extends eui.Component implements ModuleView
 
     private updateAssetTree()
     {
-        var folders = editorAsset.rootFile.getFolderList();
+        const folders = editorAsset.rootFile.getFolderList();
         this.listData.replaceAll(folders);
     }
 
-    private updateShowFloder(host?: any, property?: string, oldvalue?: any)
+    private updateShowFloder(_host?: any, _property?: string, _oldvalue?: any)
     {
-        var floder = editorAsset.showFloder;
+        let floder = editorAsset.showFloder;
         if (!floder) return;
 
-        var textFlow = new Array<egret.ITextElement>();
+        const textFlow = new Array<egret.ITextElement>();
         do
         {
             if (textFlow.length > 0)
-                textFlow.unshift({ text: " > " });
-            textFlow.unshift({ text: floder.label, style: { "href": `event:${floder.asset.assetId}` } });
+            { textFlow.unshift({ text: ' > ' }); }
+            textFlow.unshift({ text: floder.label, style: { href: `event:${floder.asset.assetId}` } });
             floder = floder.parent;
         }
-        while (floder)
+        while (floder);
         this.floderpathTxt.textFlow = textFlow;
 
-        var children = editorAsset.showFloder.children;
+        const children = editorAsset.showFloder.children;
 
+        let excludeReg: RegExp;
         try
         {
-            var excludeReg = new RegExp(this.excludeTxt.text);
-        } catch (error)
-        {
-            excludeReg = new RegExp("");
+            excludeReg = new RegExp(this.excludeTxt.text);
         }
+        catch (error)
+        {
+            excludeReg = new RegExp('');
+        }
+        let includeReg: RegExp;
         try
         {
-            var includeReg = new RegExp(this.includeTxt.text);
-        } catch (error)
+            includeReg = new RegExp(this.includeTxt.text);
+        }
+        catch (error)
         {
-            includeReg = new RegExp("");
+            includeReg = new RegExp('');
         }
 
-        var fileinfos = children.filter((value) =>
+        const fileinfos = children.filter((value) =>
         {
             if (this.includeTxt.text)
             {
                 if (!includeReg.test(value.label))
+                {
                     return false;
+                }
             }
             if (this.excludeTxt.text)
             {
                 if (excludeReg.test(value.label))
+                {
                     return false;
+                }
             }
+
             return true;
         });
-        var nodes = fileinfos.map((value) => { return value; });
+        let nodes = fileinfos.map((value) => value);
         nodes = nodes.sort((a, b) =>
         {
             if (a.isDirectory > b.isDirectory)
+            {
                 return -1;
+            }
             if (a.isDirectory < b.isDirectory)
+            {
                 return 1;
+            }
             if (a.label < b.label)
+            {
                 return -1;
+            }
+
             return 1;
         });
 
@@ -230,14 +246,14 @@ export class ProjectView extends eui.Component implements ModuleView
 
     private selectedfilechanged()
     {
-        var selectedAssetFile = EditorData.editorData.selectedAssetNodes;
+        const selectedAssetFile = EditorData.editorData.selectedAssetNodes;
         if (selectedAssetFile.length > 0)
-            this.filepathLabel.text = selectedAssetFile.map(v =>
-            {
-                return v.asset.fileName + v.asset.extenson;
-            }).join(",");
+        {
+            this.filepathLabel.text = selectedAssetFile.map((v) =>
+                v.asset.fileName + v.asset.extenson).join(',');
+        }
         else
-            this.filepathLabel.text = "";
+        { this.filepathLabel.text = ''; }
     }
 
     private onShowAsset()
@@ -247,13 +263,13 @@ export class ProjectView extends eui.Component implements ModuleView
 
     private onfilelistclick(e: egret.MouseEvent)
     {
-        if (e.target == this.filelist)
+        if (e.target === this.filelist)
         {
-            EditorData.editorData.clearSelectedObjects()
+            EditorData.editorData.clearSelectedObjects();
         }
     }
 
-    private onfilelistrightclick(e: egret.MouseEvent)
+    private onfilelistrightclick(_e: egret.MouseEvent)
     {
         EditorData.editorData.clearSelectedObjects();
 
@@ -268,63 +284,64 @@ export class ProjectView extends eui.Component implements ModuleView
     private areaSelectStartPosition: Vector2;
     private onMouseDown(e: egret.MouseEvent)
     {
-        if (e.target != this.filelist) return;
-        if (shortcut.getState("splitGroupDraging")) return;
+        if (e.target !== this.filelist) return;
+        if (shortcut.getState('splitGroupDraging')) return;
 
         this.areaSelectStartPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        windowEventProxy.on("mousemove", this.onMouseMove, this);
-        windowEventProxy.on("mouseup", this.onMouseUp, this);
+        windowEventProxy.on('mousemove', this.onMouseMove, this);
+        windowEventProxy.on('mouseup', this.onMouseUp, this);
     }
 
     private onMouseMove()
     {
-        var areaSelectEndPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        var rectangle = this.filelist.getGlobalBounds();
+        let areaSelectEndPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        const rectangle = this.filelist.getGlobalBounds();
         //
         areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
         //
         this._areaSelectRect.show(this.areaSelectStartPosition, areaSelectEndPosition);
         //
-        var min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
-        var max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
-        var areaRect = new Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
+        const min = this.areaSelectStartPosition.clone().min(areaSelectEndPosition);
+        const max = this.areaSelectStartPosition.clone().max(areaSelectEndPosition);
+        const areaRect = new Rectangle(min.x, min.y, max.x - min.x, max.y - min.y);
         //
-        var datas = this.filelist.$indexToRenderer.filter(v =>
+        const datas = this.filelist.$indexToRenderer.filter((v) =>
         {
-            var rectangle = v.getGlobalBounds();
+            const rectangle = v.getGlobalBounds();
+
             return areaRect.intersects(rectangle);
-        }).map(v => v.data);
+        }).map((v) => v.data);
         EditorData.editorData.selectMultiObject(datas);
     }
 
     private onMouseUp()
     {
         this._areaSelectRect.hide();
-        windowEventProxy.off("mousemove", this.onMouseMove, this);
-        windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off('mousemove', this.onMouseMove, this);
+        windowEventProxy.off('mouseup', this.onMouseUp, this);
     }
 }
 
 class FileDrag
 {
-    addEventListener: () => void
+    addEventListener: () => void;
     removeEventListener: () => void;
 
     constructor(displayobject: egret.DisplayObject)
     {
         this.addEventListener = () =>
         {
-            document.addEventListener("dragenter", dragenter, false);
-            document.addEventListener("dragover", dragover, false);
-            document.addEventListener("drop", drop, false);
-        }
+            document.addEventListener('dragenter', dragenter, false);
+            document.addEventListener('dragover', dragover, false);
+            document.addEventListener('drop', drop, false);
+        };
 
         this.removeEventListener = () =>
         {
-            document.removeEventListener("dragenter", dragenter, false);
-            document.removeEventListener("dragover", dragover, false);
-            document.removeEventListener("drop", drop, false);
-        }
+            document.removeEventListener('dragenter', dragenter, false);
+            document.removeEventListener('dragover', dragover, false);
+            document.removeEventListener('drop', drop, false);
+        };
 
         function dragenter(e)
         {
@@ -340,9 +357,9 @@ class FileDrag
         {
             e.stopPropagation();
             e.preventDefault();
-            var dt = e.dataTransfer;
-            var fileList = dt.files;
-            var files = [];
+            const dt = e.dataTransfer;
+            const fileList = dt.files;
+            const files = [];
             for (let i = 0; i < fileList.length; i++)
             {
                 files[i] = fileList[i];

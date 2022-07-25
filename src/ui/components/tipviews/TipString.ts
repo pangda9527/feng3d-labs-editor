@@ -10,12 +10,12 @@ export class TipString extends eui.Component implements eui.UIComponent
     constructor()
     {
         super();
-        this.skinName = "TipString";
+        this.skinName = 'TipString';
         this.touchChildren = this.touchEnabled = false;
     }
 
-    @watch("valuechanged")
-    value = "";
+    @watch('valuechanged')
+    value = '';
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
     {
@@ -26,8 +26,7 @@ export class TipString extends eui.Component implements eui.UIComponent
 
     $onRemoveFromStage()
     {
-        super.$onRemoveFromStage()
-
+        super.$onRemoveFromStage();
     }
 
     private valuechanged()
@@ -37,6 +36,5 @@ export class TipString extends eui.Component implements eui.UIComponent
             this.txtLab.text = String(this.value);
         }
     }
-
 }
 

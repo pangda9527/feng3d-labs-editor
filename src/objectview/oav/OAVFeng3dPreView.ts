@@ -11,7 +11,7 @@ export class OAVFeng3dPreView extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVFeng3dPreView";
+        this.skinName = 'OAVFeng3dPreView';
         this.alpha = 1;
     }
 
@@ -21,7 +21,7 @@ export class OAVFeng3dPreView extends OAVBase
         this.onResize();
         this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         //
-        windowEventProxy.on("mousedown", this.onMouseDown, this);
+        windowEventProxy.on('mousedown', this.onMouseDown, this);
 
         ticker.on(100, this.onDrawObject, this);
 
@@ -30,7 +30,7 @@ export class OAVFeng3dPreView extends OAVBase
 
     dispose()
     {
-        windowEventProxy.off("mousedown", this.onMouseDown, this);
+        windowEventProxy.off('mousedown', this.onMouseDown, this);
         ticker.off(100, this.onDrawObject, this);
 
         MouseOnDisableScroll.unRegister(this);
@@ -40,20 +40,20 @@ export class OAVFeng3dPreView extends OAVBase
     private onMouseDown()
     {
         this.preMousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-        var rect = this.getGlobalBounds();
+        const rect = this.getGlobalBounds();
         if (rect.contains(this.preMousePos.x, this.preMousePos.y))
         {
-            windowEventProxy.on("mousemove", this.onMouseMove, this);
-            windowEventProxy.on("mouseup", this.onMouseUp, this);
+            windowEventProxy.on('mousemove', this.onMouseMove, this);
+            windowEventProxy.on('mouseup', this.onMouseUp, this);
         }
     }
 
     private onMouseMove()
     {
-        var mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+        const mousePos = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 
-        var X_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisX();
-        var Y_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisY();
+        const X_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisX();
+        const Y_AXIS = Feng3dScreenShot.feng3dScreenShot.camera.transform.matrix.getAxisY();
         Feng3dScreenShot.feng3dScreenShot.camera.transform.rotate(X_AXIS, mousePos.y - this.preMousePos.y);
         Feng3dScreenShot.feng3dScreenShot.camera.transform.rotate(Y_AXIS, mousePos.x - this.preMousePos.x);
         this.cameraRotation = Feng3dScreenShot.feng3dScreenShot.camera.transform.rotation.clone();
@@ -67,10 +67,12 @@ export class OAVFeng3dPreView extends OAVBase
         if (this.space instanceof GameObject)
         {
             Feng3dScreenShot.feng3dScreenShot.drawGameObject(this.space, this.cameraRotation);
-        } else if (this.space instanceof Geometry)
+        }
+ else if (this.space instanceof Geometry)
         {
-            Feng3dScreenShot.feng3dScreenShot.drawGeometry(<any>this.space, this.cameraRotation);
-        } else if (this.space instanceof Material)
+            Feng3dScreenShot.feng3dScreenShot.drawGeometry(<any> this.space, this.cameraRotation);
+        }
+ else if (this.space instanceof Material)
         {
             Feng3dScreenShot.feng3dScreenShot.drawMaterial(this.space, this.cameraRotation);
         }
@@ -79,8 +81,8 @@ export class OAVFeng3dPreView extends OAVBase
 
     private onMouseUp()
     {
-        windowEventProxy.off("mousemove", this.onMouseMove, this);
-        windowEventProxy.off("mouseup", this.onMouseUp, this);
+        windowEventProxy.off('mousemove', this.onMouseMove, this);
+        windowEventProxy.off('mouseup', this.onMouseUp, this);
     }
 
     updateView()

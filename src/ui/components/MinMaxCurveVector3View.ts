@@ -3,7 +3,7 @@ import { MinMaxCurveView } from './MinMaxCurveView';
 
 export class MinMaxCurveVector3View extends eui.Component
 {
-    @watch("_onMinMaxCurveVector3Changed")
+    @watch('_onMinMaxCurveVector3Changed')
     minMaxCurveVector3 = new MinMaxCurveVector3();
 
     public xMinMaxCurveView: MinMaxCurveView;
@@ -13,7 +13,7 @@ export class MinMaxCurveVector3View extends eui.Component
     constructor()
     {
         super();
-        this.skinName = "MinMaxCurveVector3View";
+        this.skinName = 'MinMaxCurveVector3View';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -23,7 +23,6 @@ export class MinMaxCurveVector3View extends eui.Component
         this.xMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
         this.yMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
         this.zMinMaxCurveView.addEventListener(egret.Event.CHANGE, this._onchanged, this);
-
     }
 
     $onRemoveFromStage()
@@ -32,7 +31,7 @@ export class MinMaxCurveVector3View extends eui.Component
         this.yMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
         this.zMinMaxCurveView.removeEventListener(egret.Event.CHANGE, this._onchanged, this);
 
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()

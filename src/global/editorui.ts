@@ -12,4 +12,4 @@ export interface EditorUI
     messageLayer: eui.UILayer;
 }
 
-export var editorui: EditorUI = <any>{};
+export const editorui: EditorUI = <any>{};

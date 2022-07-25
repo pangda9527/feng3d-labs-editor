@@ -40,7 +40,7 @@ export class OAVNumber extends OAVBase
 	{
 		super(attributeViewInfo);
 
-		this.skinName = "OAVNumber";
+		this.skinName = 'OAVNumber';
 	}
 
 	initView()

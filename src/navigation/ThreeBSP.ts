@@ -3,27 +3,26 @@
 
 import { Vector3, Vector2 } from 'feng3d';
 
-
 /**
  * 精度值
  */
-var EPSILON = 1e-5;
+const EPSILON = 1e-5;
 /**
  * 共面
  */
-var COPLANAR = 0;
+const COPLANAR = 0;
 /**
  * 正面
  */
-var FRONT = 1;
+const FRONT = 1;
 /**
  * 反面
  */
-var BACK = 2;
+const BACK = 2;
 /**
  * 横跨
  */
-var SPANNING = 3;
+const SPANNING = 3;
 
 export class ThreeBSP
 {
@@ -34,7 +33,8 @@ export class ThreeBSP
         if (geometry instanceof ThreeBSPNode)
         {
             this.tree = geometry;
-        } else
+        }
+        else
         {
             this.tree = new ThreeBSPNode(geometry);
         }
@@ -42,44 +42,51 @@ export class ThreeBSP
 
     toGeometry()
     {
-        var data = this.tree.getGeometryData();
+        const data = this.tree.getGeometryData();
+
         return data;
     }
 
     /**
      * 相减
-     * @param other 
+     * @param other
      */
     subtract(other: ThreeBSP)
     {
-        var them = other.tree.clone(), us = this.tree.clone();
+        const them = other.tree.clone(); const
+            us = this.tree.clone();
         us.invert().clipTo(them);
         them.clipTo(us).invert().clipTo(us).invert();
+
         return new ThreeBSP(us.build(them.allPolygons()).invert());
-    };
+    }
 
     /**
      * 相加
-     * @param other 
+     * @param other
      */
     union(other: ThreeBSP)
     {
-        var them = other.tree.clone(), us = this.tree.clone();
+        const them = other.tree.clone(); const
+            us = this.tree.clone();
         us.clipTo(them);
         them.clipTo(us).invert().clipTo(us).invert();
+
         return new ThreeBSP(us.build(them.allPolygons()));
-    };
+    }
 
     /**
      * 相交
-     * @param other 
+     * @param other
      */
     intersect(other: ThreeBSP)
     {
-        var them = other.tree.clone(), us = this.tree.clone();
+        const them = other.tree.clone(); const
+            us = this.tree.clone();
         them.clipTo(us.invert()).invert().clipTo(us.clipTo(them));
+
         return new ThreeBSP(us.build(them.allPolygons()).invert());
-    };
+    }
 }
 
 /**
@@ -113,25 +120,26 @@ export class ThreeBSPVertex
     clone()
     {
         return new ThreeBSPVertex(this.position.clone(), this.normal.clone(), this.uv.clone());
-    };
+    }
 
     /**
-     * 
+     *
      * @param v 线性插值
-     * @param alpha 
+     * @param alpha
      */
     lerp(v: ThreeBSPVertex, alpha: number)
     {
         this.position.lerpNumber(v.position, alpha);
         this.uv.lerpNumber(v.uv, alpha);
         this.normal.lerpNumber(v.position, alpha);
+
         return this;
-    };
+    }
 
     interpolate(v: ThreeBSPVertex, alpha: number)
     {
         return this.clone().lerp(v, alpha);
-    };
+    }
 }
 
 /**
@@ -162,18 +170,19 @@ export class ThreeBSPPolygon
 
     /**
      * 获取多边形几何体数据
-     * @param data 
+     * @param data
      */
     getGeometryData(data?: { positions: number[], uvs: number[], normals: number[] })
     {
         data = data || { positions: [], uvs: [], normals: [] };
-        var vertices = data.positions = data.positions || [];
-        var uvs = data.uvs = data.uvs || [];
-        var normals = data.normals = data.normals || [];
+        const vertices = data.positions = data.positions || [];
+        const uvs = data.uvs = data.uvs || [];
+        const normals = data.normals = data.normals || [];
 
-        for (var i = 2, n = this.vertices.length; i < n; i++)
+        for (let i = 2, n = this.vertices.length; i < n; i++)
         {
-            var v0 = this.vertices[0], v1 = this.vertices[i - 1], v2 = this.vertices[i];
+            const v0 = this.vertices[0]; const v1 = this.vertices[i - 1]; const
+                v2 = this.vertices[i];
             vertices.push(v0.position.x, v0.position.y, v0.position.z,
                 v1.position.x, v1.position.y, v1.position.z,
                 v2.position.x, v2.position.y, v2.position.z);
@@ -184,6 +193,7 @@ export class ThreeBSPPolygon
                 this.normal.x, this.normal.y, this.normal.z,
                 this.normal.x, this.normal.y, this.normal.z);
         }
+
         return data;
     }
 
@@ -192,21 +202,23 @@ export class ThreeBSPPolygon
      */
     calculateProperties()
     {
-        var a = this.vertices[0].position, b = this.vertices[1].position, c = this.vertices[2].position;
+        const a = this.vertices[0].position; const b = this.vertices[1].position; const
+            c = this.vertices[2].position;
         this.normal = b.clone().subTo(a).crossTo(c.clone().subTo(a)).normalize();
         this.w = this.normal.clone().dot(a);
 
         return this;
-    };
+    }
 
     /**
      * 克隆
      */
     clone()
     {
-        var vertices = this.vertices.map((v) => { return v.clone(); });
+        const vertices = this.vertices.map((v) => v.clone());
+
         return new ThreeBSPPolygon(vertices);
-    };
+    }
 
     /**
      * 翻转多边形
@@ -216,37 +228,44 @@ export class ThreeBSPPolygon
         this.normal.scaleNumber(-1);
         this.w *= -1;
         this.vertices.reverse();
+
         return this;
-    };
+    }
 
     /**
      * 获取顶点与多边形所在平面相对位置
-     * @param vertex 
+     * @param vertex
      */
     classifyVertex(vertex: ThreeBSPVertex)
     {
-        var side = this.normal.dot(vertex.position) - this.w;
+        const side = this.normal.dot(vertex.position) - this.w;
         if (side < -EPSILON)
-            return BACK;
+        { return BACK; }
         if (side > EPSILON)
-            return FRONT;
+        { return FRONT; }
+
         return COPLANAR;
     }
 
     /**
      * 计算与另外一个多边形的相对位置
-     * @param polygon 
+     * @param polygon
      */
     classifySide(polygon: ThreeBSPPolygon)
     {
-        var front = 0, back = 0;
-        polygon.vertices.forEach(v =>
+        let front = 0; let
+            back = 0;
+        polygon.vertices.forEach((v) =>
         {
-            var side = this.classifyVertex(v);
-            if (side == FRONT)
+            const side = this.classifyVertex(v);
+            if (side === FRONT)
+            {
                 front += 1;
-            else if (side == BACK)
+            }
+            else if (side === BACK)
+            {
                 back += 1;
+            }
         });
 
         if (front > 0 && back === 0)
@@ -261,12 +280,13 @@ export class ThreeBSPPolygon
         {
             return COPLANAR;
         }
+
         return SPANNING;
     }
 
     /**
      * 切割多边形
-     * @param poly 
+     * @param poly
      */
     tessellate(poly: ThreeBSPPolygon)
     {
@@ -275,17 +295,17 @@ export class ThreeBSPPolygon
             return [poly];
         }
 
-        var f: ThreeBSPVertex[] = [];
-        var b: ThreeBSPVertex[] = [];
-        var count = poly.vertices.length;
+        const f: ThreeBSPVertex[] = [];
+        const b: ThreeBSPVertex[] = [];
+        const count = poly.vertices.length;
 
-        //切割多边形的每条边
+        // 切割多边形的每条边
         poly.vertices.forEach((item, i) =>
         {
-            var vi = poly.vertices[i];
-            var vj = poly.vertices[(i + 1) % count];
-            var ti = this.classifyVertex(vi);
-            var tj = this.classifyVertex(vj);
+            const vi = poly.vertices[i];
+            const vj = poly.vertices[(i + 1) % count];
+            const ti = this.classifyVertex(vi);
+            const tj = this.classifyVertex(vj);
 
             if (ti !== BACK)
             {
@@ -298,15 +318,15 @@ export class ThreeBSPPolygon
             // 切割横跨多边形的边
             if ((ti | tj) === SPANNING)
             {
-                var t = (this.w - this.normal.dot(vi.position)) / this.normal.dot(vj.clone().position.subTo(vi.position));
-                var v = vi.interpolate(vj, t);
+                const t = (this.w - this.normal.dot(vi.position)) / this.normal.dot(vj.clone().position.subTo(vi.position));
+                const v = vi.interpolate(vj, t);
                 f.push(v);
                 b.push(v);
             }
         });
 
         // 处理切割后的多边形
-        var polys: ThreeBSPPolygon[] = []
+        const polys: ThreeBSPPolygon[] = [];
         if (f.length >= 3)
         {
             polys.push(new ThreeBSPPolygon(f));
@@ -315,22 +335,23 @@ export class ThreeBSPPolygon
         {
             polys.push(new ThreeBSPPolygon(b));
         }
+
         return polys;
     }
 
     /**
      * 切割多边形并进行分类
      * @param polygon 被切割多边形
-     * @param coplanar_front    切割后的平面正面多边形 
-     * @param coplanar_back     切割后的平面反面多边形
+     * @param coplanarFront    切割后的平面正面多边形
+     * @param coplanarBack     切割后的平面反面多边形
      * @param front 多边形在正面
      * @param back 多边形在反面
      */
-    subdivide(polygon: ThreeBSPPolygon, coplanar_front: ThreeBSPPolygon[], coplanar_back: ThreeBSPPolygon[], front: ThreeBSPPolygon[], back: ThreeBSPPolygon[])
+    subdivide(polygon: ThreeBSPPolygon, coplanarFront: ThreeBSPPolygon[], coplanarBack: ThreeBSPPolygon[], front: ThreeBSPPolygon[], back: ThreeBSPPolygon[])
     {
-        this.tessellate(polygon).forEach(poly =>
+        this.tessellate(polygon).forEach((poly) =>
         {
-            var side = this.classifySide(poly);
+            const side = this.classifySide(poly);
             switch (side)
             {
                 case FRONT:
@@ -342,17 +363,18 @@ export class ThreeBSPPolygon
                 case COPLANAR:
                     if (this.normal.dot(poly.normal) > 0)
                     {
-                        coplanar_front.push(poly);
-                    } else
+                        coplanarFront.push(poly);
+                    }
+                    else
                     {
-                        coplanar_back.push(poly);
+                        coplanarBack.push(poly);
                     }
                     break;
                 default:
-                    throw new Error("BUG: Polygon of classification " + side + " in subdivision");
+                    throw new Error(`BUG: Polygon of classification ${side} in subdivision`);
             }
         });
-    };
+    }
 }
 
 /**
@@ -375,29 +397,29 @@ export class ThreeBSPNode
     {
         this.polygons = [];
         if (!data)
-            return;
+        { return; }
 
-        var positions: number[] = data.positions;
-        var normals: number[] = data.normals;
-        var uvs: number[] = data.uvs;
-        var indices: number[] = data.indices;
+        const positions: number[] = data.positions;
+        const normals: number[] = data.normals;
+        const uvs: number[] = data.uvs;
+        const indices: number[] = data.indices;
 
         // 初始化多边形
-        var polygons: ThreeBSPPolygon[] = [];
+        const polygons: ThreeBSPPolygon[] = [];
         for (let i = 0, n = indices.length; i < n; i += 3)
         {
-            var polygon = new ThreeBSPPolygon();
+            const polygon = new ThreeBSPPolygon();
 
-            var i0 = indices[i]
-            var i1 = indices[i + 1];
-            var i2 = indices[i + 2];
+            const i0 = indices[i];
+            const i1 = indices[i + 1];
+            const i2 = indices[i + 2];
 
             polygon.vertices = [
                 new ThreeBSPVertex(new Vector3(positions[i0 * 3], positions[i0 * 3 + 1], positions[i0 * 3 + 2]), new Vector3(normals[i0 * 3], normals[i0 * 3 + 1], normals[i0 * 3 + 2]), new Vector2(uvs[i0 * 2], uvs[i0 * 2 + 1])),
                 new ThreeBSPVertex(new Vector3(positions[i1 * 3], positions[i1 * 3 + 1], positions[i1 * 3 + 2]), new Vector3(normals[i1 * 3], normals[i1 * 3 + 1], normals[i1 * 3 + 2]), new Vector2(uvs[i1 * 2], uvs[i1 * 2 + 1])),
                 new ThreeBSPVertex(new Vector3(positions[i2 * 3], positions[i2 * 3 + 1], positions[i2 * 3 + 2]), new Vector3(normals[i2 * 3], normals[i2 * 3 + 1], normals[i2 * 3 + 2]), new Vector2(uvs[i2 * 2], uvs[i2 * 2 + 1])),
             ];
-            polygon.calculateProperties()
+            polygon.calculateProperties();
             polygons.push(polygon);
         }
         if (polygons.length)
@@ -411,9 +433,9 @@ export class ThreeBSPNode
      */
     getGeometryData()
     {
-        var data: { positions: number[], uvs: number[], normals: number[], indices: number[] } = { positions: [], uvs: [], normals: [], indices: [] };
-        var polygons = this.allPolygons();
-        polygons.forEach(polygon =>
+        const data: { positions: number[], uvs: number[], normals: number[], indices: number[] } = { positions: [], uvs: [], normals: [], indices: [] };
+        const polygons = this.allPolygons();
+        polygons.forEach((polygon) =>
         {
             polygon.getGeometryData(data);
         });
@@ -421,6 +443,7 @@ export class ThreeBSPNode
         {
             indices.push(i);
         }
+
         return data;
     }
 
@@ -429,16 +452,15 @@ export class ThreeBSPNode
      */
     clone()
     {
-        var node = new ThreeBSPNode();
+        const node = new ThreeBSPNode();
         node.divider = this.divider && this.divider.clone();
-        node.polygons = this.polygons.map(element =>
-        {
-            return element.clone();
-        });
+        node.polygons = this.polygons.map((element) =>
+            element.clone());
         node.front = this.front && this.front.clone();
         node.back = this.back && this.back.clone();
+
         return node;
-    };
+    }
 
     /**
      * 构建树结点
@@ -447,14 +469,15 @@ export class ThreeBSPNode
     build(polygons: ThreeBSPPolygon[])
     {
         // 以第一个多边形为切割面
-        if (this.divider == null)
+        if (!this.divider)
         {
             this.divider = polygons[0].clone();
         }
 
-        var front: ThreeBSPPolygon[] = [], back: ThreeBSPPolygon[] = [];
-        //进行切割并分类
-        polygons.forEach(poly =>
+        const front: ThreeBSPPolygon[] = []; const
+            back: ThreeBSPPolygon[] = [];
+        // 进行切割并分类
+        polygons.forEach((poly) =>
         {
             this.divider.subdivide(poly, this.polygons, this.polygons, front, back);
         });
@@ -472,46 +495,48 @@ export class ThreeBSPNode
             this.back = this.back || new ThreeBSPNode();
             this.back.build(back);
         }
+
         return this;
-    };
+    }
 
     /**
      * 判定是否为凸面体
-     * @param polys 
+     * @param polys
      */
     isConvex(polys: ThreeBSPPolygon[])
     {
-        polys.every(inner =>
-        {
-            return polys.every(outer =>
+        polys.every((inner) =>
+            polys.every((outer) =>
             {
                 if (inner !== outer && outer.classifySide(inner) !== BACK)
                 {
                     return false;
                 }
+
                 return true;
-            });
-        });
+            }));
+
         return true;
-    };
+    }
 
     /**
      * 所有多边形
      */
     allPolygons()
     {
-        var front = (this.front && this.front.allPolygons()) || [];
-        var back = (this.back && this.back.allPolygons()) || [];
-        var polygons: ThreeBSPPolygon[] = this.polygons.slice().concat(front).concat(back);
+        const front = (this.front && this.front.allPolygons()) || [];
+        const back = (this.back && this.back.allPolygons()) || [];
+        const polygons: ThreeBSPPolygon[] = this.polygons.slice().concat(front).concat(back);
+
         return polygons;
-    };
+    }
 
     /**
      * 翻转
      */
     invert()
     {
-        this.polygons.forEach(poly =>
+        this.polygons.forEach((poly) =>
         {
             poly.invert();
         });
@@ -520,16 +545,16 @@ export class ThreeBSPNode
         this.front && this.front.invert();
         this.back && this.back.invert();
 
-        var temp = this.back;
+        const temp = this.back;
         this.back = this.front;
         this.front = temp;
 
         return this;
-    };
+    }
 
     /**
      * 裁剪多边形
-     * @param polygons 
+     * @param polygons
      */
     clipPolygons(polygons: ThreeBSPPolygon[])
     {
@@ -537,10 +562,10 @@ export class ThreeBSPNode
         {
             return polygons.slice();
         }
-        var front: ThreeBSPPolygon[] = [];
-        var back: ThreeBSPPolygon[] = [];
+        let front: ThreeBSPPolygon[] = [];
+        let back: ThreeBSPPolygon[] = [];
 
-        polygons.forEach(polygon =>
+        polygons.forEach((polygon) =>
         {
             this.divider.subdivide(polygon, front, back, front, back);
         });
@@ -557,14 +582,16 @@ export class ThreeBSPNode
         {
             return front.concat(back);
         }
+
         return front;
-    };
+    }
 
     clipTo(node: ThreeBSPNode)
     {
         this.polygons = node.clipPolygons(this.polygons);
         this.front && this.front.clipTo(node);
         this.back && this.back.clipTo(node);
+
         return this;
-    };
+    }
 }

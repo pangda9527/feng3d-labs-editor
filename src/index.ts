@@ -1,32 +1,21 @@
 export * from './net/client';
-// 扩展 feng3d
 export * from './polyfill/feng3d/ClassUtils';
 export * from './polyfill/feng3d/ShortCut';
 export * from './polyfill/feng3d/EventDispatcher';
-// 扩展 egret
 export * from './polyfill/egret/MouseEvent';
 export * from './polyfill/egret/TextField';
 export * from './polyfill/egret/DisplayObject';
 export * from './polyfill/egret/Scroller';
-//
 export * from './oauth/GiteeOauth';
-//
 export * from './assets/NativeRequire';
-export * from './assets/FileObject';
 export * from './assets/NativeFS';
 export * from './assets/EditorRS';
-//
 export * from './caches/Editorcache';
-//
 export * from './ui/drag/Drag';
 export * from './ui/drag/Cursor';
-//
 export * from './shortcut/Editorshortcut';
-//
 export * from './Modules';
-//
 export * from './shortcut/ShortCutSetting';
-//
 export * from './ui/SceneView';
 export * from './ui/CameraPreview';
 export * from './ui/components/RenameTextInput';
@@ -52,27 +41,19 @@ export * from './ui/components/MinMaxCurveEditor';
 export * from './ui/components/MinMaxCurveVector3View';
 export * from './ui/components/MinMaxGradientView';
 export * from './ui/components/GradientEditor';
-// tipviews
 export * from './ui/components/tipviews/TipString';
-//
 export * from './ui/components/binders/TextInputBinder';
 export * from './ui/components/binders/NumberTextInputBinder';
 export * from './ui/components/binders/NumberSliderTextInputBinder';
 export * from './ui/components/tools/MouseOnDisableScroll';
-//
 export * from './ui/components/terrain/TerrainView';
 export * from './ui/components/terrain/OVTerrain';
-//
 export * from './objectview/ov/OVFolderAsset';
-//
 export * from './objectview/ov/OVBaseDefault';
 export * from './objectview/ov/OVDefault';
 export * from './objectview/ov/OVTransform';
-//
 export * from './objectview/obv/OBVDefault';
-//
 export * from './objectview/events/ObjectViewEvent';
-//
 export * from './objectview/oav/OAVBase';
 export * from './objectview/oav/OAVDefault';
 export * from './objectview/oav/OAVBoolean';
@@ -99,36 +80,27 @@ export * from './objectview/oav/OAVFeng3dPreView';
 export * from './objectview/oav/OAVMinMaxCurve';
 export * from './objectview/oav/OAVMinMaxCurveVector3';
 export * from './objectview/oav/OAVMinMaxGradient';
-//
 export * from './ui/inspector/InspectorView';
 export * from './ui/inspector/InspectorMultiObject';
-//
 export * from './ui/hierarchy/HierarchyTreeItemRenderer';
 export * from './ui/hierarchy/HierarchyView';
-//
 export * from './ui/animation/AnimationView';
-//
 export * from './ui/assets/EditorAsset';
 export * from './ui/assets/AssetFileItemRenderer';
 export * from './ui/assets/AssetNode';
 export * from './ui/assets/AssetTreeItemRenderer';
 export * from './ui/assets/ProjectView';
 export * from './ui/assets/AssetFileTemplates';
-//
 export * from './ui/TopView';
 export * from './ui/NavigationView';
 export * from './ui/MainSplitView';
 export * from './ui/MainView';
-//
 export * from './ui/AssetAdapter';
 export * from './ui/LoadingUI';
 export * from './ui/MainUI';
 export * from './ui/ThemeAdapter';
-//
 export * from './global/editorui';
-//
 export * from './global/EditorData';
-//
 export * from './feng3d/mrsTool/MRSToolTarget';
 export * from './feng3d/mrsTool/models/MToolModel';
 export * from './feng3d/mrsTool/models/RToolModel';
@@ -138,7 +110,6 @@ export * from './feng3d/mrsTool/MTool';
 export * from './feng3d/mrsTool/RTool';
 export * from './feng3d/mrsTool/STool';
 export * from './feng3d/mrsTool/MRSTool';
-//
 export * from './feng3d/hierarchy/HierarchyNode';
 export * from './feng3d/hierarchy/Hierarchy';
 export * from './feng3d/scene/SceneRotateTool';
@@ -146,32 +117,24 @@ export * from './feng3d/GroundGrid';
 export * from './feng3d/EditorView';
 export * from './feng3d/EditorComponent';
 export * from './feng3d/Feng3dScreenShot';
-//
 export * from './navigation/Navigation';
 export * from './navigation/ThreeBSP';
 export * from './navigation/NavigationProcess';
-//
 export * from './recastnavigation/Recastnavigation';
-//
 export * from './scripts/EditorScript';
 export * from './scripts/MouseRayTestScript';
 export * from './scripts/DirectionLightIcon';
 export * from './scripts/PointLightIcon';
 export * from './scripts/SpotLightIcon';
 export * from './scripts/CameraIcon';
-//
 export * from './loaders/load';
 export * from './loaders/threejsLoader';
-//configs
 export * from './configs/CommonConfig';
 export * from './configs/ViewLayoutConfig';
 export * from './configs/ObjectViewConfig';
 export * from './configs/ShortcutConfig';
-//
 export * from './ScriptCompiler';
-// 粒子系统
 export * from './ui/ParticleEffectController';
 export * from './ui/components/ParticleComponentView';
 export * from './objectview/oav/OAVParticleComponentList';
-//
 export * from './Editor';

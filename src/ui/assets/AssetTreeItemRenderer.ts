@@ -15,7 +15,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
     constructor()
     {
         super();
-        this.skinName = "AssetTreeItemRenderer";
+        this.skinName = 'AssetTreeItemRenderer';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -26,7 +26,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
 
         MouseOnDisableScroll.register(this);
 
-        watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
+        watcher.watch(editorAsset, 'showFloder', this.showFloderChanged, this);
         this.showFloderChanged();
     }
 
@@ -38,7 +38,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
 
         MouseOnDisableScroll.unRegister(this);
 
-        watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
+        watcher.unwatch(editorAsset, 'showFloder', this.showFloderChanged, this);
     }
 
     dataChanged()
@@ -50,11 +50,12 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
             drag.register(this, (dragsource) =>
             {
                 this.data.setdargSource(dragsource);
-            }, ["assetNodes"], (dragdata) =>
+            }, ['assetNodes'], (dragdata) =>
             {
                 this.data.acceptDragDrop(dragdata);
             });
-        } else
+        }
+        else
         {
             drag.unregister(this);
         }
@@ -63,7 +64,7 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
 
     private showFloderChanged()
     {
-        this.selected = this.data ? editorAsset.showFloder == this.data : false;
+        this.selected = this.data ? editorAsset.showFloder === this.data : false;
     }
 
     private onclick()
@@ -71,12 +72,13 @@ export class AssetTreeItemRenderer extends TreeItemRenderer
         editorAsset.showFloder = this.data;
     }
 
-    private onrightclick(e)
+    private onrightclick(_e)
     {
-        if (this.data.parent != null)
+        if (this.data.parent !== null)
         {
             editorAsset.popupmenu(this.data);
-        } else
+        }
+        else
         {
             editorAsset.popupmenu(this.data);
         }

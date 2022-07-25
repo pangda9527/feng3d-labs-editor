@@ -16,7 +16,7 @@ export class OAVGameObjectName extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVGameObjectName";
+        this.skinName = 'OAVGameObjectName';
     }
 
     initView()

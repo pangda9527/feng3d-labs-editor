@@ -30,42 +30,41 @@ export class RTool extends MRSToolBase
     {
         super.onAddedToScene();
 
-        this.toolModel.xAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.zAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.freeAxis.on("mousedown", this.onItemMouseDown, this);
-        this.toolModel.cameraAxis.on("mousedown", this.onItemMouseDown, this);
+        this.toolModel.xAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.zAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.freeAxis.on('mousedown', this.onItemMouseDown, this);
+        this.toolModel.cameraAxis.on('mousedown', this.onItemMouseDown, this);
     }
 
     protected onRemovedFromScene()
     {
         super.onRemovedFromScene();
 
-        this.toolModel.xAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.yAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.zAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.freeAxis.off("mousedown", this.onItemMouseDown, this);
-        this.toolModel.cameraAxis.off("mousedown", this.onItemMouseDown, this);
+        this.toolModel.xAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.yAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.zAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.freeAxis.off('mousedown', this.onItemMouseDown, this);
+        this.toolModel.cameraAxis.off('mousedown', this.onItemMouseDown, this);
     }
 
     protected onItemMouseDown(event: IEvent<any>)
     {
-        if (!shortcut.getState("mouseInView3D")) return;
-        if (shortcut.keyState.getKeyState("alt")) return;
+        if (!shortcut.getState('mouseInView3D')) return;
+        if (shortcut.keyState.getKeyState('alt')) return;
         if (!this.editorCamera) return;
 
         super.onItemMouseDown(event);
-        //全局矩阵
-        var globalMatrix = this.transform.localToWorldMatrix;
-        //中心与X,Y,Z轴上点坐标
-        var pos = globalMatrix.getPosition();
-        var xDir = globalMatrix.getAxisX();
-        var yDir = globalMatrix.getAxisY();
-        var zDir = globalMatrix.getAxisZ();
-        //摄像机前方方向
-        var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-        var cameraDir = cameraSceneTransform.getAxisZ();
-        var cameraPos = cameraSceneTransform.getPosition();
+        // 全局矩阵
+        const globalMatrix = this.transform.localToWorldMatrix;
+        // 中心与X,Y,Z轴上点坐标
+        const pos = globalMatrix.getPosition();
+        const xDir = globalMatrix.getAxisX();
+        const yDir = globalMatrix.getAxisY();
+        const zDir = globalMatrix.getAxisZ();
+        // 摄像机前方方向
+        const cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
+        const cameraDir = cameraSceneTransform.getAxisZ();
         this.movePlane3D = new Plane();
         switch (event.currentTarget)
         {
@@ -98,7 +97,7 @@ export class RTool extends MRSToolBase
         this.startSceneTransform = globalMatrix.clone();
         this.mrsToolTarget.startRotate();
         //
-        windowEventProxy.on("mousemove", this.onMouseMove, this);
+        windowEventProxy.on('mousemove', this.onMouseMove, this);
     }
 
     private onMouseMove()
@@ -111,36 +110,36 @@ export class RTool extends MRSToolBase
             case this.toolModel.yAxis:
             case this.toolModel.zAxis:
             case this.toolModel.cameraAxis:
-                var origin = this.startSceneTransform.getPosition();
-                var planeCross = this.getMousePlaneCross();
-                var startDir = this.stepPlaneCross.subTo(origin);
+                const origin = this.startSceneTransform.getPosition();
+                const planeCross = this.getMousePlaneCross();
+                const startDir = this.stepPlaneCross.subTo(origin);
                 startDir.normalize();
-                var endDir = planeCross.subTo(origin);
+                const endDir = planeCross.subTo(origin);
                 endDir.normalize();
-                //计算夹角
-                var cosValue = startDir.dot(endDir);
+                // 计算夹角
+                let cosValue = startDir.dot(endDir);
                 cosValue = mathUtil.clamp(cosValue, -1, 1);
-                var angle = Math.acos(cosValue) * mathUtil.RAD2DEG;
-                //计算是否顺时针
-                var sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
+                let angle = Math.acos(cosValue) * mathUtil.RAD2DEG;
+                // 计算是否顺时针
+                let sign = this.movePlane3D.getNormal().cross(startDir).dot(endDir);
                 sign = sign > 0 ? 1 : -1;
                 angle = angle * sign;
                 //
                 this.mrsToolTarget.rotate1(angle, this.movePlane3D.getNormal());
                 this.stepPlaneCross.copy(planeCross);
                 this.mrsToolTarget.startRotate();
-                //绘制扇形区域
+                // 绘制扇形区域
                 if (this.selectedItem instanceof CoordinateRotationAxis)
                 {
                     this.selectedItem.showSector(this.startPlanePos, planeCross);
                 }
                 break;
             case this.toolModel.freeAxis:
-                var endPoint = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
-                var offset = endPoint.subTo(this.startMousePos);
-                var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
-                var right = cameraSceneTransform.getAxisX();
-                var up = cameraSceneTransform.getAxisY();
+                const endPoint = new Vector2(editorui.stage.stageX, editorui.stage.stageY);
+                const offset = endPoint.subTo(this.startMousePos);
+                const cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix;
+                const right = cameraSceneTransform.getAxisX();
+                const up = cameraSceneTransform.getAxisY();
                 this.mrsToolTarget.rotate2(-offset.y, right, -offset.x, up);
                 //
                 this.startMousePos = endPoint;
@@ -152,7 +151,7 @@ export class RTool extends MRSToolBase
     protected onMouseUp()
     {
         super.onMouseUp();
-        windowEventProxy.off("mousemove", this.onMouseMove, this);
+        windowEventProxy.off('mousemove', this.onMouseMove, this);
 
         if (this.selectedItem instanceof CoordinateRotationAxis)
         {
@@ -169,20 +168,20 @@ export class RTool extends MRSToolBase
     {
         if (!this.editorCamera) return;
 
-        var cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix.clone();
-        var cameraDir = cameraSceneTransform.getAxisZ();
+        const cameraSceneTransform = this.editorCamera.transform.localToWorldMatrix.clone();
+        const cameraDir = cameraSceneTransform.getAxisZ();
         cameraDir.negate();
         //
-        var xyzAxis = [this.toolModel.xAxis, this.toolModel.yAxis, this.toolModel.zAxis];
-        for (var i = 0; i < xyzAxis.length; i++)
+        const xyzAxis = [this.toolModel.xAxis, this.toolModel.yAxis, this.toolModel.zAxis];
+        for (let i = 0; i < xyzAxis.length; i++)
         {
-            var axis = xyzAxis[i];
+            const axis = xyzAxis[i];
             axis.filterNormal = cameraDir;
         }
-        //朝向摄像机
-        var temp = cameraSceneTransform.clone();
+        // 朝向摄像机
+        const temp = cameraSceneTransform.clone();
         temp.append(this.toolModel.transform.worldToLocalMatrix);
-        var rotation = temp.toTRS()[1];
+        const rotation = temp.toTRS()[1];
         this.toolModel.freeAxis.transform.rotation = rotation;
         this.toolModel.cameraAxis.transform.rotation = rotation;
     }

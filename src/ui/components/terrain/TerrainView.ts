@@ -1,10 +1,9 @@
-
 export class TerrainView extends eui.Component
 {
     public constructor()
     {
         super();
-        this.skinName = "TerrainView";
+        this.skinName = 'TerrainView';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -16,15 +15,11 @@ export class TerrainView extends eui.Component
 
     $onRemoveFromStage()
     {
-
-        super.$onRemoveFromStage()
+        super.$onRemoveFromStage();
     }
 
     updateView()
     {
         if (!this.stage) return;
-
     }
-
-
 }

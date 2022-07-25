@@ -12,13 +12,15 @@ export class OAVMultiText extends OAVBase
     constructor(attributeViewInfo: AttributeViewInfo)
     {
         super(attributeViewInfo);
-        this.skinName = "OAVMultiText";
+        this.skinName = 'OAVMultiText';
     }
 
     initView()
     {
         if (this._attributeViewInfo.editable)
+        {
             watcher.watch(this.space, this._attributeName, this.updateView, this);
+        }
     }
 
     dispose()
