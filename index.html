@@ -45,9 +45,11 @@
 	<script src="../feng3d/dist/index.js"></script>
 	<script src="../cannon/dist/index.js"></script>
 	<script src="../cannon-plugin/dist/index.js"></script>
+	<script src="./packages/json/dist/index.js"></script>
+	<script src="./packages/typescript/dist/index.js"></script>
 	<script src="./dist/index.js"></script>
 	<!-- 合并js -->
-	<script src="index.js"></script>
+	<!-- <script src="index.js"></script> -->
 </head>
 
 <body>
@@ -74,6 +76,16 @@
 		data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
 	</div>
 	<div id="output" style="position: absolute;display: none;top: 10px; right: 10px;"></div>
+	<script>
+		/**
+		 * {
+		 * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
+		 * "audioType": "" //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
+		 * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
+		 * }
+		 **/
+		egret.runEgret({ renderMode: "webgl", audioType: 0 });
+	</script>
 </body>
 
 </html>

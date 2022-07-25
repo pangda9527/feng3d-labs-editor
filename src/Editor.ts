@@ -27,6 +27,8 @@ export class Editor extends eui.UILayer
     {
         super();
         // giteeOauth.oauth();
+        // 关闭右键默认菜单
+        document.body.oncontextmenu = function () { return false; }
 
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
     }
