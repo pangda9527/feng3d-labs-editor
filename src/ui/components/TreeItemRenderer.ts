@@ -8,7 +8,7 @@ export class TreeItemRenderer extends eui.ItemRenderer
     /**
      * 子结点相对父结点的缩进值，以像素为单位。默认17。
      */
-    indentation = 17
+    indentation = 17;
     data: TreeNode;
 
     private watchers: eui.Watcher[] = [];
@@ -16,21 +16,21 @@ export class TreeItemRenderer extends eui.ItemRenderer
     constructor()
     {
         super();
-        this.skinName = "TreeItemRendererSkin";
+        this.skinName = 'TreeItemRendererSkin';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
     {
-        super.$onAddToStage(stage, nestLevel)
+        super.$onAddToStage(stage, nestLevel);
 
         //
         this.disclosureButton.addEventListener(egret.MouseEvent.CLICK, this.onDisclosureButtonClick, this);
 
         this.watchers.push(
-            eui.Watcher.watch(this, ["data", "depth"], this.updateView, this),
-            eui.Watcher.watch(this, ["data", "isOpen"], this.updateView, this),
-            eui.Watcher.watch(this, ["data", "hasChildren"], this.updateView, this),
-            eui.Watcher.watch(this, ["indentation"], this.updateView, this)
+            eui.Watcher.watch(this, ['data', 'depth'], this.updateView, this),
+            eui.Watcher.watch(this, ['data', 'isOpen'], this.updateView, this),
+            eui.Watcher.watch(this, ['data', 'hasChildren'], this.updateView, this),
+            eui.Watcher.watch(this, ['indentation'], this.updateView, this)
         );
 
         this.updateView();
@@ -52,7 +52,7 @@ export class TreeItemRenderer extends eui.ItemRenderer
     private onDisclosureButtonClick()
     {
         if (this.data)
-            this.data.isOpen = !this.data.isOpen;
+            { this.data.isOpen = !this.data.isOpen; }
     }
 
     private updateView()

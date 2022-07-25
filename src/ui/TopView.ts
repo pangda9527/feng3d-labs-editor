@@ -30,7 +30,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 		super();
 
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "TopView";
+		this.skinName = 'TopView';
 	}
 
 	private onComplete(): void
@@ -57,14 +57,14 @@ export class TopView extends eui.Component implements eui.UIComponent
 		this.settingButton.addEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 		this.qrcodeButton.addEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-		globalEmitter.on("editor.toolTypeChanged", this.updateview, this);
+		globalEmitter.on('editor.toolTypeChanged', this.updateview, this);
 
 		//
-		var menuItems = menuConfig.getMainMenu();
-		var menuItem = menu.handleShow({ submenu: menuItems });
+		let menuItems = menuConfig.getMainMenu();
+		const menuItem = menu.handleShow({ submenu: menuItems });
 		menuItems = menuItem.submenu;
-		menuItems = menuItems.filter(v => v.type != "separator");
-		var dataProvider = new eui.ArrayCollection();
+		menuItems = menuItems.filter((v) => v.type !== 'separator');
+		const dataProvider = new eui.ArrayCollection();
 		dataProvider.replaceAll(menuItems);
 		//
 		this.menuList.itemRenderer = TopMenuItemRenderer;
@@ -85,7 +85,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 		this.settingButton.removeEventListener(egret.MouseEvent.CLICK, this.onHelpButtonClick, this);
 		this.qrcodeButton.removeEventListener(egret.MouseEvent.CLICK, this.onButtonClick, this);
 
-		globalEmitter.off("editor.toolTypeChanged", this.updateview, this);
+		globalEmitter.off('editor.toolTypeChanged', this.updateview, this);
 
 		if (TopView.runwin) TopView.runwin.close();
 		TopView.runwin = null;
@@ -93,7 +93,7 @@ export class TopView extends eui.Component implements eui.UIComponent
 
 	private onHelpButtonClick()
 	{
-		window.open("http://com");
+		window.open('http://com');
 	}
 
 	private onButtonClick(event: egret.TouchEvent)
@@ -116,28 +116,29 @@ export class TopView extends eui.Component implements eui.UIComponent
 				EditorData.editorData.isBaryCenter = !EditorData.editorData.isBaryCenter;
 				break;
 			case this.playBtn:
-				var e = globalEmitter.emit("inspector.saveShowData", () =>
+				globalEmitter.emit('inspector.saveShowData', () =>
 				{
-					let obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
-					editorRS.fs.writeObject("default.scene.json", obj, (err) =>
+					const obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
+					editorRS.fs.writeObject('default.scene.json', obj, (err) =>
 					{
 						if (err)
 						{
 							console.warn(err);
+
 							return;
 						}
-						if (editorRS.fs.type == FSType.indexedDB)
+						if (editorRS.fs.type === FSType.indexedDB)
 						{
 							if (TopView.runwin) TopView.runwin.close();
 							TopView.runwin = window.open(`run.html?fstype=${FS.fs.type}&project=${editorcache.projectname}`);
+
 							return;
 						}
-						var path = editorRS.fs.getAbsolutePath("index.html");
+						const path = editorRS.fs.getAbsolutePath('index.html');
 						if (TopView.runwin) TopView.runwin.close();
 						TopView.runwin = window.open(path);
 					});
 				});
-				var a = e;
 				break;
 			case this.qrcodeButton:
 				setTimeout(() =>
@@ -151,16 +152,16 @@ export class TopView extends eui.Component implements eui.UIComponent
 	private updateview()
 	{
 		this.labelLab.text = editorcache.projectname;
-		this.moveButton.selected = EditorData.editorData.toolType == MRSToolType.MOVE;
-		this.rotateButton.selected = EditorData.editorData.toolType == MRSToolType.ROTATION;
-		this.scaleButton.selected = EditorData.editorData.toolType == MRSToolType.SCALE;
+		this.moveButton.selected = EditorData.editorData.toolType === MRSToolType.MOVE;
+		this.rotateButton.selected = EditorData.editorData.toolType === MRSToolType.ROTATION;
+		this.scaleButton.selected = EditorData.editorData.toolType === MRSToolType.SCALE;
 		this.worldButton.selected = !EditorData.editorData.isWoldCoordinate;
 		this.centerButton.selected = EditorData.editorData.isBaryCenter;
 	}
 }
 
-var showMenuItem: { menu: egret.DisplayObject, item: TopMenuItemRenderer };
-var items: { item: TopMenuItemRenderer; rect: Rectangle; }[]
+let showMenuItem: { menu: egret.DisplayObject, item: TopMenuItemRenderer };
+let items: { item: TopMenuItemRenderer; rect: Rectangle; }[];
 
 export class TopMenuItemRenderer extends eui.ItemRenderer
 {
@@ -179,7 +180,7 @@ export class TopMenuItemRenderer extends eui.ItemRenderer
 	{
 		super();
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "TopMenuItemRender";
+		this.skinName = 'TopMenuItemRender';
 	}
 
 	private onComplete(): void
@@ -208,24 +209,24 @@ export class TopMenuItemRenderer extends eui.ItemRenderer
 	private updateView()
 	{
 		if (!this.data)
-			return;
+		{ return; }
 		this.touchEnabled = true;
 		this.touchChildren = true;
-		this.skin.currentState = "normal";
+		this.skin.currentState = 'normal';
 		this.selectedRect.visible = false;
 	}
 
-	private onItemMouseDown(event: egret.TouchEvent): void
+	private onItemMouseDown(_event: egret.TouchEvent): void
 	{
 		if (showMenuItem) return;
 
-		var list = this.parent;
+		const list = this.parent;
 		console.assert(list instanceof eui.List);
-		items = list.$children.filter(v => v instanceof TopMenuItemRenderer).map((v: TopMenuItemRenderer) => { return { item: v, rect: v.getGlobalBounds() }; });
+		items = list.$children.filter((v) => v instanceof TopMenuItemRenderer).map((v: TopMenuItemRenderer) => ({ item: v, rect: v.getGlobalBounds() }));
 
 		showMenu(this);
 
-		windowEventProxy.on("mousemove", onMenuMouseMove);
+		windowEventProxy.on('mousemove', onMenuMouseMove);
 	}
 }
 
@@ -234,20 +235,20 @@ function showMenu(item: TopMenuItemRenderer)
 	removeMenu();
 
 	//
-	var rect = item.getTransformedBounds(item.stage);
-	var menuView = menu.popup(item.data.submenu);
+	const rect = item.getTransformedBounds(item.stage);
+	const menuView = menu.popup(item.data.submenu);
 	menuView.x = rect.x;
 	menuView.y = rect.bottom;
 	menuView.addEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
-	showMenuItem = { menu: menuView, item: item };
+	showMenuItem = { menu: menuView, item };
 }
 
 function onMenuMouseMove()
 {
-	var p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-	var overitem = items.filter(v => v.rect.contains(p.x, p.y))[0];
+	const p = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+	const overitem = items.filter((v) => v.rect.contains(p.x, p.y))[0];
 	if (!overitem) return;
-	if (showMenuItem.item == overitem.item) return;
+	if (showMenuItem.item === overitem.item) return;
 
 	showMenu(overitem.item);
 }
@@ -257,8 +258,8 @@ function removeMenu()
 	if (showMenuItem)
 	{
 		showMenuItem.menu.removeEventListener(egret.Event.REMOVED_FROM_STAGE, onRemoveFromeStage, null);
-		showMenuItem.menu.remove()
-	};
+		showMenuItem.menu.remove();
+	}
 	showMenuItem = null;
 }
 
@@ -266,6 +267,6 @@ function onRemoveFromeStage()
 {
 	removeMenu();
 
-	windowEventProxy.off("mousemove", onMenuMouseMove);
+	windowEventProxy.off('mousemove', onMenuMouseMove);
 }
 

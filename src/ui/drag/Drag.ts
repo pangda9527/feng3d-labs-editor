@@ -8,23 +8,23 @@ declare global
 	interface MixinsDragDataMap { }
 }
 
-export var drag: Drag;
-
 export class Drag
 {
 	register(displayObject: egret.DisplayObject, setdargSource: (dragSource: DragData) => void, accepttypes: (keyof DragDataMap)[], onDragDrop?: (dragSource: DragData) => void)
 	{
 		this.unregister(displayObject);
-		registers.push({ displayObject: displayObject, setdargSource: setdargSource, accepttypes: accepttypes, onDragDrop: onDragDrop });
+		registers.push({ displayObject, setdargSource, accepttypes, onDragDrop });
 
 		if (setdargSource)
+		{
 			displayObject.addEventListener(egret.MouseEvent.MOUSE_DOWN, onItemMouseDown, null, false, 1000);
+		}
 	}
 	unregister(displayObject: egret.DisplayObject)
 	{
-		for (var i = registers.length - 1; i >= 0; i--)
+		for (let i = registers.length - 1; i >= 0; i--)
 		{
-			if (registers[i].displayObject == displayObject)
+			if (registers[i].displayObject === displayObject)
 			{
 				registers.splice(i, 1);
 			}
@@ -34,19 +34,20 @@ export class Drag
 	/** 当拖拽过程中拖拽数据发生变化时调用该方法刷新可接受对象列表 */
 	refreshAcceptables()
 	{
-		//获取可接受数据的对象列表
+		// 获取可接受数据的对象列表
 		acceptableitems = registers.reduce((value: DragItem[], item) =>
 		{
-			if (item != dragitem && acceptData(item, dragSource))
+			if (item !== dragitem && acceptData(item, dragSource))
 			{
 				value.push(item);
 			}
+
 			return value;
 		}, []);
 	}
-};
+}
 
-drag = new Drag();
+export const drag = new Drag();
 
 export interface DragDataItem<K extends keyof DragDataMap>
 {
@@ -60,35 +61,37 @@ export class DragData
 
 	/**
 	 * 添加拖拽数据
-	 * 
-	 * @param datatype 
-	 * @param value 
+	 *
+	 * @param datatype
+	 * @param value
 	 */
 	addDragData<K extends keyof DragDataMap>(datatype: K, value: DragDataMap[K])
 	{
-		var item = { datatype: datatype, value: value };
-		this.datas.push(item)
+		const item = { datatype, value };
+		this.datas.push(item);
 	}
 
 	/**
 	 * 获取拖拽数据列表
-	 * 
-	 * @param datatype 
+	 *
+	 * @param datatype
 	 */
 	getDragData<K extends keyof DragDataMap>(datatype: K)
 	{
-		var data: DragDataMap[K][] = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+		const data: DragDataMap[K][] = this.datas.filter((v) => v.datatype === datatype).map((v) => v.value);
+
 		return data;
 	}
 
 	/**
 	 * 是否拥有指定类型数据
-	 * 
-	 * @param datatype 
+	 *
+	 * @param datatype
 	 */
 	hasDragData<K extends keyof DragDataMap>(datatype: K)
 	{
-		var data: DragDataMap[K][] = this.datas.filter(v => v.datatype == datatype).map(v => v.value);
+		const data: DragDataMap[K][] = this.datas.filter((v) => v.datatype === datatype).map((v) => v.value);
+
 		return data.length > 0;
 	}
 }
@@ -134,54 +137,56 @@ interface DragItem
 	onDragDrop?: (dragSource: DragData) => void
 }
 
-var stage: egret.Stage;
-var registers: DragItem[] = [];
+let stage: egret.Stage;
+const registers: DragItem[] = [];
 /**
  * 对象与触发接受拖拽的对象列表
  */
-var accepter: egret.DisplayObject;
-var accepterAlpha: number;
+let accepter: egret.DisplayObject;
+let accepterAlpha: number;
 /**
  * 被拖拽数据
  */
-var dragSource: DragData;
+let dragSource: DragData;
 /**
  * 被拖拽对象
  */
-var dragitem: DragItem;
+let dragitem: DragItem;
 /**
  * 可接受拖拽数据对象列表
  */
-var acceptableitems: DragItem[];
+let acceptableitems: DragItem[];
 
 function getitem(displayObject: egret.DisplayObject)
 {
-	for (var i = 0; i < registers.length; i++)
+	for (let i = 0; i < registers.length; i++)
 	{
-		if (registers[i].displayObject == displayObject)
-			return registers[i];
+		if (registers[i].displayObject === displayObject)
+		{ return registers[i]; }
 	}
+
 	return null;
 }
 
 /**
  * 判断是否接受数据
- * @param item 
- * @param dragSource 
+ * @param item
+ * @param dragSource
  */
 function acceptData(item: DragItem, dragSource: DragData)
 {
-	var hasdata = item.accepttypes.reduce((prevalue, accepttype) => { return prevalue || dragSource.hasDragData(accepttype); }, false)
+	const hasdata = item.accepttypes.reduce((prevalue, accepttype) => prevalue || dragSource.hasDragData(accepttype), false);
+
 	return hasdata;
 }
 
 /**
  * 是否处于拖拽中
  */
-var draging = false;
+let draging = false;
 // 鼠标按下时位置
-var mouseDownPosX = 0;
-var mouseDownPosY = 0;
+let mouseDownPosX = 0;
+let mouseDownPosY = 0;
 
 function onItemMouseDown(event: egret.TouchEvent): void
 {
@@ -189,12 +194,13 @@ function onItemMouseDown(event: egret.TouchEvent): void
 	mouseDownPosY = windowEventProxy.clientY;
 
 	if (dragitem)
-		return;
+	{ return; }
 	dragitem = getitem(event.currentTarget);
 
 	if (!dragitem.setdargSource)
 	{
 		dragitem = null;
+
 		return;
 	}
 
@@ -208,7 +214,7 @@ function onItemMouseDown(event: egret.TouchEvent): void
 	}
 }
 
-function onMouseUp(event: egret.MouseEvent)
+function onMouseUp(_event: egret.MouseEvent)
 {
 	stage.removeEventListener(egret.MouseEvent.MOUSE_MOVE, onMouseMove, null);
 	stage.removeEventListener(egret.MouseEvent.MOUSE_UP, onMouseUp, null);
@@ -217,8 +223,8 @@ function onMouseUp(event: egret.MouseEvent)
 
 	if (accepter)
 	{
-		var accepteritem = getitem(accepter);
-		if (accepter != dragitem.displayObject)
+		const accepteritem = getitem(accepter);
+		if (accepter !== dragitem.displayObject)
 		{
 			accepter.alpha = accepterAlpha;
 			accepteritem.onDragDrop && accepteritem.onDragDrop(dragSource);
@@ -237,39 +243,42 @@ function onMouseMove(event: egret.MouseEvent)
 
 	if (!draging)
 	{
-		if (Math.abs(mouseDownPosX - windowEventProxy.clientX) +
-			Math.abs(mouseDownPosY - windowEventProxy.clientY) > 5)
+		if (Math.abs(mouseDownPosX - windowEventProxy.clientX)
+			+ Math.abs(mouseDownPosY - windowEventProxy.clientY) > 5)
 		{
 			draging = true;
 		}
+
 		return;
 	}
 	if (!acceptableitems)
 	{
-		//获取拖拽数据
+		// 获取拖拽数据
 		dragSource = new DragData();
 		dragitem.setdargSource(dragSource);
 
-		//获取可接受数据的对象列表
+		// 获取可接受数据的对象列表
 		acceptableitems = registers.reduce((value: DragItem[], item) =>
 		{
 			if (acceptData(item, dragSource) && item.displayObject.stage)
 			{
-				item["hierarchyValue"] = getHierarchyValue(item.displayObject);
+				item['hierarchyValue'] = getHierarchyValue(item.displayObject);
 				value.push(item);
 			}
+
 			return value;
 		}, []);
 
 		// 根据层级排序
 		acceptableitems.sort((a, b) =>
 		{
-			var ah: number[] = a["hierarchyValue"];
-			var bh: number[] = b["hierarchyValue"];
+			const ah: number[] = a['hierarchyValue'];
+			const bh: number[] = b['hierarchyValue'];
 			for (let i = 0, num = Math.min(ah.length, bh.length); i < num; i++)
 			{
-				if (ah[i] != bh[i]) return ah[i] - bh[i];
+				if (ah[i] !== bh[i]) return ah[i] - bh[i];
 			}
+
 			return ah.length - bh.length;
 		});
 		acceptableitems.reverse();
@@ -277,7 +286,7 @@ function onMouseMove(event: egret.MouseEvent)
 
 	if (accepter)
 	{
-		if (dragitem.displayObject != accepter)
+		if (dragitem.displayObject !== accepter)
 		{
 			accepter.alpha = accepterAlpha;
 		}
@@ -289,11 +298,11 @@ function onMouseMove(event: egret.MouseEvent)
 	for (let i = 0; i < acceptableitems.length; i++)
 	{
 		const element = acceptableitems[i];
-		var rect = element.displayObject.getGlobalBounds();
+		const rect = element.displayObject.getGlobalBounds();
 		if (rect.contains(event.stageX, event.stageY))
 		{
 			accepter = element.displayObject;
-			if (dragitem.displayObject != accepter)
+			if (dragitem.displayObject !== accepter)
 			{
 				accepterAlpha = element.displayObject.alpha;
 				element.displayObject.alpha = 0.5;
@@ -305,16 +314,17 @@ function onMouseMove(event: egret.MouseEvent)
 
 /**
  * 获取显示对象的层级
- * 
- * @param displayObject 
+ *
+ * @param displayObject
  */
 function getHierarchyValue(displayObject: egret.DisplayObject)
 {
-	var hierarchys = [];
+	const hierarchys = [];
 	if (displayObject.parent)
 	{
 		hierarchys.unshift(displayObject.parent.getChildIndex(displayObject));
 		displayObject = displayObject.parent;
 	}
+
 	return hierarchy;
 }

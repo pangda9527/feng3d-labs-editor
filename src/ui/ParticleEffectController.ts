@@ -16,11 +16,10 @@ export class ParticleEffectController extends eui.Component
     private saveParent: egret.DisplayObjectContainer;
     private particleSystems: ParticleSystem[] = [];
 
-
     constructor()
     {
         super();
-        this.skinName = "ParticleEffectController";
+        this.skinName = 'ParticleEffectController';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -46,13 +45,13 @@ export class ParticleEffectController extends eui.Component
         switch (e.currentTarget)
         {
             case this.stopBtn:
-                this.particleSystems.forEach(v => v.stop());
+                this.particleSystems.forEach((v) => v.stop());
                 break;
             case this.pauseBtn:
                 if (this.isParticlePlaying)
-                    this.particleSystems.forEach(v => v.pause());
+                    { this.particleSystems.forEach((v) => v.pause()); }
                 else
-                    this.particleSystems.forEach(v => v.continue());
+                    { this.particleSystems.forEach((v) => v.continue()); }
                 break;
         }
         this.updateView();
@@ -60,12 +59,17 @@ export class ParticleEffectController extends eui.Component
 
     private onEnterFrame()
     {
-        var v = this.particleSystems;
+        const v = this.particleSystems;
         if (v)
         {
-            var playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
-            var playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
-            var particles = this.particleSystems.reduce((pv, cv) => { pv += cv.particleCount; return pv; }, 0);
+            const playbackSpeed = (this.particleSystems[0] && this.particleSystems[0].main.simulationSpeed) || 1;
+            const playbackTime = (this.particleSystems[0] && this.particleSystems[0].time) || 0;
+            const particles = this.particleSystems.reduce((pv, cv) =>
+{
+ pv += cv.particleCount;
+
+return pv;
+}, 0);
 
             //
             this.speedInput.text = playbackSpeed.toString();
@@ -78,41 +82,46 @@ export class ParticleEffectController extends eui.Component
     {
         if (this.saveParent) return;
         this.saveParent = this.parent;
-        globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.onDataChange, this);
         this.onDataChange();
     }
 
     private updateView()
     {
         if (!this.particleSystems) return;
-        this.pauseBtn.label = this.isParticlePlaying ? "Pause" : "Continue";
+        this.pauseBtn.label = this.isParticlePlaying ? 'Pause' : 'Continue';
     }
 
     private get isParticlePlaying()
     {
-        return this.particleSystems.reduce((pv, cv) => { return pv || cv.isPlaying; }, false)
+        return this.particleSystems.reduce((pv, cv) => pv || cv.isPlaying, false);
     }
 
     private onDataChange()
     {
-        var particleSystems = EditorData.editorData.selectedGameObjects.reduce((pv: ParticleSystem[], cv) => { var ps = cv.getComponent(ParticleSystem); ps && (pv.push(ps)); return pv; }, []);
-        this.particleSystems.forEach(v =>
+        const particleSystems = EditorData.editorData.selectedGameObjects.reduce((pv: ParticleSystem[], cv) =>
+{
+ const ps = cv.getComponent(ParticleSystem); ps && (pv.push(ps));
+
+return pv;
+}, []);
+        this.particleSystems.forEach((v) =>
         {
-            v.pause()
-            v.off("particleCompleted", this.updateView, this);
+            v.pause();
+            v.off('particleCompleted', this.updateView, this);
         });
         this.particleSystems = particleSystems;
-        this.particleSystems.forEach(v =>
+        this.particleSystems.forEach((v) =>
         {
-            v.continue()
-            v.on("particleCompleted", this.updateView, this);
+            v.continue();
+            v.on('particleCompleted', this.updateView, this);
         });
         if (this.particleSystems.length > 0) this.saveParent.addChild(this);
         else this.parent && this.parent.removeChild(this);
     }
 }
 
-globalEmitter.once("editor.selectedObjectsChanged", () =>
+globalEmitter.once('editor.selectedObjectsChanged', () =>
 {
-    globalEmitter.emit("editor.addSceneToolView", new ParticleEffectController());
+    globalEmitter.emit('editor.addSceneToolView', new ParticleEffectController());
 });

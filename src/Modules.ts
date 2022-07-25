@@ -2,11 +2,9 @@ import { Constructor } from 'feng3d';
 import { Message } from './ui/components/Message';
 import { ModuleView } from './ui/components/TabView';
 
-export var modules: Modules;
-
 /**
  * 模块
- * 
+ *
  * 用于管理功能模块
  */
 export class Modules
@@ -16,23 +14,25 @@ export class Modules
     getModuleView(moduleName: string)
     {
         this.moduleViewMap[moduleName] = this.moduleViewMap[moduleName] || [];
-        var moduleview = this.moduleViewMap[moduleName].pop();
+        let moduleview = this.moduleViewMap[moduleName].pop();
         if (!moduleview)
         {
-            var cls = Modules.moduleViewCls[moduleName];
-            if (!cls)
+            const Cls = Modules.moduleViewCls[moduleName];
+            if (!Cls)
             {
                 console.error(`无法获取模块 ${moduleName} 界面类定义`);
+
                 return;
             }
-            moduleview = new cls();
+            moduleview = new Cls();
         }
+
         return moduleview;
     }
 
     /**
      * 回收模块界面
-     * 
+     *
      * @param moduleView 模块界面
      */
     recycleModuleView(moduleView: ModuleView)
@@ -49,4 +49,4 @@ export class Modules
     static moduleViewCls: { [name: string]: Constructor<ModuleView> } = {};
 }
 
-modules = new Modules();
+export const modules = new Modules();

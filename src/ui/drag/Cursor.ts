@@ -2,9 +2,9 @@ import { MapUtils } from 'feng3d';
 
 class Cursor
 {
-    private o = new Map<any, "e-resize" | "n-resize">();
+    private o = new Map<any, 'e-resize' | 'n-resize'>();
 
-    add(id: any, value: "e-resize" | "n-resize")
+    add(id: any, value: 'e-resize' | 'n-resize')
     {
         this.o.set(id, value);
         this.update();
@@ -18,11 +18,11 @@ class Cursor
 
     private update()
     {
-        var v = MapUtils.getValues(this.o).reverse()[0];
-        document.body.style.cursor = v || "auto";
+        const v = MapUtils.getValues(this.o).reverse()[0];
+        document.body.style.cursor = v || 'auto';
     }
 }
 /**
  * 鼠标光标管理
  */
-export var cursor = new Cursor();
+export const cursor = new Cursor();

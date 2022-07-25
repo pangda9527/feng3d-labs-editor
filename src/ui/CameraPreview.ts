@@ -22,7 +22,7 @@ export class CameraPreview extends eui.Component
         this._camera = value;
         this.previewView.camera = this._camera;
         this.visible = !!this._camera;
-        this.canvas.style.display = this._camera ? "inline" : "none";
+        this.canvas.style.display = this._camera ? 'inline' : 'none';
         if (this._camera)
         {
             ticker.onframe(this.onframe, this);
@@ -34,7 +34,7 @@ export class CameraPreview extends eui.Component
     constructor()
     {
         super();
-        this.skinName = "CameraPreview";
+        this.skinName = 'CameraPreview';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -48,8 +48,8 @@ export class CameraPreview extends eui.Component
         if (this.saveParent) return;
 
         //
-        var canvas = this.canvas = document.createElement("canvas");
-        (document.getElementById("CameraPreviewLayer")).appendChild(canvas);
+        const canvas = this.canvas = document.createElement('canvas');
+        (document.getElementById('CameraPreviewLayer')).appendChild(canvas);
         this.previewView = new View(canvas);
         this.previewView.mouse3DManager.mouseInput.enable = false;
         this.previewView.stop();
@@ -59,7 +59,7 @@ export class CameraPreview extends eui.Component
         {
             this.parent.removeChild(this);
         });
-        globalEmitter.on("editor.selectedObjectsChanged", this.onDataChange, this);
+        globalEmitter.on('editor.selectedObjectsChanged', this.onDataChange, this);
 
         this.addEventListener(egret.Event.RESIZE, this.onResize, this);
         this.addEventListener(egret.Event.ENTER_FRAME, this.onResize, this);
@@ -70,33 +70,34 @@ export class CameraPreview extends eui.Component
     private onResize()
     {
         if (!this.stage)
-            return;
+        { return; }
 
         this.height = this.width * 3 / 5;
 
-        var bound = this.group.getGlobalBounds();
+        const bound = this.group.getGlobalBounds();
 
-        var style = this.canvas.style;
-        style.position = "absolute";
-        style.left = bound.x + "px";
-        style.top = bound.y + "px";
-        style.width = bound.width + "px";
-        style.height = bound.height + "px";
-        style.cursor = "hand";
+        const style = this.canvas.style;
+        style.position = 'absolute';
+        style.left = `${bound.x}px`;
+        style.top = `${bound.y}px`;
+        style.width = `${bound.width}px`;
+        style.height = `${bound.height}px`;
+        style.cursor = 'hand';
     }
 
     private onDataChange()
     {
-        var selectedGameObjects = EditorData.editorData.selectedGameObjects;
+        const selectedGameObjects = EditorData.editorData.selectedGameObjects;
         if (selectedGameObjects.length > 0)
         {
             for (let i = 0; i < selectedGameObjects.length; i++)
             {
-                var camera = selectedGameObjects[i].getComponent(Camera);
+                const camera = selectedGameObjects[i].getComponent(Camera);
                 if (camera)
                 {
                     this.camera = camera;
                     this.saveParent.addChild(this);
+
                     return;
                 }
             }
@@ -107,7 +108,7 @@ export class CameraPreview extends eui.Component
 
     private onframe()
     {
-        if (this.previewView.scene != EditorData.editorData.gameScene)
+        if (this.previewView.scene !== EditorData.editorData.gameScene)
         {
             this.previewView.scene = EditorData.editorData.gameScene;
         }

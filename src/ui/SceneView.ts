@@ -37,7 +37,7 @@ export class SceneView extends eui.Component implements ModuleView
 	 * 模块名称
 	 */
 	moduleName: string;
-	static moduleName = "Scene";
+	static moduleName = 'Scene';
 
 	/**
 	 * 鼠标是否在界面中
@@ -45,15 +45,16 @@ export class SceneView extends eui.Component implements ModuleView
 	private get mouseInView()
 	{
 		if (!this.stage) return false;
+
 		return this.getGlobalBounds().contains(this.stage.stageX, this.stage.stageY);
 	}
 
 	constructor()
 	{
 		super();
-		this.skinName = "SceneView";
+		this.skinName = 'SceneView';
 		//
-		Stats.init(document.getElementById("stats"));
+		Stats.init(document.getElementById('stats'));
 		//
 		this.moduleName = SceneView.moduleName;
 		//
@@ -69,11 +70,11 @@ export class SceneView extends eui.Component implements ModuleView
 		if (!this._canvas)
 		{
 			//
-			this._canvas = document.createElement("canvas");
-			document.getElementById("app").appendChild(this._canvas);
+			this._canvas = document.createElement('canvas');
+			document.getElementById('app').appendChild(this._canvas);
 			this.view = new EditorView(this._canvas);
 			//
-			var editorCamera = this.editorCamera = serialization.setValue(new GameObject(), { name: "editorCamera" }).addComponent(Camera);
+			const editorCamera = this.editorCamera = serialization.setValue(new GameObject(), { name: 'editorCamera' }).addComponent(Camera);
 			editorCamera.lens.far = 5000;
 			editorCamera.transform.x = 5;
 			editorCamera.transform.y = 3;
@@ -82,23 +83,23 @@ export class SceneView extends eui.Component implements ModuleView
 			editorCamera.gameObject.addComponent(FPSController).auto = false;
 			this.view.camera = editorCamera;
 			//
-			var editorScene = serialization.setValue(new GameObject(), { name: "editorScene" }).addComponent(Scene);
+			const editorScene = serialization.setValue(new GameObject(), { name: 'editorScene' }).addComponent(Scene);
 			editorScene.runEnvironment = RunEnvironment.all;
 			this.view.editorScene = editorScene;
 			//
-			var sceneRotateTool = editorScene.gameObject.addComponent(SceneRotateTool);
+			const sceneRotateTool = editorScene.gameObject.addComponent(SceneRotateTool);
 			sceneRotateTool.view = this.view;
 			//
-			//初始化模块
-			var groundGrid = editorScene.gameObject.addComponent(GroundGrid);
+			// 初始化模块
+			const groundGrid = editorScene.gameObject.addComponent(GroundGrid);
 			groundGrid.editorCamera = editorCamera;
-			var mrsTool = editorScene.gameObject.addComponent(MRSTool);
+			const mrsTool = editorScene.gameObject.addComponent(MRSTool);
 			mrsTool.editorCamera = editorCamera;
 			this.view.editorComponent = editorScene.gameObject.addComponent(EditorComponent);
 			//
-			loader.loadText(EditorData.editorData.getEditorAssetPath("gameobjects/Trident.gameobject.json"), (content) =>
+			loader.loadText(EditorData.editorData.getEditorAssetPath('gameobjects/Trident.gameobject.json'), (content) =>
 			{
-				var trident: GameObject = serialization.deserialize(JSON.parse(content));
+				const trident: GameObject = serialization.deserialize(JSON.parse(content));
 				editorScene.gameObject.addChild(trident);
 			});
 		}
@@ -108,43 +109,43 @@ export class SceneView extends eui.Component implements ModuleView
 		this.backRect.addEventListener(egret.MouseEvent.MOUSE_OVER, this.onMouseOver, this);
 		this.backRect.addEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
-		shortcut.on("selectGameObject", this.onSelectGameObject, this);
+		shortcut.on('selectGameObject', this.onSelectGameObject, this);
 		//
-		shortcut.on("areaSelectStart", this._onAreaSelectStart, this);
-		shortcut.on("areaSelect", this._onAreaSelect, this);
-		shortcut.on("areaSelectEnd", this._onAreaSelectEnd, this);
+		shortcut.on('areaSelectStart', this._onAreaSelectStart, this);
+		shortcut.on('areaSelect', this._onAreaSelect, this);
+		shortcut.on('areaSelectEnd', this._onAreaSelectEnd, this);
 		//
-		shortcut.on("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-		shortcut.on("mouseRotateScene", this.onMouseRotateScene, this);
-		shortcut.on("mouseRotateSceneEnd", this.onMouseRotateSceneEnd, this);
+		shortcut.on('mouseRotateSceneStart', this.onMouseRotateSceneStart, this);
+		shortcut.on('mouseRotateScene', this.onMouseRotateScene, this);
+		shortcut.on('mouseRotateSceneEnd', this.onMouseRotateSceneEnd, this);
 		//
-		shortcut.on("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
-		shortcut.on("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
-		shortcut.on("sceneCameraForwardBackMouseMoveEnd", this.onSceneCameraForwardBackMouseMoveEnd, this);
+		shortcut.on('sceneCameraForwardBackMouseMoveStart', this.onSceneCameraForwardBackMouseMoveStart, this);
+		shortcut.on('sceneCameraForwardBackMouseMove', this.onSceneCameraForwardBackMouseMove, this);
+		shortcut.on('sceneCameraForwardBackMouseMoveEnd', this.onSceneCameraForwardBackMouseMoveEnd, this);
 		//
-		shortcut.on("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
+		shortcut.on('lookToSelectedGameObject', this.onLookToSelectedGameObject, this);
 		//
-		shortcut.on("dragSceneStart", this.onDragSceneStart, this);
-		shortcut.on("dragScene", this.onDragScene, this);
-		shortcut.on("dragSceneEnd", this.onDragSceneEnd, this);
+		shortcut.on('dragSceneStart', this.onDragSceneStart, this);
+		shortcut.on('dragScene', this.onDragScene, this);
+		shortcut.on('dragSceneEnd', this.onDragSceneEnd, this);
 		//
-		shortcut.on("fpsViewStart", this.onFpsViewStart, this);
-		shortcut.on("fpsViewStop", this.onFpsViewStop, this);
-		shortcut.on("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+		shortcut.on('fpsViewStart', this.onFpsViewStart, this);
+		shortcut.on('fpsViewStop', this.onFpsViewStop, this);
+		shortcut.on('mouseWheelMoveSceneCamera', this.onMouseWheelMoveSceneCamera, this);
 
-		globalEmitter.on("editor.addSceneToolView", this._onAddSceneToolView, this);
+		globalEmitter.on('editor.addSceneToolView', this._onAddSceneToolView, this);
 
-		drag.register(this, null, ["file_gameobject", "file_script"], (dragdata) =>
+		drag.register(this, null, ['file_gameobject', 'file_script'], (dragdata) =>
 		{
-			dragdata.getDragData("file_gameobject").forEach(v =>
+			dragdata.getDragData('file_gameobject').forEach((v) =>
 			{
 				hierarchy.addGameoObjectFromAsset(v, hierarchy.rootnode.gameobject);
 			});
-			dragdata.getDragData("file_script").forEach(v =>
+			dragdata.getDragData('file_script').forEach((v) =>
 			{
-				var gameobject = this.view.mouse3DManager.selectedGameObject;
+				let gameobject = this.view.mouse3DManager.selectedGameObject;
 				if (!gameobject || !gameobject.scene)
-					gameobject = hierarchy.rootnode.gameobject;
+				{ gameobject = hierarchy.rootnode.gameobject; }
 				gameobject.addScript(v.scriptName);
 			});
 		});
@@ -160,34 +161,34 @@ export class SceneView extends eui.Component implements ModuleView
 		this.backRect.removeEventListener(egret.MouseEvent.MOUSE_OUT, this.onMouseOut, this);
 
 		//
-		shortcut.off("selectGameObject", this.onSelectGameObject, this);
+		shortcut.off('selectGameObject', this.onSelectGameObject, this);
 		//
-		shortcut.off("areaSelectStart", this._onAreaSelectStart, this);
-		shortcut.off("areaSelect", this._onAreaSelect, this);
-		shortcut.off("areaSelectEnd", this._onAreaSelectEnd, this);
+		shortcut.off('areaSelectStart', this._onAreaSelectStart, this);
+		shortcut.off('areaSelect', this._onAreaSelect, this);
+		shortcut.off('areaSelectEnd', this._onAreaSelectEnd, this);
 		//
-		shortcut.off("mouseRotateSceneStart", this.onMouseRotateSceneStart, this);
-		shortcut.off("mouseRotateScene", this.onMouseRotateScene, this);
-		shortcut.off("mouseRotateSceneEnd", this.onMouseRotateSceneEnd, this);
+		shortcut.off('mouseRotateSceneStart', this.onMouseRotateSceneStart, this);
+		shortcut.off('mouseRotateScene', this.onMouseRotateScene, this);
+		shortcut.off('mouseRotateSceneEnd', this.onMouseRotateSceneEnd, this);
 		//
-		shortcut.off("sceneCameraForwardBackMouseMoveStart", this.onSceneCameraForwardBackMouseMoveStart, this);
-		shortcut.off("sceneCameraForwardBackMouseMove", this.onSceneCameraForwardBackMouseMove, this);
-		shortcut.off("sceneCameraForwardBackMouseMoveEnd", this.onSceneCameraForwardBackMouseMoveEnd, this);
+		shortcut.off('sceneCameraForwardBackMouseMoveStart', this.onSceneCameraForwardBackMouseMoveStart, this);
+		shortcut.off('sceneCameraForwardBackMouseMove', this.onSceneCameraForwardBackMouseMove, this);
+		shortcut.off('sceneCameraForwardBackMouseMoveEnd', this.onSceneCameraForwardBackMouseMoveEnd, this);
 		//
-		shortcut.off("lookToSelectedGameObject", this.onLookToSelectedGameObject, this);
-		shortcut.off("dragSceneStart", this.onDragSceneStart, this);
-		shortcut.off("dragScene", this.onDragScene, this);
-		shortcut.off("fpsViewStart", this.onFpsViewStart, this);
-		shortcut.off("fpsViewStop", this.onFpsViewStop, this);
-		shortcut.off("mouseWheelMoveSceneCamera", this.onMouseWheelMoveSceneCamera, this);
+		shortcut.off('lookToSelectedGameObject', this.onLookToSelectedGameObject, this);
+		shortcut.off('dragSceneStart', this.onDragSceneStart, this);
+		shortcut.off('dragScene', this.onDragScene, this);
+		shortcut.off('fpsViewStart', this.onFpsViewStart, this);
+		shortcut.off('fpsViewStop', this.onFpsViewStop, this);
+		shortcut.off('mouseWheelMoveSceneCamera', this.onMouseWheelMoveSceneCamera, this);
 
-		globalEmitter.off("editor.addSceneToolView", this._onAddSceneToolView, this);
+		globalEmitter.off('editor.addSceneToolView', this._onAddSceneToolView, this);
 
 		drag.unregister(this);
 
 		if (this._canvas)
 		{
-			this._canvas.style.display = "none";
+			this._canvas.style.display = 'none';
 			this._canvas = null;
 		}
 	}
@@ -202,19 +203,17 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this._areaSelectStartPosition) return;
 
-		var areaSelectEndPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+		let areaSelectEndPosition = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 
-		var rectangle = this.getGlobalBounds();
+		const rectangle = this.getGlobalBounds();
 		//
 		areaSelectEndPosition = rectangle.clampPoint(areaSelectEndPosition);
 		//
 		this._areaSelectRect.show(this._areaSelectStartPosition, areaSelectEndPosition);
 		//
-		var gs = this.view.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
-		var gs0 = gs.filter(g =>
-		{
-			return !!hierarchy.getNode(g);
-		});
+		const gs = this.view.getObjectsInGlobalArea(this._areaSelectStartPosition, areaSelectEndPosition);
+		const gs0 = gs.filter((g) =>
+			!!hierarchy.getNode(g));
 		EditorData.editorData.selectMultiObject(gs0);
 	}
 
@@ -226,71 +225,74 @@ export class SceneView extends eui.Component implements ModuleView
 
 	private onMouseOver()
 	{
-		shortcut.activityState("mouseInView3D");
+		shortcut.activityState('mouseInView3D');
 	}
 
 	private onMouseOut()
 	{
-		shortcut.deactivityState("mouseInView3D");
+		shortcut.deactivityState('mouseInView3D');
 	}
 
 	private onResize()
 	{
 		if (!this._canvas) return;
 
-		this._canvas.style.display = "";
+		this._canvas.style.display = '';
 
-		var bound = this.getGlobalBounds();
+		const bound = this.getGlobalBounds();
 
-		var style = this._canvas.style;
-		style.position = "absolute";
-		style.left = bound.x + "px";
-		style.top = bound.y + "px";
-		style.width = bound.width + "px";
-		style.height = bound.height + "px";
-		style.cursor = "hand";
+		const style = this._canvas.style;
+		style.position = 'absolute';
+		style.left = `${bound.x}px`;
+		style.top = `${bound.y}px`;
+		style.width = `${bound.width}px`;
+		style.height = `${bound.height}px`;
+		style.cursor = 'hand';
 
-		Stats.instance.dom.style.left = bound.x + "px";
-		Stats.instance.dom.style.top = bound.y + "px";
+		Stats.instance.dom.style.left = `${bound.x}px`;
+		Stats.instance.dom.style.top = `${bound.y}px`;
 	}
 
 	private onSelectGameObject()
 	{
 		if (!this.mouseInView) return;
 
-		var gameObjects = raycaster.pickAll(this.view.mouseRay3D, this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
+		let gameObjects = raycaster.pickAll(this.view.mouseRay3D, this.view.editorScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map((v) => v.gameObject);
 		if (gameObjects.length > 0)
-			return;
+		{ return; }
 		//
-		gameObjects = raycaster.pickAll(this.view.mouseRay3D, EditorData.editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map(v => v.gameObject);
-		if (gameObjects.length == 0)
+		gameObjects = raycaster.pickAll(this.view.mouseRay3D, EditorData.editorData.gameScene.mouseCheckObjects).sort((a, b) => a.rayEntryDistance - b.rayEntryDistance).map((v) => v.gameObject);
+		if (gameObjects.length === 0)
 		{
 			EditorData.editorData.clearSelectedObjects();
+
 			return;
 		}
 		//
 		gameObjects = gameObjects.reduce((pv: GameObject[], gameObject) =>
 		{
-			var node = hierarchy.getNode(gameObject);
+			let node = hierarchy.getNode(gameObject);
 			while (!node && gameObject.parent)
 			{
 				gameObject = gameObject.parent;
 				node = hierarchy.getNode(gameObject);
 			}
-			if (gameObject != gameObject.scene.gameObject)
+			if (gameObject !== gameObject.scene.gameObject)
 			{
 				pv.push(gameObject);
 			}
+
 			return pv;
 		}, []);
 		//
 		if (gameObjects.length > 0)
 		{
-			var selectedObjectsHistory = this.selectedObjectsHistory;
-			var gameObject = gameObjects.reduce((pv, cv) =>
+			const selectedObjectsHistory = this.selectedObjectsHistory;
+			let gameObject = gameObjects.reduce((pv, cv) =>
 			{
 				if (pv) return pv;
-				if (selectedObjectsHistory.indexOf(cv) == -1) pv = cv;
+				if (selectedObjectsHistory.indexOf(cv) === -1) pv = cv;
+
 				return pv;
 			}, null);
 			if (!gameObject)
@@ -314,12 +316,13 @@ export class SceneView extends eui.Component implements ModuleView
 		this.rotateSceneMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
 		this.rotateSceneCameraGlobalMatrix = this.editorCamera.transform.localToWorldMatrix.clone();
 		this.rotateSceneCenter = null;
-		//获取第一个 游戏对象
-		var transformBox = EditorData.editorData.transformBox;
+		// 获取第一个 游戏对象
+		const transformBox = EditorData.editorData.transformBox;
 		if (transformBox)
 		{
 			this.rotateSceneCenter = transformBox.getCenter();
-		} else
+		}
+		else
 		{
 			this.rotateSceneCenter = this.rotateSceneCameraGlobalMatrix.getAxisZ();
 			this.rotateSceneCenter.scaleNumber(sceneControlConfig.lookDistance);
@@ -331,13 +334,13 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.rotateSceneMousePoint) return;
 
-		var globalMatrix = this.rotateSceneCameraGlobalMatrix.clone();
-		var mousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-		var view3DRect = this.view.viewRect;
-		var rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
-		var rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
+		const globalMatrix = this.rotateSceneCameraGlobalMatrix.clone();
+		const mousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+		const view3DRect = this.view.viewRect;
+		const rotateX = (mousePoint.y - this.rotateSceneMousePoint.y) / view3DRect.height * 180;
+		const rotateY = (mousePoint.x - this.rotateSceneMousePoint.x) / view3DRect.width * 180;
 		globalMatrix.appendRotation(Vector3.Y_AXIS, rotateY, this.rotateSceneCenter);
-		var rotateAxisX = globalMatrix.getAxisX();
+		const rotateAxisX = globalMatrix.getAxisX();
 		globalMatrix.appendRotation(rotateAxisX, rotateX, this.rotateSceneCenter);
 		this.editorCamera.transform.localToWorldMatrix = globalMatrix;
 	}
@@ -358,17 +361,17 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.preMousePoint) return;
 
-		var currentMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-		var moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
+		const currentMousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+		const moveDistance = (currentMousePoint.x + currentMousePoint.y - this.preMousePoint.x - this.preMousePoint.y) * sceneControlConfig.sceneCameraForwardBackwardStep;
 		sceneControlConfig.lookDistance -= moveDistance;
 
-		var forward = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
-		var camerascenePosition = this.editorCamera.transform.worldPosition;
-		var newCamerascenePosition = new Vector3(
+		const forward = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
+		const camerascenePosition = this.editorCamera.transform.worldPosition;
+		const newCamerascenePosition = new Vector3(
 			forward.x * moveDistance + camerascenePosition.x,
 			forward.y * moveDistance + camerascenePosition.y,
 			forward.z * moveDistance + camerascenePosition.z);
-		var newCameraPosition = this.editorCamera.transform.worldToLocalPoint(newCamerascenePosition);
+		const newCameraPosition = this.editorCamera.transform.worldToLocalPoint(newCamerascenePosition);
 		this.editorCamera.transform.position = newCameraPosition;
 
 		this.preMousePoint = currentMousePoint;
@@ -391,14 +394,14 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.dragSceneMousePoint) return;
 
-		var mousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
-		var addPoint = mousePoint.subTo(this.dragSceneMousePoint);
-		var scale = this.view.getScaleByDepth(sceneControlConfig.lookDistance);
-		var up = this.dragSceneCameraGlobalMatrix.getAxisY();
-		var right = this.dragSceneCameraGlobalMatrix.getAxisX();
+		const mousePoint = new Vector2(windowEventProxy.clientX, windowEventProxy.clientY);
+		const addPoint = mousePoint.subTo(this.dragSceneMousePoint);
+		const scale = this.view.getScaleByDepth(sceneControlConfig.lookDistance);
+		const up = this.dragSceneCameraGlobalMatrix.getAxisY();
+		const right = this.dragSceneCameraGlobalMatrix.getAxisX();
 		up.normalize(addPoint.y * scale);
 		right.normalize(-addPoint.x * scale);
-		var globalMatrix = this.dragSceneCameraGlobalMatrix.clone();
+		const globalMatrix = this.dragSceneCameraGlobalMatrix.clone();
 		globalMatrix.appendTranslation(up.x + right.x, up.y + right.y, up.z + right.z);
 		this.editorCamera.transform.localToWorldMatrix = globalMatrix;
 	}
@@ -413,21 +416,21 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.mouseInView) return;
 
-		var fpsController: FPSController = this.editorCamera.getComponent(FPSController)
+		const fpsController: FPSController = this.editorCamera.getComponent(FPSController);
 		fpsController.onMousedown();
 		ticker.onframe(this.updateFpsView, this);
 	}
 
 	private onFpsViewStop()
 	{
-		var fpsController = this.editorCamera.getComponent(FPSController)
+		const fpsController = this.editorCamera.getComponent(FPSController);
 		fpsController.onMouseup();
 		ticker.offframe(this.updateFpsView, this);
 	}
 
 	private updateFpsView()
 	{
-		var fpsController = this.editorCamera.getComponent(FPSController)
+		const fpsController = this.editorCamera.getComponent(FPSController);
 		fpsController.update();
 	}
 
@@ -435,24 +438,24 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.mouseInView) return;
 
-		var transformBox = EditorData.editorData.transformBox;
+		const transformBox = EditorData.editorData.transformBox;
 		if (transformBox)
 		{
-			var scenePosition = transformBox.getCenter();
-			var size = transformBox.getSize().length;
+			const scenePosition = transformBox.getCenter();
+			let size = transformBox.getSize().length;
 			size = Math.max(size, 1);
-			var lookDistance = size;
-			var lens = this.editorCamera.lens;
+			let lookDistance = size;
+			const lens = this.editorCamera.lens;
 			if (lens instanceof PerspectiveLens)
 			{
 				lookDistance = 0.6 * size / Math.tan(lens.fov * Math.PI / 360);
 			}
 			//
 			sceneControlConfig.lookDistance = lookDistance;
-			var lookPos = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
+			const lookPos = this.editorCamera.transform.localToWorldMatrix.getAxisZ();
 			lookPos.scaleNumber(-lookDistance);
 			lookPos.add(scenePosition);
-			var localLookPos = lookPos.clone();
+			let localLookPos = lookPos.clone();
 			if (this.editorCamera.transform.parent)
 			{
 				localLookPos = this.editorCamera.transform.parent.worldToLocalMatrix.transformPoint3(lookPos);
@@ -465,7 +468,7 @@ export class SceneView extends eui.Component implements ModuleView
 	{
 		if (!this.mouseInView) return;
 
-		var distance = -windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
+		const distance = -windowEventProxy.deltaY * sceneControlConfig.mouseWheelMoveStep * sceneControlConfig.lookDistance / 10;
 		this.editorCamera.transform.localToWorldMatrix = this.editorCamera.transform.localToWorldMatrix.moveForward(distance);
 		sceneControlConfig.lookDistance -= distance;
 	}

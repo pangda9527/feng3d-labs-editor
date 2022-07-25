@@ -13,7 +13,7 @@ import { inspectorMultiObject } from './InspectorMultiObject';
  */
 export class InspectorView extends eui.Component implements ModuleView
 {
-	static moduleName = "Inspector";
+	static moduleName = 'Inspector';
 
 	public typeLab: eui.Label;
 	public backButton: eui.Button;
@@ -26,7 +26,7 @@ export class InspectorView extends eui.Component implements ModuleView
 	{
 		super();
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "InspectorViewSkin";
+		this.skinName = 'InspectorViewSkin';
 		this.moduleName = InspectorView.moduleName;
 	}
 
@@ -46,18 +46,18 @@ export class InspectorView extends eui.Component implements ModuleView
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	preSelectedObjects()
 	{
 		this._historySelectedObject.pop();
-		var v = this._historySelectedObject.pop();
+		const v = this._historySelectedObject.pop();
 		EditorData.editorData.selectedObjects = v;
 	}
 
 	private showData(data: any)
 	{
-		if (this._viewData == data) return;
+		if (this._viewData === data) return;
 		if (this._viewData)
 		{
 			this.saveShowData();
@@ -82,7 +82,7 @@ export class InspectorView extends eui.Component implements ModuleView
 			this._view.parent.removeChild(this._view);
 		}
 		if (this.emptyLabel.parent)
-			this.emptyLabel.parent.removeChild(this.emptyLabel);
+		{ this.emptyLabel.parent.removeChild(this.emptyLabel); }
 		if (this._viewData)
 		{
 			if (this._viewData instanceof AssetNode)
@@ -91,24 +91,25 @@ export class InspectorView extends eui.Component implements ModuleView
 				if (this._viewData.asset)
 				{
 					this.updateShowData(this._viewData.asset);
-				} else
-				{
+				}
+				else
 					if (!this._viewData.isLoaded)
 					{
-						var viewData = this._viewData;
+						const viewData = this._viewData;
 						viewData.load(() =>
 						{
 							console.assert(!!viewData.asset);
-							if (viewData == this._viewData)
-								this.updateShowData(viewData.asset);
+							if (viewData === this._viewData)
+							{ this.updateShowData(viewData.asset); }
 						});
 					}
-				}
-			} else
+			}
+			else
 			{
 				this.updateShowData(this._viewData);
 			}
-		} else
+		}
+		else
 		{
 			this.group.addChild(this.emptyLabel);
 		}
@@ -123,7 +124,7 @@ export class InspectorView extends eui.Component implements ModuleView
 		{
 			if (this._viewData.assetId)
 			{
-				var feng3dAsset = ReadRS.rs.getAssetById(this._viewData.assetId);
+				const feng3dAsset = ReadRS.rs.getAssetById(this._viewData.assetId);
 				if (feng3dAsset)
 				{
 					editorRS.writeAsset(feng3dAsset, (err) =>
@@ -132,13 +133,15 @@ export class InspectorView extends eui.Component implements ModuleView
 						callback && callback();
 					});
 				}
-			} else if (this._viewData instanceof AssetNode)
+			}
+			else if (this._viewData instanceof AssetNode)
 			{
 				editorAsset.saveAsset(this._viewData);
 			}
 
 			this._dataChanged = false;
-		} else
+		}
+		else
 		{
 			callback && callback();
 		}
@@ -165,10 +168,10 @@ export class InspectorView extends eui.Component implements ModuleView
 		this.backButton.visible = this._historySelectedObject.length > 1;
 
 		this.backButton.addEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-		globalEmitter.on("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+		globalEmitter.on('editor.selectedObjectsChanged', this.onSelectedObjectsChanged, this);
 		//
-		globalEmitter.on("inspector.update", this.updateView, this);
-		globalEmitter.on("inspector.saveShowData", this.onSaveShowData, this);
+		globalEmitter.on('inspector.update', this.updateView, this);
+		globalEmitter.on('inspector.saveShowData', this.onSaveShowData, this);
 
 		//
 		this.updateView();
@@ -177,10 +180,10 @@ export class InspectorView extends eui.Component implements ModuleView
 	private onRemovedFromStage()
 	{
 		this.backButton.removeEventListener(egret.MouseEvent.CLICK, this.onBackButton, this);
-		globalEmitter.off("editor.selectedObjectsChanged", this.onSelectedObjectsChanged, this);
+		globalEmitter.off('editor.selectedObjectsChanged', this.onSelectedObjectsChanged, this);
 		//
-		globalEmitter.off("inspector.update", this.updateView, this);
-		globalEmitter.off("inspector.saveShowData", this.onSaveShowData, this);
+		globalEmitter.off('inspector.update', this.updateView, this);
+		globalEmitter.off('inspector.saveShowData', this.onSaveShowData, this);
 	}
 
 	private onSelectedObjectsChanged()
@@ -188,35 +191,36 @@ export class InspectorView extends eui.Component implements ModuleView
 		this._historySelectedObject.push(EditorData.editorData.selectedObjects);
 		if (this._historySelectedObject.length > this._maxHistorySelectedObject) this._historySelectedObject.shift();
 
-		var data = inspectorMultiObject.convertInspectorObject(EditorData.editorData.selectedObjects);
+		const data = inspectorMultiObject.convertInspectorObject(EditorData.editorData.selectedObjects);
 		this.showData(data);
 	}
 
 	private updateShowData(showdata: Object)
 	{
-		this.typeLab.text = `${showdata.constructor["name"]}`;
+		this.typeLab.text = `${showdata.constructor['name']}`;
 		if (this._view)
-			this._view.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
-		var editable = true;
-		if (showdata instanceof Feng3dObject) editable = !Boolean(showdata.hideFlags & HideFlags.NotEditable);
-		this._view = objectview.getObjectView(showdata, { editable: editable });
+		{ this._view.removeEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this); }
+		let editable = true;
+		if (showdata instanceof Feng3dObject) editable = !(showdata.hideFlags & HideFlags.NotEditable);
+		this._view = objectview.getObjectView(showdata, { editable });
 		// this._view.percentWidth = 100;
 		this.group.addChild(this._view);
 		this.group.scrollV = 0;
 		this._view.addEventListener(ObjectViewEvent.VALUE_CHANGE, this.onValueChanged, this);
 	}
 
-	private onValueChanged(e: ObjectViewEvent)
+	private onValueChanged(_e: ObjectViewEvent)
 	{
 		this._dataChanged = true;
 		if (this._viewData instanceof FileAsset)
 		{
 			if (this._viewData.assetId)
 			{
-				var assetNode = editorAsset.getAssetByID(this._viewData.assetId);
+				const assetNode = editorAsset.getAssetByID(this._viewData.assetId);
 				assetNode && assetNode.updateImage();
 			}
-		} else if (this._viewData instanceof AssetNode)
+		}
+		else if (this._viewData instanceof AssetNode)
 		{
 			this._viewData.updateImage();
 		}

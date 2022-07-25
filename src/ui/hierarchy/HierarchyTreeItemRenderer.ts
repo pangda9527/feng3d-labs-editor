@@ -14,7 +14,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
     constructor()
     {
         super();
-        this.skinName = "HierarchyTreeItemRenderer";
+        this.skinName = 'HierarchyTreeItemRenderer';
     }
 
     $onAddToStage(stage: egret.Stage, nestLevel: number)
@@ -23,8 +23,8 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
 
         drag.register(this, (dragSource: DragData) =>
         {
-            this.data.setdargSource(dragSource)
-        }, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+            this.data.setdargSource(dragSource);
+        }, ['gameobject', 'file_gameobject', 'file_script'], (dragdata: DragData) =>
         {
             this.data.acceptDragDrop(dragdata);
         });
@@ -53,32 +53,32 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
 
     private onDoubleClick()
     {
-        shortcut.emit("lookToSelectedGameObject");
+        shortcut.emit('lookToSelectedGameObject');
     }
 
     private onrightclick()
     {
-        var menus: MenuItem[] = [];
-        //scene无法删除
-        if (this.data.gameobject.scene.gameObject != this.data.gameobject)
+        let menus: MenuItem[] = [];
+        // scene无法删除
+        if (this.data.gameobject.scene.gameObject !== this.data.gameobject)
         {
             menus.push(
                 {
-                    label: "复制", click: () =>
+                    label: '复制', click: () =>
                     {
-                        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
+                        const objects = EditorData.editorData.selectedObjects.filter((v) => v instanceof GameObject);
                         EditorData.editorData.copyObjects = objects;
                     }
                 },
                 {
-                    label: "粘贴", click: () =>
+                    label: '粘贴', click: () =>
                     {
-                        var undoSelectedObjects = EditorData.editorData.selectedObjects;
+                        const undoSelectedObjects = EditorData.editorData.selectedObjects;
                         //
-                        var objects: GameObject[] = EditorData.editorData.copyObjects.filter(v => v instanceof GameObject);
-                        if (objects.length == 0) return;
-                        var newGameObjects = objects.map(v => serialization.clone(v));
-                        newGameObjects.forEach(v =>
+                        const objects: GameObject[] = EditorData.editorData.copyObjects.filter((v) => v instanceof GameObject);
+                        if (objects.length === 0) return;
+                        const newGameObjects = objects.map((v) => serialization.clone(v));
+                        newGameObjects.forEach((v) =>
                         {
                             this.data.gameobject.parent.addChild(v);
                         });
@@ -87,7 +87,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                         // undo
                         EditorData.editorData.undoList.push(() =>
                         {
-                            newGameObjects.forEach(v =>
+                            newGameObjects.forEach((v) =>
                             {
                                 v.remove();
                             });
@@ -97,23 +97,24 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                 },
                 { type: 'separator' },
                 {
-                    label: "副本", click: () =>
+                    label: '副本', click: () =>
                     {
-                        var undoSelectedObjects = EditorData.editorData.selectedObjects;
+                        const undoSelectedObjects = EditorData.editorData.selectedObjects;
                         //
-                        var objects = EditorData.editorData.selectedObjects.filter(v => v instanceof GameObject);
-                        var newGameObjects = objects.map(v =>
+                        const objects = EditorData.editorData.selectedObjects.filter((v) => v instanceof GameObject);
+                        const newGameObjects = objects.map((v) =>
                         {
-                            var no = serialization.clone(v);
+                            const no = serialization.clone(v);
                             v.parent.addChild(no);
-                            return no;
+
+return no;
                         });
                         EditorData.editorData.selectMultiObject(newGameObjects);
 
                         // undo
                         EditorData.editorData.undoList.push(() =>
                         {
-                            newGameObjects.forEach(v =>
+                            newGameObjects.forEach((v) =>
                             {
                                 v.remove();
                             });
@@ -122,13 +123,13 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                     }
                 },
                 {
-                    label: "删除", click: () =>
+                    label: '删除', click: () =>
                     {
                         this.data.gameobject.parent.removeChild(this.data.gameobject);
-                        var index = EditorData.editorData.selectedObjects.indexOf(this.data.gameobject);
-                        if (index != -1)
+                        const index = EditorData.editorData.selectedObjects.indexOf(this.data.gameobject);
+                        if (index !== -1)
                         {
-                            var selectedObjects = EditorData.editorData.selectedObjects.concat();
+                            const selectedObjects = EditorData.editorData.selectedObjects.concat();
                             selectedObjects.splice(index, 1);
                             EditorData.editorData.selectMultiObject(selectedObjects);
                         }
@@ -140,6 +141,6 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
         menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
 
         if (menus.length > 0)
-            menu.popup(menus);
+            { menu.popup(menus); }
     }
 }

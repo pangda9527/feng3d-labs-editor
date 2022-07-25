@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
 //  All rights reserved.
@@ -25,7 +25,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 export class AssetAdapter implements eui.IAssetAdapter
 {
     /**
@@ -43,7 +43,7 @@ export class AssetAdapter implements eui.IAssetAdapter
         }
         if (RES.hasRes(source))
         {
-            let data = RES.getRes(source);
+            const data = RES.getRes(source);
             if (data)
             {
                 onGetRes(data);

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
 //  All rights reserved.
@@ -25,11 +25,10 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 
 export class ThemeAdapter implements eui.IThemeAdapter
 {
-
     /**
      * 解析主题
      * @param url 待解析的主题url
@@ -45,7 +44,7 @@ export class ThemeAdapter implements eui.IThemeAdapter
         }
         function onError(e: RES.ResourceEvent): void
         {
-            if (e.resItem.url == url)
+            if (e.resItem.url === url)
             {
                 RES.removeEventListener(RES.ResourceEvent.ITEM_LOAD_ERROR, onError, null);
                 errorFunc.call(thisObject);

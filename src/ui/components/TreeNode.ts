@@ -12,33 +12,34 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<
 	/**
 	 * 标签
 	 */
-	label = "";
+	label = '';
 	/**
 	 * 目录深度
 	 */
 	get depth()
 	{
-		var d = 0;
-		var p = this.parent;
+		let d = 0;
+		let p = this.parent;
 		while (p)
 		{
 			d++;
 			p = p.parent;
 		}
+
 		return d;
 	}
 	/**
 	 * 是否打开
 	 */
-	@watch("openChanged")
+	@watch('openChanged')
 	isOpen = false;
 
 	/**
 	 * 是否选中
 	 */
-	@watch("selectedChanged")
+	@watch('selectedChanged')
 	selected = false;
-	/** 
+	/**
 	 * 父结点
 	 */
 	parent: TreeNode = null;
@@ -63,7 +64,7 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<
 	{
 		if (this.children)
 		{
-			this.children.concat().forEach(element =>
+			this.children.concat().forEach((element) =>
 			{
 				element.destroy();
 			});
@@ -81,9 +82,10 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<
 	{
 		while (node)
 		{
-			if (node == this) return true;
+			if (node === this) return true;
 			node = node.parent;
 		}
+
 		return false;
 	}
 
@@ -91,41 +93,42 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<
 	{
 		node.remove();
 
-		console.assert(!node.contain(this), "无法添加到自身结点中!");
+		console.assert(!node.contain(this), '无法添加到自身结点中!');
 
-		if (this.children.indexOf(node) == -1) this.children.push(node);
+		if (this.children.indexOf(node) === -1) this.children.push(node);
 		node.parent = this;
 
-		this.emit("added", node, true);
+		this.emit('added', node, true);
 	}
 
 	remove()
 	{
 		if (this.parent)
 		{
-			var index = this.parent.children.indexOf(this);
-			if (index != -1) this.parent.children.splice(index, 1);
-			this.emit("removed", this, true);
+			const index = this.parent.children.indexOf(this);
+			if (index !== -1) this.parent.children.splice(index, 1);
+			this.emit('removed', this, true);
 			this.parent = null;
 		}
 	}
 
 	getShowNodes()
 	{
-		var nodes: TreeNode[] = [this];
+		let nodes: TreeNode[] = [this];
 		if (this.isOpen)
 		{
-			this.children.forEach(element =>
+			this.children.forEach((element) =>
 			{
 				nodes = nodes.concat(element.getShowNodes());
 			});
 		}
+
 		return nodes;
 	}
 
 	openParents()
 	{
-		var p = this.parent;
+		let p = this.parent;
 		while (p)
 		{
 			p.isOpen = true;
@@ -135,7 +138,7 @@ export class TreeNode<T extends TreeNodeMap = TreeNodeMap> extends EventEmitter<
 
 	private openChanged()
 	{
-		this.emit("openChanged", null, true);
+		this.emit('openChanged', null, true);
 	}
 
 	private selectedChanged()

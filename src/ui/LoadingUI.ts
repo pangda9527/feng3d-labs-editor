@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
 //  All rights reserved.
@@ -25,10 +25,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 export class LoadingUI extends egret.Sprite
 {
-
     constructor()
     {
         super();
@@ -44,7 +43,7 @@ export class LoadingUI extends egret.Sprite
         this.textField.y = 300;
         this.textField.width = 480;
         this.textField.height = 100;
-        this.textField.textAlign = "center";
+        this.textField.textAlign = 'center';
     }
 
     setProgress(current: number, total: number): void

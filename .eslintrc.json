@@ -312,7 +312,7 @@
             "LabeledStatement",
             "WithStatement"
         ],
-        "no-spaced-func": 1,
+        "no-spaced-func": 0,
         "no-ternary": 0,
         "no-trailing-spaces": 1,
         "no-underscore-dangle": 0,

@@ -14,7 +14,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 	/**
 	 * 模块名称
 	 */
-	static moduleName = "Hierarchy";
+	static moduleName = 'Hierarchy';
 
 	public hierachyScroller: eui.Scroller;
 	public list: eui.List;
@@ -30,7 +30,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 	{
 		super();
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "HierarchyViewSkin";
+		this.skinName = 'HierarchyViewSkin';
 		this.moduleName = HierarchyView.moduleName;
 	}
 
@@ -53,7 +53,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 
 	private onAddedToStage()
 	{
-		drag.register(this.list, null, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
+		drag.register(this.list, null, ['gameobject', 'file_gameobject', 'file_script'], (dragdata: DragData) =>
 		{
 			hierarchy.rootnode.acceptDragDrop(dragdata);
 		});
@@ -61,7 +61,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 		this.list.addEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 		this.list.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-		watcher.watch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+		watcher.watch(hierarchy, 'rootnode', this.onRootNodeChanged, this);
 		this.onRootNode(hierarchy.rootnode);
 
 		this.invalidHierarchy();
@@ -74,7 +74,7 @@ export class HierarchyView extends eui.Component implements ModuleView
 		this.list.removeEventListener(egret.MouseEvent.CLICK, this.onListClick, this);
 		this.list.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onListRightClick, this);
 
-		watcher.unwatch(hierarchy, "rootnode", this.onRootNodeChanged, this);
+		watcher.unwatch(hierarchy, 'rootnode', this.onRootNodeChanged, this);
 		this.offRootNode(hierarchy.rootnode);
 	}
 
@@ -89,9 +89,9 @@ export class HierarchyView extends eui.Component implements ModuleView
 	{
 		if (node)
 		{
-			node.on("added", this.invalidHierarchy, this);
-			node.on("removed", this.invalidHierarchy, this);
-			node.on("openChanged", this.invalidHierarchy, this);
+			node.on('added', this.invalidHierarchy, this);
+			node.on('removed', this.invalidHierarchy, this);
+			node.on('openChanged', this.invalidHierarchy, this);
 		}
 	}
 
@@ -99,9 +99,9 @@ export class HierarchyView extends eui.Component implements ModuleView
 	{
 		if (node)
 		{
-			node.off("added", this.invalidHierarchy, this);
-			node.off("removed", this.invalidHierarchy, this);
-			node.off("openChanged", this.invalidHierarchy, this);
+			node.off('added', this.invalidHierarchy, this);
+			node.off('removed', this.invalidHierarchy, this);
+			node.off('openChanged', this.invalidHierarchy, this);
 		}
 	}
 
@@ -113,21 +113,21 @@ export class HierarchyView extends eui.Component implements ModuleView
 	private updateHierarchyTree()
 	{
 		if (!hierarchy.rootnode) return;
-		var nodes = hierarchy.rootnode.getShowNodes();
+		const nodes = hierarchy.rootnode.getShowNodes();
 		this.listData.replaceAll(nodes);
 	}
 
 	private onListClick(e: egret.MouseEvent)
 	{
-		if (e.target == this.list)
+		if (e.target === this.list)
 		{
-			EditorData.editorData.selectObject(null)
+			EditorData.editorData.selectObject(null);
 		}
 	}
 
 	private onListRightClick(e: egret.MouseEvent)
 	{
-		if (e.target == this.list)
+		if (e.target === this.list)
 		{
 			EditorData.editorData.selectObject(null);
 			menu.popup(menuConfig.getCreateObjectMenu());

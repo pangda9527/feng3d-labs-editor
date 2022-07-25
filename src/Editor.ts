@@ -14,9 +14,9 @@ import { MainView } from './ui/MainView';
 /**
  * editor的版本号
  */
-export var version: string = "2018.08.22";
+export const version = '2018.08.22';
 
-console.log(`editor version ${version}`)
+console.log(`editor version ${version}`);
 
 /**
  * 编辑器
@@ -28,7 +28,7 @@ export class Editor extends eui.UILayer
         super();
         // giteeOauth.oauth();
         // 关闭右键默认菜单
-        document.body.oncontextmenu = function () { return false; }
+        document.body.oncontextmenu = function () { return false; };
 
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddedToStage, this);
     }
@@ -55,30 +55,30 @@ export class Editor extends eui.UILayer
 
     /**
      * 初始化 Egret
-     * 
+     *
      * @param callback 完成回调
      */
     private initEgret(callback: () => void)
     {
-        var mainui = new MainUI(() =>
+        const mainui = new MainUI(() =>
         {
             //
-            var tooltipLayer = new eui.UILayer();
+            const tooltipLayer = new eui.UILayer();
             tooltipLayer.touchEnabled = false;
             this.stage.addChild(tooltipLayer);
             editorui.tooltipLayer = tooltipLayer;
             //
-            var popupLayer = new eui.UILayer();
+            const popupLayer = new eui.UILayer();
             popupLayer.touchEnabled = false;
             this.stage.addChild(popupLayer);
             editorui.popupLayer = popupLayer;
             //
-            var messageLayer = new eui.UILayer();
+            const messageLayer = new eui.UILayer();
             messageLayer.touchEnabled = false;
             this.stage.addChild(messageLayer);
             editorui.messageLayer = messageLayer;
             //
-            editorcache.projectname = editorcache.projectname || "newproject";
+            editorcache.projectname = editorcache.projectname || 'newproject';
 
             editorui.stage.removeChild(mainui);
             callback();
@@ -88,7 +88,7 @@ export class Editor extends eui.UILayer
 
     private init(callback: () => void)
     {
-        document.head.getElementsByTagName("title")[0].innerText = "feng3d-editor -- " + editorcache.projectname;
+        document.head.getElementsByTagName('title')[0].innerText = `feng3d-editor -- ${editorcache.projectname}`;
 
         editorcache.setLastProject(editorcache.projectname);
 
@@ -96,15 +96,16 @@ export class Editor extends eui.UILayer
         {
             editorAsset.runProjectScript(() =>
             {
-                editorAsset.readScene("default.scene.json", (err, scene) =>
+                editorAsset.readScene('default.scene.json', (err, scene) =>
                 {
                     if (err)
-                        EditorData.editorData.gameScene = View.createNewScene();
+                        { EditorData.editorData.gameScene = View.createNewScene(); }
                     else
-                        EditorData.editorData.gameScene = scene;
+                        { EditorData.editorData.gameScene = scene; }
 
                     //
-                    this.initMainView()
+                    this.initMainView();
+                    // eslint-disable-next-line no-new
                     new Editorshortcut();
                     mouseEventEnvironment();
                     callback();
@@ -112,19 +113,18 @@ export class Editor extends eui.UILayer
             });
         });
 
-        window.addEventListener("beforeunload", () =>
+        window.addEventListener('beforeunload', () =>
         {
-            let obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
-            editorRS.fs.writeObject("default.scene.json", obj);
+            const obj = serialization.serialize(EditorData.editorData.gameScene.gameObject);
+            editorRS.fs.writeObject('default.scene.json', obj);
         });
     }
 
     private initMainView()
     {
         //
-        var mainView = new MainView();
+        const mainView = new MainView();
         editorui.mainview = mainView;
         this.stage.addChildAt(mainView, 1);
     }
-
 }

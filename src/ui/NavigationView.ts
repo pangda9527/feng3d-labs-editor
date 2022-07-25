@@ -4,14 +4,14 @@ import { ModuleView } from './components/TabView';
 export class NavigationView extends eui.Component implements ModuleView
 {
     moduleName: string;
-    static moduleName = "Navigation";
+    static moduleName = 'Navigation';
 
     constructor()
     {
         super();
 
         this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-        this.skinName = "NavigationView";
+        this.skinName = 'NavigationView';
         this.moduleName = NavigationView.moduleName;
     }
 

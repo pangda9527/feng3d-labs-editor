@@ -7,7 +7,7 @@ export class MainView extends eui.Component implements eui.UIComponent
 		super();
 
 		this.once(eui.UIEvent.COMPLETE, this.onComplete, this);
-		this.skinName = "MainViewSkin";
+		this.skinName = 'MainViewSkin';
 	}
 
 	private onComplete(): void
@@ -23,13 +23,13 @@ export class MainView extends eui.Component implements eui.UIComponent
 
 	private onAddedToStage()
 	{
-		window.addEventListener("resize", this.onresize.bind(this));
+		window.addEventListener('resize', this.onresize.bind(this));
 		this.onresize();
 	}
 
 	private onRemovedFromStage()
 	{
-		window.removeEventListener("resize", this.onresize.bind(this));
+		window.removeEventListener('resize', this.onresize.bind(this));
 	}
 
 	private onresize()
