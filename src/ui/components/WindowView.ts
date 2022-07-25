@@ -24,9 +24,9 @@ export class WindowView extends eui.Panel
         return null;
     }
 
-    public moveArea: eui.Group;
-    public titleDisplay: eui.Label;
-    public closeButton: eui.Button;
+    declare public moveArea: eui.Group;
+    declare public titleDisplay: eui.Label;
+    declare public closeButton: eui.Button;
     public contenGroup: eui.Group;
 
     constructor()

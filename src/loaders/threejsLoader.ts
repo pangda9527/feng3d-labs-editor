@@ -1,18 +1,18 @@
-import feng3d = require('feng3d');
+import { Animation, AnimationClip, Camera, CullFace, CustomGeometry, GameObject, globalEmitter, Matrix4x4, pathUtils, PerspectiveLens, PropertyClip, PropertyClipPathItemType, Quaternion, Renderable, serialization, SkeletonComponent, SkeletonJoint, SkinnedMeshRenderer, SkinSkeletonTemp, Vector3 } from 'feng3d';
 import { editorRS } from '../assets/EditorRS';
 import { EditorData } from '../global/EditorData';
 import { loadjs } from './load';
 
 export class ThreejsLoader
 {
-    load(url: string, _completed?: (gameobject: feng3d.GameObject) => void)
+    load(url: string, _completed?: (gameobject: GameObject) => void)
     {
         editorRS.fs.readArrayBuffer(url, (_err, data) =>
         {
             load(data, (gameobject) =>
             {
-                gameobject.name = feng3d.pathUtils.getName(url);
-                feng3d.globalEmitter.emit('asset.parsed', gameobject);
+                gameobject.name = pathUtils.getName(url);
+                globalEmitter.emit('asset.parsed', gameobject);
             });
         });
     }
@@ -24,7 +24,7 @@ const usenumberfixed = true;
 
 function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => void)
 {
-    let skeletonComponent: feng3d.SkeletonComponent;
+    let skeletonComponent: SkeletonComponent;
     prepare(() =>
     {
         //
@@ -66,43 +66,43 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
         console.error(err);
     }
 
-    function parse(object3d, parent?: feng3d.GameObject)
+    function parse(object3d, parent?: GameObject)
     {
         if (object3d.type === 'Bone')
         {
             return null;
         }
 
-        const gameobject = feng3d.serialization.setValue(new feng3d.GameObject(), { name: object3d.name });
-        gameobject.transform.position = new feng3d.Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
-        gameobject.transform.orientation = new feng3d.Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
-        gameobject.transform.scale = new feng3d.Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
+        const gameobject = serialization.setValue(new GameObject(), { name: object3d.name });
+        gameobject.transform.position = new Vector3(object3d.position.x, object3d.position.y, object3d.position.z);
+        gameobject.transform.orientation = new Quaternion(object3d.quaternion.x, object3d.quaternion.y, object3d.quaternion.z, object3d.quaternion.w);
+        gameobject.transform.scale = new Vector3(object3d.scale.x, object3d.scale.y, object3d.scale.z);
         if (parent)
         { parent.addChild(gameobject); }
 
         switch (object3d.type)
         {
             case 'PerspectiveCamera':
-                gameobject.addComponent(feng3d.Camera).lens = parsePerspectiveCamera(object3d);
+                gameobject.addComponent(Camera).lens = parsePerspectiveCamera(object3d);
                 break;
             case 'SkinnedMesh':
-                const skinnedModel = gameobject.addComponent(feng3d.SkinnedMeshRenderer);
+                const skinnedModel = gameobject.addComponent(SkinnedMeshRenderer);
                 skinnedModel.geometry = parseGeometry(object3d.geometry);
-                skinnedModel.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                skinnedModel.material.renderParams.cullFace = CullFace.NONE;
                 console.assert(object3d.bindMode === 'attached');
                 skinnedModel.skinSkeleton = parseSkinnedSkeleton(skeletonComponent, object3d.skeleton);
                 if (parent)
                 { skinnedModel.initMatrix = gameobject.transform.localToWorldMatrix.clone(); }
                 break;
             case 'Mesh':
-                const model = gameobject.addComponent(feng3d.Renderable);
+                const model = gameobject.addComponent(Renderable);
                 model.geometry = parseGeometry(object3d.geometry);
-                model.material.renderParams.cullFace = feng3d.CullFace.NONE;
+                model.material.renderParams.cullFace = CullFace.NONE;
                 break;
             case 'Group':
                 if (object3d.skeleton)
                 {
-                    skeletonComponent = gameobject.addComponent(feng3d.SkeletonComponent);
+                    skeletonComponent = gameobject.addComponent(SkeletonComponent);
                     skeletonComponent.joints = parseSkeleton(object3d.skeleton);
                 }
                 break;
@@ -116,7 +116,7 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
 
         if (object3d.animations && object3d.animations.length > 0)
         {
-            const animation = gameobject.addComponent(feng3d.Animation);
+            const animation = gameobject.addComponent(Animation);
             for (let i = 0; i < object3d.animations.length; i++)
             {
                 const animationClip = parseAnimations(object3d.animations[i]);
@@ -137,7 +137,7 @@ function load(url: string | File | ArrayBuffer, onParseComplete?: (group) => voi
 function parseAnimations(animationClipData: { name: string; duration: number; tracks: any; })
 {
     //
-    const animationClip = new feng3d.AnimationClip();
+    const animationClip = new AnimationClip();
 
     animationClip.name = animationClipData.name;
     animationClip.length = animationClipData.duration * 1000;
@@ -155,14 +155,14 @@ function parseAnimations(animationClipData: { name: string; duration: number; tr
 
     function parsePropertyClip(keyframeTrack)
     {
-        const propertyClip = new feng3d.PropertyClip();
+        const propertyClip = new PropertyClip();
 
         const trackName: string = keyframeTrack.name;
         const result = (/\.bones\[(\w+)\]\.(\w+)/).exec(trackName);
         propertyClip.path = <any>[
-            [feng3d.PropertyClipPathItemType.GameObject, result[1]],
+            [PropertyClipPathItemType.GameObject, result[1]],
             // eslint-disable-next-line no-sparse-arrays
-            [feng3d.PropertyClipPathItemType.Component, , 'feng3d.Transform'],
+            [PropertyClipPathItemType.Component, , 'Transform'],
         ];
 
         switch (result[2])
@@ -218,7 +218,7 @@ function parseAnimations(animationClipData: { name: string; duration: number; tr
 
 function parseSkeleton(skeleton)
 {
-    const joints: feng3d.SkeletonJoint[] = [];
+    const joints: SkeletonJoint[] = [];
     const skeNameDic = {};
 
     const len = skeleton.bones.length;
@@ -229,10 +229,10 @@ function parseSkeleton(skeleton)
     for (let i = 0; i < len; i++)
     {
         const bone = skeleton.bones[i];
-        const skeletonJoint = joints[i] = new feng3d.SkeletonJoint();
+        const skeletonJoint = joints[i] = new SkeletonJoint();
         //
         skeletonJoint.name = bone.name;
-        skeletonJoint.matrix = new feng3d.Matrix4x4(bone.matrixWorld.elements);
+        skeletonJoint.matrix = new Matrix4x4(bone.matrixWorld.elements);
 
         let parentId = skeNameDic[bone.parent.name];
         if (parentId === undefined)
@@ -244,9 +244,9 @@ function parseSkeleton(skeleton)
     return joints;
 }
 
-function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonData)
+function parseSkinnedSkeleton(skeleton: SkeletonComponent, skinSkeletonData)
 {
-    const skinSkeleton = new feng3d.SkinSkeletonTemp();
+    const skinSkeleton = new SkinSkeletonTemp();
 
     const joints = skeleton.joints;
     const jointsMap = {};
@@ -268,7 +268,7 @@ function parseSkinnedSkeleton(skeleton: feng3d.SkeletonComponent, skinSkeletonDa
         if (jointsMapitem)
         {
             skinSkeleton.joints[i] = jointsMapitem;
-            joints[jointsMapitem[0]].matrix = new feng3d.Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
+            joints[jointsMapitem[0]].matrix = new Matrix4x4(skinSkeletonData.boneInverses[i].elements).invert();
         }
         else
         {
@@ -283,7 +283,7 @@ function parseGeometry(geometry)
 {
     const attributes = geometry.attributes;
 
-    const geo = new feng3d.CustomGeometry();
+    const geo = new CustomGeometry();
 
     for (const key in attributes)
     {
@@ -329,7 +329,7 @@ function parseGeometry(geometry)
 
 function parsePerspectiveCamera(perspectiveCamera)
 {
-    const perspectiveLen = new feng3d.PerspectiveLens();
+    const perspectiveLen = new PerspectiveLens();
 
     perspectiveLen.near = perspectiveCamera.near;
     perspectiveLen.far = perspectiveCamera.far;

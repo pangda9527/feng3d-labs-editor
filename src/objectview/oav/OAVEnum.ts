@@ -5,7 +5,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVEnum extends OAVBase
 {
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public combobox: ComboBox;
 
     private list: { label: string, value: number }[];

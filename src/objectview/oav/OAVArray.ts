@@ -7,7 +7,7 @@ export class OAVArray extends OAVBase
 {
     public group: eui.Group;
     public titleGroup: eui.Group;
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public contentGroup: eui.Group;
     public sizeTxt: eui.TextInput;
 

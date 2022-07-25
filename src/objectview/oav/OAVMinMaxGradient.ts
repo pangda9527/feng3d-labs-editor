@@ -5,7 +5,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVMinMaxGradient extends OAVBase
 {
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public minMaxGradientView: MinMaxGradientView;
 
     constructor(attributeViewInfo: AttributeViewInfo)

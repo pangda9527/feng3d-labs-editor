@@ -11,7 +11,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVPick extends OAVBase
 {
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public text: eui.Label;
     public pickBtn: eui.Button;
 

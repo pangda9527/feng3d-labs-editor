@@ -238,7 +238,7 @@ class MenuUI extends eui.List
 
 class MenuItemRenderer extends eui.ItemRenderer
 {
-    data: MenuItem;
+    declare data: MenuItem;
     menuUI: MenuUI;
 
     public selectedRect: eui.Rect;

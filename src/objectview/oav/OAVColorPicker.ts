@@ -11,7 +11,7 @@ export interface OAVColorPicker
 @OAVComponent()
 export class OAVColorPicker extends OAVBase
 {
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public colorPicker: ColorPicker;
     public input: eui.TextInput;
 

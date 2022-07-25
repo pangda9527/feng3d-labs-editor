@@ -8,7 +8,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVVector3 extends OAVBase
 {
-    public labelLab: eui.Label;
+    declare public labelLab: eui.Label;
     public group: eui.Group;
     public xLabel: eui.Label;
     public xTextInput: eui.TextInput;

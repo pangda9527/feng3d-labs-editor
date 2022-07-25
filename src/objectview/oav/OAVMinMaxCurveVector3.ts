@@ -5,7 +5,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVMinMaxCurveVector3 extends OAVBase
 {
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
     public minMaxCurveVector3View: MinMaxCurveVector3View;
 
     constructor(attributeViewInfo: AttributeViewInfo)

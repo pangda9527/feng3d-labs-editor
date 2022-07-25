@@ -8,7 +8,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVComponentList extends OAVBase
 {
-	protected _space: GameObject;
+	declare protected _space: GameObject;
 
 	//
 	group: eui.Group;

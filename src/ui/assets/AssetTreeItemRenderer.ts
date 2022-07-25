@@ -7,10 +7,10 @@ import { editorAsset } from './EditorAsset';
 
 export class AssetTreeItemRenderer extends TreeItemRenderer
 {
-    public contentGroup: eui.Group;
-    public disclosureButton: eui.ToggleButton;
+    declare public contentGroup: eui.Group;
+    declare public disclosureButton: eui.ToggleButton;
 
-    data: AssetNode;
+    declare data: AssetNode;
 
     constructor()
     {

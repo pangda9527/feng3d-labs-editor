@@ -4,7 +4,7 @@ import { ObjectViewEvent } from '../events/ObjectViewEvent';
 
 export class OAVBase extends eui.Component implements IObjectAttributeView
 {
-    protected _space: any;
+    declare protected _space: any;
     protected _attributeName: string;
     protected _attributeType: string;
     protected _attributeViewInfo: AttributeViewInfo;

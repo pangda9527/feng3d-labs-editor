@@ -9,7 +9,7 @@ export class TreeItemRenderer extends eui.ItemRenderer
      * 子结点相对父结点的缩进值，以像素为单位。默认17。
      */
     indentation = 17;
-    data: TreeNode;
+    declare data: TreeNode;
 
     private watchers: eui.Watcher[] = [];
 
@@ -52,7 +52,7 @@ export class TreeItemRenderer extends eui.ItemRenderer
     private onDisclosureButtonClick()
     {
         if (this.data)
-            { this.data.isOpen = !this.data.isOpen; }
+        { this.data.isOpen = !this.data.isOpen; }
     }
 
     private updateView()

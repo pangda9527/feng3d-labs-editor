@@ -8,7 +8,7 @@ export class AssetFileItemRenderer extends eui.ItemRenderer
 {
     public icon: eui.Image;
 
-    data: AssetNode;
+    declare data: AssetNode;
     itemSelected = false;
 
     constructor()

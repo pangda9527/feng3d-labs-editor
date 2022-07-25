@@ -5,7 +5,7 @@ import { OAVBase } from './OAVBase';
 @OAVComponent()
 export class OAVParticleComponentList extends OAVBase
 {
-    protected _space: ParticleSystem;
+    declare protected _space: ParticleSystem;
 
     //
     group: eui.Group;

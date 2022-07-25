@@ -31,12 +31,12 @@ export class AssetNode<T extends AssetNodeEventMap = AssetNodeEventMap> extends 
     /**
      * 显示标签
      */
-    label: string;
+    declare label: string;
 
     @serialize
     children: AssetNode[] = [];
 
-    parent: AssetNode;
+    declare parent: AssetNode;
 
     asset: FileAsset;
 

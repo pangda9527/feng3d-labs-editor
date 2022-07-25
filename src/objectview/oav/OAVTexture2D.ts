@@ -11,7 +11,7 @@ export class OAVTexture2D extends OAVBase
 {
     public image: eui.Image;
     public pickBtn: eui.Button;
-    public labelLab: eui.Label;
+declare public labelLab: eui.Label;
 
     constructor(attributeViewInfo: AttributeViewInfo)
     {

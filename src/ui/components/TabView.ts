@@ -413,7 +413,7 @@ export class TabView extends eui.Group
 			//
 			drag.register(v, (dragSource) =>
 			{
-				dragSource.addDragData('moduleView', { tabView: <any> this, moduleName: v.moduleName });
+				dragSource.addDragData('moduleView', { tabView: <any>this, moduleName: v.moduleName });
 			}, []);
 			v.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
 		});
@@ -468,8 +468,8 @@ export class TabView extends eui.Group
  */
 class TabViewButton extends eui.Button
 {
-	public iconDisplay: eui.Image;
-	public labelDisplay: eui.Label;
+	declare public iconDisplay: eui.Image;
+	declare public labelDisplay: eui.Label;
 
 	/**
 	 * 模块名称

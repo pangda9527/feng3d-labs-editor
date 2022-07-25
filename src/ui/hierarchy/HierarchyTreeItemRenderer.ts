@@ -9,7 +9,7 @@ import { drag, DragData } from '../drag/Drag';
 
 export class HierarchyTreeItemRenderer extends TreeItemRenderer
 {
-    data: HierarchyNode;
+    declare data: HierarchyNode;
 
     constructor()
     {
@@ -107,7 +107,7 @@ export class HierarchyTreeItemRenderer extends TreeItemRenderer
                             const no = serialization.clone(v);
                             v.parent.addChild(no);
 
-return no;
+                            return no;
                         });
                         EditorData.editorData.selectMultiObject(newGameObjects);
 
@@ -141,6 +141,6 @@ return no;
         menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
 
         if (menus.length > 0)
-            { menu.popup(menus); }
+        { menu.popup(menus); }
     }
 }

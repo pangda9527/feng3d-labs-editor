@@ -77,6 +77,44 @@ async function main()
     } = pkg;
     const freeze = false;
 
+    results.push({
+        input,
+        output: [
+            {
+                banner,
+                file: path.join(basePath, main),
+                format: 'cjs',
+                freeze,
+                sourcemap,
+            },
+            {
+                banner,
+                file: path.join(basePath, module),
+                format: 'esm',
+                freeze,
+                sourcemap,
+            },
+        ],
+        external,
+        plugins,
+    });
+
+    results.push({
+        input,
+        external: standalone ? [] : external,
+        output: [{
+            file: path.join(basePath, types),
+            name: namespaces[pkg.name],
+            format: 'es',
+            footer: `export as namespace ${namespaces[pkg.name]};`
+        }],
+        plugins: [
+            json(),
+            typescript({ tsconfig: './tsconfig.json' }),
+            dts({ respectExternal: true }),
+        ],
+    });
+
     // The package.json file has a bundle field
     // we'll use this to generate the bundle file
     // this will package all dependencies

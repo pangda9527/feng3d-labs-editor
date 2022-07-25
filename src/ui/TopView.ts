@@ -165,7 +165,7 @@ let items: { item: TopMenuItemRenderer; rect: Rectangle; }[];
 
 export class TopMenuItemRenderer extends eui.ItemRenderer
 {
-	data: MenuItem;
+	declare data: MenuItem;
 
 	public selectedRect: eui.Rect;
 	public label: eui.Label;
