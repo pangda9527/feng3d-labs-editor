@@ -1,145 +1,153 @@
-namespace editor
+import { globalEmitter, GameObject, Scene, shortcut, AssetData } from 'feng3d';
+import { EditorData } from '../../global/EditorData';
+import { drag } from '../drag/Drag';
+import { AssetNode } from './AssetNode';
+import { editorAsset } from './EditorAsset';
+
+export class AssetFileItemRenderer extends eui.ItemRenderer
 {
-    export class AssetFileItemRenderer extends eui.ItemRenderer
+    public icon: eui.Image;
+
+    declare data: AssetNode;
+    itemSelected = false;
+
+    constructor()
     {
-        public icon: eui.Image;
+        super();
+        this.skinName = 'AssetFileItemRenderer';
+    }
 
-        data: AssetNode;
-        itemSelected = false;
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
 
-        constructor()
-        {
-            super();
-            this.skinName = "AssetFileItemRenderer";
-        }
+        this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
+        this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
+        globalEmitter.on('editor.selectedObjectsChanged', this.selectedfilechanged, this);
+        this.selectedfilechanged();
+    }
 
-            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    $onRemoveFromStage()
+    {
+        super.$onRemoveFromStage();
+        this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-            feng3d.globalEmitter.on("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-            this.selectedfilechanged();
-        }
+        globalEmitter.off('editor.selectedObjectsChanged', this.selectedfilechanged, this);
+    }
 
-        $onRemoveFromStage()
-        {
-            super.$onRemoveFromStage();
-            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.ondoubleclick, this);
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    dataChanged()
+    {
+        super.dataChanged();
 
-            feng3d.globalEmitter.off("editor.selectedObjectsChanged", this.selectedfilechanged, this);
-        }
-
-        dataChanged()
-        {
-            super.dataChanged();
-
-            if (this.data)
-            {
-                if (this.data.isDirectory)
-                {
-                    drag.register(this, (dragsource) =>
-                    {
-                        this.data.setdargSource(dragsource);
-                    }, ["assetNodes"], (dragdata) =>
-                    {
-                        this.data.acceptDragDrop(dragdata);
-                    });
-                }
-                else
-                {
-                    if (!this.data.isLoaded)
-                    {
-                        var data = this.data;
-                        data.load(() =>
-                        {
-                            console.assert(data.isLoaded);
-                            if (data == this.data) this.dataChanged();
-                        })
-                        return;
-                    }
-
-                    drag.register(this, (dragsource) =>
-                    {
-                        this.data.setdargSource(dragsource);
-                    }, []);
-                }
-            } else
-            {
-                drag.unregister(this);
-            }
-            this.selectedfilechanged();
-        }
-
-        private ondoubleclick()
+        if (this.data)
         {
             if (this.data.isDirectory)
             {
-                editorAsset.showFloder = this.data;
-            } else if (this.data.asset instanceof feng3d.GameObject)
-            {
-                var scene = this.data.asset.getComponent(feng3d.Scene);
-                if (scene)
+                drag.register(this, (dragsource) =>
                 {
-                    editorData.gameScene = scene;
+                    this.data.setdargSource(dragsource);
+                }, ['assetNodes'], (dragdata) =>
+                {
+                    this.data.acceptDragDrop(dragdata);
+                });
+            }
+            else
+            {
+                if (!this.data.isLoaded)
+                {
+                    const data = this.data;
+                    data.load(() =>
+                    {
+                        console.assert(data.isLoaded);
+                        if (data === this.data) this.dataChanged();
+                    });
+
+                    return;
                 }
+
+                drag.register(this, (dragsource) =>
+                {
+                    this.data.setdargSource(dragsource);
+                }, []);
             }
         }
-
-        private onclick()
+        else
         {
-            // 处理按下shift键时
-            var isShift = feng3d.shortcut.keyState.getKeyState("shift");
-            if (isShift)
-            {
-                var source = (<eui.ArrayCollection>(<eui.List>this.parent).dataProvider).source;
-                var index = source.indexOf(this.data);
-                var min = index, max = index;
-                if (editorData.selectedAssetNodes.indexOf(preAssetFile) != -1)
-                {
-                    index = source.indexOf(preAssetFile);
-                    if (index < min) min = index;
-                    if (index > max) max = index;
-                }
-                editorData.selectMultiObject(source.slice(min, max + 1));
-            } else
-            {
-                editorData.selectObject(this.data);
-                preAssetFile = this.data;
-            }
+            drag.unregister(this);
         }
+        this.selectedfilechanged();
+    }
 
-        private onrightclick(e: egret.Event)
+    private ondoubleclick()
+    {
+        if (this.data.isDirectory)
         {
-            e.stopPropagation();
-            editorData.selectObject(this.data);
-            editorAsset.popupmenu(this.data);
+            editorAsset.showFloder = this.data;
         }
-
-        private selectedfilechanged()
+        else if (this.data.asset instanceof GameObject)
         {
-            var selected = false;
-            if (this.data)
+            const scene = this.data.asset.getComponent(Scene);
+            if (scene)
             {
-                var selectedAssetFile = editorData.selectedAssetNodes;
-                selected = selectedAssetFile.indexOf(this.data) != -1;
-                if (!selected)
-                {
-                    var assetids = editorData.selectedObjects.map(v => (<feng3d.AssetData>v).assetId);
-                    selected = assetids.indexOf(this.data.asset.assetId) != -1;
-                }
-            }
-
-            if (this.itemSelected != selected)
-            {
-                this.itemSelected = selected;
+                EditorData.editorData.gameScene = scene;
             }
         }
     }
-    var preAssetFile: AssetNode;
+
+    private onclick()
+    {
+        // 处理按下shift键时
+        const isShift = shortcut.keyState.getKeyState('shift');
+        if (isShift)
+        {
+            const source = (<eui.ArrayCollection>(this.parent as eui.List).dataProvider).source;
+            let index = source.indexOf(this.data);
+            let min = index; let
+                max = index;
+            if (EditorData.editorData.selectedAssetNodes.indexOf(preAssetFile) !== -1)
+            {
+                index = source.indexOf(preAssetFile);
+                if (index < min) min = index;
+                if (index > max) max = index;
+            }
+            EditorData.editorData.selectMultiObject(source.slice(min, max + 1));
+        }
+        else
+        {
+            EditorData.editorData.selectObject(this.data);
+            preAssetFile = this.data;
+        }
+    }
+
+    private onrightclick(e: egret.Event)
+    {
+        e.stopPropagation();
+        EditorData.editorData.selectObject(this.data);
+        editorAsset.popupmenu(this.data);
+    }
+
+    private selectedfilechanged()
+    {
+        let selected = false;
+        if (this.data)
+        {
+            const selectedAssetFile = EditorData.editorData.selectedAssetNodes;
+            selected = selectedAssetFile.indexOf(this.data) !== -1;
+            if (!selected)
+            {
+                const assetids = EditorData.editorData.selectedObjects.map((v) => (<AssetData>v).assetId);
+                selected = assetids.indexOf(this.data.asset.assetId) !== -1;
+            }
+        }
+
+        if (this.itemSelected !== selected)
+        {
+            this.itemSelected = selected;
+        }
+    }
 }
+let preAssetFile: AssetNode;

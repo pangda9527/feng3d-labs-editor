@@ -1,80 +1,86 @@
-namespace editor
+import { watcher } from 'feng3d';
+import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
+import { TreeItemRenderer } from '../components/TreeItemRenderer';
+import { drag } from '../drag/Drag';
+import { AssetNode } from './AssetNode';
+import { editorAsset } from './EditorAsset';
+
+export class AssetTreeItemRenderer extends TreeItemRenderer
 {
-    export class AssetTreeItemRenderer extends TreeItemRenderer
+    declare public contentGroup: eui.Group;
+    declare public disclosureButton: eui.ToggleButton;
+
+    declare data: AssetNode;
+
+    constructor()
     {
-        public contentGroup: eui.Group;
-        public disclosureButton: eui.ToggleButton;
+        super();
+        this.skinName = 'AssetTreeItemRenderer';
+    }
 
-        data: AssetNode;
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
+        this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
 
-        constructor()
+        MouseOnDisableScroll.register(this);
+
+        watcher.watch(editorAsset, 'showFloder', this.showFloderChanged, this);
+        this.showFloderChanged();
+    }
+
+    $onRemoveFromStage()
+    {
+        super.$onRemoveFromStage();
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+
+        MouseOnDisableScroll.unRegister(this);
+
+        watcher.unwatch(editorAsset, 'showFloder', this.showFloderChanged, this);
+    }
+
+    dataChanged()
+    {
+        super.dataChanged();
+
+        if (this.data)
         {
-            super();
-            this.skinName = "AssetTreeItemRenderer";
-        }
-
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-
-            MouseOnDisableScroll.register(this);
-
-            feng3d.watcher.watch(editorAsset, "showFloder", this.showFloderChanged, this);
-            this.showFloderChanged();
-        }
-
-        $onRemoveFromStage()
-        {
-            super.$onRemoveFromStage();
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-
-            MouseOnDisableScroll.unRegister(this);
-
-            feng3d.watcher.unwatch(editorAsset, "showFloder", this.showFloderChanged, this);
-        }
-
-        dataChanged()
-        {
-            super.dataChanged();
-
-            if (this.data)
+            drag.register(this, (dragsource) =>
             {
-                drag.register(this, (dragsource) =>
-                {
-                    this.data.setdargSource(dragsource);
-                }, ["assetNodes"], (dragdata) =>
-                    {
-                        this.data.acceptDragDrop(dragdata);
-                    });
-            } else
+                this.data.setdargSource(dragsource);
+            }, ['assetNodes'], (dragdata) =>
             {
-                drag.unregister(this);
-            }
-            this.showFloderChanged();
+                this.data.acceptDragDrop(dragdata);
+            });
         }
-
-        private showFloderChanged()
+        else
         {
-            this.selected = this.data ? editorAsset.showFloder == this.data : false;
+            drag.unregister(this);
         }
+        this.showFloderChanged();
+    }
 
-        private onclick()
+    private showFloderChanged()
+    {
+        this.selected = this.data ? editorAsset.showFloder === this.data : false;
+    }
+
+    private onclick()
+    {
+        editorAsset.showFloder = this.data;
+    }
+
+    private onrightclick(_e)
+    {
+        if (this.data.parent !== null)
         {
-            editorAsset.showFloder = this.data;
+            editorAsset.popupmenu(this.data);
         }
-
-        private onrightclick(e)
+        else
         {
-            if (this.data.parent != null)
-            {
-                editorAsset.popupmenu(this.data);
-            } else
-            {
-                editorAsset.popupmenu(this.data);
-            }
+            editorAsset.popupmenu(this.data);
         }
     }
 }

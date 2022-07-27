@@ -14,6 +14,13 @@
 	<meta name="x5-fullscreen" content="true" />
 	<meta name="360-fullscreen" content="true" />
 
+	<!--  -->
+	<script src="libs/modules/egret/egret.js"></script>
+	<script src="libs/modules/egret/egret.web.js"></script>
+	<script src="libs/modules/res/res.js"></script>
+	<script src="libs/modules/eui/eui.js"></script>
+	<script src="libs/modules/tween/tween.js"></script>
+	<!--  -->
 	<script src="libs/FileSaver.min.js"></script>
 	<script src="libs/jszip.min.js"></script>
 	<script src="libs/require.min.js"></script>
@@ -34,8 +41,20 @@
 
 	<!--这个标签为通过egret提供的第三方库的方式生成的 javascript 文件。删除 modules_files 标签后，库文件加载列表将不会变化，请谨慎操作！-->
 
+	<!-- feng3d  -->
+	<!-- <script src="./node_modules/feng3d/dist/index.js"></script> -->
+	<script src="https://unpkg.com/feng3d@0.5.0/dist/index.js"></script>
+    <!-- plugin -->
+	<!-- <script src="./node_modules/@feng3d/cannon/dist/index.js"></script> -->
+	<!-- <script src="./node_modules/@feng3d/cannon-plugin/dist/index.js"></script> -->
+	<script src="https://unpkg.com/@feng3d/cannon@0.5.1/dist/index.js"></script>
+	<script src="https://unpkg.com/@feng3d/cannon-plugin@0.5.0/dist/index.js"></script>
+	<!--  -->
+	<script src="./packages/json/dist/index.js"></script>
+	<script src="./packages/typescript/dist/index.js"></script>
+	<script src="./dist/index.js"></script>
 	<!-- 合并js -->
-	<script src="index.js"></script>
+	<!-- <script src="index.js"></script> -->
 </head>
 
 <body>
@@ -62,6 +81,16 @@
 		data-show-fps-style="x:0,y:0,size:12,textColor:0xffffff,bgAlpha:0.9">
 	</div>
 	<div id="output" style="position: absolute;display: none;top: 10px; right: 10px;"></div>
+	<script>
+		/**
+		 * {
+		 * "renderMode":, //引擎渲染模式，"canvas" 或者 "webgl"
+		 * "audioType": "" //使用的音频类型，0:默认，1:qq audio，2:web audio，3:audio
+		 * "antialias": //WebGL模式下是否开启抗锯齿，true:开启，false:关闭，默认为false
+		 * }
+		 **/
+		egret.runEgret({ renderMode: "webgl", audioType: 0 });
+	</script>
 </body>
 
 </html>

@@ -1,59 +1,58 @@
-namespace editor
+import { OVComponent, IObjectView, FolderAsset, ObjectViewInfo } from 'feng3d';
+import { editorAsset } from '../../ui/assets/EditorAsset';
+
+@OVComponent()
+export class OVFolderAsset extends eui.Component implements IObjectView
 {
-    @feng3d.OVComponent()
-    export class OVFolderAsset extends eui.Component implements feng3d.IObjectView
+    space: FolderAsset;
+    private _objectViewInfo: ObjectViewInfo;
+
+    public nameLabel: eui.Label;
+    public openBtn: eui.Button;
+
+    constructor(objectViewInfo: ObjectViewInfo)
     {
-        space: feng3d.FolderAsset;
-        private _objectViewInfo: feng3d.ObjectViewInfo;
+        super();
+        this.skinName = 'OVFolderAsset';
+        this._objectViewInfo = objectViewInfo;
+        this.space = <any>objectViewInfo.owner;
+    }
 
-        public nameLabel: eui.Label;
-        public openBtn: eui.Button;
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
 
-        constructor(objectViewInfo: feng3d.ObjectViewInfo)
-        {
-            super();
-            this.skinName = "OVFolderAsset";
-            this._objectViewInfo = objectViewInfo;
-            this.space = <any>objectViewInfo.owner;
-        }
+        this.openBtn.addEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
 
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
-        {
-            super.$onAddToStage(stage, nestLevel);
+        this.updateView();
+    }
 
+    $onRemoveFromStage()
+    {
+        this.openBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
 
-            this.openBtn.addEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
+        super.$onRemoveFromStage();
+    }
 
-            this.updateView();
-        }
+    updateView()
+    {
+        if (!this.stage) return;
 
-        $onRemoveFromStage()
-        {
-            this.openBtn.removeEventListener(egret.MouseEvent.CLICK, this.onOpenBtnClick, this);
+        this.nameLabel.name = this.space.fileName;
+    }
 
-            super.$onRemoveFromStage()
-        }
+    getAttributeView(_attributeName: String)
+    {
+        return null;
+    }
 
-        updateView()
-        {
-            if (!this.stage) return;
+    getblockView(_blockName: String)
+    {
+        return null;
+    }
 
-            this.nameLabel.name = this.space.fileName;
-        }
-
-        getAttributeView(attributeName: String)
-        {
-            return null;
-        }
-
-        getblockView(blockName: String)
-        {
-            return null;
-        }
-
-        private onOpenBtnClick()
-        {
-            editorAsset.showFloder = editorAsset.getAssetByID(this.space.assetId);
-        }
+    private onOpenBtnClick()
+    {
+        editorAsset.showFloder = editorAsset.getAssetByID(this.space.assetId);
     }
 }

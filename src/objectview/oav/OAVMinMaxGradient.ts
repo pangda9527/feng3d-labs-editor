@@ -1,46 +1,47 @@
-namespace editor
+import { OAVComponent, AttributeViewInfo } from 'feng3d';
+import { MinMaxGradientView } from '../../ui/components/MinMaxGradientView';
+import { OAVBase } from './OAVBase';
+
+@OAVComponent()
+export class OAVMinMaxGradient extends OAVBase
 {
-    @feng3d.OAVComponent()
-    export class OAVMinMaxGradient extends OAVBase
+declare public labelLab: eui.Label;
+    public minMaxGradientView: MinMaxGradientView;
+
+    constructor(attributeViewInfo: AttributeViewInfo)
     {
-        public labelLab: eui.Label;
-        public minMaxGradientView: editor.MinMaxGradientView;
+        super(attributeViewInfo);
 
-        constructor(attributeViewInfo: feng3d.AttributeViewInfo)
+        this.skinName = 'OAVMinMaxGradient';
+    }
+
+    initView()
+    {
+        if (this._attributeViewInfo.editable)
         {
-            super(attributeViewInfo);
-
-            this.skinName = "OAVMinMaxGradient";
+            this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
         }
 
-        initView()
+        this.minMaxGradientView.minMaxGradient = this.attributeValue;
+
+        this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
+    }
+
+    dispose()
+    {
+        if (this._attributeViewInfo.editable)
         {
-            if (this._attributeViewInfo.editable)
-            {
-                this.minMaxGradientView.addEventListener(egret.Event.CHANGE, this.onChange, this);
-            }
-
-            this.minMaxGradientView.minMaxGradient = this.attributeValue;
-
-            this.minMaxGradientView.touchEnabled = this.minMaxGradientView.touchChildren = this._attributeViewInfo.editable;
+            this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
         }
+    }
 
-        dispose()
-        {
-            if (this._attributeViewInfo.editable)
-            {
-                this.minMaxGradientView.removeEventListener(egret.Event.CHANGE, this.onChange, this);
-            }
-        }
+    updateView()
+    {
 
-        updateView()
-        {
+    }
 
-        }
+    private onChange()
+    {
 
-        private onChange()
-        {
-
-        }
     }
 }

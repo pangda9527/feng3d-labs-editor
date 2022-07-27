@@ -1,139 +1,146 @@
-namespace editor
+import { GameObject, serialization, shortcut } from 'feng3d';
+import { menuConfig } from '../../configs/CommonConfig';
+import { HierarchyNode } from '../../feng3d/hierarchy/HierarchyNode';
+import { EditorData } from '../../global/EditorData';
+import { menu, MenuItem } from '../components/Menu';
+import { MouseOnDisableScroll } from '../components/tools/MouseOnDisableScroll';
+import { TreeItemRenderer } from '../components/TreeItemRenderer';
+import { drag, DragData } from '../drag/Drag';
+
+export class HierarchyTreeItemRenderer extends TreeItemRenderer
 {
-    export class HierarchyTreeItemRenderer extends TreeItemRenderer
+    declare data: HierarchyNode;
+
+    constructor()
     {
-        data: HierarchyNode;
+        super();
+        this.skinName = 'HierarchyTreeItemRenderer';
+    }
 
-        constructor()
+    $onAddToStage(stage: egret.Stage, nestLevel: number)
+    {
+        super.$onAddToStage(stage, nestLevel);
+
+        drag.register(this, (dragSource: DragData) =>
         {
-            super();
-            this.skinName = "HierarchyTreeItemRenderer";
-        }
-
-        $onAddToStage(stage: egret.Stage, nestLevel: number)
+            this.data.setdargSource(dragSource);
+        }, ['gameobject', 'file_gameobject', 'file_script'], (dragdata: DragData) =>
         {
-            super.$onAddToStage(stage, nestLevel);
+            this.data.acceptDragDrop(dragdata);
+        });
+        MouseOnDisableScroll.register(this);
+        //
+        this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    }
 
-            drag.register(this, (dragSource: DragData) =>
-            {
-                this.data.setdargSource(dragSource)
-            }, ["gameobject", "file_gameobject", "file_script"], (dragdata: DragData) =>
-            {
-                this.data.acceptDragDrop(dragdata);
-            });
-            MouseOnDisableScroll.register(this);
-            //
-            this.addEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.addEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
+    $onRemoveFromStage()
+    {
+        drag.unregister(this);
+        MouseOnDisableScroll.unRegister(this);
 
-        $onRemoveFromStage()
+        super.$onRemoveFromStage();
+        this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
+        this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
+        this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
+    }
+
+    private onclick()
+    {
+        EditorData.editorData.selectObject(this.data.gameobject);
+    }
+
+    private onDoubleClick()
+    {
+        shortcut.emit('lookToSelectedGameObject');
+    }
+
+    private onrightclick()
+    {
+        let menus: MenuItem[] = [];
+        // scene无法删除
+        if (this.data.gameobject.scene.gameObject !== this.data.gameobject)
         {
-            drag.unregister(this);
-            MouseOnDisableScroll.unRegister(this);
-
-            super.$onRemoveFromStage();
-            this.removeEventListener(egret.MouseEvent.CLICK, this.onclick, this);
-            this.removeEventListener(egret.MouseEvent.DOUBLE_CLICK, this.onDoubleClick, this);
-            this.removeEventListener(egret.MouseEvent.RIGHT_CLICK, this.onrightclick, this);
-        }
-
-        private onclick()
-        {
-            editorData.selectObject(this.data.gameobject);
-        }
-
-        private onDoubleClick()
-        {
-            feng3d.shortcut.emit("lookToSelectedGameObject");
-        }
-
-        private onrightclick()
-        {
-            var menus: MenuItem[] = [];
-            //scene无法删除
-            if (this.data.gameobject.scene.gameObject != this.data.gameobject)
-            {
-                menus.push(
+            menus.push(
+                {
+                    label: '复制', click: () =>
                     {
-                        label: "复制", click: () =>
-                        {
-                            var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
-                            editorData.copyObjects = objects;
-                        }
-                    },
+                        const objects = EditorData.editorData.selectedObjects.filter((v) => v instanceof GameObject);
+                        EditorData.editorData.copyObjects = objects;
+                    }
+                },
+                {
+                    label: '粘贴', click: () =>
                     {
-                        label: "粘贴", click: () =>
+                        const undoSelectedObjects = EditorData.editorData.selectedObjects;
+                        //
+                        const objects: GameObject[] = EditorData.editorData.copyObjects.filter((v) => v instanceof GameObject);
+                        if (objects.length === 0) return;
+                        const newGameObjects = objects.map((v) => serialization.clone(v));
+                        newGameObjects.forEach((v) =>
                         {
-                            var undoSelectedObjects = editorData.selectedObjects;
-                            //
-                            var objects: feng3d.GameObject[] = editorData.copyObjects.filter(v => v instanceof feng3d.GameObject);
-                            if (objects.length == 0) return;
-                            var newGameObjects = objects.map(v => feng3d.serialization.clone(v));
-                            newGameObjects.forEach(v =>
-                            {
-                                this.data.gameobject.parent.addChild(v);
-                            });
-                            editorData.selectMultiObject(newGameObjects);
+                            this.data.gameobject.parent.addChild(v);
+                        });
+                        EditorData.editorData.selectMultiObject(newGameObjects);
 
-                            // undo
-                            editorData.undoList.push(() =>
-                            {
-                                newGameObjects.forEach(v =>
-                                {
-                                    v.remove();
-                                });
-                                editorData.selectMultiObject(undoSelectedObjects, false);
-                            });
-                        }
-                    },
-                    { type: 'separator' },
-                    {
-                        label: "副本", click: () =>
+                        // undo
+                        EditorData.editorData.undoList.push(() =>
                         {
-                            var undoSelectedObjects = editorData.selectedObjects;
-                            //
-                            var objects = editorData.selectedObjects.filter(v => v instanceof feng3d.GameObject);
-                            var newGameObjects = objects.map(v =>
+                            newGameObjects.forEach((v) =>
                             {
-                                var no = feng3d.serialization.clone(v);
-                                v.parent.addChild(no);
-                                return no;
+                                v.remove();
                             });
-                            editorData.selectMultiObject(newGameObjects);
+                            EditorData.editorData.selectMultiObject(undoSelectedObjects, false);
+                        });
+                    }
+                },
+                { type: 'separator' },
+                {
+                    label: '副本', click: () =>
+                    {
+                        const undoSelectedObjects = EditorData.editorData.selectedObjects;
+                        //
+                        const objects = EditorData.editorData.selectedObjects.filter((v) => v instanceof GameObject);
+                        const newGameObjects = objects.map((v) =>
+                        {
+                            const no = serialization.clone(v);
+                            v.parent.addChild(no);
 
-                            // undo
-                            editorData.undoList.push(() =>
-                            {
-                                newGameObjects.forEach(v =>
-                                {
-                                    v.remove();
-                                });
-                                editorData.selectMultiObject(undoSelectedObjects, false);
-                            });
-                        }
-                    },
-                    {
-                        label: "删除", click: () =>
+                            return no;
+                        });
+                        EditorData.editorData.selectMultiObject(newGameObjects);
+
+                        // undo
+                        EditorData.editorData.undoList.push(() =>
                         {
-                            this.data.gameobject.parent.removeChild(this.data.gameobject);
-                            var index = editorData.selectedObjects.indexOf(this.data.gameobject);
-                            if (index != -1)
+                            newGameObjects.forEach((v) =>
                             {
-                                var selectedObjects = editorData.selectedObjects.concat();
-                                selectedObjects.splice(index, 1);
-                                editorData.selectMultiObject(selectedObjects);
-                            }
+                                v.remove();
+                            });
+                            EditorData.editorData.selectMultiObject(undoSelectedObjects, false);
+                        });
+                    }
+                },
+                {
+                    label: '删除', click: () =>
+                    {
+                        this.data.gameobject.parent.removeChild(this.data.gameobject);
+                        const index = EditorData.editorData.selectedObjects.indexOf(this.data.gameobject);
+                        if (index !== -1)
+                        {
+                            const selectedObjects = EditorData.editorData.selectedObjects.concat();
+                            selectedObjects.splice(index, 1);
+                            EditorData.editorData.selectMultiObject(selectedObjects);
                         }
                     }
-                );
-            }
-
-            menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
-
-            if (menus.length > 0)
-                menu.popup(menus);
+                }
+            );
         }
+
+        menus = menus.concat({ type: 'separator' }, menuConfig.getCreateObjectMenu());
+
+        if (menus.length > 0)
+        { menu.popup(menus); }
     }
 }

@@ -1,30 +1,25 @@
-namespace editor
+export class AssetFileTemplates
 {
-    export var assetFileTemplates: AssetFileTemplates;
-
-    export class AssetFileTemplates
+    /**
+     *
+     * @param scriptName 脚本名称（类名）
+     */
+    getNewScript(scriptName: string)
     {
-        /**
-         * 
-         * @param scriptName 脚本名称（类名）
-         */
-        getNewScript(scriptName)
-        {
-            return scriptTemplate.replace("NewScript", scriptName);
-        }
-        /**
-         * 
-         * @param shadername shader名称
-         */
-        getNewShader(shadername: string)
-        {
-            return shaderTemplate.replace(new RegExp("NewShader", "g"), shadername);
-        }
+        return scriptTemplate.replace('NewScript', scriptName);
     }
+    /**
+     *
+     * @param shadername shader名称
+     */
+    getNewShader(shadername: string)
+    {
+        return shaderTemplate.replace(new RegExp('NewShader', 'g'), shadername);
+    }
+}
+export const assetFileTemplates = new AssetFileTemplates();
 
-    assetFileTemplates = new AssetFileTemplates();
-
-    var scriptTemplate = `
+const scriptTemplate = `
 class NewScript extends feng3d.Script
 {
 
@@ -60,7 +55,7 @@ class NewScript extends feng3d.Script
     }
 }`;
 
-    var shaderTemplate = `
+const shaderTemplate = `
 class NewShaderUniforms
 {
     /** 
@@ -71,7 +66,7 @@ class NewShaderUniforms
     u_color = new feng3d.Color4();
 }
 
-feng3d.shaderConfig.shaders["NewShader"] = {
+shaderConfig.shaders["NewShader"] = {
     cls: NewShaderUniforms,
     vertex: \`
     
@@ -98,14 +93,13 @@ feng3d.shaderConfig.shaders["NewShader"] = {
     \`,
 };
 
-type NewShaderMaterial = feng3d.Material & { uniforms: NewShaderUniforms; };
+type NewShaderMaterial = Material & { uniforms: NewShaderUniforms; };
 interface MaterialFactory
 {
-    create(shader: "NewShader", raw?: feng3d.gPartial<NewShaderMaterial>): NewShaderMaterial;
+    create(shader: "NewShader", raw?: gPartial<NewShaderMaterial>): NewShaderMaterial;
 }
 
 interface MaterialRawMap
 {
-    NewShader: feng3d.gPartial<NewShaderMaterial>;
+    NewShader: gPartial<NewShaderMaterial>;
 }`;
-}

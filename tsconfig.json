@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES5",
+        "module": "CommonJS",
         "noImplicitAny": false,
         "sourceMap": true,
         "declarationMap": true,
@@ -9,74 +10,13 @@
         "skipLibCheck": true,
         "lib": [
             "ES2015",
-            "dom"
+            "DOM",
         ],
-        "outFile": "dist/index.js"
-        // "outDir": "debug"
+        "outDir": "lib"
     },
-    "references": [
-        {
-            "path": "../feng3d/packages/event",
-        },
-        {
-            "path": "../feng3d/packages/bezier",
-        },
-        {
-            "path": "../feng3d/packages/objectview",
-        },
-        {
-            "path": "../feng3d/packages/polyfill",
-        },
-        {
-            "path": "../feng3d/packages/task",
-        },
-        {
-            "path": "../feng3d/packages/watcher",
-        },
-        {
-            "path": "../feng3d/packages/serialization",
-        },
-        {
-            "path": "../feng3d/packages/math",
-        },
-        {
-            "path": "../feng3d/packages/filesystem",
-        },
-        {
-            "path": "../feng3d/packages/shortcut",
-        },
-        {
-            "path": "../feng3d/packages/renderer",
-        },
-        {
-            "path": "../feng3d/packages/core",
-        },
-        {
-            "path": "../feng3d/packages/terrain",
-        },
-        {
-            "path": "../feng3d/packages/particlesystem",
-        },
-        {
-            "path": "../feng3d/packages/assets",
-        },
-        {
-            "path": "../feng3d/packages/parsers",
-        },
-        {
-            "path": "../feng3d/packages/ui",
-        },
-        {
-            "path": "../feng3d",
-        },
-        {
-            "path": "../cannon",
-        },
-        {
-            "path": "../cannon-plugin"
-        },
-    ],
     "files": [
+        "./packages/json/dist/index.d.ts",
+        "./packages/typescript/dist/index.d.ts",
         //
         "libs/modules/egret/egret.d.ts",
         "libs/modules/eui/eui.d.ts",
@@ -87,188 +27,15 @@
         //
         "libs/jszip.d.ts",
         "libs/FileSaver.d.ts",
+    ],
+    "include": [
         //
-        "src/net/client.ts",
-        //
-        "src/polyfill/typescript/typescriptServices.ts",
-        // 扩展 feng3d
-        "src/polyfill/feng3d/ClassUtils.ts",
-        "src/polyfill/feng3d/ShortCut.ts",
-        "src/polyfill/feng3d/EventDispatcher.ts",
-        // 扩展 egret
-        "src/polyfill/egret/MouseEvent.ts",
-        "src/polyfill/egret/TextField.ts",
-        "src/polyfill/egret/DisplayObject.ts",
-        "src/polyfill/egret/Scroller.ts",
-        // 扩展 json ，支持注释
-        "src/polyfill/json/json.ts",
-        //
-        "src/oauth/GiteeOauth.ts",
-        //
-        "src/assets/NativeRequire.ts",
-        "src/assets/FileObject.ts",
-        "src/assets/NativeFS.ts",
-        "src/assets/EditorRS.ts",
-        //
-        "src/caches/Editorcache.ts",
-        //
-        "src/ui/drag/Drag.ts",
-        "src/ui/drag/Cursor.ts",
-        //
-        "src/shortcut/Editorshortcut.ts",
-        //
-        "src/Modules.ts",
-        //
-        "src/shortcut/ShortCutSetting.ts",
-        //
-        "src/ui/SceneView.ts",
-        "src/ui/CameraPreview.ts",
-        "src/ui/components/RenameTextInput.ts",
-        "src/ui/components/SplitGroup.ts",
-        "src/ui/components/SplitUIComponent.ts",
-        "src/ui/components/TabView.ts",
-        "src/ui/components/WindowView.ts",
-        "src/ui/components/Maskview.ts",
-        "src/ui/components/Popupview.ts",
-        "src/ui/components/ComboBox.ts",
-        "src/ui/components/Accordion.ts",
-        "src/ui/components/ColorPicker.ts",
-        "src/ui/components/TreeItemRenderer.ts",
-        "src/ui/components/TreeNode.ts",
-        "src/ui/components/ComponentView.ts",
-        "src/ui/components/Menu.ts",
-        "src/ui/components/Message.ts",
-        "src/ui/components/ToolTip.ts",
-        "src/ui/components/ColorPickerView.ts",
-        "src/ui/components/AreaSelectRect.ts",
-        "src/ui/components/MinMaxCurveView.ts",
-        "src/ui/components/MinMaxCurveEditor.ts",
-        "src/ui/components/MinMaxCurveVector3View.ts",
-        "src/ui/components/MinMaxGradientView.ts",
-        "src/ui/components/GradientEditor.ts",
-        // tipviews
-        "src/ui/components/tipviews/TipString.ts",
-        //
-        "src/ui/components/binders/TextInputBinder.ts",
-        "src/ui/components/binders/NumberTextInputBinder.ts",
-        "src/ui/components/binders/NumberSliderTextInputBinder.ts",
-        "src/ui/components/tools/MouseOnDisableScroll.ts",
-        //
-        "src/ui/components/terrain/TerrainView.ts",
-        "src/ui/components/terrain/OVTerrain.ts",
-        //
-        "src/objectview/ov/OVFolderAsset.ts",
-        //
-        "src/objectview/ov/OVBaseDefault.ts",
-        "src/objectview/ov/OVDefault.ts",
-        "src/objectview/ov/OVTransform.ts",
-        //
-        "src/objectview/obv/OBVDefault.ts",
-        //
-        "src/objectview/events/ObjectViewEvent.ts",
-        //
-        "src/objectview/oav/OAVBase.ts",
-        "src/objectview/oav/OAVDefault.ts",
-        "src/objectview/oav/OAVBoolean.ts",
-        "src/objectview/oav/OAVNumber.ts",
-        "src/objectview/oav/OAVString.ts",
-        "src/objectview/oav/OAVMultiText.ts",
-        "src/objectview/oav/OAVVector2.ts",
-        "src/objectview/oav/OAVVector3.ts",
-        "src/objectview/oav/OAVVector4.ts",
-        "src/objectview/oav/OAVArray.ts",
-        "src/objectview/oav/OAVEnum.ts",
-        "src/objectview/oav/OAVImage.ts",
-        "src/objectview/oav/OAVCubeMap.ts",
-        "src/objectview/oav/OAVComponentList.ts",
-        "src/objectview/oav/OAVFunction.ts",
-        "src/objectview/oav/OAVColorPicker.ts",
-        "src/objectview/oav/OAVMaterialName.ts",
-        "src/objectview/oav/OAVObjectView.ts",
-        "src/objectview/oav/OAVAccordionObjectView.ts",
-        "src/objectview/oav/OAVGameObjectName.ts",
-        "src/objectview/oav/OAVPick.ts",
-        "src/objectview/oav/OAVTexture2D.ts",
-        "src/objectview/oav/OAVFeng3dPreView.ts",
-        "src/objectview/oav/OAVMinMaxCurve.ts",
-        "src/objectview/oav/OAVMinMaxCurveVector3.ts",
-        "src/objectview/oav/OAVMinMaxGradient.ts",
-        //
-        "src/ui/inspector/InspectorView.ts",
-        "src/ui/inspector/InspectorMultiObject.ts",
-        //
-        "src/ui/hierarchy/HierarchyTreeItemRenderer.ts",
-        "src/ui/hierarchy/HierarchyView.ts",
-        //
-        "src/ui/animation/AnimationView.ts",
-        //
-        "src/ui/assets/EditorAsset.ts",
-        "src/ui/assets/AssetFileItemRenderer.ts",
-        "src/ui/assets/AssetNode.ts",
-        "src/ui/assets/AssetTreeItemRenderer.ts",
-        "src/ui/assets/ProjectView.ts",
-        "src/ui/assets/AssetFileTemplates.ts",
-        //
-        "src/ui/TopView.ts",
-        "src/ui/NavigationView.ts",
-        "src/ui/MainSplitView.ts",
-        "src/ui/MainView.ts",
-        //
-        "src/ui/AssetAdapter.ts",
-        "src/ui/LoadingUI.ts",
-        "src/ui/MainUI.ts",
-        "src/ui/ThemeAdapter.ts",
-        //
-        "src/global/editorui.ts",
-        //
-        "src/global/EditorData.ts",
-        //
-        "src/feng3d/mrsTool/MRSToolTarget.ts",
-        "src/feng3d/mrsTool/models/MToolModel.ts",
-        "src/feng3d/mrsTool/models/RToolModel.ts",
-        "src/feng3d/mrsTool/models/SToolModel.ts",
-        "src/feng3d/mrsTool/MRSToolBase.ts",
-        "src/feng3d/mrsTool/MTool.ts",
-        "src/feng3d/mrsTool/RTool.ts",
-        "src/feng3d/mrsTool/STool.ts",
-        "src/feng3d/mrsTool/MRSTool.ts",
-        //
-        "src/feng3d/hierarchy/HierarchyNode.ts",
-        "src/feng3d/hierarchy/Hierarchy.ts",
-        "src/feng3d/scene/SceneRotateTool.ts",
-        "src/feng3d/GroundGrid.ts",
-        "src/feng3d/EditorView.ts",
-        "src/feng3d/EditorComponent.ts",
-        "src/feng3d/Feng3dScreenShot.ts",
-        //
-        "src/navigation/Navigation.ts",
-        "src/navigation/ThreeBSP.ts",
-        "src/navigation/NavigationProcess.ts",
-        //
-        "src/recastnavigation/Recastnavigation.ts",
-        //
-        "src/scripts/EditorScript.ts",
-        "src/scripts/MouseRayTestScript.ts",
-        "src/scripts/DirectionLightIcon.ts",
-        "src/scripts/PointLightIcon.ts",
-        "src/scripts/SpotLightIcon.ts",
-        "src/scripts/CameraIcon.ts",
-        //
-        "src/loaders/load.ts",
-        "src/loaders/threejsLoader.ts",
-        //configs
-        "src/configs/CommonConfig.ts",
-        "src/configs/ViewLayoutConfig.ts",
-        "src/configs/ObjectViewConfig.ts",
-        "src/configs/ShortcutConfig.ts",
-        //
-        "src/polyfill/typescript/typescriptSorting.ts",
-        "src/ScriptCompiler.ts",
-        // 粒子系统
-        "src/ui/ParticleEffectController.ts",
-        "src/ui/components/ParticleComponentView.ts",
-        "src/objectview/oav/OAVParticleComponentList.ts",
-        //
-        "src/Editor.ts"
-    ]
+        "src/**/*.ts"
+    ],
+    "ts-node": {
+        "files": true,
+        "compilerOptions": {
+            "esModuleInterop": true
+        }
+    }
 }

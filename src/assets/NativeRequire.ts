@@ -1,119 +1,109 @@
-declare var require: (s: any) => any;
-declare var __dirname: string;
+/**
+ * 是否支持本地API
+ */
+export const supportNative = !(typeof __dirname === 'undefined');
 
-namespace editor
+/**
+ * 本地文件系统
+ */
+// eslint-disable-next-line global-require, @typescript-eslint/no-var-requires
+export const nativeFS: NativeFSBase = supportNative ? (require(`${__dirname}/native/NativeFSBase.js`).nativeFS) : null;
+
+/**
+ * 本地API
+ */
+// eslint-disable-next-line global-require
+export const nativeAPI: NativeAPI = supportNative ? (require(`${__dirname}/native/electron_renderer.js`)) : null;
+
+/**
+ * 本地API
+ */
+export interface NativeAPI
 {
     /**
-     * 本地文件系统
+     * 选择文件夹对话框
+     *
+     * @param callback 完成回调
      */
-    export var nativeFS: NativeFSBase;
+    selectDirectoryDialog(callback: (event: Event, path: string) => void): void;
 
     /**
-     * 本地API
+     * 在资源管理器中显示
+     *
+     * @param fullPath 完整路径
      */
-    export var nativeAPI: NativeAPI;
+    showFileInExplorer(fullPath: string): void;
 
     /**
-     * 是否支持本地API
+     * 使用 VSCode 打开项目
+     *
+     * @param  projectPath 项目路径
      */
-    export var supportNative = !(typeof __dirname == "undefined");
-
-    if (supportNative)
-    {
-        nativeFS = require(__dirname + "/native/NativeFSBase.js").nativeFS;
-        nativeAPI = require(__dirname + "/native/electron_renderer.js");
-    }
+    openWithVSCode(projectPath: string, callback: (err: Error) => void): void;
 
     /**
-     * 本地API
+     * 打开开发者工具
      */
-    export interface NativeAPI
-    {
-        /**
-         * 选择文件夹对话框
-         * 
-         * @param callback 完成回调
-         */
-        selectDirectoryDialog(callback: (event: Event, path: string) => void): void;
+    openDevTools(): void;
+}
 
-        /**
-         * 在资源管理器中显示
-         * 
-         * @param fullPath 完整路径
-         */
-        showFileInExplorer(fullPath: string): void;
-
-        /**
-         * 使用 VSCode 打开项目
-         * 
-         * @param  projectPath 项目路径
-         */
-        openWithVSCode(projectPath: string, callback: (err: Error) => void): void;
-
-        /**
-         * 打开开发者工具
-         */
-        openDevTools(): void;
-    }
-
+/**
+ * Native文件系统
+ */
+export interface NativeFSBase
+{
     /**
-     * Native文件系统
+     * 文件是否存在
+     * @param path 文件路径
+     * @param callback 回调函数
      */
-    export interface NativeFSBase
-    {
-        /**
-         * 文件是否存在
-         * @param path 文件路径
-         * @param callback 回调函数
-         */
-        exists(path: string, callback: (exists: boolean) => void): void;
-        /**
-         * 读取文件夹中文件列表
-         * @param path 路径
-         * @param callback 回调函数
-         */
-        readdir(path: string, callback: (err: Error, files: string[]) => void): void;
-        /**
-         * 新建文件夹
-         *
-         * @param path 文件夹路径
-         * @param callback 回调函数
-         */
-        mkdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 读取文件
-         * @param path 路径
-         * @param callback 读取完成回调 当err不为null时表示读取失败
-         */
-        readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void;
-        /**
-         * 删除文件
-         *
-         * @param path 文件路径
-         * @param callback 完成回调
-         */
-        deleteFile(path: string, callback: (err: Error) => void): void;
-        /**
-         * 删除文件夹
-         *
-         * @param path 文件夹路径
-         * @param callback 完成回调
-         */
-        rmdir(path: string, callback: (err: Error) => void): void;
-        /**
-         * 是否为文件夹
-         *
-         * @param path 文件路径
-         * @param callback 完成回调
-         */
-        isDirectory(path: string, callback: (result: boolean) => void): void;
-        /**
-         * 写ArrayBuffer(新建)文件
-         *
-         * @param path 文件路径
-         * @param data 文件数据
-         * @param callback 回调函数
-         */
-        writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
-    }
+    exists(path: string, callback: (exists: boolean) => void): void;
+    /**
+     * 读取文件夹中文件列表
+     * @param path 路径
+     * @param callback 回调函数
+     */
+    readdir(path: string, callback: (err: Error, files: string[]) => void): void;
+    /**
+     * 新建文件夹
+     *
+     * @param path 文件夹路径
+     * @param callback 回调函数
+     */
+    mkdir(path: string, callback: (err: Error) => void): void;
+    /**
+     * 读取文件
+     * @param path 路径
+     * @param callback 读取完成回调 当err不为null时表示读取失败
+     */
+    readFile(path: string, callback: (err: Error, data: ArrayBuffer) => void): void;
+    /**
+     * 删除文件
+     *
+     * @param path 文件路径
+     * @param callback 完成回调
+     */
+    deleteFile(path: string, callback: (err: Error) => void): void;
+    /**
+     * 删除文件夹
+     *
+     * @param path 文件夹路径
+     * @param callback 完成回调
+     */
+    rmdir(path: string, callback: (err: Error) => void): void;
+    /**
+     * 是否为文件夹
+     *
+     * @param path 文件路径
+     * @param callback 完成回调
+     */
+    isDirectory(path: string, callback: (result: boolean) => void): void;
+    /**
+     * 写ArrayBuffer(新建)文件
+     *
+     * @param path 文件路径
+     * @param data 文件数据
+     * @param callback 回调函数
+     */
+    writeFile(path: string, data: ArrayBuffer, callback: (err: Error) => void): void;
 }

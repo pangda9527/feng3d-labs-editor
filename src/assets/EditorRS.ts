@@ -1,274 +1,299 @@
-var templateurls = [
-    ["resource/template/.vscode/settings.json", ".vscode/settings.json"],
-    ["resource/template/app.js", "app.js"],
-    ["resource/template/index.html", "index.html"],
-    ["resource/template/project.js", "project.js"],
-    ["resource/template/tsconfig.json", "tsconfig.json"],
-    ["resource/template/default.scene.json", "default.scene.json"],
-    ["resource/template/libs/feng3d.js", "libs/feng3d.js"],
-    ["resource/template/libs/feng3d.d.ts", "libs/feng3d.d.ts"],
-    ["resource/template/libs/cannon.js", "libs/cannon.js"],
-    ["resource/template/libs/cannon.d.ts", "libs/cannon.d.ts"],
-    ["resource/template/libs/cannon-plugin.js", "libs/cannon-plugin.js"],
-    ["resource/template/libs/cannon-plugin.d.ts", "libs/cannon-plugin.d.ts"],
+import { ReadWriteRS, loader, task, FS, indexedDBFS, ReadWriteFS, ReadRS } from 'feng3d';
+import { editorcache } from '../caches/Editorcache';
+import { NativeFS } from './NativeFS';
+import { supportNative, nativeFS } from './NativeRequire';
+
+const templateurls = [
+    ['resource/template/.vscode/settings.json', '.vscode/settings.json'],
+    ['resource/template/app.js', 'app.js'],
+    ['resource/template/index.html', 'index.html'],
+    ['resource/template/project.js', 'project.js'],
+    ['resource/template/tsconfig.json', 'tsconfig.json'],
+    ['resource/template/default.scene.json', 'default.scene.json'],
+    ['resource/template/libs/feng3d.js', 'libs/feng3d.js'],
+    ['resource/template/libs/feng3d.d.ts', 'libs/feng3d.d.ts'],
+    ['resource/template/libs/cannon.js', 'libs/cannon.js'],
+    ['resource/template/libs/cannon.d.ts', 'libs/cannon.d.ts'],
+    ['resource/template/libs/cannon-plugin.js', 'libs/cannon-plugin.js'],
+    ['resource/template/libs/cannon-plugin.d.ts', 'libs/cannon-plugin.d.ts'],
 ];
 
-namespace editor
+/**
+ * 编辑器资源系统
+ */
+export class EditorRS extends ReadWriteRS
 {
     /**
-     * 编辑器资源系统
+     * 初始化项目
+     *
+     * @param callback 完成回调
      */
-    export var editorRS: EditorRS;
+    initproject(callback: (err?: Error) => void)
+    {
+        this.fs.hasProject(editorcache.projectname, (has) =>
+        {
+            this.fs.initproject(editorcache.projectname, (err: Error) =>
+            {
+                if (err)
+                {
+                    callback(err);
+
+                    return;
+                }
+                if (has)
+                {
+                    callback();
+
+                    return;
+                }
+                this.createproject(callback);
+            });
+        });
+    }
 
     /**
-     * 编辑器资源系统
+     * 创建项目
      */
-    export class EditorRS extends feng3d.ReadWriteRS
+    private createproject(callback: (err?: Error) => void)
     {
-        /**
-         * 初始化项目
-         * 
-         * @param callback 完成回调
-         */
-        initproject(callback: (err?: Error) => void)
+        const urls = templateurls;
+        let index = 0;
+        const loadUrls = () =>
         {
-            this.fs.hasProject(editorcache.projectname, (has) =>
+            if (index >= urls.length)
             {
-                this.fs.initproject(editorcache.projectname, (err: Error) =>
-                {
-                    if (err) { callback(err); return; }
-                    if (has) { callback(); return; }
-                    this.createproject(callback);
-                });
-            });
-        }
+                callback();
 
-        /**
-         * 创建项目
-         */
-        private createproject(callback: (err?: Error) => void)
-        {
-            var urls = templateurls;
-            var index = 0;
-            var loadUrls = () =>
+                return;
+            }
+            loader.loadText(urls[index][0], (content) =>
             {
-                if (index >= urls.length) { callback(); return; }
-                feng3d.loader.loadText(urls[index][0], (content) =>
+                this.fs.writeString(urls[index][1], content, (err) =>
                 {
-                    this.fs.writeString(urls[index][1], content, (err) =>
-                    {
-                        if (err) throw err;
-                        index++;
-                        loadUrls();
-                    });
-
-                }, null, (e) =>
-                {
-                    throw e;
+                    if (err) throw err;
                     index++;
                     loadUrls();
                 });
-            }
-            loadUrls();
-        }
-
-        upgradeProject(callback: () => void)
-        {
-            var urls = templateurls;
-            var index = 0;
-            var loadUrls = () =>
+            }, null, (e) =>
             {
-                if (index >= urls.length) { callback(); return; }
-                feng3d.loader.loadText(urls[index][0], (content) =>
-                {
-                    this.fs.writeString(urls[index][1], content, (err) =>
-                    {
-                        if (err) console.warn(err);
-                        index++;
-                        loadUrls();
-                    });
+                throw e;
+                index++;
+                loadUrls();
+            });
+        };
+        loadUrls();
+    }
 
-                }, null, (e) =>
+    upgradeProject(callback: () => void)
+    {
+        const urls = templateurls;
+        let index = 0;
+        const loadUrls = () =>
+        {
+            if (index >= urls.length)
+            {
+                callback();
+
+                return;
+            }
+            loader.loadText(urls[index][0], (content) =>
+            {
+                this.fs.writeString(urls[index][1], content, (err) =>
                 {
-                    console.warn(e);
+                    if (err) console.warn(err);
                     index++;
                     loadUrls();
                 });
+            }, null, (e) =>
+            {
+                console.warn(e);
+                index++;
+                loadUrls();
+            });
+        };
+        loadUrls();
+    }
+
+    /**
+     * 选择文件
+     *
+     * @param callback 完成回调
+     */
+    selectFile(callback: (file: FileList) => void)
+    {
+        selectFileCallback = callback;
+        isSelectFile = true;
+    }
+
+    /**
+     * 清理项目
+     *
+     * @param callback
+     */
+    clearProject(callback: () => void)
+    {
+        this._idMap = {};
+        this._pathMap = {};
+
+        this.fs.delete('', callback);
+    }
+
+    /**
+     * 导出项目为zip压缩包
+     *
+     * @param filename 导出后压缩包名称
+     * @param callback 完成回调
+     */
+    exportProjectToJSZip(filename: string, callback?: () => void)
+    {
+        this.fs.getAllPathsInFolder('', (err, filepaths) =>
+        {
+            if (err)
+            {
+                console.error(err);
+                callback && callback();
+
+                return;
             }
-            loadUrls();
-        }
+            this.exportFilesToJSZip(filename, filepaths, callback);
+        });
+    }
 
-        /**
-         * 选择文件
-         * 
-         * @param callback 完成回调
-         */
-        selectFile(callback: (file: FileList) => void)
+    /**
+     * 导出指定文件夹为zip压缩包
+     *
+     * @param filename 导出后压缩包名称
+     * @param folderpath 需要导出的文件夹路径
+     * @param callback 完成回调
+     */
+    exportFolderToJSZip(filename: string, folderpath: string, callback: () => void)
+    {
+        this.fs.getAllPathsInFolder(folderpath, (err, filepaths) =>
         {
-            selectFileCallback = callback;
-            isSelectFile = true;
-        }
-
-        /**
-         * 清理项目
-         * 
-         * @param callback 
-         */
-        clearProject(callback: () => void)
-        {
-            this._idMap = {};
-            this._pathMap = {};
-
-            this.fs.delete("", callback);
-        }
-
-        /**
-         * 导出项目为zip压缩包
-         * 
-         * @param filename 导出后压缩包名称
-         * @param callback 完成回调
-         */
-        exportProjectToJSZip(filename: string, callback?: () => void)
-        {
-            this.fs.getAllPathsInFolder("", (err, filepaths) =>
+            if (err)
             {
-                if (err)
+                console.error(err);
+                callback && callback();
+
+                return;
+            }
+            this.exportFilesToJSZip(filename, filepaths, callback);
+        });
+    }
+
+    /**
+     * 导出文件列表为zip压缩包
+     *
+     * @param filename 导出后压缩包名称
+     * @param filepaths 需要导出的文件列表
+     * @param callback 完成回调
+     */
+    exportFilesToJSZip(filename: string, filepaths: string[], callback?: () => void)
+    {
+        const zip = new JSZip();
+        const fns = filepaths.map((p) => (callback) =>
+        {
+            this.fs.isDirectory(p, (result) =>
+            {
+                if (result)
                 {
-                    console.error(err);
-                    callback && callback();
-                    return;
+                    zip.folder(p);
+                    callback();
                 }
-                this.exportFilesToJSZip(filename, filepaths, callback);
-            });
-        }
-
-        /**
-         * 导出指定文件夹为zip压缩包
-         * 
-         * @param filename 导出后压缩包名称
-         * @param folderpath 需要导出的文件夹路径
-         * @param callback 完成回调
-         */
-        exportFolderToJSZip(filename: string, folderpath: string, callback: () => void)
-        {
-            this.fs.getAllPathsInFolder(folderpath, (err, filepaths) =>
-            {
-                if (err)
+                else
                 {
-                    console.error(err);
-                    callback && callback();
-                    return;
-                }
-                this.exportFilesToJSZip(filename, filepaths, callback);
-            });
-        }
-
-        /**
-         * 导出文件列表为zip压缩包
-         * 
-         * @param filename 导出后压缩包名称
-         * @param filepaths 需要导出的文件列表
-         * @param callback 完成回调
-         */
-        exportFilesToJSZip(filename: string, filepaths: string[], callback?: () => void)
-        {
-            var zip = new JSZip();
-            var fns = filepaths.map(p => (callback) =>
-            {
-                this.fs.isDirectory(p, (result) =>
-                {
-                    if (result)
+                    this.fs.readArrayBuffer(p, (_err, data) =>
                     {
-                        zip.folder(p);
+                        // 处理文件夹
+                        data && zip.file(p, data);
                         callback();
-                    } else
-                    {
-                        this.fs.readArrayBuffer(p, (err, data) =>
-                        {
-                            //处理文件夹
-                            data && zip.file(p, data);
-                            callback();
-                        });
-                    }
-                });
+                    });
+                }
             });
-            feng3d.task.parallel(fns)(() =>
-            {
-                zip.generateAsync({ type: "blob" }).then(function (content)
-                {
-                    saveAs(content, filename);
-                    callback && callback();
-                });
-            });
-        }
-
-        /**
-         * 导入项目
-         */
-        importProject(file: File, callback: () => void)
+        });
+        task.parallel(fns)(() =>
         {
-            var zip = new JSZip();
-            zip.loadAsync(file).then((value) =>
+            zip.generateAsync({ type: 'blob' }).then(function (content)
             {
-                var filepaths = Object.keys(value.files);
-                filepaths.sort();
+                saveAs(content, filename);
+                callback && callback();
+            });
+        });
+    }
 
-                var fns = filepaths.map(p => (callback) =>
+    /**
+     * 导入项目
+     */
+    importProject(file: File, callback: () => void)
+    {
+        const zip = new JSZip();
+        zip.loadAsync(file).then((value) =>
+        {
+            const filepaths = Object.keys(value.files);
+            filepaths.sort();
+
+            const fns = filepaths.map((p) => (callback) =>
+            {
+                if (value.files[p].dir)
                 {
-                    if (value.files[p].dir)
+                    this.fs.mkdir(p, (_err) =>
                     {
-                        this.fs.mkdir(p, (err) =>
+                        callback();
+                    });
+                }
+                else
+                {
+                    zip.file(p).async('arraybuffer').then((data) =>
+                    {
+                        this.fs.writeFile(p, data, (_err) =>
                         {
                             callback();
                         });
-                    } else
+                    }, (_reason) =>
                     {
-                        zip.file(p).async("arraybuffer").then((data) =>
-                        {
-                            this.fs.writeFile(p, data, (err) =>
-                            {
-                                callback();
-                            });
-                        }, (reason) =>
-                        {
-                        });
-                    }
-                });
-
-                feng3d.task.series(fns)(callback);
+                    });
+                }
             });
-        }
+
+            task.series(fns)(callback);
+        });
     }
-
-    if (supportNative)
-    {
-        feng3d.FS.basefs = new NativeFS(nativeFS);
-    } else
-    {
-        feng3d.FS.basefs = feng3d.indexedDBFS;
-    }
-    feng3d.FS.fs = new feng3d.ReadWriteFS();
-    feng3d.rs = editorRS = new EditorRS();
-
-    //
-    var isSelectFile = false;
-    var fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.multiple = true;
-    fileInput.style.display = "none";
-    fileInput.addEventListener('change', function (event)
-    {
-        selectFileCallback && selectFileCallback(fileInput.files);
-        selectFileCallback = null;
-        fileInput.value = null;
-    });
-    // document.body.appendChild(fileInput);
-    window.addEventListener("click", () =>
-    {
-        if (isSelectFile)
-            fileInput.click();
-        isSelectFile = false;
-    });
-
-    var selectFileCallback: (file: FileList) => void;
 }
+
+if (supportNative)
+{
+    FS.basefs = new NativeFS(nativeFS);
+}
+else
+{
+    FS.basefs = indexedDBFS;
+}
+
+/**
+ * 编辑器资源系统
+ */
+export const editorRS = new EditorRS();
+FS.fs = new ReadWriteFS();
+ReadRS.rs = editorRS;
+
+//
+let isSelectFile = false;
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.multiple = true;
+fileInput.style.display = 'none';
+fileInput.addEventListener('change', function (_event)
+{
+    selectFileCallback && selectFileCallback(fileInput.files);
+    selectFileCallback = null;
+    fileInput.value = null;
+});
+// document.body.appendChild(fileInput);
+window.addEventListener('click', () =>
+{
+    if (isSelectFile)
+    { fileInput.click(); }
+    isSelectFile = false;
+});
+
+let selectFileCallback: (file: FileList) => void;

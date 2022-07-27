@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
 //  All rights reserved.
@@ -25,30 +25,29 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 //  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-//////////////////////////////////////////////////////////////////////////////////////
+// ////////////////////////////////////////////////////////////////////////////////////
+export class LoadingUI extends egret.Sprite
+{
+    constructor()
+    {
+        super();
+        this.createView();
+    }
 
-namespace editor {
+    private textField: egret.TextField;
 
-    export class LoadingUI extends egret.Sprite {
+    private createView(): void
+    {
+        this.textField = new egret.TextField();
+        this.addChild(this.textField);
+        this.textField.y = 300;
+        this.textField.width = 480;
+        this.textField.height = 100;
+        this.textField.textAlign = 'center';
+    }
 
-        constructor() {
-            super();
-            this.createView();
-        }
-
-        private textField: egret.TextField;
-
-        private createView(): void {
-            this.textField = new egret.TextField();
-            this.addChild(this.textField);
-            this.textField.y = 300;
-            this.textField.width = 480;
-            this.textField.height = 100;
-            this.textField.textAlign = "center";
-        }
-
-        setProgress(current: number, total: number): void {
-            this.textField.text = `Loading...${current}/${total}`;
-        }
+    setProgress(current: number, total: number): void
+    {
+        this.textField.text = `Loading...${current}/${total}`;
     }
 }

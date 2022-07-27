@@ -1,19 +1,10 @@
 var isdebug = true;
 
 var result = [
-    isdebug ? "libs/modules/egret/egret.js" : "libs/modules/egret/egret.min.js",
-    isdebug ? "libs/modules/egret/egret.web.js" : "libs/modules/egret/egret.web.min.js",
-    isdebug ? "libs/modules/res/res.js" : "libs/modules/res/res.min.js",
-    isdebug ? "libs/modules/eui/eui.js" : "libs/modules/eui/eui.min.js",
-    isdebug ? "libs/modules/tween/tween.js" : "libs/modules/tween/tween.min.js",
 ];
 
 var modules = [
-    "../feng3d/tsconfig.json",
-    "../cannon/tsconfig.json",
-    "../cannon-plugin/tsconfig.json",
     //
-    "tsconfig.json",
 ];
 
 loadModule(modules, () =>

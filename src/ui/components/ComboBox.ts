@@ -1,105 +1,114 @@
-namespace editor
+import { editorui } from '../../global/editorui';
+import { maskview } from './Maskview';
+
+/**
+ * 下拉列表
+ */
+export class ComboBox extends eui.Component implements eui.UIComponent
 {
+	public label: eui.Label;
+	public list: eui.List;
 
 	/**
-	 * 下拉列表
+	 * 数据
 	 */
-	export class ComboBox extends eui.Component implements eui.UIComponent
+	dataProvider: { label: string, value: any }[] = [];
+	/**
+	 * 选中数据
+	 */
+	get data()
 	{
-		public label: eui.Label;
-		public list: eui.List
-
-		/**
-		 * 数据
-		 */
-		dataProvider: { label: string, value: any }[] = [];
-		/**
-		 * 选中数据
-		 */
-		get data()
+		return this._data;
+	}
+	set data(v)
+	{
+		this._data = v;
+		if (this.label)
 		{
-			return this._data;
-		}
-		set data(v)
-		{
-			this._data = v;
-			if (this.label)
+			if (this._data)
 			{
-				if (this._data)
-					this.label.text = this._data.label;
-				else
-					this.label.text = "";
+				this.label.text = this._data.label;
+			}
+			else
+			{
+				this.label.text = '';
 			}
 		}
-		_data: { label: string, value: any };
+	}
+	_data: { label: string, value: any };
 
-		public constructor()
+	public constructor()
+	{
+		super();
+		this.skinName = 'ComboBoxSkin';
+	}
+
+	$onAddToStage(stage: egret.Stage, nestLevel: number): void
+	{
+		super.$onAddToStage(stage, nestLevel);
+
+		this.init();
+		this.updateview();
+
+		this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+		this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
+	}
+
+	$onRemoveFromStage(): void
+	{
+		super.$onRemoveFromStage();
+		this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
+		this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
+	}
+
+	private init()
+	{
+		this.list = new eui.List();
+		this.list.itemRenderer = eui.ItemRenderer;
+	}
+
+	private updateview()
+	{
+		if (!this.data && this.dataProvider)
 		{
-			super();
-			this.skinName = "ComboBoxSkin";
+			this.data = this.dataProvider[0];
 		}
 
-		$onAddToStage(stage: egret.Stage, nestLevel: number): void
+		if (this.data)
 		{
-			super.$onAddToStage(stage, nestLevel);
-
-			this.init();
-			this.updateview();
-
-			this.addEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-			this.list.addEventListener(egret.Event.CHANGE, this.onlistChange, this);
+			this.label.text = this.data.label;
 		}
-
-		$onRemoveFromStage(): void
+		else
 		{
-			super.$onRemoveFromStage();
-			this.removeEventListener(egret.MouseEvent.CLICK, this.onClick, this);
-			this.list.removeEventListener(egret.Event.CHANGE, this.onlistChange, this);
+			this.label.text = '';
 		}
+	}
 
-		private init()
-		{
-			this.list = new eui.List();
-			this.list.itemRenderer = eui.ItemRenderer;
-		}
+	private onClick()
+	{
+		if (!this.dataProvider)
+		{ return; }
 
-		private updateview()
-		{
-			if (this.data == null && this.dataProvider != null)
-				this.data = this.dataProvider[0];
+		this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
 
-			if (this.data)
-				this.label.text = this.data.label;
-			else
-				this.label.text = "";
-		}
+		const rect = this.getTransformedBounds(this.stage);
 
-		private onClick()
-		{
-			if (!this.dataProvider)
-				return;
+		this.list.x = rect.left;
+		this.list.y = rect.bottom;
+		this.list.selectedIndex = this.dataProvider.indexOf(this.data);
 
-			this.list.dataProvider = new eui.ArrayCollection(this.dataProvider);
+		editorui.popupLayer.addChild(this.list);
+		maskview.mask(this.list);
+	}
 
-			var rect = this.getTransformedBounds(this.stage);
+	private onlistChange()
+	{
+		this.data = this.list.selectedItem;
+		this.updateview();
 
-			this.list.x = rect.left;
-			this.list.y = rect.bottom;
-			this.list.selectedIndex = this.dataProvider.indexOf(this.data);
+		if (this.list.parent)
+		{ this.list.parent.removeChild(this.list); }
 
-			editor.editorui.popupLayer.addChild(this.list);
-			editor.maskview.mask(this.list);
-		}
-
-		private onlistChange()
-		{
-			this.data = this.list.selectedItem;
-			this.updateview();
-
-			if (this.list.parent)
-				this.list.parent.removeChild(this.list);
-
-			this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
-		}
+		this.dispatchEvent(new egret.Event(egret.Event.CHANGE));
 	}
 }
