@@ -14,7 +14,7 @@ import { MainView } from './ui/MainView';
 /**
  * editor的版本号
  */
-export const version = '2018.08.22';
+export const version = '0.5.1';
 
 console.log(`editor version ${version}`);
 
