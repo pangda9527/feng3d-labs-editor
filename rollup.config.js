@@ -40,7 +40,7 @@ async function main()
     ];
 
     const compiled = (new Date()).toUTCString().replace(/GMT/g, 'UTC');
-    const sourcemap = true;
+    const sourcemap = false;
     const results = [];
 
     const namespaces = {};

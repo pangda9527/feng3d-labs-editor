@@ -413,7 +413,7 @@ export class TabView extends eui.Group
 			//
 			drag.register(v, (dragSource) =>
 			{
-				dragSource.addDragData('moduleView', { tabView: <any>this, moduleName: v.moduleName });
+				dragSource.addDragData('moduleView', { tabView: this, moduleName: v.moduleName });
 			}, []);
 			v.addEventListener(egret.MouseEvent.RIGHT_CLICK, this.onTabButtonRightClick, this);
 		});

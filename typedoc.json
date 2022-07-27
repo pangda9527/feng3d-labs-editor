@@ -1,0 +1,9 @@
+{
+    "name": "@feng3d/editor",
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "src/index.ts"
+    ],
+    "sourcefile-url-prefix": "https://gitlab.com/feng3d/editor/tree/master/src/",
+    "out": "public/docs"
+}
